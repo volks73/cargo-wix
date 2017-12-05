@@ -9,12 +9,15 @@ extern crate toml;
 
 use ansi_term::Colour;
 use clap::{App, Arg, SubCommand};
+use std::error::Error as StdError;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::fmt;
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use toml::Value;
 
+const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 const SUBCOMMAND_NAME: &str = "wix";
 const WIX_TOOLSET_COMPILER: &str = "candle";
 const WIX_TOOLSET_LINKER: &str = "light";
@@ -22,82 +25,138 @@ const SIGNTOOL: &str = "signtool";
 
 const ERROR_COLOR: Colour = Colour::Fixed(9); // Bright red
 
-fn main() {
-    // Based on documentation for the ansi_term crate, Windows 10 supports ANSI escape characters,
-    // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
-    // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
-    // avoid build errors on non-windows platforms, a cfg guard should be put in place.
-    #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
-    // TODO: Add verbosity logging
-    let matches = App::new(crate_name!())
-        .bin_name("cargo")
-        .subcommand(
-            SubCommand::with_name(SUBCOMMAND_NAME)
-                .version(crate_version!())
-                .about(crate_description!())
-                .author(crate_authors!())
-                .arg(Arg::with_name("nocapture")
-                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
-                     .long("nocapture"))
-                .arg(Arg::with_name("sign")
-                     .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
-                     .short("s")
-                     .long("sign"))
-                .arg(Arg::with_name("verbose")
-                     .help("Sets the level of verbosity. The higher the level of verbosity, the more information that is printed and logged when the application is executed. This flag can be specified multiple times, where each occurrance increases the level and/or details written for each statement.")
-                     .long("verbose")
-                     .short("v")
-                     .multiple(true))
-                .arg(Arg::with_name("x64")
-                     .help("Builds the installer for the x64 platform. The default is to build the installer for the x86 platform.")
-                     .long("x64"))
-        ).get_matches();
-    let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
-    let verbosity = matches.occurrences_of("verbose");
-    let capture_output = !matches.is_present("nocapture");
-    if verbosity > 3 {
-        loggerv::Logger::new()
-            .line_numbers(true)
-            .module_path(true)
-    } else {
-        loggerv::Logger::new()
-            .module_path(false)
-    }.verbosity(verbosity)
-    .level(true)
-    .init()
-    .expect("logger to initiate");
-    let platform = if matches.is_present("x64") {
-        "x64"
-    } else {
-        "x86"
-    };
-    debug!("platform = {:?}", platform);
-    let cargo_file_path = Path::new("Cargo.toml");
+#[derive(Debug)]
+enum Error {
+    /// A build operation for the release binary failed.
+    Build(String),
+    /// A compiler operation failed.
+    Compile(String),
+    /// A generic or custom error occurred. The message should contain the detailed information.
+    Generic(String),
+    /// An I/O operation failed.
+    Io(io::Error),
+    /// A linker operation failed.
+    Link(String),
+    /// A needed field within the `Cargo.toml` manifest could not be found.
+    Manifest(String),
+    /// A signing operation failed.
+    Sign(String),
+    /// Parsing of the `Cargo.toml` manifest failed.
+    Toml(toml::de::Error),
+}
+
+impl Error {
+    /// Gets an error code related to the error.
+    ///
+    /// This is useful as a return, or exit, code for a command line application, where a non-zero
+    /// integer indicates a failure in the application. it can also be used for quickly and easily
+    /// testing equality between two errors.
+    pub fn code(&self) -> i32 {
+        match *self{
+            Error::Build(..) => 1,
+            Error::Compile(..) => 2,
+            Error::Generic(..) => 3,
+            Error::Io(..) => 4,
+            Error::Link(..) => 5,
+            Error::Manifest(..) => 6,
+            Error::Sign(..) => 7,
+            Error::Toml(..) => 8,
+        }
+    }
+}
+
+impl StdError for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::Build(..) => "Build",
+            Error::Compile(..) => "Compile",
+            Error::Generic(..) => "Generic",
+            Error::Io(..) => "Io",
+            Error::Link(..) => "Link",
+            Error::Manifest(..) => "Manifest",
+            Error::Sign(..) => "Sign",
+            Error::Toml(..) => "TOML",
+        }
+    }
+
+    fn cause(&self) -> Option<&StdError> {
+        match *self {
+            Error::Io(ref err) => Some(err),
+            Error::Toml(ref err) => Some(err),
+            _ => None
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Error::Build(ref msg) => write!(f, "{}", msg),
+            Error::Compile(ref msg) => write!(f, "{}", msg),
+            Error::Generic(ref msg) => write!(f, "{}", msg),
+            Error::Io(ref err) => write!(f, "{}", err),
+            Error::Link(ref msg) => write!(f, "{}", msg),
+            Error::Manifest(ref var) => write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
+            Error::Sign(ref msg) => write!(f, "{}", msg),
+            Error::Toml(ref err) => write!(f, "{}", err),
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Error {
+        Error::Io(err)
+    }
+}
+
+impl From<toml::de::Error> for Error {
+    fn from(err: toml::de::Error) -> Error {
+        Error::Toml(err)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Platform {
+    X86,
+    X64
+}
+
+impl fmt::Display for Platform {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Platform::X86 => write!(f, "x86"),
+            Platform::X64 => write!(f, "x64"),
+        }
+    }
+}
+
+fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error> {
+    let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
     debug!("cargo_file_path = {:?}", cargo_file_path);
-    let mut cargo_file = File::open(cargo_file_path).expect("Open Cargo.toml file");
+    let mut cargo_file = File::open(cargo_file_path)?;
     let mut cargo_file_content = String::new();
-    cargo_file.read_to_string(&mut cargo_file_content).expect("Read to string");
-    let cargo_values = cargo_file_content.parse::<Value>().expect("Parse cargo file contents");
+    cargo_file.read_to_string(&mut cargo_file_content)?;
+    let cargo_values = cargo_file_content.parse::<Value>()?;
     let pkg_version = cargo_values
         .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("version"))
         .and_then(|v| v.as_str())
-        .expect("Package version");
+        .ok_or(Error::Manifest(String::from("version")))?;
     debug!("pkg_version = {:?}", pkg_version);
     let pkg_name = cargo_values
         .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("name"))
         .and_then(|n| n.as_str())
-        .expect("Package name");
+        .ok_or(Error::Manifest(String::from("name")))?;
     debug!("pkg_name = {:?}", pkg_name);
     let pkg_description = cargo_values
         .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("description"))
         .and_then(|d| d.as_str())
-        .expect("Package description");
+        .ok_or(Error::Manifest(String::from("description")))?;
     debug!("pkg_description = {:?}", pkg_description);
     let bin_name = cargo_values
         .get("bin")
@@ -138,7 +197,8 @@ fn main() {
             .status()
     }.ok() {
         if !status.success() {
-            panic!("Failed to build the release executable");
+            // TODO: Add better error message
+            return Err(Error::Build(String::from("Failed to build the release executable")));
         }
     }
     // Compile the installer
@@ -160,7 +220,8 @@ fn main() {
             .status()
     }.ok() {
         if !status.success() {
-            panic!("Failed to compile the installer");
+            // TODO: Add better error message
+            return Err(Error::Compile(String::from("Failed to compile the installer")));
         }
     }
     // Link the installer
@@ -180,11 +241,12 @@ fn main() {
             .status()
     }.ok() {
         if !status.success() {
-            panic!("Failed to link the installer");
+            // TODO: Add better error message
+            return Err(Error::Link(String::from("Failed to link the installer")));
         }
     }
     // Sign the installer
-    if matches.is_present("sign") {
+    if sign {
         info!("Signing the installer");
         if let Some(status) = {
             let mut signer = Command::new(SIGNTOOL);
@@ -200,23 +262,75 @@ fn main() {
                 .status()
         }.ok() {
             if !status.success() {
-                panic!("Failed to sign the installer");
+                // TODO: Add better error message
+                return Err(Error::Sign(String::from("Failed to sign the installer")));
             }
         }
     }
-    // TODO: Wrap execution into a function that returns a Result
-    //match result {
-        //Ok(_) => {
-            //std::process::exit(0);
-        //},
-        //Err(e) => {
-            //let mut tag = format!("Error[{}] ({})", e.code(), e.description());
-            //if atty::is(atty::Stream::Stderr) {
-                //tag = ERROR_COLOR.paint(tag).to_string()
-            //}
-            //writeln!(&mut std::io::stderr(), "{}: {}", tag, e)
-                //.expect("Writing to stderr");
-            //std::process::exit(e.code());
-        //}
-    //}
+    Ok(())
+}
+
+fn main() {
+    // Based on documentation for the ansi_term crate, Windows 10 supports ANSI escape characters,
+    // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
+    // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
+    // avoid build errors on non-windows platforms, a cfg guard should be put in place.
+    #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
+    let matches = App::new(crate_name!())
+        .bin_name("cargo")
+        .subcommand(
+            SubCommand::with_name(SUBCOMMAND_NAME)
+                .version(crate_version!())
+                .about(crate_description!())
+                .author(crate_authors!())
+                .arg(Arg::with_name("nocapture")
+                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
+                     .long("nocapture"))
+                .arg(Arg::with_name("sign")
+                     .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
+                     .short("s")
+                     .long("sign"))
+                .arg(Arg::with_name("verbose")
+                     .help("Sets the level of verbosity. The higher the level of verbosity, the more information that is printed and logged when the application is executed. This flag can be specified multiple times, where each occurrance increases the level and/or details written for each statement.")
+                     .long("verbose")
+                     .short("v")
+                     .multiple(true))
+                .arg(Arg::with_name("x64")
+                     .help("Builds the installer for the x64 platform. The default is to build the installer for the x86 platform.")
+                     .long("x64"))
+        ).get_matches();
+    let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
+    let verbosity = matches.occurrences_of("verbose");
+    let capture_output = !matches.is_present("nocapture");
+    if verbosity > 3 {
+        loggerv::Logger::new()
+            .line_numbers(true)
+            .module_path(true)
+    } else {
+        loggerv::Logger::new()
+            .module_path(false)
+    }.verbosity(verbosity)
+    .level(true)
+    .init()
+    .expect("logger to initiate");
+    let platform = if matches.is_present("x64") {
+        Platform::X64
+    } else {
+        Platform::X86
+    };
+    debug!("platform = {:?}", platform);
+    match run(platform, matches.is_present("sign"), capture_output) {
+        Ok(_) => {
+            std::process::exit(0);
+        },
+        Err(e) => {
+            let mut tag = format!("Error[{}] ({})", e.code(), e.description());
+            if atty::is(atty::Stream::Stderr) {
+                tag = ERROR_COLOR.paint(tag).to_string()
+            }
+            writeln!(&mut std::io::stderr(), "{}: {}", tag, e)
+                .expect("Writing to stderr");
+            std::process::exit(e.code());
+        }
+    }
 }
