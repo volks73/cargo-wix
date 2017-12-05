@@ -1,0 +1,20 @@
+[package]
+name = "cargo-wix"
+description = "Build MSI installers using the Wix Toolset"
+version = "0.1.0"
+authors = ["Christopher Field <cfield2@gmail.com>"]
+license = "MIT/Apache-2.0"
+repository = "https://github.com/volks73/cargo-wix"
+documentation = "https://github.com/volks73/cargo-wix"
+categories = ["development-tools"]
+keywords = ["cargo-subcommand", "installer", "wix-toolset", "wix"]
+homepage = "https://github.com/volks73/cargo-wix"
+readme = "README.md"
+
+[[bin]]
+name = "cargo-wix"
+
+[dependencies]
+clap = "2.28"
+toml = "0.4"
+
