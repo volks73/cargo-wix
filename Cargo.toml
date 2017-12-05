@@ -16,5 +16,6 @@ name = "cargo-wix"
 
 [dependencies]
 clap = "2.28"
+loggerv = "0.6"
 toml = "0.4"
 
