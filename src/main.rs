@@ -12,7 +12,7 @@ use clap::{App, Arg, SubCommand};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use toml::Value;
 
 const SUBCOMMAND_NAME: &str = "wix";
@@ -40,28 +40,33 @@ fn main() {
                      .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
                      .short("s")
                      .long("sign"))
-                .arg(Arg::with_name("win64")
+                .arg(Arg::with_name("x64")
                      .help("Builds the installer for the x64 platform. The default is to build the installer for the x86 platform.")
-                     .long("win64"))
+                     .long("x64"))
                 .arg(Arg::with_name("verbose")
                      .help("Sets the level of verbosity. The higher the level of verbosity, the more information that is printed and logged when the application is executed. This flag can be specified multiple times, where each occurrance increases the level and/or details written for each statement.")
                      .long("verbose")
                      .short("v")
                      .multiple(true))
+                .arg(Arg::with_name("nocapture")
+                     .help("By default, this subcommand hides output from the builder, compiler, and linker for the binary and Windows installer, respectively to keep output readable. Use this flag to show the output.")
+                     .long("nocapture"))
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
-    if matches.occurrences_of("verbose") > 3 {
+    let verbosity = matches.occurrences_of("verbose");
+    let capture_output = !matches.is_present("nocapture");
+    if verbosity > 3 {
         loggerv::Logger::new()
             .line_numbers(true)
             .module_path(true)
     } else {
         loggerv::Logger::new()
             .module_path(false)
-    }.verbosity(matches.occurrences_of("verbose"))
+    }.verbosity(verbosity)
     .level(true)
     .init()
     .expect("logger to initiate");
-    let platform = if matches.is_present("win64") {
+    let platform = if matches.is_present("x64") {
         "x64"
     } else {
         "x86"
@@ -119,46 +124,61 @@ fn main() {
     // name.
     main_msi.push(&format!("{}-{}-{}.msi", pkg_name, pkg_version, platform));
     debug!("main_msi = {:?}", main_msi);
-    // Build the binary with the release profile. A release binary has already been built, this
-    // will essentially do nothing.
+    // Build the binary with the release profile. If a release binary has already been built, then
+    // this will essentially do nothing.
     info!("Building release binary");
-    if let Some(status) = Command::new("cargo")
-        .arg("build")
-        .arg("--release")
-        .status()
-        .ok() {
+    if let Some(status) = {
+        let mut builder = Command::new("cargo");
+        if capture_output {
+            builder.stdout(Stdio::null());
+            builder.stderr(Stdio::null());
+        }
+        builder.arg("build")
+            .arg("--release")
+            .status()
+    }.ok() {
         if !status.success() {
             panic!("Failed to build the release executable");
         }
     }
     // Compile the installer
     info!("Compiling installer");
-    if let Some(status) = Command::new(WIX_TOOLSET_COMPILER)
-        .arg(format!("-dVersion={}", pkg_version))
-        .arg(format!("-dPlatform={}", platform))
-        .arg(format!("-dProductName={}", pkg_name))
-        .arg(format!("-dBinaryName={}", bin_name))
-        .arg(format!("-dDescription={}", pkg_description))
-        .arg("-o")
-        .arg(&main_wixobj)
-        .arg(&main_wxs)
-        .status()
-        .ok() {
+    if let Some(status) = {
+        let mut compiler = Command::new(WIX_TOOLSET_COMPILER);
+        if capture_output {
+            compiler.stdout(Stdio::null());
+            compiler.stderr(Stdio::null());
+        } 
+        compiler.arg(format!("-dVersion={}", pkg_version))
+            .arg(format!("-dPlatform={}", platform))
+            .arg(format!("-dProductName={}", pkg_name))
+            .arg(format!("-dBinaryName={}", bin_name))
+            .arg(format!("-dDescription={}", pkg_description))
+            .arg("-o")
+            .arg(&main_wixobj)
+            .arg(&main_wxs)
+            .status()
+    }.ok() {
         if !status.success() {
             panic!("Failed to compile the installer");
         }
     }
     // Link the installer
     info!("Linking the installer");
-    if let Some(status) = Command::new(WIX_TOOLSET_LINKER)
-        .arg("-ext")
-        .arg("WixUIExtension")
-        .arg("-cultures:en-us")
-        .arg(&main_wixobj)
-        .arg("-out")
-        .arg(&main_msi)
-        .status()
-        .ok() {
+    if let Some(status) = {
+        let mut linker = Command::new(WIX_TOOLSET_LINKER);
+        if capture_output {    
+            linker.stdout(Stdio::null());
+            linker.stderr(Stdio::null());
+        }
+        linker.arg("-ext")
+            .arg("WixUIExtension")
+            .arg("-cultures:en-us")
+            .arg(&main_wixobj)
+            .arg("-out")
+            .arg(&main_msi)
+            .status()
+    }.ok() {
         if !status.success() {
             panic!("Failed to link the installer");
         }
@@ -166,14 +186,19 @@ fn main() {
     // Sign the installer
     if matches.is_present("sign") {
         info!("Signing the installer");
-        if let Some(status) = Command::new(SIGNTOOL)
-            .arg("sign")
-            .arg("/a")
-            .arg("/t")
-            .arg("http://timestamp.comodoca.com")
-            .arg(&main_msi)
-            .status()
-            .ok() {
+        if let Some(status) = {
+            let mut signer = Command::new(SIGNTOOL);
+            if capture_output {
+                signer.stdout(Stdio::null());
+                signer.stderr(Stdio::null());
+            }
+            signer.arg("sign")
+                .arg("/a")
+                .arg("/t")
+                .arg("http://timestamp.comodoca.com")
+                .arg(&main_msi)
+                .status()
+        }.ok() {
             if !status.success() {
                 panic!("Failed to sign the installer");
             }
