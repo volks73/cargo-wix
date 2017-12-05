@@ -3,7 +3,7 @@
 extern crate ansi_term;
 extern crate atty;
 #[macro_use] extern crate clap;
-extern crate log;
+#[macro_use] extern crate log;
 extern crate loggerv;
 extern crate toml;
 
@@ -66,7 +66,9 @@ fn main() {
     } else {
         "x86"
     };
+    debug!("platform = {:?}", platform);
     let cargo_file_path = Path::new("Cargo.toml");
+    debug!("cargo_file_path = {:?}", cargo_file_path);
     let mut cargo_file = File::open(cargo_file_path).expect("Open Cargo.toml file");
     let mut cargo_file_content = String::new();
     cargo_file.read_to_string(&mut cargo_file_content).expect("Read to string");
@@ -77,32 +79,38 @@ fn main() {
         .and_then(|t| t.get("version"))
         .and_then(|v| v.as_str())
         .expect("Package version");
+    debug!("pkg_version = {:?}", pkg_version);
     let pkg_name = cargo_values
         .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("name"))
         .and_then(|n| n.as_str())
         .expect("Package name");
+    debug!("pkg_name = {:?}", pkg_name);
     let pkg_description = cargo_values
         .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("description"))
         .and_then(|d| d.as_str())
         .expect("Package description");
+    debug!("pkg_description = {:?}", pkg_description);
     let bin_name = cargo_values
         .get("bin")
         .and_then(|b| b.as_table())
         .and_then(|t| t.get("name"))
         .and_then(|n| n.as_str())
         .unwrap_or(pkg_name);
+    debug!("bin_name = {:?}", bin_name);
     let mut main_wxs = PathBuf::from("wix");
     main_wxs.push("main");
     main_wxs.set_extension("wxs");
+    debug!("main_wxs = {:?}", main_wxs);
     let mut main_wixobj = PathBuf::from("target");
     main_wixobj.push("wix");
     main_wixobj.push("build");
     main_wixobj.push("main");
     main_wixobj.set_extension("wixobj");
+    debug!("main_wixobj = {:?}", main_wixobj);
     let mut main_msi = PathBuf::from("target");
     main_msi.push("wix");
     // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
@@ -110,8 +118,10 @@ fn main() {
     // architecture/platform with `msi`.  Instead, just include the extension in the formatted
     // name.
     main_msi.push(&format!("{}-{}-{}.msi", pkg_name, pkg_version, platform));
+    debug!("main_msi = {:?}", main_msi);
     // Build the binary with the release profile. A release binary has already been built, this
     // will essentially do nothing.
+    info!("Building release binary");
     if let Some(status) = Command::new("cargo")
         .arg("build")
         .arg("--release")
@@ -122,6 +132,7 @@ fn main() {
         }
     }
     // Compile the installer
+    info!("Compiling installer");
     if let Some(status) = Command::new(WIX_TOOLSET_COMPILER)
         .arg(format!("-dVersion={}", pkg_version))
         .arg(format!("-dPlatform={}", platform))
@@ -138,6 +149,7 @@ fn main() {
         }
     }
     // Link the installer
+    info!("Linking the installer");
     if let Some(status) = Command::new(WIX_TOOLSET_LINKER)
         .arg("-ext")
         .arg("WixUIExtension")
@@ -153,6 +165,7 @@ fn main() {
     }
     // Sign the installer
     if matches.is_present("sign") {
+        info!("Signing the installer");
         if let Some(status) = Command::new(SIGNTOOL)
             .arg("sign")
             .arg("/a")
