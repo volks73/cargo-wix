@@ -23,7 +23,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "cargo-wix"
 version = "0.1.0"
 dependencies = [
+ "ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "atty 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "loggerv 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "toml 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
