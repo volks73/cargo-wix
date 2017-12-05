@@ -1,6 +1,6 @@
 [package]
 name = "cargo-wix"
-description = "Build MSI installers using the Wix Toolset"
+description = "Build Windows installers using the Wix Toolset"
 version = "0.1.0"
 authors = ["Christopher Field <cfield2@gmail.com>"]
 license = "MIT/Apache-2.0"
