@@ -298,6 +298,11 @@ impl Wix {
     /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
     /// (msi).
     pub fn run(self) -> Result<(), Error> {
+        debug!("capture_output = {:?}", self.capture_output);
+        debug!("input = {:?}", self.input);
+        debug!("manufacturer = {:?}", self.manufacturer);
+        debug!("sign = {:?}", self.sign);
+        debug!("timestamp = {:?}", self.timestamp);
         let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
         debug!("cargo_file_path = {:?}", cargo_file_path);
         let mut cargo_file = File::open(cargo_file_path)?;
@@ -324,6 +329,7 @@ impl Wix {
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str())
             .ok_or(Error::Manifest(String::from("description")))?;
+        debug!("pkg_description = {:?}", pkg_description);
         let manufacturer = if let Some(m) = self.manufacturer {
             Ok(m)
         } else {
@@ -336,7 +342,7 @@ impl Wix {
             .map(|m| String::from(m))
             .ok_or(Error::Manifest(String::from("authors")))
         }?;
-        debug!("pkg_description = {:?}", pkg_description);
+        debug!("manufacturer = {}", manufacturer);
         let help_url = cargo_values
             .get("package")
             .and_then(|p| p.as_table())
