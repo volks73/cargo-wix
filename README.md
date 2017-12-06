@@ -43,7 +43,11 @@ The feature for signing the installer is still under heavy development, but to e
 C:\Path\To\Project\>cargo wix --sign
 ```
 
-Use the `-h,--help` flag to display information about about additional options and features.
+Use the `-h,--help` flag to display information about additional options and features.
+
+```dos
+C:\Path\To\Project\>cargo wix -h
+```
 
 ## License
 
