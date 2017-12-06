@@ -42,7 +42,7 @@ fn main() {
                 .about(crate_description!())
                 .author(crate_authors!())
                 .arg(Arg::with_name("force")
-                     .help("Overwriting any existing WiX Source files when using the '--init' flag. Use with caution.")
+                     .help("Overwrites any existing WiX Source files when using the '--init' flag. Use with caution.")
                      .long("force")
                      .requires("init"))
                 .arg(Arg::with_name("init")
@@ -74,6 +74,9 @@ fn main() {
                      .long("verbose")
                      .short("v")
                      .multiple(true))
+                .arg(Arg::with_name("INPUT")
+                     .help("A WiX Source (wxs) file. The default is to use the 'wix\\main.wxs' file.")
+                     .index(1))
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = matches.occurrences_of("verbose");
@@ -95,6 +98,7 @@ fn main() {
     } else {
         cargo_wix::Wix::new()
             .capture_output(!matches.is_present("no-capture"))
+            .input(matches.value_of("INPUT"))
             .manufacturer(matches.value_of("manufacturer"))
             .sign(matches.is_present("sign"))
             .timestamp(matches.value_of("timestamp"))

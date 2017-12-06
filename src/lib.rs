@@ -367,14 +367,22 @@ impl Wix {
                 trace!("Using the '{}' WiX source file", p.display());
                 Ok(p)
             } else {
-                Err(Error::Generic(format!("The '{}' WiX source (wxs) file does not exist", p.display())))
+                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template > {0}' command to create it.", p.display())))
             }
         } else {
-            trace!("Using the default 'wix\\main.wxs' WiX source file");
+            trace!("Using the default WiX source file");
             let mut main_wxs = PathBuf::from(WIX);
             main_wxs.push(WIX_SOURCE_FILE_NAME);
             main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
-            Ok(main_wxs)
+            if main_wxs.exists() {
+                Ok(main_wxs)
+            } else {
+               Err(Error::Generic(
+                   format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", 
+                       main_wxs.display()
+                   )
+               ))
+            }
         }?;
         debug!("main_wxs = {:?}", main_wxs);
         let mut main_wixobj = PathBuf::from("target");
