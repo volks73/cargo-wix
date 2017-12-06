@@ -14,6 +14,9 @@ readme = "README.md"
 [[bin]]
 name = "cargo-wix"
 
+[lib]
+name = "cargo_wix"
+
 [dependencies]
 ansi_term = "0.10"
 atty = "0.2"
