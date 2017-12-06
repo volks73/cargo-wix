@@ -1,4 +1,4 @@
-# cargo-wix: A cargo subcommand to create Windows installers for binaries using the Wix Toolset
+# cargo-wix: A cargo subcommand to create Windows installers
 
 [About](#what-is-cargo-wix) | [Installation](#installation) | [Usage](#usage)  
 
