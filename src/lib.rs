@@ -22,7 +22,7 @@ use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
 use std::fs::File;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use toml::Value;
@@ -37,14 +37,24 @@ const SIGNTOOL: &str = "signtool";
 /// The template, or example, WiX Source (WXS) file.
 static TEMPLATE: &str = include_str!("template.wxs");
 
-/// Generates unique GUIDs for appropriate values in the template and prints to stdout.
-pub fn print_template() -> Result<(), Error> {
+/// Generates unique GUIDs for appropriate values in the template and renders to a writer.
+fn write_template<W: Write>(writer: &mut W) -> Result<(), Error> {
     let template = mustache::compile_str(TEMPLATE)?;
     let data = MapBuilder::new()
         .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
         .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
         .build();
-    template.render_data(&mut io::stdout(), &data)?;
+    template.render_data(writer, &data)?;
+    Ok(())
+}
+
+/// Generates unique GUIDs for appropriate values in the template and prints to stdout.
+pub fn print_template() -> Result<(), Error> {
+    write_template(&mut io::stdout())
+}
+
+/// Creates the necessary sub-folders and files to immediately create an installer for a package.
+pub fn init() -> Result<(), Error> {
     Ok(())
 }
 
