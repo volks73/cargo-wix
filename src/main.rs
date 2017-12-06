@@ -37,6 +37,9 @@ const SIGNTOOL: &str = "signtool";
 
 const ERROR_COLOR: Colour = Colour::Fixed(9); // Bright red
 
+/// The template, or example, WiX Source (WXS) file.
+static TEMPLATE: &str = include_str!("template.wxs");
+
 #[derive(Debug)]
 enum Error {
     /// A build operation for the release binary failed.
@@ -142,6 +145,14 @@ impl fmt::Display for Platform {
     }
 }
 
+/// Prints the template to stdout
+fn print_template() -> Result<(), Error> {
+    io::stdout().write(TEMPLATE.as_bytes())?;
+    Ok(())
+}
+
+/// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
+/// (msi).
 fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error> {
     let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
     debug!("cargo_file_path = {:?}", cargo_file_path);
@@ -298,6 +309,9 @@ fn main() {
                 .arg(Arg::with_name("nocapture")
                      .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                      .long("nocapture"))
+                .arg(Arg::with_name("print-template")
+                     .help("Prints a template WiX Source (wxs) file to use with this subcommand to stdout.")
+                     .long("print-template"))
                 .arg(Arg::with_name("sign")
                      .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
                      .short("s")
@@ -331,7 +345,12 @@ fn main() {
         Platform::X86
     };
     debug!("platform = {:?}", platform);
-    match run(platform, matches.is_present("sign"), capture_output) {
+    let result = if matches.is_present("print-template") {
+        print_template()
+    } else {
+        run(platform, matches.is_present("sign"), capture_output) 
+    };
+    match result {
         Ok(_) => {
             std::process::exit(0);
         },
