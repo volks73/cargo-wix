@@ -364,8 +364,16 @@ impl Wix {
         debug!("platform = {:?}", platform);
         let main_wxs = if let Some(p) = self.input {
             if p.exists() {
-                trace!("Using the '{}' WiX source file", p.display());
-                Ok(p)
+                if p.is_dir() {
+                    Err(Error::Generic(
+                        format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", 
+                            p.display()
+                        )
+                    ))
+                } else {
+                    trace!("Using the '{}' WiX source file", p.display());
+                    Ok(p)
+                }
             } else {
                 Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template > {0}' command to create it.", p.display())))
             }
