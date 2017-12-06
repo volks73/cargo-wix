@@ -307,7 +307,9 @@ fn main() {
     // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
     // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
     // avoid build errors on non-windows platforms, a cfg guard should be put in place.
-    #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
+    if atty::is(atty::Stream::Stdout) {
+        #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
+    }
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
