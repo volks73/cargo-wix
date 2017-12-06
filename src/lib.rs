@@ -131,7 +131,16 @@ impl From<toml::de::Error> for Error {
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Platform {
     X86,
-    X64
+    X64,
+}
+
+impl Platform {
+    pub fn arch(&self) -> &'static str {
+        match *self {
+            Platform::X86 => "i686",
+            Platform::X64 => "x86_64",
+        }
+    }
 }
 
 impl fmt::Display for Platform {
@@ -145,7 +154,11 @@ impl fmt::Display for Platform {
 
 impl Default for Platform {
     fn default() -> Self {
-        Platform::X86
+        if cfg!(target_arch = "x86_64") {
+            Platform::X64
+        } else {
+            Platform::X86
+        }
     }
 }
 
@@ -239,7 +252,7 @@ impl Wix {
         // format, the `set_extension` method will replace the Patch version number and
         // architecture/platform with `msi`.  Instead, just include the extension in the formatted
         // name.
-        main_msi.push(&format!("{}-{}-{}.msi", pkg_name, pkg_version, platform));
+        main_msi.push(&format!("{}-{}-{}.msi", pkg_name, pkg_version, platform.arch()));
         debug!("main_msi = {:?}", main_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
@@ -327,6 +340,12 @@ impl Wix {
             }
         }
         Ok(())
+    }
+}
+
+impl Default for Wix {
+    fn default() -> Self {
+        Wix::new()
     }
 }
 
