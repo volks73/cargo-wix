@@ -21,7 +21,7 @@ use mustache::MapBuilder;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -30,9 +30,12 @@ use uuid::Uuid;
 
 const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 const CARGO: &str = "cargo";
-const WIX_TOOLSET_COMPILER: &str = "candle";
-const WIX_TOOLSET_LINKER: &str = "light";
 const SIGNTOOL: &str = "signtool";
+const WIX: &str = "wix";
+const WIX_COMPILER: &str = "candle";
+const WIX_LINKER: &str = "light";
+const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
+const WIX_SOURCE_FILE_NAME: &str = "main";
 
 /// The template, or example, WiX Source (WXS) file.
 static TEMPLATE: &str = include_str!("template.wxs");
@@ -53,9 +56,25 @@ pub fn print_template() -> Result<(), Error> {
     write_template(&mut io::stdout())
 }
 
-/// Creates the necessary sub-folders and files to immediately create an installer for a package.
+/// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
+/// create an installer for the package.
 pub fn init() -> Result<(), Error> {
-    Ok(())
+    let mut main_wxs_path = PathBuf::from(WIX);
+    if !main_wxs_path.exists() {
+        fs::create_dir(&main_wxs_path)?;
+    }
+    main_wxs_path.push(WIX_SOURCE_FILE_NAME);
+    main_wxs_path.set_extension(WIX_SOURCE_FILE_EXTENSION);
+    if main_wxs_path.exists() {
+        Err(Error::Generic(
+            format!("The '{}' file already exists. Use the '--force' flag to overwrite the contents.", 
+                main_wxs_path.display())
+        ))
+    } else {
+        let mut main_wxs = File::create(main_wxs_path)?;
+        write_template(&mut main_wxs)?;
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -333,20 +352,20 @@ impl Wix {
             }
         } else {
             trace!("Using the default 'wix\\main.wxs' WiX source file");
-            let mut main_wxs = PathBuf::from("wix");
-            main_wxs.push("main");
-            main_wxs.set_extension("wxs");
+            let mut main_wxs = PathBuf::from(WIX);
+            main_wxs.push(WIX_SOURCE_FILE_NAME);
+            main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
             Ok(main_wxs)
         }?;
         debug!("main_wxs = {:?}", main_wxs);
         let mut main_wixobj = PathBuf::from("target");
-        main_wixobj.push("wix");
+        main_wixobj.push(WIX);
         main_wixobj.push("build");
-        main_wixobj.push("main");
+        main_wixobj.push(WIX_SOURCE_FILE_NAME);
         main_wixobj.set_extension("wixobj");
         debug!("main_wixobj = {:?}", main_wixobj);
         let mut main_msi = PathBuf::from("target");
-        main_msi.push("wix");
+        main_msi.push(WIX);
         // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
         // format, the `set_extension` method will replace the Patch version number and
         // architecture/platform with `msi`.  Instead, just include the extension in the formatted
@@ -375,9 +394,9 @@ impl Wix {
         // Compile the installer
         info!("Compiling installer");
         if let Some(status) = {
-            let mut compiler = Command::new(WIX_TOOLSET_COMPILER);
+            let mut compiler = Command::new(WIX_COMPILER);
             if self.capture_output {
-                trace!("Capturing the '{}' output", WIX_TOOLSET_COMPILER);
+                trace!("Capturing the '{}' output", WIX_COMPILER);
                 compiler.stdout(Stdio::null());
                 compiler.stderr(Stdio::null());
             } 
@@ -401,9 +420,9 @@ impl Wix {
         // Link the installer
         info!("Linking the installer");
         if let Some(status) = {
-            let mut linker = Command::new(WIX_TOOLSET_LINKER);
+            let mut linker = Command::new(WIX_LINKER);
             if self.capture_output {
-                trace!("Capturing the '{}' output", WIX_TOOLSET_LINKER);
+                trace!("Capturing the '{}' output", WIX_LINKER);
                 linker.stdout(Stdio::null());
                 linker.stderr(Stdio::null());
             }
