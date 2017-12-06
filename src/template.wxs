@@ -51,7 +51,7 @@
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
-                <Directory Id='APPLICATIONFOLDER' Name='[ProductName]'>
+                <Directory Id='APPLICATIONFOLDER' Name='$(var.ProductName)'>
                     <Component Id='License' Guid='*' Win64='$(var.Win64)'>
                         <File 
                             Id='LicenseTXT' 
