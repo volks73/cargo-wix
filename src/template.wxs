@@ -112,7 +112,7 @@
         -->
         <!--<Icon Id='ProductICO' SourceFile='wix\Product.ico'/>-->
         <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
-        <!--<Property Id='ARPHELPLINK' Value='$(var.Documentation)'/>-->
+        <!--<Property Id='ARPHELPLINK' Value='$(var.Help)'/>-->
 
         <UIRef Id='WixUI_FeatureTree'/>
         <!-- 

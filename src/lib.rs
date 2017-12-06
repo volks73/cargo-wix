@@ -295,6 +295,12 @@ impl Wix {
             .and_then(|f| f.as_str())
             .ok_or(Error::Manifest(String::from("authors")))?;
         debug!("pkg_description = {:?}", pkg_description);
+        let help_url = cargo_values
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
+            .and_then(|h| h.as_str())
+            .ok_or(Error::Manifest(String::from("documentation")))?;
         let bin_name = cargo_values
             .get("bin")
             .and_then(|b| b.as_table())
@@ -371,6 +377,7 @@ impl Wix {
                 .arg(format!("-dBinaryName={}", bin_name))
                 .arg(format!("-dDescription={}", pkg_description))
                 .arg(format!("-dAuthor={}", pkg_author))
+                .arg(format!("-dHelp={}", help_url))
                 .arg("-o")
                 .arg(&main_wixobj)
                 .arg(&main_wxs)
