@@ -36,7 +36,7 @@ const SIGNTOOL: &str = "signtool";
 /// The template, or example, WiX Source (WXS) file.
 static TEMPLATE: &str = include_str!("template.wxs");
 
-/// Prints the template to stdout
+/// Generates unique GUIDs for appropriate values in the template and prints to stdout.
 pub fn print_template() -> Result<(), Error> {
     let template = mustache::compile_str(TEMPLATE)?;
     let data = MapBuilder::new()
@@ -149,13 +149,34 @@ impl From<mustache::Error> for Error {
     }
 }
 
+/// The different values for the `Platform` attribute of the `Package` element.
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum Platform {
+pub enum Platform {
+    /// The `x86` WiX Toolset value.
     X86,
+    /// The `x64` WiX Toolset value.
     X64,
 }
 
 impl Platform {
+    /// Gets the name of the platform as an architecture string as used in Rust toolchains.
+    ///
+    /// This is different from the string used in WiX Source (wxs) files. This is the string
+    /// commonly used for the `target_arch` conditional compilation attribute. To get the string
+    /// recognized in wxs files, use `format!("{}", Platform::X86)`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate cargo_wix;
+    /// 
+    /// use cargo_wix::Platform;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Platform::X86.arch(), "i686");
+    ///     assert_eq!(Platform::X64.arch(), "x86_64");
+    /// }
+    /// ```
     pub fn arch(&self) -> &'static str {
         match *self {
             Platform::X86 => "i686",
@@ -183,6 +204,8 @@ impl Default for Platform {
     }
 }
 
+/// The builder for running the subcommand.
+#[derive(Debug, Clone)]
 pub struct Wix {
     capture_output: bool,
     sign: bool,
@@ -190,6 +213,7 @@ pub struct Wix {
 }
 
 impl Wix {
+    /// Creates a new `Wix` instance.
     pub fn new() -> Self {
         Wix {
             capture_output: true,
@@ -198,16 +222,27 @@ impl Wix {
         }
     }
 
+    /// Enables or disables capturing of the output from the builder (`cargo`), compiler
+    /// (`candle`), linker (`light`), and signer (`signtool`).
+    ///
+    /// The default is to capture all output, i.e. display nothing in the console but the log
+    /// statements.
     pub fn capture_output(mut self, c: bool) -> Self {
         self.capture_output = c;
         self
     }
 
+    /// Enables or disables signing of the installer after creation with the `signtool`
+    /// application.
     pub fn sign(mut self, s: bool) -> Self {
         self.sign = s;
         self
     }
 
+    /// Sets the URL for the timestamp server used when signing an installer.
+    ///
+    /// The default is to _not_ use a timestamp server, even though it is highly recommended. Use
+    /// this method to enable signing with the timestamp.
     pub fn timestamp(mut self, t: Option<&str>) -> Self {
         self.timestamp = t.map(|t| String::from(t));
         self
