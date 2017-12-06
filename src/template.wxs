@@ -105,6 +105,15 @@
             </Feature>
         </Feature>
 
+        <SetProperty Id='ARPINSTALLLOCATION' Value='[ApplicationFolder]' After='CostFinalize'/>
+
+        <!--
+          Uncomment the next three lines to add a custom icon for the Add/Remove Programs.
+        -->
+        <!--<Icon Id='ProductICO' SourceFile='wix\Product.ico'/>-->
+        <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
+        <!--<Property Id='ARPHELPLINK' Value='$(var.Documentation)'/>-->
+
         <UIRef Id='WixUI_FeatureTree'/>
         <!-- 
           Uncomment the next three lines to customize the installer's Graphical
