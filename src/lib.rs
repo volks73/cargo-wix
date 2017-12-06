@@ -58,14 +58,14 @@ pub fn print_template() -> Result<(), Error> {
 
 /// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
 /// create an installer for the package.
-pub fn init() -> Result<(), Error> {
+pub fn init(force: bool) -> Result<(), Error> {
     let mut main_wxs_path = PathBuf::from(WIX);
     if !main_wxs_path.exists() {
         fs::create_dir(&main_wxs_path)?;
     }
     main_wxs_path.push(WIX_SOURCE_FILE_NAME);
     main_wxs_path.set_extension(WIX_SOURCE_FILE_EXTENSION);
-    if main_wxs_path.exists() {
+    if main_wxs_path.exists() && !force {
         Err(Error::Generic(
             format!("The '{}' file already exists. Use the '--force' flag to overwrite the contents.", 
                 main_wxs_path.display())

@@ -41,6 +41,9 @@ fn main() {
                 .version(crate_version!())
                 .about(crate_description!())
                 .author(crate_authors!())
+                .arg(Arg::with_name("force")
+                     .help("Overwriting any existing WiX Source files when using the '--init' flag. Use with caution.")
+                     .long("force"))
                 .arg(Arg::with_name("init")
                      .help("Initializes the package to be used with this subcommand. This creates a 'wix` sub-folder within the root folder of the package and creates a 'main.wxs' WiX Source (wxs) file within the 'wix' sub-folder from the embedded template. The 'wix\\main.wxs' file that is created can immediately be used with this subcommand without modification to create an installer for the project.")
                      .long("init"))
@@ -80,7 +83,7 @@ fn main() {
     .init()
     .expect("logger to initiate");
     let result = if matches.is_present("init") {
-        cargo_wix::init()
+        cargo_wix::init(matches.is_present("force"))
     } else if matches.is_present("print-template") {
         cargo_wix::print_template()
     } else {
