@@ -13,16 +13,20 @@
 // limitations under the License.
 
 #[macro_use] extern crate log;
+extern crate mustache;
 extern crate toml;
+extern crate uuid;
 
+use mustache::MapBuilder;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::{self, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use toml::Value;
+use uuid::Uuid;
 
 const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 const WIX_TOOLSET_COMPILER: &str = "candle";
@@ -34,7 +38,12 @@ static TEMPLATE: &str = include_str!("template.wxs");
 
 /// Prints the template to stdout
 pub fn print_template() -> Result<(), Error> {
-    io::stdout().write(TEMPLATE.as_bytes())?;
+    let template = mustache::compile_str(TEMPLATE)?;
+    let data = MapBuilder::new()
+        .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
+        .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
+        .build();
+    template.render_data(&mut io::stdout(), &data)?;
     Ok(())
 }
 
@@ -52,6 +61,8 @@ pub enum Error {
     Link(String),
     /// A needed field within the `Cargo.toml` manifest could not be found.
     Manifest(String),
+    /// An error occurred with rendering the template using the mustache renderer.
+    Mustache(mustache::Error),
     /// A signing operation failed.
     Sign(String),
     /// Parsing of the `Cargo.toml` manifest failed.
@@ -72,8 +83,9 @@ impl Error {
             Error::Io(..) => 4,
             Error::Link(..) => 5,
             Error::Manifest(..) => 6,
+            Error::Mustache(..) => 7,
             Error::Sign(..) => 7,
-            Error::Toml(..) => 8,
+            Error::Toml(..) => 9,
         }
     }
 }
@@ -87,6 +99,7 @@ impl StdError for Error {
             Error::Io(..) => "Io",
             Error::Link(..) => "Link",
             Error::Manifest(..) => "Manifest",
+            Error::Mustache(..) => "Mustache",
             Error::Sign(..) => "Sign",
             Error::Toml(..) => "TOML",
         }
@@ -96,6 +109,7 @@ impl StdError for Error {
         match *self {
             Error::Io(ref err) => Some(err),
             Error::Toml(ref err) => Some(err),
+            Error::Mustache(ref err) => Some(err),
             _ => None
         }
     }
@@ -110,6 +124,7 @@ impl fmt::Display for Error {
             Error::Io(ref err) => write!(f, "{}", err),
             Error::Link(ref msg) => write!(f, "{}", msg),
             Error::Manifest(ref var) => write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
+            Error::Mustache(ref err) => write!(f, "{}", err),
             Error::Sign(ref msg) => write!(f, "{}", msg),
             Error::Toml(ref err) => write!(f, "{}", err),
         }
@@ -125,6 +140,12 @@ impl From<io::Error> for Error {
 impl From<toml::de::Error> for Error {
     fn from(err: toml::de::Error) -> Error {
         Error::Toml(err)
+    }
+}
+
+impl From<mustache::Error> for Error {
+    fn from(err: mustache::Error) -> Error {
+        Error::Mustache(err)
     }
 }
 
