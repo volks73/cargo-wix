@@ -153,7 +153,7 @@ fn print_template() -> Result<(), Error> {
 
 /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
 /// (msi).
-fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error> {
+fn run(sign: bool, capture_output: bool) -> Result<(), Error> {
     let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
     debug!("cargo_file_path = {:?}", cargo_file_path);
     let mut cargo_file = File::open(cargo_file_path)?;
@@ -200,7 +200,7 @@ fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error
         Platform::X64
     } else {
         Platform::X86
-    }
+    };
     debug!("platform = {:?}", platform);
     let mut main_wxs = PathBuf::from("wix");
     main_wxs.push("main");
@@ -356,7 +356,7 @@ fn main() {
     let result = if matches.is_present("print-template") {
         print_template()
     } else {
-        run(platform, matches.is_present("sign"), capture_output) 
+        run(matches.is_present("sign"), capture_output) 
     };
     match result {
         Ok(_) => {
