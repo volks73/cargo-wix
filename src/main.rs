@@ -196,6 +196,12 @@ fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error
         .and_then(|n| n.as_str())
         .unwrap_or(pkg_name);
     debug!("bin_name = {:?}", bin_name);
+    let platform = if cfg!(target_arch = "x86_64") {
+        Platform::X64
+    } else {
+        Platform::X86
+    }
+    debug!("platform = {:?}", platform);
     let mut main_wxs = PathBuf::from("wix");
     main_wxs.push("main");
     main_wxs.set_extension("wxs");
@@ -288,8 +294,8 @@ fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error
             }
             signer.arg("sign")
                 .arg("/a")
-                .arg("/t")
-                .arg("http://timestamp.comodoca.com")
+                //.arg("/t")
+                //.arg("http://timestamp.comodoca.com")
                 .arg(&main_msi)
                 .status()
         }.ok() {
@@ -332,9 +338,6 @@ fn main() {
                      .long("verbose")
                      .short("v")
                      .multiple(true))
-                .arg(Arg::with_name("x64")
-                     .help("Builds the installer for the x64 platform. The default is to build the installer for the x86 platform.")
-                     .long("x64"))
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = matches.occurrences_of("verbose");
@@ -350,12 +353,6 @@ fn main() {
     .level(true)
     .init()
     .expect("logger to initiate");
-    let platform = if matches.is_present("x64") {
-        Platform::X64
-    } else {
-        Platform::X86
-    };
-    debug!("platform = {:?}", platform);
     let result = if matches.is_present("print-template") {
         print_template()
     } else {
