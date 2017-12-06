@@ -79,7 +79,9 @@ fn main() {
     .level(true)
     .init()
     .expect("logger to initiate");
-    let result = if matches.is_present("print-template") {
+    let result = if matches.is_present("init") {
+        cargo_wix::init()
+    } else if matches.is_present("print-template") {
         cargo_wix::print_template()
     } else {
         cargo_wix::Wix::new()
