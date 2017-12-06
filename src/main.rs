@@ -80,8 +80,9 @@ fn main() {
         cargo_wix::print_template()
     } else {
         cargo_wix::Wix::new()
-            .sign(matches.is_present("sign"))
             .capture_output(!matches.is_present("nocapture"))
+            .sign(matches.is_present("sign"))
+            .timestamp(matches.value_of("timestamp"))
             .run()
     };
     match result {

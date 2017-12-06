@@ -163,15 +163,17 @@ impl Default for Platform {
 }
 
 pub struct Wix {
-    sign: bool,
     capture_output: bool,
+    sign: bool,
+    timestamp: Option<String>,
 }
 
 impl Wix {
     pub fn new() -> Self {
         Wix {
-            sign: false,
             capture_output: true,
+            sign: false,
+            timestamp: None,
         }
     }
 
@@ -182,6 +184,11 @@ impl Wix {
 
     pub fn sign(mut self, s: bool) -> Self {
         self.sign = s;
+        self
+    }
+
+    pub fn timestamp(mut self, t: Option<&str>) -> Self {
+        self.timestamp = t.map(|t| String::from(t));
         self
     }
 
@@ -326,12 +333,12 @@ impl Wix {
                     signer.stdout(Stdio::null());
                     signer.stderr(Stdio::null());
                 }
-                signer.arg("sign")
-                    .arg("/a")
-                    //.arg("/t")
-                    //.arg("http://timestamp.comodoca.com")
-                    .arg(&main_msi)
-                    .status()
+                signer.arg("sign").arg("/a");
+                if let Some(t) = self.timestamp {
+                    signer.arg("/t");
+                    signer.arg(t);
+                }
+                signer.arg(&main_msi).status()
             }.ok() {
                 if !status.success() {
                     // TODO: Add better error message
