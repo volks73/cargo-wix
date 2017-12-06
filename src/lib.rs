@@ -29,6 +29,7 @@ use toml::Value;
 use uuid::Uuid;
 
 const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
+const CARGO: &str = "cargo";
 const WIX_TOOLSET_COMPILER: &str = "candle";
 const WIX_TOOLSET_LINKER: &str = "light";
 const SIGNTOOL: &str = "signtool";
@@ -84,7 +85,7 @@ impl Error {
             Error::Link(..) => 5,
             Error::Manifest(..) => 6,
             Error::Mustache(..) => 7,
-            Error::Sign(..) => 7,
+            Error::Sign(..) => 8,
             Error::Toml(..) => 9,
         }
     }
@@ -208,6 +209,7 @@ impl Default for Platform {
 #[derive(Debug, Clone)]
 pub struct Wix {
     capture_output: bool,
+    input: Option<PathBuf>,
     sign: bool,
     timestamp: Option<String>,
 }
@@ -217,6 +219,7 @@ impl Wix {
     pub fn new() -> Self {
         Wix {
             capture_output: true,
+            input: None,
             sign: false,
             timestamp: None,
         }
@@ -229,6 +232,12 @@ impl Wix {
     /// statements.
     pub fn capture_output(mut self, c: bool) -> Self {
         self.capture_output = c;
+        self
+    }
+
+    /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.rs`.
+    pub fn input(mut self, i: Option<&str>) -> Self {
+        self.input = i.map(|i| PathBuf::from(i));
         self
     }
 
@@ -299,9 +308,20 @@ impl Wix {
             Platform::X86
         };
         debug!("platform = {:?}", platform);
-        let mut main_wxs = PathBuf::from("wix");
-        main_wxs.push("main");
-        main_wxs.set_extension("wxs");
+        let main_wxs = if let Some(p) = self.input {
+            if p.exists() {
+                trace!("Using the '{}' WiX source file", p.display());
+                Ok(p)
+            } else {
+                Err(Error::Generic(format!("The '{}' WiX source (wxs) file does not exist", p.display())))
+            }
+        } else {
+            trace!("Using the default 'wix\\main.wxs' WiX source file");
+            let mut main_wxs = PathBuf::from("wix");
+            main_wxs.push("main");
+            main_wxs.set_extension("wxs");
+            Ok(main_wxs)
+        }?;
         debug!("main_wxs = {:?}", main_wxs);
         let mut main_wixobj = PathBuf::from("target");
         main_wixobj.push("wix");
@@ -321,8 +341,9 @@ impl Wix {
         // this will essentially do nothing.
         info!("Building release binary");
         if let Some(status) = {
-            let mut builder = Command::new("cargo");
+            let mut builder = Command::new(CARGO);
             if self.capture_output {
+                trace!("Capturing the '{}' output", CARGO);
                 builder.stdout(Stdio::null());
                 builder.stderr(Stdio::null());
             }
@@ -340,6 +361,7 @@ impl Wix {
         if let Some(status) = {
             let mut compiler = Command::new(WIX_TOOLSET_COMPILER);
             if self.capture_output {
+                trace!("Capturing the '{}' output", WIX_TOOLSET_COMPILER);
                 compiler.stdout(Stdio::null());
                 compiler.stderr(Stdio::null());
             } 
@@ -363,7 +385,8 @@ impl Wix {
         info!("Linking the installer");
         if let Some(status) = {
             let mut linker = Command::new(WIX_TOOLSET_LINKER);
-            if self.capture_output {    
+            if self.capture_output {
+                trace!("Capturing the '{}' output", WIX_TOOLSET_LINKER);
                 linker.stdout(Stdio::null());
                 linker.stderr(Stdio::null());
             }
@@ -386,11 +409,13 @@ impl Wix {
             if let Some(status) = {
                 let mut signer = Command::new(SIGNTOOL);
                 if self.capture_output {
+                    trace!("Capturing the {} output", SIGNTOOL);
                     signer.stdout(Stdio::null());
                     signer.stderr(Stdio::null());
                 }
                 signer.arg("sign").arg("/a");
                 if let Some(t) = self.timestamp {
+                    trace!("Using the '{}' timestamp server to sign the installer", t); 
                     signer.arg("/t");
                     signer.arg(t);
                 }
