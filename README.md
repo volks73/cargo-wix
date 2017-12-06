@@ -35,7 +35,14 @@ Navigate to the Rust binary project's root folder and run the subcommand:
 C:\Path\To\Project\>cargo wix
 ```
 
-The `cargo wix` subcommand will search for a `main.wxs` file in a `wix` folder within the root folder of the project. If found, it will compile the `main.wxs` file and then link the object file (`main.wixobj`) to create the Windows installer (msi). The installer will be located in the `target\wix` folder. All artifacts of the installer compilation and linking process are placed within the `target\wix` folder. Paths in the `main.wxs` file should be relative to the project's root folder, i.e. the same location as the `Cargo.toml` manifest file.
+The `cargo wix` subcommand will search for a `main.wxs` file in a `wix` folder within the root folder of the project. If found, it will compile the `main.wxs` file and then link the object file (`main.wixobj`) to create the Windows installer (msi). The installer will be located in the `target\wix` folder. All artifacts of the installer compilation and linking process are placed within the `target\wix` folder. Paths in the `main.wxs` file should be relative to the project's root folder, i.e. the same location as the `Cargo.toml` manifest file. 
+
+The `--print-template` flag, which prints a WiX Source (wxs) template stdout, can be used to create the `main.wxs` file. A template.wxs file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary. Use the following commands to create the `main.wxs` file in the `wix` subfolder. The `main.wxs` can then be customized using a text editor, but modification of the xml preprocessor variables should be avoided to ensure the `cargo wix` command functions properly.
+
+```dos
+C:\Path\To\Project\>mkdir wix
+C:\Path\To\Project\>cargo --print-template > wix\main.wxs
+```
 
 The feature for signing the installer is still under heavy development, but to eventually sign the installer (msi) once it has been created, use the `--sign` flag with the subcommand as follows:
 
