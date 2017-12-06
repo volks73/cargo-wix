@@ -239,6 +239,7 @@ impl Default for Platform {
 pub struct Wix {
     capture_output: bool,
     input: Option<PathBuf>,
+    manufacturer: Option<String>,
     sign: bool,
     timestamp: Option<String>,
 }
@@ -249,6 +250,7 @@ impl Wix {
         Wix {
             capture_output: true,
             input: None,
+            manufacturer: None,
             sign: false,
             timestamp: None,
         }
@@ -267,6 +269,13 @@ impl Wix {
     /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.rs`.
     pub fn input(mut self, i: Option<&str>) -> Self {
         self.input = i.map(|i| PathBuf::from(i));
+        self
+    }
+
+    /// Overrides the first author in the `authors` field of the package's manifest (Cargo.toml) as
+    /// the manufacturer within the installer.
+    pub fn manufacturer(mut self, m: Option<&str>) -> Self {
+        self.manufacturer = m.map(|s| String::from(s));
         self
     }
 
@@ -315,14 +324,18 @@ impl Wix {
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str())
             .ok_or(Error::Manifest(String::from("description")))?;
-        let pkg_author = cargo_values
-            .get("package")
+        let manufacturer = if let Some(m) = self.manufacturer {
+            Ok(m)
+        } else {
+            cargo_values.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("authors"))
             .and_then(|a| a.as_array())
             .and_then(|a| a.get(0)) // For now, just use the first author
             .and_then(|f| f.as_str())
-            .ok_or(Error::Manifest(String::from("authors")))?;
+            .map(|m| String::from(m))
+            .ok_or(Error::Manifest(String::from("authors")))
+        }?;
         debug!("pkg_description = {:?}", pkg_description);
         let help_url = cargo_values
             .get("package")
@@ -405,7 +418,7 @@ impl Wix {
                 .arg(format!("-dProductName={}", pkg_name))
                 .arg(format!("-dBinaryName={}", bin_name))
                 .arg(format!("-dDescription={}", pkg_description))
-                .arg(format!("-dAuthor={}", pkg_author))
+                .arg(format!("-dManufacturer={}", manufacturer))
                 .arg(format!("-dHelp={}", help_url))
                 .arg("-o")
                 .arg(&main_wixobj)

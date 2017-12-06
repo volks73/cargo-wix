@@ -26,7 +26,7 @@
         Id='*' 
         Name='$(var.ProductName)' 
         UpgradeCode='{{upgrade-code-guid}}' 
-        Manufacturer='$(var.Author)'
+        Manufacturer='$(var.Manufacturer)'
         Language='1033' 
         Codepage='1252' 
         Version='$(var.Version)'>
@@ -34,7 +34,7 @@
         <Package Id='*' 
             Keywords='Installer' 
             Description='$(var.Description)'
-            Manufacturer='$(var.Author)'
+            Manufacturer='$(var.Manufacturer)'
             InstallerVersion='450' 
             Languages='1033' 
             Compressed='yes' 
