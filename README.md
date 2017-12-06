@@ -13,7 +13,7 @@ The cargo-wix project can be installed on any platform supported by the [Rust](h
 - [Cargo](http://doc.crates.io)
 - [Rust](https://www.rust-lang.org)
 - [WiX Toolset](http://wixtoolset.org)
-- [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk), need for signing the installer
+- [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk), needed for optionally signing the installer
 
 The [SignTool](https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx) executable is used to optionally sign an installer. It is available as part of the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk).
 
