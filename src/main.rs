@@ -319,7 +319,7 @@ fn main() {
                      .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                      .long("nocapture"))
                 .arg(Arg::with_name("print-template")
-                     .help("Prints a template WiX Source (wxs) file to use with this subcommand to stdout.")
+                     .help("Prints a template WiX Source (wxs) file to use with this subcommand to stdout. The template provided with this subcommand uses xml preprocessor varaibles to set values based on fields in the rust project's manifest file (Cargo.toml). Only the '{{replace-with-a-guid}}' placeholders within the template need to be modified with unique GUIDs by hand. Redirection can be used to save the contents to 'main.wxs' and then placed in the 'wix' subfolder.")
                      .long("print-template"))
                 .arg(Arg::with_name("sign")
                      .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")

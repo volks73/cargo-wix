@@ -25,7 +25,7 @@
     <Product 
         Id='*' 
         Name='$(var.ProductName)' 
-        UpgradeCode='D573A799-0FFE-493B-BDCD-A2B506955747' 
+        UpgradeCode='{{replace-with-a-guid}}' 
         Manufacturer='$(var.Author)'
         Language='1033' 
         Codepage='1252' 
@@ -61,7 +61,7 @@
                             KeyPath='yes'/>
                     </Component>
                     <Directory Id='Bin' Name='bin'>
-                        <Component Id='Path' Guid='' Win64='$(var.Win64)' KeyPath='yes'>
+                        <Component Id='Path' Guid='{{replace-with-a-guid}}' Win64='$(var.Win64)' KeyPath='yes'>
                             <Environment 
                                 Id='PATH' 
                                 Name='PATH' 
