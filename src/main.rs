@@ -180,6 +180,14 @@ fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error
         .and_then(|t| t.get("description"))
         .and_then(|d| d.as_str())
         .ok_or(Error::Manifest(String::from("description")))?;
+    let pkg_author = cargo_values
+        .get("package")
+        .and_then(|p| p.as_table())
+        .and_then(|t| t.get("authors"))
+        .and_then(|a| a.as_array())
+        .and_then(|a| a.get(0)) // For now, just use the first author
+        .and_then(|f| f.as_str())
+        .ok_or(Error::Manifest(String::from("authors")))?;
     debug!("pkg_description = {:?}", pkg_description);
     let bin_name = cargo_values
         .get("bin")
@@ -237,6 +245,7 @@ fn run(platform: Platform, sign: bool, capture_output: bool) -> Result<(), Error
             .arg(format!("-dProductName={}", pkg_name))
             .arg(format!("-dBinaryName={}", bin_name))
             .arg(format!("-dDescription={}", pkg_description))
+            .arg(format!("-dAuthor={}", pkg_author))
             .arg("-o")
             .arg(&main_wixobj)
             .arg(&main_wxs)
