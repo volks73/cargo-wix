@@ -510,3 +510,51 @@ impl Default for Wix {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn defaults_are_correct() {
+        let wix = Wix::new();
+        assert!(wix.capture_output);
+        assert_eq!(wix.input, None);
+        assert_eq!(wix.manufacturer, None);
+        assert!(!wix.sign);
+        assert_eq!(wix.timestamp, None);
+    }
+
+    #[test]
+    fn capture_output_works() {
+        let wix = Wix::new().capture_output(false);
+        assert!(!wix.capture_output);
+    }
+
+    #[test]
+    fn input_works() {
+        const EXPECTED: &str = "test.wxs";
+        let wix = Wix::new().input(Some(EXPECTED));
+        assert_eq!(wix.input, Some(PathBuf::from(EXPECTED)));
+    }
+
+    #[test]
+    fn manufacturer_works() {
+        const EXPECTED: &str = "Tester";
+        let wix = Wix::new().manufacturer(Some(EXPECTED));
+        assert_eq!(wix.manufacturer, Some(String::from(EXPECTED)));
+    }
+
+    #[test]
+    fn sign_works() {
+        let wix = Wix::new().sign(true);
+        assert!(wix.sign);
+    }
+
+    #[test]
+    fn timestamp_works() {
+        const EXPECTED: &str = "http://timestamp.comodoca.com/";
+        let wix = Wix::new().timestamp(Some(EXPECTED));
+        assert_eq!(wix.timestamp, Some(String::from(EXPECTED)));
+    }
+}
+
