@@ -477,6 +477,11 @@ impl Wix {
                 .ok_or(Error::Manifest(String::from("description")))
         }?;
         debug!("description = {:?}", description);
+        let homepage = cargo_values.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("homepage"))
+            .and_then(|d| d.as_str());
+        debug!("homepage = {:?}", homepage);
         let license_name = if let Some(ref l) = self.license_path {
             l.file_name()
                 .and_then(|f| f.to_str())
@@ -653,6 +658,10 @@ impl Wix {
                 .arg("/a")
                 .arg("/d")
                 .arg(format!("{} - {}", product_name, description));
+            if let Some(h) = homepage {
+                trace!("Using the '{}' URL for the expanded description", h);
+                signer.arg("/du").arg(h);
+            }
             if let Some(t) = self.timestamp {
                 let server = TimestampServer::from_str(&t)?;
                 trace!("Using the '{}' timestamp server to sign the installer", server); 
