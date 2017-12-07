@@ -131,7 +131,7 @@ pub fn init(force: bool) -> Result<(), Error> {
 
 /// The error type for cargo-wix-related operations and associated traits.
 ///
-/// Errors mostly originate from the dependencies, but custom instances of Error can be created
+/// Errors mostly originate from the dependencies, but custom instances of `Error` can be created
 /// with the `Generic` variant and a message.
 #[derive(Debug)]
 pub enum Error {
