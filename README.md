@@ -1,6 +1,6 @@
 # cargo-wix: A cargo subcommand to create Windows installers
 
-[About](#what-is-cargo-wix) | [Installation](#installation) | [Usage](#usage)  
+[About](#what-is-cargo-wix) | [Installation](#installation) | [Usage](#usage) | [Documentation](https://volks73.github.io/cargo-wix) 
 
 ## What is cargo-wix?
 
