@@ -54,10 +54,10 @@
                 <Directory Id='APPLICATIONFOLDER' Name='$(var.ProductName)'>
                     <Component Id='License' Guid='*' Win64='$(var.Win64)'>
                         <File 
-                            Id='LicenseTXT' 
-                            Name='License.txt' 
+                            Id='LicenseFile' 
+                            Name='$(var.LicenseName)'
                             DiskId='1' 
-                            Source='$(var.License)' 
+                            Source='$(var.LicenseSource)' 
                             KeyPath='yes'/>
                     </Component>
                     <Directory Id='Bin' Name='bin'>

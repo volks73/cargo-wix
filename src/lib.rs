@@ -66,11 +66,13 @@
 
 #[macro_use] extern crate log;
 extern crate mustache;
+extern crate regex;
 extern crate toml;
 extern crate uuid;
 
 use mustache::MapBuilder;
 use std::default::Default;
+use regex::Regex;
 use std::error::Error as StdError;
 use std::fmt;
 use std::fs::{self, File};
@@ -429,7 +431,27 @@ impl Wix {
                 .ok_or(Error::Manifest(String::from("description")))
         }?;
         debug!("description = {:?}", description);
-        let license_path = self.license_path.unwrap_or(
+        let license_name = if let Some(ref l) = self.license_path {
+            l.file_name()
+                .and_then(|f| f.to_str())
+                .map(|s| String::from(s))
+                .ok_or(Error::Generic(
+                    format!("The '{}' license path does not contain a file name.", l.display())
+                ))
+        } else {
+            cargo_values.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("license-file"))
+                .and_then(|l| l.as_str())
+                .and_then(|s| Path::new(s).file_name().and_then(|f| f.to_str()))
+                .or(Some("License.txt"))
+                .map(|s| String::from(s))
+                .ok_or(Error::Generic(
+                    format!("The 'license-file' field value does not contain a file name.")
+                )) 
+        }?;
+        debug!("license_name = {:?}", license_name);
+        let license_source = self.license_path.unwrap_or(
             // TODO: Add generation of license file from `license` field
             cargo_values.get("package")
                 .and_then(|p| p.as_table())
@@ -438,7 +460,7 @@ impl Wix {
                 .map(|s| PathBuf::from(s))
                 .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
         );
-        debug!("license_path = {:?}", license_path);
+        debug!("license_source = {:?}", license_source);
         let manufacturer = if let Some(m) = self.manufacturer {
             Ok(m)
         } else {
@@ -446,9 +468,14 @@ impl Wix {
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("authors"))
                 .and_then(|a| a.as_array())
-                .and_then(|a| a.get(0)) // For now, just use the first author
+                .and_then(|a| a.get(0)) 
                 .and_then(|f| f.as_str())
-                .map(|m| String::from(m))
+                .and_then(|s| {
+                    // Strip email if it exists.
+                    let re = Regex::new(r"<(.*?)>").unwrap();
+                    Some(re.replace_all(s, ""))
+                })
+                .map(|s| String::from(s.trim()))
                 .ok_or(Error::Manifest(String::from("authors")))
         }?;
         debug!("manufacturer = {}", manufacturer);
@@ -538,7 +565,8 @@ impl Wix {
             .arg(format!("-dBinaryName={}", binary_name))
             .arg(format!("-dDescription={}", description))
             .arg(format!("-dManufacturer={}", manufacturer))
-            .arg(format!("-dLicense={}", license_path.display()))
+            .arg(format!("-dLicenseName={}", license_name))
+            .arg(format!("-dLicenseSource={}", license_source.display()))
             .arg(format!("-dHelp={}", help_url))
             .arg("-o")
             .arg(&main_wixobj)
@@ -644,6 +672,22 @@ mod tests {
         const EXPECTED: &str = "http://timestamp.comodoca.com/";
         let wix = Wix::new().timestamp(Some(EXPECTED));
         assert_eq!(wix.timestamp, Some(String::from(EXPECTED)));
+    }
+
+    #[test]
+    fn strip_email_works() {
+        const EXPECTED: &str = "Christopher R. Field";
+        let re = Regex::new(r"<(.*?)>").unwrap();
+        let actual = re.replace_all("Christopher R. Field <cfield2@gmail.com>", "");
+        assert_eq!(actual.trim(), EXPECTED);
+    }
+
+    #[test]
+    fn strip_email_works_without_email() {
+        const EXPECTED: &str = "Christopher R. Field";
+        let re = Regex::new(r"<(.*?)>").unwrap();
+        let actual = re.replace_all("Christopher R. Field", "");
+        assert_eq!(actual.trim(), EXPECTED);
     }
 }
 
