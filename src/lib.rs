@@ -689,5 +689,13 @@ mod tests {
         let actual = re.replace_all("Christopher R. Field", "");
         assert_eq!(actual.trim(), EXPECTED);
     }
+
+    #[test]
+    fn strip_email_works_with_only_email() {
+        const EXPECTED: &str = "cfield2@gmail.com";
+        let re = Regex::new(r"<(.*?)>").unwrap();
+        let actual = re.replace_all("cfield2@gmail.com", "");
+        assert_eq!(actual.trim(), EXPECTED);
+    }
 }
 
