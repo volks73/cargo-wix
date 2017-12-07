@@ -57,7 +57,7 @@
                             Id='LicenseTXT' 
                             Name='License.txt' 
                             DiskId='1' 
-                            Source='LICENSE.txt' 
+                            Source='$(var.License)' 
                             KeyPath='yes'/>
                     </Component>
                     <Directory Id='Bin' Name='bin'>

@@ -82,6 +82,7 @@ use uuid::Uuid;
 
 const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 const CARGO: &str = "cargo";
+const DEFAULT_LICENSE_FILE_NAME: &str = "LICENSE";
 const SIGNTOOL: &str = "signtool";
 const WIX: &str = "wix";
 const WIX_COMPILER: &str = "candle";
@@ -193,7 +194,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::Command(ref command, ref code) => 
-                write!(f, "The {} application failed with exit code = {}. Consider using the '--nocapture' flag to obtain more information.", command, code),
+                write!(f, "The '{}' application failed with exit code = {}. Consider using the '--nocapture' flag to obtain more information.", command, code),
             Error::Generic(ref msg) => write!(f, "{}", msg),
             Error::Io(ref err) => write!(f, "{}", err),
             Error::Manifest(ref var) => 
@@ -284,6 +285,7 @@ pub struct Wix {
     capture_output: bool,
     description: Option<String>,
     input: Option<PathBuf>,
+    license_path: Option<PathBuf>,
     manufacturer: Option<String>,
     product_name: Option<String>,
     sign: bool,
@@ -298,6 +300,7 @@ impl Wix {
             capture_output: true,
             description: None,
             input: None,
+            license_path: None,
             manufacturer: None,
             product_name: None,
             sign: false,
@@ -335,6 +338,16 @@ impl Wix {
     /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.rs`.
     pub fn input(mut self, i: Option<&str>) -> Self {
         self.input = i.map(|i| PathBuf::from(i));
+        self
+    }
+    
+    /// Sets the path to a file to used as the `License.txt` file within the installer.
+    ///
+    /// The `License.txt` file is installed into the installation location along side the `bin`
+    /// folder. Note, the file can be in any format with any name, but it is automatically renamed
+    /// to `License.txt` during creation of the installer.
+    pub fn license_file(mut self, l: Option<&str>) -> Self {
+        self.license_path = l.map(|l| PathBuf::from(l));
         self
     }
 
@@ -412,10 +425,20 @@ impl Wix {
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("description"))
                 .and_then(|d| d.as_str())
-                .map(|m| String::from(m))
+                .map(|s| String::from(s))
                 .ok_or(Error::Manifest(String::from("description")))
         }?;
         debug!("description = {:?}", description);
+        let license_path = self.license_path.unwrap_or(
+            // TODO: Add generation of license file from `license` field
+            cargo_values.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("license-file"))
+                .and_then(|l| l.as_str())
+                .map(|s| PathBuf::from(s))
+                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
+        );
+        debug!("license_path = {:?}", license_path);
         let manufacturer = if let Some(m) = self.manufacturer {
             Ok(m)
         } else {
@@ -515,6 +538,7 @@ impl Wix {
             .arg(format!("-dBinaryName={}", binary_name))
             .arg(format!("-dDescription={}", description))
             .arg(format!("-dManufacturer={}", manufacturer))
+            .arg(format!("-dLicense={}", license_path.display()))
             .arg(format!("-dHelp={}", help_url))
             .arg("-o")
             .arg(&main_wixobj)
