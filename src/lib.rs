@@ -129,6 +129,10 @@ pub fn init(force: bool) -> Result<(), Error> {
     }
 }
 
+/// The error type for cargo-wix-related operations and associated traits.
+///
+/// Errors mostly originate from the dependencies, but custom instances of Error can be created
+/// with the `Generic` variant and a message.
 #[derive(Debug)]
 pub enum Error {
     /// A command operation failed.
@@ -273,7 +277,7 @@ impl Default for Platform {
     }
 }
 
-/// The builder for running the subcommand.
+/// A builder for running the subcommand.
 #[derive(Debug, Clone)]
 pub struct Wix {
     binary_name: Option<String>,
