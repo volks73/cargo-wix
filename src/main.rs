@@ -86,7 +86,7 @@ fn main() {
                      .short("s")
                      .long("sign"))
                 .arg(Arg::with_name("timestamp")
-                     .help("The URL for the timestamp server used with the 'signtool' to sign the installer. This can only be used with the '-s,--sign' flag.")
+                     .help("The alias or URL for the timestamp server used with the 'signtool' to sign the installer. This can only be used with the '-s,--sign' flag. Either an alias can be used or a URL. Available case-insensitive aliases include: Comodo and Verisign.")
                      .short("t")
                      .long("timestamp")
                      .takes_value(true)

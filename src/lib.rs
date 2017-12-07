@@ -79,6 +79,7 @@ use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::str::FromStr;
 use toml::Value;
 use uuid::Uuid;
 
@@ -276,6 +277,51 @@ impl Default for Platform {
             Platform::X64
         } else {
             Platform::X86
+        }
+    }
+}
+
+/// The aliases for the URLs to different Microsoft Authenticode timestamp servers.
+#[derive(Debug, Clone, PartialEq)]
+pub enum TimestampServer {
+    Custom(String),
+    Comodo,
+    Verisign,
+}
+
+impl TimestampServer {
+    /// Gets the possible string representations of each variant.
+    pub fn possible_values() -> Vec<&'static str> {
+        vec![
+            "Comodo", "comodo", "COMODO",
+            "Verisign", "verisign", "VERISIGN",
+        ]
+    }
+
+    /// Gets the URL of the timestamp server for an alias.
+    pub fn url(&self) -> &str {
+        match *self {
+            TimestampServer::Custom(ref url) => url,
+            TimestampServer::Comodo => "http://timestamp.comodoca.com/",
+            TimestampServer::Verisign => "http://timestamp.verisign.com/scripts/timstamp.dll",
+        }
+    }
+}
+ 
+impl fmt::Display for TimestampServer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.url())
+    }
+}
+
+impl FromStr for TimestampServer {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().trim() {
+            "comodo" => Ok(TimestampServer::Comodo),
+            "verisign" => Ok(TimestampServer::Verisign),
+            u @ _ => Ok(TimestampServer::Custom(String::from(u)))
         }
     }
 }
@@ -605,9 +651,10 @@ impl Wix {
             }
             signer.arg("sign").arg("/a");
             if let Some(t) = self.timestamp {
-                trace!("Using the '{}' timestamp server to sign the installer", t); 
+                let server = TimestampServer::from_str(&t)?;
+                trace!("Using the '{}' timestamp server to sign the installer", server); 
                 signer.arg("/t");
-                signer.arg(t);
+                signer.arg(server.url());
             }
             let status = signer.arg(&main_msi).status()?;
             if !status.success() {
