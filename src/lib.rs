@@ -81,22 +81,16 @@ pub fn init(force: bool) -> Result<(), Error> {
 
 #[derive(Debug)]
 pub enum Error {
-    /// A build operation for the release binary failed.
-    Build(String),
-    /// A compiler operation failed.
-    Compile(String),
+    /// A command operation failed.
+    Command(&'static str, i32),
     /// A generic or custom error occurred. The message should contain the detailed information.
     Generic(String),
     /// An I/O operation failed.
     Io(io::Error),
-    /// A linker operation failed.
-    Link(String),
     /// A needed field within the `Cargo.toml` manifest could not be found.
     Manifest(String),
     /// An error occurred with rendering the template using the mustache renderer.
     Mustache(mustache::Error),
-    /// A signing operation failed.
-    Sign(String),
     /// Parsing of the `Cargo.toml` manifest failed.
     Toml(toml::de::Error),
 }
@@ -109,15 +103,12 @@ impl Error {
     /// testing equality between two errors.
     pub fn code(&self) -> i32 {
         match *self{
-            Error::Build(..) => 1,
-            Error::Compile(..) => 2,
-            Error::Generic(..) => 3,
-            Error::Io(..) => 4,
-            Error::Link(..) => 5,
-            Error::Manifest(..) => 6,
-            Error::Mustache(..) => 7,
-            Error::Sign(..) => 8,
-            Error::Toml(..) => 9,
+            Error::Command(..) => 1,
+            Error::Generic(..) => 2,
+            Error::Io(..) => 3,
+            Error::Manifest(..) => 4,
+            Error::Mustache(..) => 5,
+            Error::Toml(..) => 6,
         }
     }
 }
@@ -125,14 +116,11 @@ impl Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::Build(..) => "Build",
-            Error::Compile(..) => "Compile",
+            Error::Command(..) => "Command",
             Error::Generic(..) => "Generic",
             Error::Io(..) => "Io",
-            Error::Link(..) => "Link",
             Error::Manifest(..) => "Manifest",
             Error::Mustache(..) => "Mustache",
-            Error::Sign(..) => "Sign",
             Error::Toml(..) => "TOML",
         }
     }
@@ -150,14 +138,13 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Build(ref msg) => write!(f, "{}", msg),
-            Error::Compile(ref msg) => write!(f, "{}", msg),
+            Error::Command(ref command, ref code) => 
+                write!(f, "The {} application failed with exit code = {}. Consider using the '--nocapture' flag to obtain more information.", command, code),
             Error::Generic(ref msg) => write!(f, "{}", msg),
             Error::Io(ref err) => write!(f, "{}", err),
-            Error::Link(ref msg) => write!(f, "{}", msg),
-            Error::Manifest(ref var) => write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
+            Error::Manifest(ref var) => 
+                write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
             Error::Mustache(ref err) => write!(f, "{}", err),
-            Error::Sign(ref msg) => write!(f, "{}", msg),
             Error::Toml(ref err) => write!(f, "{}", err),
         }
     }
@@ -367,11 +354,7 @@ impl Wix {
         let main_wxs = if let Some(p) = self.input {
             if p.exists() {
                 if p.is_dir() {
-                    Err(Error::Generic(
-                        format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", 
-                            p.display()
-                        )
-                    ))
+                    Err(Error::Generic(format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", p.display())))
                 } else {
                     trace!("Using the '{}' WiX source file", p.display());
                     Ok(p)
@@ -387,11 +370,7 @@ impl Wix {
             if main_wxs.exists() {
                 Ok(main_wxs)
             } else {
-               Err(Error::Generic(
-                   format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", 
-                       main_wxs.display()
-                   )
-               ))
+               Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", main_wxs.display())))
             }
         }?;
         debug!("main_wxs = {:?}", main_wxs);
@@ -412,92 +391,76 @@ impl Wix {
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
         info!("Building release binary");
-        if let Some(status) = {
-            let mut builder = Command::new(CARGO);
-            if self.capture_output {
-                trace!("Capturing the '{}' output", CARGO);
-                builder.stdout(Stdio::null());
-                builder.stderr(Stdio::null());
-            }
-            builder.arg("build")
-                .arg("--release")
-                .status()
-        }.ok() {
-            if !status.success() {
-                // TODO: Add better error message
-                return Err(Error::Build(String::from("Failed to build the release executable")));
-            }
+        let mut builder = Command::new(CARGO);
+        if self.capture_output {
+            trace!("Capturing the '{}' output", CARGO);
+            builder.stdout(Stdio::null());
+            builder.stderr(Stdio::null());
+        }
+        let status = builder.arg("build").arg("--release").status()?;
+        if !status.success() {
+            return Err(Error::Command(CARGO, status.code().unwrap_or(0)));
         }
         // Compile the installer
         info!("Compiling installer");
-        if let Some(status) = {
-            let mut compiler = Command::new(WIX_COMPILER);
-            if self.capture_output {
-                trace!("Capturing the '{}' output", WIX_COMPILER);
-                compiler.stdout(Stdio::null());
-                compiler.stderr(Stdio::null());
-            } 
-            compiler.arg(format!("-dVersion={}", pkg_version))
-                .arg(format!("-dPlatform={}", platform))
-                .arg(format!("-dProductName={}", pkg_name))
-                .arg(format!("-dBinaryName={}", bin_name))
-                .arg(format!("-dDescription={}", pkg_description))
-                .arg(format!("-dManufacturer={}", manufacturer))
-                .arg(format!("-dHelp={}", help_url))
-                .arg("-o")
-                .arg(&main_wixobj)
-                .arg(&main_wxs)
-                .status()
-        }.ok() {
-            if !status.success() {
-                // TODO: Add better error message
-                return Err(Error::Compile(String::from("Failed to compile the installer")));
-            }
+        let mut compiler = Command::new(WIX_COMPILER);
+        if self.capture_output {
+            trace!("Capturing the '{}' output", WIX_COMPILER);
+            compiler.stdout(Stdio::null());
+            compiler.stderr(Stdio::null());
+        } 
+        let status = compiler
+            .arg(format!("-dVersion={}", pkg_version))
+            .arg(format!("-dPlatform={}", platform))
+            .arg(format!("-dProductName={}", pkg_name))
+            .arg(format!("-dBinaryName={}", bin_name))
+            .arg(format!("-dDescription={}", pkg_description))
+            .arg(format!("-dManufacturer={}", manufacturer))
+            .arg(format!("-dHelp={}", help_url))
+            .arg("-o")
+            .arg(&main_wixobj)
+            .arg(&main_wxs)
+            .status()?;
+        if !status.success() {
+            return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(0)));
         }
         // Link the installer
         info!("Linking the installer");
-        if let Some(status) = {
-            let mut linker = Command::new(WIX_LINKER);
-            if self.capture_output {
-                trace!("Capturing the '{}' output", WIX_LINKER);
-                linker.stdout(Stdio::null());
-                linker.stderr(Stdio::null());
-            }
-            linker.arg("-ext")
-                .arg("WixUIExtension")
-                .arg("-cultures:en-us")
-                .arg(&main_wixobj)
-                .arg("-out")
-                .arg(&main_msi)
-                .status()
-        }.ok() {
-            if !status.success() {
-                // TODO: Add better error message
-                return Err(Error::Link(String::from("Failed to link the installer")));
-            }
+        let mut linker = Command::new(WIX_LINKER);
+        if self.capture_output {
+            trace!("Capturing the '{}' output", WIX_LINKER);
+            linker.stdout(Stdio::null());
+            linker.stderr(Stdio::null());
+        }
+        let status = linker
+            .arg("-ext")
+            .arg("WixUIExtension")
+            .arg("-cultures:en-us")
+            .arg(&main_wixobj)
+            .arg("-out")
+            .arg(&main_msi)
+            .status()?;
+        if !status.success() {
+            return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(0)));
         }
         // Sign the installer
         if self.sign {
             info!("Signing the installer");
-            if let Some(status) = {
-                let mut signer = Command::new(SIGNTOOL);
-                if self.capture_output {
-                    trace!("Capturing the {} output", SIGNTOOL);
-                    signer.stdout(Stdio::null());
-                    signer.stderr(Stdio::null());
-                }
-                signer.arg("sign").arg("/a");
-                if let Some(t) = self.timestamp {
-                    trace!("Using the '{}' timestamp server to sign the installer", t); 
-                    signer.arg("/t");
-                    signer.arg(t);
-                }
-                signer.arg(&main_msi).status()
-            }.ok() {
-                if !status.success() {
-                    // TODO: Add better error message
-                    return Err(Error::Sign(String::from("Failed to sign the installer")));
-                }
+            let mut signer = Command::new(SIGNTOOL);
+            if self.capture_output {
+                trace!("Capturing the {} output", SIGNTOOL);
+                signer.stdout(Stdio::null());
+                signer.stderr(Stdio::null());
+            }
+            signer.arg("sign").arg("/a");
+            if let Some(t) = self.timestamp {
+                trace!("Using the '{}' timestamp server to sign the installer", t); 
+                signer.arg("/t");
+                signer.arg(t);
+            }
+            let status = signer.arg(&main_msi).status()?;
+            if !status.success() {
+                return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(0)));
             }
         }
         Ok(())
