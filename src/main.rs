@@ -102,17 +102,13 @@ fn main() {
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = matches.occurrences_of("verbose");
-    if verbosity > 3 {
-        loggerv::Logger::new()
-            .line_numbers(true)
-            .module_path(true)
-    } else {
-        loggerv::Logger::new()
-            .module_path(false)
-    }.verbosity(verbosity)
-    .level(true)
-    .init()
-    .expect("logger to initiate");
+    loggerv::Logger::new()
+        .verbosity(verbosity)
+        .line_numbers(verbosity > 3)
+        .module_path(false)
+        .level(true)
+        .init()
+        .expect("logger to initiate");
     let result = if matches.is_present("init") {
         cargo_wix::init(matches.is_present("force"))
     } else if matches.is_present("print-template") {
