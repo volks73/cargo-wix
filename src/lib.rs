@@ -226,9 +226,12 @@ impl Default for Platform {
 /// The builder for running the subcommand.
 #[derive(Debug, Clone)]
 pub struct Wix {
+    binary_name: Option<String>,
     capture_output: bool,
+    description: Option<String>,
     input: Option<PathBuf>,
     manufacturer: Option<String>,
+    product_name: Option<String>,
     sign: bool,
     timestamp: Option<String>,
 }
@@ -237,12 +240,23 @@ impl Wix {
     /// Creates a new `Wix` instance.
     pub fn new() -> Self {
         Wix {
+            binary_name: None,
             capture_output: true,
+            description: None,
             input: None,
             manufacturer: None,
+            product_name: None,
             sign: false,
             timestamp: None,
         }
+    }
+
+    /// Sets the binary name.
+    ///
+    /// This overrides the binary name determined from the package's manifest (Cargo.toml).
+    pub fn binary_name(mut self, b: Option<&str>) -> Self {
+        self.binary_name = b.map(|s| String::from(s));
+        self
     }
 
     /// Enables or disables capturing of the output from the builder (`cargo`), compiler
@@ -252,6 +266,15 @@ impl Wix {
     /// statements.
     pub fn capture_output(mut self, c: bool) -> Self {
         self.capture_output = c;
+        self
+    }
+
+    /// Sets the description.
+    ///
+    /// This override the description determined from the `description` field in the package's
+    /// manifest (Cargo.toml).
+    pub fn description(mut self, d: Option<&str>) -> Self {
+        self.description = d.map(|s| String::from(s));
         self
     }
 
@@ -265,6 +288,15 @@ impl Wix {
     /// the manufacturer within the installer.
     pub fn manufacturer(mut self, m: Option<&str>) -> Self {
         self.manufacturer = m.map(|s| String::from(s));
+        self
+    }
+
+    /// Sets the product name.
+    ///
+    /// This override the product name determined from the `name` field in the package's
+    /// manifest (Cargo.toml).
+    pub fn product_name(mut self, p: Option<&str>) -> Self {
+        self.product_name = p.map(|s| String::from(s));
         self
     }
 
@@ -287,9 +319,12 @@ impl Wix {
     /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
     /// (msi).
     pub fn run(self) -> Result<(), Error> {
+        debug!("binary_name = {:?}", self.binary_name);
         debug!("capture_output = {:?}", self.capture_output);
+        debug!("description = {:?}", self.description);
         debug!("input = {:?}", self.input);
         debug!("manufacturer = {:?}", self.manufacturer);
+        debug!("product_name = {:?}", self.product_name);
         debug!("sign = {:?}", self.sign);
         debug!("timestamp = {:?}", self.timestamp);
         let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
@@ -305,31 +340,39 @@ impl Wix {
             .and_then(|v| v.as_str())
             .ok_or(Error::Manifest(String::from("version")))?;
         debug!("pkg_version = {:?}", pkg_version);
-        let pkg_name = cargo_values
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("name"))
-            .and_then(|n| n.as_str())
-            .ok_or(Error::Manifest(String::from("name")))?;
-        debug!("pkg_name = {:?}", pkg_name);
-        let pkg_description = cargo_values
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("description"))
-            .and_then(|d| d.as_str())
-            .ok_or(Error::Manifest(String::from("description")))?;
-        debug!("pkg_description = {:?}", pkg_description);
+        let product_name = if let Some(p) = self.product_name {
+            Ok(p) 
+        } else {
+            cargo_values.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("name"))
+                .and_then(|n| n.as_str())
+                .map(|s| String::from(s))
+                .ok_or(Error::Manifest(String::from("name")))
+        }?;
+        debug!("product_name = {:?}", product_name);
+        let description = if let Some(d) = self.description {
+            Ok(d)
+        } else {
+            cargo_values.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("description"))
+                .and_then(|d| d.as_str())
+                .map(|m| String::from(m))
+                .ok_or(Error::Manifest(String::from("description")))
+        }?;
+        debug!("description = {:?}", description);
         let manufacturer = if let Some(m) = self.manufacturer {
             Ok(m)
         } else {
             cargo_values.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("authors"))
-            .and_then(|a| a.as_array())
-            .and_then(|a| a.get(0)) // For now, just use the first author
-            .and_then(|f| f.as_str())
-            .map(|m| String::from(m))
-            .ok_or(Error::Manifest(String::from("authors")))
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("authors"))
+                .and_then(|a| a.as_array())
+                .and_then(|a| a.get(0)) // For now, just use the first author
+                .and_then(|f| f.as_str())
+                .map(|m| String::from(m))
+                .ok_or(Error::Manifest(String::from("authors")))
         }?;
         debug!("manufacturer = {}", manufacturer);
         let help_url = cargo_values
@@ -338,13 +381,15 @@ impl Wix {
             .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
             .and_then(|h| h.as_str())
             .ok_or(Error::Manifest(String::from("documentation")))?;
-        let bin_name = cargo_values
-            .get("bin")
-            .and_then(|b| b.as_table())
-            .and_then(|t| t.get("name"))
-            .and_then(|n| n.as_str())
-            .unwrap_or(pkg_name);
-        debug!("bin_name = {:?}", bin_name);
+        let binary_name = self.binary_name.unwrap_or(
+            cargo_values.get("bin")
+                .and_then(|b| b.as_table())
+                .and_then(|t| t.get("name")) 
+                .and_then(|n| n.as_str())
+                .map(|s| String::from(s))
+                .unwrap_or(product_name.clone())
+        );
+        debug!("binary_name = {:?}", binary_name);
         let platform = if cfg!(target_arch = "x86_64") {
             Platform::X64
         } else {
@@ -386,7 +431,7 @@ impl Wix {
         // format, the `set_extension` method will replace the Patch version number and
         // architecture/platform with `msi`.  Instead, just include the extension in the formatted
         // name.
-        main_msi.push(&format!("{}-{}-{}.msi", pkg_name, pkg_version, platform.arch()));
+        main_msi.push(&format!("{}-{}-{}.msi", product_name, pkg_version, platform.arch()));
         debug!("main_msi = {:?}", main_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
@@ -412,9 +457,9 @@ impl Wix {
         let status = compiler
             .arg(format!("-dVersion={}", pkg_version))
             .arg(format!("-dPlatform={}", platform))
-            .arg(format!("-dProductName={}", pkg_name))
-            .arg(format!("-dBinaryName={}", bin_name))
-            .arg(format!("-dDescription={}", pkg_description))
+            .arg(format!("-dProductName={}", product_name))
+            .arg(format!("-dBinaryName={}", binary_name))
+            .arg(format!("-dDescription={}", description))
             .arg(format!("-dManufacturer={}", manufacturer))
             .arg(format!("-dHelp={}", help_url))
             .arg("-o")
@@ -480,9 +525,12 @@ mod tests {
     #[test]
     fn defaults_are_correct() {
         let wix = Wix::new();
+        assert_eq!(wix.binary_name, None);
         assert!(wix.capture_output);
+        assert_eq!(wix.description, None);
         assert_eq!(wix.input, None);
         assert_eq!(wix.manufacturer, None);
+        assert_eq!(wix.product_name, None);
         assert!(!wix.sign);
         assert_eq!(wix.timestamp, None);
     }
