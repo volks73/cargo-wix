@@ -649,7 +649,10 @@ impl Wix {
                 signer.stdout(Stdio::null());
                 signer.stderr(Stdio::null());
             }
-            signer.arg("sign").arg("/a");
+            signer.arg("sign")
+                .arg("/a")
+                .arg("/d")
+                .arg(format!("{} - {}", product_name, description));
             if let Some(t) = self.timestamp {
                 let server = TimestampServer::from_str(&t)?;
                 trace!("Using the '{}' timestamp server to sign the installer", server); 
