@@ -17,7 +17,7 @@
 //! The goal of the cargo-wix project and `cargo wix` subcommand is to make it easy to create
 //! a Windows installer (msi) for any Rust project.
 //!
-//! # Quick Start
+//! ## Quick Start
 //!
 //! Ensure the [WiX Toolset](http://wixtoolset.org) is installed and the `C:\Program Files\WiX
 //! Toolset\bin` folder has been added to the PATH system environment variable. Then start
@@ -25,19 +25,19 @@
 //!
 //! ```dos
 //! C:\>cargo install cargo-wix
-//! C:\>cd Path\To\Rust\Project
-//! C:\Path\To\Rust\Project\>cargo wix --init
-//! C:\Path\To\Rust\Project\>cargo wix
+//! C:\>cd Path\To\Project
+//! C:\Path\To\Project\>cargo wix --init
+//! C:\Path\To\Project\>cargo wix
 //! ```
 //!
-//! The Windows installer (msi) will be in the `C:\Path\To\Rust\Project\target\wix` folder.
+//! The Windows installer (msi) will be in the `C:\Path\To\Project\target\wix` folder.
 //!
-//! # Concepts
+//! ## Concepts
 //!
-//! cargo-wix is primarily implemented as a cargo subcommand, but the core functionality is
-//! provided in a library (crate). Documentation for the binary and Command Line Interface (CLI)
-//! are provided with the `cargo wix --help` command, but documentation is provided here for the
-//! core functionality and concepts.
+//! The cargo-wix project is primarily implemented as a cargo subcommand, but the core
+//! functionality is provided in a library (crate). Documentation for the binary and Command Line
+//! Interface (CLI) are provided with the `cargo wix --help` command, but documentation is provided
+//! here for the concepts and core functionality that govern the subcommand.
 //!
 //! The cargo-wix binary, and related `cargo wix` subcommand, use the WiX Toolset and
 //! [SignTool](https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx)
@@ -51,18 +51,19 @@
 //! in the `bin` directory of the installation location for the WiX Toolset. This subcommand uses
 //! these two applications with the `std::process::Command` module to create an installer. The WiX
 //! Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided with
-//! this subcommand that attempts to meet the majority of use cases for developers, so an extensive
+//! this subcommand that attempts to meet the majority of use cases for developers, so extensive
 //! knowledge of the WiX Toolset and Windows installer technologies is not required (but always
 //! recommended). Modification of the template is encouraged, but please consult the WiX Toolset's
 //! extensive documentation and tutorials for information about writing, customizing, and using wxs
 //! files. The documentation here is only for this subcommand.
 //!
-//! The template is embedded in the binary installation of the subcommand and it can be printed
-//! using the `cargo wix --print-template` command from the command prompt (cmd.exe). Note, each
-//! time the `cargo wix --print-template` command is invoked, new GUIDs are generated for fields
-//! that require them. Thus, a Rust developer does not need to worry about generating GUIDs and can
-//! begin using the template immediately with this subcommand or the WiX Toolset's `candle.exe` and
-//! `light.exe` applications.
+//! The [template](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) is embedded
+//! in the binary installation of the subcommand and it can be printed using the `cargo wix
+//! --print-template` command from the command prompt (cmd.exe). Note, each time the `cargo wix
+//! --print-template` command is invoked, new GUIDs are generated for fields that require them.
+//! Thus, a developer does not need to worry about generating GUIDs and can begin using the
+//! template immediately with this subcommand or the WiX Toolset's `candle.exe` and `light.exe`
+//! applications.
 
 #[macro_use] extern crate log;
 extern crate mustache;
