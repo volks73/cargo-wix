@@ -690,6 +690,7 @@ mod tests {
         assert!(wix.capture_output);
         assert_eq!(wix.description, None);
         assert_eq!(wix.input, None);
+        assert_eq!(wix.license_path, None);
         assert_eq!(wix.manufacturer, None);
         assert_eq!(wix.product_name, None);
         assert!(!wix.sign);
@@ -697,9 +698,23 @@ mod tests {
     }
 
     #[test]
+    fn binary_name_works() {
+        const EXPECTED: &str = "test";
+        let wix = Wix::new().binary_name(Some(EXPECTED));
+        assert_eq!(wix.binary_name, Some(String::from(EXPECTED)));
+    }
+
+    #[test]
     fn capture_output_works() {
         let wix = Wix::new().capture_output(false);
         assert!(!wix.capture_output);
+    }
+
+    #[test]
+    fn description_works() {
+        const EXPECTED: &str = "test description";
+        let wix = Wix::new().description(Some(EXPECTED));
+        assert_eq!(wix.description, Some(String::from(EXPECTED)));
     }
 
     #[test]
@@ -710,10 +725,24 @@ mod tests {
     }
 
     #[test]
+    fn license_file_works() {
+        const EXPECTED: &str = "MIT-LICENSE";
+        let wix = Wix::new().license_file(Some(EXPECTED));
+        assert_eq!(wix.license_path, Some(PathBuf::from(EXPECTED)));
+    }
+
+    #[test]
     fn manufacturer_works() {
         const EXPECTED: &str = "Tester";
         let wix = Wix::new().manufacturer(Some(EXPECTED));
         assert_eq!(wix.manufacturer, Some(String::from(EXPECTED)));
+    }
+
+    #[test]
+    fn product_name_works() {
+        const EXPECTED: &str = "Test Product Name";
+        let wix = Wix::new().product_name(Some(EXPECTED));
+        assert_eq!(wix.product_name, Some(String::from(EXPECTED)));
     }
 
     #[test]
