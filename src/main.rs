@@ -42,7 +42,6 @@ fn main() {
             SubCommand::with_name(SUBCOMMAND_NAME)
                 .version(crate_version!())
                 .about(crate_description!())
-                .author(crate_authors!())
                 .arg(Arg::with_name("binary-name")
                      .help("Overrides the 'name' field of the bin section of the package's manifest (Cargo.toml) as the name of the executable within the installer.")
                      .long("binary-name")

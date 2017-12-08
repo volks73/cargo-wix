@@ -285,20 +285,15 @@ impl Default for Platform {
 /// The aliases for the URLs to different Microsoft Authenticode timestamp servers.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TimestampServer {
+    /// A URL to a timestamp server.
     Custom(String),
+    /// The alias for the Comodo timestamp server.
     Comodo,
+    /// The alias for the Verisign timestamp server.
     Verisign,
 }
 
 impl TimestampServer {
-    /// Gets the possible string representations of each variant.
-    pub fn possible_values() -> Vec<&'static str> {
-        vec![
-            "Comodo", "comodo", "COMODO",
-            "Verisign", "verisign", "VERISIGN",
-        ]
-    }
-
     /// Gets the URL of the timestamp server for an alias.
     pub fn url(&self) -> &str {
         match *self {
