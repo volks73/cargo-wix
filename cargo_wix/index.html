@@ -48,29 +48,29 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#15-624' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#15-760' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='cargo-wix' class='section-header'><a href='#cargo-wix'>cargo-wix</a></h1>
 <p>The goal of the cargo-wix project and <code>cargo wix</code> subcommand is to make it easy to create
 a Windows installer (msi) for any Rust project.</p>
 
-<h1 id='quick-start' class='section-header'><a href='#quick-start'>Quick Start</a></h1>
+<h2 id='quick-start' class='section-header'><a href='#quick-start'>Quick Start</a></h2>
 <p>Ensure the <a href="http://wixtoolset.org">WiX Toolset</a> is installed and the <code>C:\Program Files\WiX Toolset\bin</code> folder has been added to the PATH system environment variable. Then start
 a commmand prompt (cmd.exe) and execute the following commands:</p>
 
 <pre><code class="language-dos">C:\&gt;cargo install cargo-wix
-C:\&gt;cd Path\To\Rust\Project
-C:\Path\To\Rust\Project\&gt;cargo wix --init
-C:\Path\To\Rust\Project\&gt;cargo wix
+C:\&gt;cd Path\To\Project
+C:\Path\To\Project\&gt;cargo wix --init
+C:\Path\To\Project\&gt;cargo wix
 </code></pre>
 
-<p>The Windows installer (msi) will be in the <code>C:\Path\To\Rust\Project\target\wix</code> folder.</p>
+<p>The Windows installer (msi) will be in the <code>C:\Path\To\Project\target\wix</code> folder.</p>
 
-<h1 id='concepts' class='section-header'><a href='#concepts'>Concepts</a></h1>
-<p>cargo-wix is primarily implemented as a cargo subcommand, but the core functionality is
-provided in a library (crate). Documentation for the binary and Command Line Interface (CLI)
-are provided with the <code>cargo wix --help</code> command, but documentation is provided here for the
-core functionality and concepts.</p>
+<h2 id='concepts' class='section-header'><a href='#concepts'>Concepts</a></h2>
+<p>The cargo-wix project is primarily implemented as a cargo subcommand, but the core
+functionality is provided in a library (crate). Documentation for the binary and Command Line
+Interface (CLI) are provided with the <code>cargo wix --help</code> command, but documentation is provided
+here for the concepts and core functionality that govern the subcommand.</p>
 
 <p>The cargo-wix binary, and related <code>cargo wix</code> subcommand, use the WiX Toolset and
 <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx">SignTool</a>
@@ -84,18 +84,17 @@ subcommand is only really useful on a Windows machine.</p>
 in the <code>bin</code> directory of the installation location for the WiX Toolset. This subcommand uses
 these two applications with the <code>std::process::Command</code> module to create an installer. The WiX
 Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided with
-this subcommand that attempts to meet the majority of use cases for developers, so an extensive
+this subcommand that attempts to meet the majority of use cases for developers, so extensive
 knowledge of the WiX Toolset and Windows installer technologies is not required (but always
 recommended). Modification of the template is encouraged, but please consult the WiX Toolset&#39;s
 extensive documentation and tutorials for information about writing, customizing, and using wxs
 files. The documentation here is only for this subcommand.</p>
 
-<p>The template is embedded in the binary installation of the subcommand and it can be printed
-using the <code>cargo wix --print-template</code> command from the command prompt (cmd.exe). Note, each
-time the <code>cargo wix --print-template</code> command is invoked, new GUIDs are generated for fields
-that require them. Thus, a Rust developer does not need to worry about generating GUIDs and can
-begin using the template immediately with this subcommand or the WiX Toolset&#39;s <code>candle.exe</code> and
-<code>light.exe</code> applications.</p>
+<p>The <a href="https://github.com/volks73/cargo-wix/blob/master/src/template.wxs">template</a> is embedded
+in the binary installation of the subcommand and it can be printed using the <code>cargo wix --print-template</code> command from the command prompt (cmd.exe). Note, each time the <code>cargo wix --print-template</code> command is invoked, new GUIDs are generated for fields that require them.
+Thus, a developer does not need to worry about generating GUIDs and can begin using the
+template immediately with this subcommand or the WiX Toolset&#39;s <code>candle.exe</code> and <code>light.exe</code>
+applications.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -118,6 +117,13 @@ begin using the template immediately with this subcommand or the WiX Toolset&#39
                                   title='enum cargo_wix::Platform'>Platform</a></td>
                            <td class='docblock-short'>
                                 <p>The different values for the <code>Platform</code> attribute of the <code>Package</code> element.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.TimestampServer.html"
+                                  title='enum cargo_wix::TimestampServer'>TimestampServer</a></td>
+                           <td class='docblock-short'>
+                                <p>The aliases for the URLs to different Microsoft Authenticode timestamp servers.</p>
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
