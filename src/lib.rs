@@ -325,6 +325,7 @@ impl FromStr for TimestampServer {
 /// A builder for running the subcommand.
 #[derive(Debug, Clone)]
 pub struct Wix {
+    bin_path: Option<PathBuf>,
     binary_name: Option<String>,
     capture_output: bool,
     description: Option<String>,
@@ -340,6 +341,7 @@ impl Wix {
     /// Creates a new `Wix` instance.
     pub fn new() -> Self {
         Wix {
+            bin_path: None,
             binary_name: None,
             capture_output: true,
             description: None,
@@ -350,6 +352,15 @@ impl Wix {
             sign: false,
             timestamp: None,
         }
+    }
+
+    /// Sets the path to the WiX Toolset's `bin` folder.
+    ///
+    /// The WiX Toolset's `bin` folder should contain the needed `candle.exe` and `light.exe`
+    /// applications. The default is to use the PATH system environment variable.
+    pub fn bin_path(mut self, b: Option<&str>) -> Self {
+        self.bin_path = b.map(|s| PathBuf::from(s));
+        self
     }
 
     /// Sets the binary name.
@@ -686,6 +697,7 @@ mod tests {
     #[test]
     fn defaults_are_correct() {
         let wix = Wix::new();
+        assert_eq!(wix.bin_path, None);
         assert_eq!(wix.binary_name, None);
         assert!(wix.capture_output);
         assert_eq!(wix.description, None);
@@ -695,6 +707,13 @@ mod tests {
         assert_eq!(wix.product_name, None);
         assert!(!wix.sign);
         assert_eq!(wix.timestamp, None);
+    }
+
+    #[test]
+    fn bin_path_works() {
+        const EXPECTED: &str = "C:\\WiX Toolset\\bin";
+        let wix = Wix::new().bin_path(Some(EXPECTED));
+        assert_eq!(wix.bin_path, Some(PathBuf::from(EXPECTED)));
     }
 
     #[test]
