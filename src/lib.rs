@@ -610,7 +610,13 @@ impl Wix {
         }
         // Compile the installer
         info!("Compiling installer");
-        let mut compiler = Command::new(WIX_COMPILER);
+        let mut compiler = if let Some(ref b) = self.bin_path {
+            trace!("Using the '{}' path to the WiX Toolset compiler", b.display());
+            Command::new(b.join(WIX_COMPILER))
+        } else {
+            Command::new(WIX_COMPILER)
+        };
+        debug!("compiler = {:?}", compiler);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_COMPILER);
             compiler.stdout(Stdio::null());
@@ -635,7 +641,13 @@ impl Wix {
         }
         // Link the installer
         info!("Linking the installer");
-        let mut linker = Command::new(WIX_LINKER);
+        let mut linker = if let Some(ref b) = self.bin_path {
+            trace!("Using the '{}' path to the WiX Toolset linker", b.display());
+            Command::new(b.join(WIX_LINKER))
+        } else {
+            Command::new(WIX_LINKER)
+        };
+        debug!("linker = {:?}", linker);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
             linker.stdout(Stdio::null());
