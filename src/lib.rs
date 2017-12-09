@@ -629,8 +629,9 @@ impl Wix {
             trace!("Using the '{}' path to the WiX Toolset compiler", b.display());
             Command::new(b.join(WIX_COMPILER))
         } else {
-            env::var(WIX_PATH_KEY).map(|p| {
-                Command::new(PathBuf::from(p).join(WIX_COMPILER))
+            env::var(WIX_PATH_KEY).map(|s| {
+                trace!("Using the '{}' path to the WiX Toolset compiler", s);
+                Command::new(PathBuf::from(s).join(WIX_COMPILER))
             }).unwrap_or(Command::new(WIX_COMPILER))
         };
         debug!("compiler = {:?}", compiler);
@@ -662,8 +663,9 @@ impl Wix {
             trace!("Using the '{}' path to the WiX Toolset linker", b.display());
             Command::new(b.join(WIX_LINKER))
         } else {
-            env::var(WIX_PATH_KEY).map(|p| {
-                Command::new(PathBuf::from(p).join(WIX_LINKER))
+            env::var(WIX_PATH_KEY).map(|s| {
+                trace!("Using the '{}' path to the WiX Toolset linker", s);
+                Command::new(PathBuf::from(s).join(WIX_LINKER))
             }).unwrap_or(Command::new(WIX_LINKER))
         };
         debug!("linker = {:?}", linker);
