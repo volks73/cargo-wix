@@ -478,7 +478,7 @@ impl Wix {
             .ok_or(Error::Manifest(String::from("version")))?;
         debug!("pkg_version = {:?}", pkg_version);
         let product_name = if let Some(p) = self.product_name {
-            Ok(p) 
+            Ok(p)
         } else {
             cargo_values.get("package")
                 .and_then(|p| p.as_table())
