@@ -6,7 +6,7 @@ A subcommand for [Cargo](http://doc.crates.io/) that builds a Windows installer 
 
 ## Quick Start
 
-Start a command prompt (cmd.exe) and the execute the following commands:
+Start a command prompt (cmd.exe) and then execute the following commands:
 
 ```dos
 C:\>cargo install cargo-wix
@@ -15,7 +15,7 @@ C:\Path\To\Project\>cargo wix --init
 C:\Path\To\Project\>cargo wix
 ```
 
-The Windows installer (msi) for the Rust project will be in the `C:\Path\To\Project\target\wix` folder.
+The Windows installer (msi) for the project will be in the `C:\Path\To\Project\target\wix` folder.
 
 ## Installation
 
