@@ -808,6 +808,13 @@ mod tests {
     }
 
     #[test]
+    fn sign_path_works() {
+        const EXPECTED: &str = "C:\\Program Files\\Windows Kit\\bin";
+        let wix = Wix::new().sign_path(Some(EXPECTED));
+        assert_eq!(wix.sign_path, Some(PathBuf::from(EXPECTED)));
+    }
+
+    #[test]
     fn timestamp_works() {
         const EXPECTED: &str = "http://timestamp.comodoca.com/";
         let wix = Wix::new().timestamp(Some(EXPECTED));
