@@ -74,6 +74,7 @@ extern crate uuid;
 use mustache::MapBuilder;
 use std::default::Default;
 use regex::Regex;
+use std::env;
 use std::error::Error as StdError;
 use std::fmt;
 use std::fs::{self, File};
@@ -91,6 +92,7 @@ const SIGNTOOL: &str = "signtool";
 const WIX: &str = "wix";
 const WIX_COMPILER: &str = "candle";
 const WIX_LINKER: &str = "light";
+const WIX_PATH_KEY: &str = "WIX_PATH";
 const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 const WIX_SOURCE_FILE_NAME: &str = "main";
 
@@ -627,7 +629,9 @@ impl Wix {
             trace!("Using the '{}' path to the WiX Toolset compiler", b.display());
             Command::new(b.join(WIX_COMPILER))
         } else {
-            Command::new(WIX_COMPILER)
+            env::var(WIX_PATH_KEY).map(|p| {
+                Command::new(PathBuf::from(p).join(WIX_COMPILER))
+            }).unwrap_or(Command::new(WIX_COMPILER))
         };
         debug!("compiler = {:?}", compiler);
         if self.capture_output {
@@ -658,7 +662,9 @@ impl Wix {
             trace!("Using the '{}' path to the WiX Toolset linker", b.display());
             Command::new(b.join(WIX_LINKER))
         } else {
-            Command::new(WIX_LINKER)
+            env::var(WIX_PATH_KEY).map(|p| {
+                Command::new(PathBuf::from(p).join(WIX_LINKER))
+            }).unwrap_or(Command::new(WIX_LINKER))
         };
         debug!("linker = {:?}", linker);
         if self.capture_output {
