@@ -46,13 +46,13 @@ Navigate to the project's root folder and run the subcommand:
 C:\Path\To\Project\>cargo wix --init
 ```
 
-This will create the `wix` folder in the root of the project and then it will create the `wix\main.wxs` file from the WiX Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file can be used without modification with the following command to create an installer for the project:
+This will create the `wix` folder in the project's root (along side the `Cargo.toml` file) and then it will create the `wix\main.wxs` file from the WiX Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file can be used without modification with the following command to create an installer for the project:
 
 ```dos
 C:\Path\To\Project\>cargo wix
 ```
 
-The `cargo wix` subcommand searches for a `wix\main.wxs` file, relative to the project's root folder. It will compile the `wix\main.wxs` file and then link the object file (`target\wix\build\main.wixobj`) to create the Windows installer (msi). The installer will be located in the `target\wix` folder. All artifacts of the installer compilation and linking process are placed within the `target\wix` folder. Paths in the `wix\main.wxs` file should be relative to the project's root folder, i.e. the same location as the `Cargo.toml` manifest file. 
+The `cargo wix` subcommand without any arguments searches for a `wix\main.wxs` file, relative to the project's root. It will compile the `wix\main.wxs` file and then link the object file (`target\wix\build\main.wixobj`) to create the Windows installer (msi). The installer will be located in the `target\wix` folder. All artifacts of the installer compilation and linking process are placed within the `target\wix` folder. Paths in the `wix\main.wxs` file should be relative to the project's root, i.e. the same location as the `Cargo.toml` manifest file. 
 
 A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by specifying a path to it as an argument to the subcommand as follows:
 
@@ -60,13 +60,16 @@ A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by sp
 C:\Path\To\Project\>cargo wix Path\To\WiX\Source\file.wxs
 ```
 
-The `--print-template` flag, which prints a WiX Source (wxs) template to stdout, can be used to create the `main.wxs` file. A [template.wxs](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file for use with this subcommand. The WiX source file can then be customized using a text editor, but modification of the xml preprocessor variables should be avoided to ensure the `cargo wix` command works properly.
+The `--print-template` flag, which prints a WiX Source (wxs) template to stdout, can be used to create the `main.wxs` file. A [template.wxs](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
 
 ```dos
 C:\Path\To\Project\>cargo --print-template > example.wxs
+C:\Path\To\Project\>cargo wix example.wxs
 ```
 
-To sign the installer (msi) once it has been created, use the `--sign` flag with the subcommand as follows:
+The WiX source file can be customized using a text editor, but modification of the XML preprocessor variables should be avoided to ensure the `cargo wix` command works properly. 
+
+To sign the installer (msi) as part of the build process, use the `--sign` flag with the subcommand as follows:
 
 ```dos
 C:\Path\To\Project\>cargo wix --sign
