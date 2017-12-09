@@ -334,6 +334,7 @@ pub struct Wix {
     manufacturer: Option<String>,
     product_name: Option<String>,
     sign: bool,
+    sign_path: Option<PathBuf>,
     timestamp: Option<String>,
 }
 
@@ -350,6 +351,7 @@ impl Wix {
             manufacturer: None,
             product_name: None,
             sign: false,
+            sign_path: None,
             timestamp: None,
         }
     }
@@ -357,7 +359,8 @@ impl Wix {
     /// Sets the path to the WiX Toolset's `bin` folder.
     ///
     /// The WiX Toolset's `bin` folder should contain the needed `candle.exe` and `light.exe`
-    /// applications. The default is to use the PATH system environment variable.
+    /// applications. The default is to use the PATH system environment variable. This will
+    /// override any value obtained from the environment.
     pub fn bin_path(mut self, b: Option<&str>) -> Self {
         self.bin_path = b.map(|s| PathBuf::from(s));
         self
@@ -426,6 +429,16 @@ impl Wix {
     /// application.
     pub fn sign(mut self, s: bool) -> Self {
         self.sign = s;
+        self
+    }
+
+    /// Sets the path to the folder containing the `signtool.exe` file.
+    ///
+    /// Normally the `signtool.exe` is installed in the `bin` folder of the Windows SDK
+    /// installation. THe default is to use the PATH system environment variable. This will
+    /// override any value obtained from the environment.
+    pub fn sign_path(mut self, s: Option<&str>) -> Self {
+        self.sign_path = s.map(|s| PathBuf::from(s));
         self
     }
 
@@ -667,7 +680,13 @@ impl Wix {
         // Sign the installer
         if self.sign {
             info!("Signing the installer");
-            let mut signer = Command::new(SIGNTOOL);
+            let mut signer = if let Some(ref s) = self.sign_path {
+                trace!("Using the '{}' path to the Windows SDK signtool", s.display());
+                Command::new(s.join(SIGNTOOL))
+            } else {
+                Command::new(SIGNTOOL)
+            };
+            debug!("signer = {:?}", signer);
             if self.capture_output {
                 trace!("Capturing the {} output", SIGNTOOL);
                 signer.stdout(Stdio::null());
