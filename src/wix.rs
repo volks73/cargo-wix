@@ -20,12 +20,13 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use super::{Error, Platform, Result, TimestampServer};
+use super::{Error, License, Platform, Result, TimestampServer};
 use toml::Value;
 
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
 pub const DEFAULT_LICENSE_FILE_NAME: &str = "LICENSE";
+pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
 pub const WIX: &str = "wix";
 pub const WIX_COMPILER: &str = "candle";
@@ -33,15 +34,6 @@ pub const WIX_LINKER: &str = "light";
 pub const WIX_PATH_KEY: &str = "WIX_PATH";
 pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 pub const WIX_SOURCE_FILE_NAME: &str = "main";
-
-/// The MIT Rich Text Format (RTF) license template.
-static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf");
-
-/// The Apache-2.0 Rich Text Format (RTF) license template.
-static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.rtf");
-
-/// The GPL-3.0 Rich Text Format (RTF) license template.
-static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf");
 
 /// A builder for running the subcommand.
 #[derive(Debug, Clone)]
@@ -198,15 +190,32 @@ impl<'a> Wix<'a> {
         main_wxs_path.push(WIX_SOURCE_FILE_NAME);
         main_wxs_path.set_extension(WIX_SOURCE_FILE_EXTENSION);
         if main_wxs_path.exists() && !force {
-            Err(Error::Generic(
+            return Err(Error::Generic(
                 format!("The '{}' file already exists. Use the '--force' flag to overwrite the contents.", 
                     main_wxs_path.display())
-            ))
+            ));
         } else {
+            info!("Creating the 'wix\\main.wxs' file");
             let mut main_wxs = File::create(main_wxs_path)?;
             super::write_wix_source(&mut main_wxs)?;
-            Ok(())
         }
+        let manifest = get_manifest()?;
+        let license_name = manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("license"))
+            .and_then(|l| l.as_str())
+            .and_then(|s| s.split("/").next());
+        debug!("license_name = {:?}", license_name);
+        if let Some(l) = license_name {
+            info!("Creating the 'wix\\License.{}' file", RTF_FILE_EXTENSION);
+            let license = License::from_str(&l)?;
+            let mut license_path = PathBuf::from(WIX);
+            license_path.push("License");
+            license_path.set_extension(RTF_FILE_EXTENSION);
+            let mut rtf = File::create(license_path)?;
+            self.write_license(&mut rtf, &license, &manifest)?;
+        }
+        Ok(())
     }
    
     /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
@@ -220,12 +229,7 @@ impl<'a> Wix<'a> {
         debug!("product_name = {:?}", self.product_name);
         debug!("sign = {:?}", self.sign);
         debug!("timestamp = {:?}", self.timestamp);
-        let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
-        debug!("cargo_file_path = {:?}", cargo_file_path);
-        let mut cargo_file = File::open(cargo_file_path)?;
-        let mut cargo_file_content = String::new();
-        cargo_file.read_to_string(&mut cargo_file_content)?;
-        let manifest = cargo_file_content.parse::<Value>()?;
+        let manifest = get_manifest()?;
         let pkg_version = self.get_version(&manifest)?;
         debug!("pkg_version = {:?}", pkg_version);
         let product_name = self.get_product_name(&manifest)?;
@@ -276,7 +280,7 @@ impl<'a> Wix<'a> {
         debug!("destination_msi = {:?}", destination_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
-        info!("Building release binary");
+        info!("Building the release binary");
         let mut builder = Command::new(CARGO);
         if self.capture_output {
             trace!("Capturing the '{}' output", CARGO);
@@ -288,7 +292,7 @@ impl<'a> Wix<'a> {
             return Err(Error::Command(CARGO, status.code().unwrap_or(0)));
         }
         // Compile the installer
-        info!("Compiling installer");
+        info!("Compiling the installer");
         let mut compiler = self.get_compiler();
         debug!("compiler = {:?}", compiler);
         if self.capture_output {
@@ -575,9 +579,8 @@ impl<'a> Wix<'a> {
     ///
     /// This will be automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_mit_license<W: Write>(&self, writer: &mut W, manifest: &Value) -> Result<()> {
-        trace!("Writing MIT license");
-        let template = mustache::compile_str(MIT_LICENSE_TEMPLATE)?;
+    fn write_license<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
+        let template = mustache::compile_str(license.template())?;
         let data = MapBuilder::new()
             .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
             .insert_str("copyright-year", self.get_copyright_year())
@@ -592,6 +595,17 @@ impl<'a> Default for Wix<'a> {
     fn default() -> Self {
         Wix::new()
     }
+}
+
+/// Gets the parsed package's manifest (Cargo.toml).
+fn get_manifest() -> Result<Value> {
+    let cargo_file_path = Path::new(CARGO_MANIFEST_FILE);
+    debug!("cargo_file_path = {:?}", cargo_file_path);
+    let mut cargo_file = File::open(cargo_file_path)?;
+    let mut cargo_file_content = String::new();
+    cargo_file.read_to_string(&mut cargo_file_content)?;
+    let manifest = cargo_file_content.parse::<Value>()?;
+    Ok(manifest)
 }
 
 #[cfg(test)]

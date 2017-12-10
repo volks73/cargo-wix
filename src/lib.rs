@@ -93,6 +93,15 @@ use wix::WIX;
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("template.wxs");
 
+/// The Apache-2.0 Rich Text Format (RTF) license template.
+static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.rtf");
+
+/// The GPL-3.0 Rich Text Format (RTF) license template.
+static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf");
+
+/// The MIT Rich Text Format (RTF) license template.
+static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf");
+
 /// Generates unique GUIDs for appropriate values in the template and renders to a writer.
 fn write_wix_source<W: Write>(writer: &mut W) -> Result<()> {
     let template = mustache::compile_str(WIX_SOURCE_TEMPLATE)?;
@@ -325,6 +334,62 @@ impl FromStr for TimestampServer {
             "comodo" => Ok(TimestampServer::Comodo),
             "verisign" => Ok(TimestampServer::Verisign),
             u @ _ => Ok(TimestampServer::Custom(String::from(u)))
+        }
+    }
+}
+
+/// The licenses that are automatically placed in the license dialog of the Windows installer.
+///
+/// If a license is _not_ a variant for this enum or a custom license is used, then the Rich Text
+/// Format (RTF) file for the license must be manually generated and added to the installer by
+/// modifying the WiX Source (wxs) file.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum License {
+    /// The Apache-2.0 license.
+    Apache2,
+    /// The GPL-3.0 license.
+    Gpl3,
+    /// The MIT license.
+    Mit,
+}
+
+impl License {
+    /// Gets the SPDX ID for the license.
+    pub fn id(&self) -> &str {
+        match *self {
+            License::Apache2 => "Apache-2.0",
+            License::Gpl3 => "GPL-3.0",
+            License::Mit => "MIT",
+        }
+    }
+
+    /// Gets the Rich Text Format (RTF) template for a license.
+    pub fn template(&self) -> &str {
+        match *self {
+            License::Apache2 => APACHE2_LICENSE_TEMPLATE,
+            License::Gpl3 => GPL3_LICENSE_TEMPLATE,
+            License::Mit => MIT_LICENSE_TEMPLATE,
+        }
+    }
+
+    // TODO: Add url() method that returns a URL to the license.
+}
+
+impl fmt::Display for License {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.id())
+    }
+}
+
+impl FromStr for License {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s.to_lowercase().trim() {
+            "apache2" => Ok(License::Apache2),
+            "gpl-3.0" => Ok(License::Gpl3),
+            "mit" => Ok(License::Mit),
+            _ => Err(Error::Generic(String::from("Cannot convert from string to License variant"))),
         }
     }
 }
