@@ -85,13 +85,16 @@ pub use self::wix::Wix;
 
 mod wix;
 
+/// A specialized `Result` type for cargo-wix operations.
+pub type Result<T> = std::result::Result<T, Error>;
+
 use wix::{WIX, WIX_SOURCE_FILE_EXTENSION, WIX_SOURCE_FILE_NAME};
 
 /// The template, or example, WiX Source (WXS) file.
 static TEMPLATE: &str = include_str!("template.wxs");
 
 /// Generates unique GUIDs for appropriate values in the template and renders to a writer.
-fn write_template<W: Write>(writer: &mut W) -> Result<(), Error> {
+fn write_template<W: Write>(writer: &mut W) -> Result<()> {
     let template = mustache::compile_str(TEMPLATE)?;
     let data = MapBuilder::new()
         .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
@@ -102,13 +105,13 @@ fn write_template<W: Write>(writer: &mut W) -> Result<(), Error> {
 }
 
 /// Generates unique GUIDs for appropriate values in the template and prints to stdout.
-pub fn print_template() -> Result<(), Error> {
+pub fn print_template() -> Result<()> {
     write_template(&mut io::stdout())
 }
 
 /// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
 /// create an installer for the package.
-pub fn init(force: bool) -> Result<(), Error> {
+pub fn init(force: bool) -> Result<()> {
     let mut main_wxs_path = PathBuf::from(WIX);
     if !main_wxs_path.exists() {
         fs::create_dir(&main_wxs_path)?;
@@ -128,7 +131,7 @@ pub fn init(force: bool) -> Result<(), Error> {
 }
 
 /// Removes the `target\wix` folder.
-pub fn clean() -> Result<(), Error> {
+pub fn clean() -> Result<()> {
     let mut target_wix = PathBuf::from("target");
     target_wix.push(WIX);
     if target_wix.exists() {
@@ -146,7 +149,7 @@ pub fn clean() -> Result<(), Error> {
 /// __Use with caution!__ All contents of both folders are removed, including files that may be
 /// located in the folders but not used or related to the creation of Windows installers via the
 /// WiX Toolset.
-pub fn purge() -> Result<(), Error> {
+pub fn purge() -> Result<()> {
     clean()?;
     let wix = PathBuf::from(WIX);
     if wix.exists() {
@@ -338,7 +341,7 @@ impl fmt::Display for TimestampServer {
 impl FromStr for TimestampServer {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s.to_lowercase().trim() {
             "comodo" => Ok(TimestampServer::Comodo),
             "verisign" => Ok(TimestampServer::Verisign),
