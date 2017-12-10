@@ -616,30 +616,32 @@ mod tests {
     #[test]
     fn defaults_are_correct() {
         let wix = Wix::new();
-        assert_eq!(wix.bin_path, None);
-        assert_eq!(wix.binary_name, None);
+        assert!(wix.bin_path.is_none());
+        assert!(wix.binary_name.is_none());
         assert!(wix.capture_output);
-        assert_eq!(wix.description, None);
-        assert_eq!(wix.input, None);
-        assert_eq!(wix.license_path, None);
-        assert_eq!(wix.manufacturer, None);
-        assert_eq!(wix.product_name, None);
+        assert!(wix.copyright_holder.is_none());
+        assert!(wix.copyright_year.is_none());
+        assert!(wix.description.is_none());
+        assert!(wix.input.is_none());
+        assert!(wix.license_path.is_none());
+        assert!(wix.manufacturer.is_none());
+        assert!(wix.product_name.is_none());
         assert!(!wix.sign);
-        assert_eq!(wix.timestamp, None);
+        assert!(wix.timestamp.is_none());
     }
 
     #[test]
     fn bin_path_works() {
-        const EXPECTED: &str = "C:\\WiX Toolset\\bin";
-        let wix = Wix::new().bin_path(Some(EXPECTED));
-        assert_eq!(wix.bin_path, Some(PathBuf::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("C:\\WiX Toolset\\bin");
+        let wix = Wix::new().bin_path(EXPECTED);
+        assert_eq!(wix.bin_path, EXPECTED);
     }
 
     #[test]
     fn binary_name_works() {
-        const EXPECTED: &str = "test";
-        let wix = Wix::new().binary_name(Some(EXPECTED));
-        assert_eq!(wix.binary_name, Some(String::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("test");
+        let wix = Wix::new().binary_name(EXPECTED);
+        assert_eq!(wix.binary_name, EXPECTED);
     }
 
     #[test]
@@ -649,38 +651,52 @@ mod tests {
     }
 
     #[test]
+    fn copyright_holder_works() {
+        const EXPECTED: Option<&str> = Some("Test");
+        let wix = Wix::new().copyright_holder(EXPECTED);
+        assert_eq!(wix.copyright_holder, EXPECTED);
+    }
+
+    #[test]
+    fn copyright_year_works() {
+        const EXPECTED: Option<&str> = Some("2013");
+        let wix = Wix::new().copyright_year(EXPECTED);
+        assert_eq!(wix.copyright_year, EXPECTED);
+    }
+
+    #[test]
     fn description_works() {
-        const EXPECTED: &str = "test description";
-        let wix = Wix::new().description(Some(EXPECTED));
-        assert_eq!(wix.description, Some(String::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("test description");
+        let wix = Wix::new().description(EXPECTED);
+        assert_eq!(wix.description, EXPECTED);
     }
 
     #[test]
     fn input_works() {
-        const EXPECTED: &str = "test.wxs";
-        let wix = Wix::new().input(Some(EXPECTED));
-        assert_eq!(wix.input, Some(PathBuf::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("test.wxs");
+        let wix = Wix::new().input(EXPECTED);
+        assert_eq!(wix.input, EXPECTED);
     }
 
     #[test]
     fn license_file_works() {
-        const EXPECTED: &str = "MIT-LICENSE";
-        let wix = Wix::new().license_file(Some(EXPECTED));
-        assert_eq!(wix.license_path, Some(PathBuf::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("MIT-LICENSE");
+        let wix = Wix::new().license_file(EXPECTED);
+        assert_eq!(wix.license_path, EXPECTED);
     }
 
     #[test]
     fn manufacturer_works() {
-        const EXPECTED: &str = "Tester";
-        let wix = Wix::new().manufacturer(Some(EXPECTED));
-        assert_eq!(wix.manufacturer, Some(String::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("Tester");
+        let wix = Wix::new().manufacturer(EXPECTED);
+        assert_eq!(wix.manufacturer, EXPECTED);
     }
 
     #[test]
     fn product_name_works() {
-        const EXPECTED: &str = "Test Product Name";
-        let wix = Wix::new().product_name(Some(EXPECTED));
-        assert_eq!(wix.product_name, Some(String::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("Test Product Name");
+        let wix = Wix::new().product_name(EXPECTED);
+        assert_eq!(wix.product_name, EXPECTED);
     }
 
     #[test]
@@ -691,16 +707,16 @@ mod tests {
 
     #[test]
     fn sign_path_works() {
-        const EXPECTED: &str = "C:\\Program Files\\Windows Kit\\bin";
-        let wix = Wix::new().sign_path(Some(EXPECTED));
-        assert_eq!(wix.sign_path, Some(PathBuf::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("C:\\Program Files\\Windows Kit\\bin");
+        let wix = Wix::new().sign_path(EXPECTED);
+        assert_eq!(wix.sign_path, EXPECTED);
     }
 
     #[test]
     fn timestamp_works() {
-        const EXPECTED: &str = "http://timestamp.comodoca.com/";
-        let wix = Wix::new().timestamp(Some(EXPECTED));
-        assert_eq!(wix.timestamp, Some(String::from(EXPECTED)));
+        const EXPECTED: Option<&str> = Some("http://timestamp.comodoca.com/");
+        let wix = Wix::new().timestamp(EXPECTED);
+        assert_eq!(wix.timestamp, EXPECTED);
     }
 
     #[test]
