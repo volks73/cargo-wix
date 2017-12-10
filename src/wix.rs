@@ -413,6 +413,7 @@ impl<'a> Wix<'a> {
         if let Some(c) = self.copyright_year {
             c.to_owned()
         } else {
+            // TODO: Change this to current year.
             String::from("YYYY")
         }
     }
