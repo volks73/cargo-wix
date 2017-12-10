@@ -136,6 +136,38 @@ pub fn init(force: bool) -> Result<(), Error> {
     }
 }
 
+/// Removes the `target\wix` folder.
+pub fn clean() -> Result<(), Error> {
+    let mut target_wix = PathBuf::from("target");
+    target_wix.push(WIX);
+    if target_wix.exists() {
+        trace!("The 'target\\wix' folder exists");
+        info!("Removing the 'target\\wix' folder");
+        fs::remove_dir_all(target_wix)?;
+    } else {
+        warn!("The 'target\\wix' folder does not exist");
+    }
+    Ok(())
+}
+
+/// Removes the `target\wix` folder and the `wix` folder.
+///
+/// __Use with caution!__ All contents of both folders are removed, including files that may be
+/// located in the folders but not used or related to the creation of Windows installers via the
+/// WiX Toolset.
+pub fn purge() -> Result<(), Error> {
+    clean()?;
+    let wix = PathBuf::from(WIX);
+    if wix.exists() {
+        trace!("The 'wix' folder exists");
+        info!("Removing the 'wix' folder");
+        fs::remove_dir_all(wix)?;
+    } else {
+        warn!("The 'wix' folder does not exist");
+    }
+    Ok(())
+}
+
 /// The error type for cargo-wix-related operations and associated traits.
 ///
 /// Errors mostly originate from the dependencies, but custom instances of `Error` can be created

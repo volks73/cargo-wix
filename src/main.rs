@@ -50,6 +50,11 @@ fn main() {
                     .long("binary-name")
                     .short("b")
                     .takes_value(true))
+                .arg(Arg::with_name("clean")
+                    .help("Deletes the 'target\\wix' folder.")
+                    .long("clean")
+                    .conflicts_with("init")
+                    .conflicts_with("sign"))
                 .arg(Arg::with_name("description")
                     .help("Overrides the 'description' field of the package's manifest (Cargo.toml) as the description within the installer.")
                     .long("description")
@@ -83,6 +88,12 @@ fn main() {
                     .long("product-name")
                     .short("p")
                     .takes_value(true))
+                .arg(Arg::with_name("purge")
+                    .help("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
+                    .long("purge")
+                    .conflicts_with("init")
+                    .conflicts_with("sign")
+                    .conflicts_with("clean"))
                 .arg(Arg::with_name("sign")
                     .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
                     .short("s")
@@ -121,6 +132,10 @@ fn main() {
         cargo_wix::init(matches.is_present("force"))
     } else if matches.is_present("print-template") {
         cargo_wix::print_template()
+    } else if matches.is_present("clean") {
+        cargo_wix::clean()
+    } else if matches.is_present("purge") {
+        cargo_wix::purge()
     } else {
         cargo_wix::Wix::new()
             .bin_path(matches.value_of("bin-path"))
