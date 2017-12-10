@@ -128,8 +128,20 @@ fn main() {
         .level(true)
         .init()
         .expect("logger to initiate");
+    let wix = cargo_wix::Wix::new()
+        .bin_path(matches.value_of("bin-path"))
+        .binary_name(matches.value_of("binary-name"))
+        .capture_output(!matches.is_present("no-capture"))
+        .description(matches.value_of("description"))
+        .input(matches.value_of("INPUT"))
+        .license_file(matches.value_of("license"))
+        .manufacturer(matches.value_of("manufacturer"))
+        .product_name(matches.value_of("product-name"))
+        .sign(matches.is_present("sign"))
+        .sign_path(matches.value_of("sign-path"))
+        .timestamp(matches.value_of("timestamp"));
     let result = if matches.is_present("init") {
-        cargo_wix::init(matches.is_present("force"))
+        wix.init(matches.is_present("force"))
     } else if matches.is_present("print-template") {
         cargo_wix::print_template()
     } else if matches.is_present("clean") {
@@ -137,19 +149,7 @@ fn main() {
     } else if matches.is_present("purge") {
         cargo_wix::purge()
     } else {
-        cargo_wix::Wix::new()
-            .bin_path(matches.value_of("bin-path"))
-            .binary_name(matches.value_of("binary-name"))
-            .capture_output(!matches.is_present("no-capture"))
-            .description(matches.value_of("description"))
-            .input(matches.value_of("INPUT"))
-            .license_file(matches.value_of("license"))
-            .manufacturer(matches.value_of("manufacturer"))
-            .product_name(matches.value_of("product-name"))
-            .sign(matches.is_present("sign"))
-            .sign_path(matches.value_of("sign-path"))
-            .timestamp(matches.value_of("timestamp"))
-            .run()
+        wix.run()
     };
     match result {
         Ok(_) => {

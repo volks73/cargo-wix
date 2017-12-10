@@ -75,7 +75,7 @@ use mustache::MapBuilder;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
-use std::fs::{self, File};
+use std::fs;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -88,14 +88,14 @@ mod wix;
 /// A specialized `Result` type for cargo-wix operations.
 pub type Result<T> = std::result::Result<T, Error>;
 
-use wix::{WIX, WIX_SOURCE_FILE_EXTENSION, WIX_SOURCE_FILE_NAME};
+use wix::WIX;
 
-/// The template, or example, WiX Source (WXS) file.
-static TEMPLATE: &str = include_str!("template.wxs");
+/// The WiX Source (wxs) template.
+static WIX_SOURCE_TEMPLATE: &str = include_str!("template.wxs");
 
 /// Generates unique GUIDs for appropriate values in the template and renders to a writer.
-fn write_template<W: Write>(writer: &mut W) -> Result<()> {
-    let template = mustache::compile_str(TEMPLATE)?;
+fn write_wix_source<W: Write>(writer: &mut W) -> Result<()> {
+    let template = mustache::compile_str(WIX_SOURCE_TEMPLATE)?;
     let data = MapBuilder::new()
         .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
         .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
@@ -106,28 +106,7 @@ fn write_template<W: Write>(writer: &mut W) -> Result<()> {
 
 /// Generates unique GUIDs for appropriate values in the template and prints to stdout.
 pub fn print_template() -> Result<()> {
-    write_template(&mut io::stdout())
-}
-
-/// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
-/// create an installer for the package.
-pub fn init(force: bool) -> Result<()> {
-    let mut main_wxs_path = PathBuf::from(WIX);
-    if !main_wxs_path.exists() {
-        fs::create_dir(&main_wxs_path)?;
-    }
-    main_wxs_path.push(WIX_SOURCE_FILE_NAME);
-    main_wxs_path.set_extension(WIX_SOURCE_FILE_EXTENSION);
-    if main_wxs_path.exists() && !force {
-        Err(Error::Generic(
-            format!("The '{}' file already exists. Use the '--force' flag to overwrite the contents.", 
-                main_wxs_path.display())
-        ))
-    } else {
-        let mut main_wxs = File::create(main_wxs_path)?;
-        write_template(&mut main_wxs)?;
-        Ok(())
-    }
+    write_wix_source(&mut io::stdout())
 }
 
 /// Removes the `target\wix` folder.

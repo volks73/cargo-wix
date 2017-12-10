@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use mustache::{self, MapBuilder};
 use regex::Regex;
 use std::env;
-use std::fs::File;
-use std::io::Read;
+use std::fs::{self, File};
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
@@ -33,29 +34,42 @@ pub const WIX_PATH_KEY: &str = "WIX_PATH";
 pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 pub const WIX_SOURCE_FILE_NAME: &str = "main";
 
+/// The MIT Rich Text Format (RTF) license template.
+static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf");
+
+/// The Apache-2.0 Rich Text Format (RTF) license template.
+static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.rtf");
+
+/// The GPL-3.0 Rich Text Format (RTF) license template.
+static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf");
+
 /// A builder for running the subcommand.
 #[derive(Debug, Clone)]
-pub struct Wix {
-    bin_path: Option<PathBuf>,
-    binary_name: Option<String>,
+pub struct Wix<'a> {
+    bin_path: Option<&'a str>,
+    binary_name: Option<&'a str>,
     capture_output: bool,
-    description: Option<String>,
-    input: Option<PathBuf>,
-    license_path: Option<PathBuf>,
-    manufacturer: Option<String>,
-    product_name: Option<String>,
+    copyright_year: Option<&'a str>,
+    copyright_holder: Option<&'a str>,
+    description: Option<&'a str>,
+    input: Option<&'a str>,
+    license_path: Option<&'a str>,
+    manufacturer: Option<&'a str>,
+    product_name: Option<&'a str>,
     sign: bool,
-    sign_path: Option<PathBuf>,
-    timestamp: Option<String>,
+    sign_path: Option<&'a str>,
+    timestamp: Option<&'a str>,
 }
 
-impl Wix {
+impl<'a> Wix<'a> {
     /// Creates a new `Wix` instance.
     pub fn new() -> Self {
         Wix {
             bin_path: None,
             binary_name: None,
             capture_output: true,
+            copyright_year: None,
+            copyright_holder: None,
             description: None,
             input: None,
             license_path: None,
@@ -72,16 +86,16 @@ impl Wix {
     /// The WiX Toolset's `bin` folder should contain the needed `candle.exe` and `light.exe`
     /// applications. The default is to use the PATH system environment variable. This will
     /// override any value obtained from the environment.
-    pub fn bin_path(mut self, b: Option<&str>) -> Self {
-        self.bin_path = b.map(|s| PathBuf::from(s));
+    pub fn bin_path(mut self, b: Option<&'a str>) -> Self {
+        self.bin_path = b;
         self
     }
 
     /// Sets the binary name.
     ///
     /// This overrides the binary name determined from the package's manifest (Cargo.toml).
-    pub fn binary_name(mut self, b: Option<&str>) -> Self {
-        self.binary_name = b.map(|s| String::from(s));
+    pub fn binary_name(mut self, b: Option<&'a str>) -> Self {
+        self.binary_name = b;
         self
     }
 
@@ -95,18 +109,30 @@ impl Wix {
         self
     }
 
+    /// Sets the copyright holder in the license dialog of the Windows installer (msi).
+    pub fn copyright_holder(mut self, h: Option<&'a str>) -> Self {
+        self.copyright_holder = h;
+        self
+    }
+
+    /// Sets the copyright year in the license dialog of the Windows installer (msi).
+    pub fn copyright_year(mut self, y: Option<&'a str>) -> Self {
+        self.copyright_year = y;
+        self
+    }
+
     /// Sets the description.
     ///
     /// This override the description determined from the `description` field in the package's
     /// manifest (Cargo.toml).
-    pub fn description(mut self, d: Option<&str>) -> Self {
-        self.description = d.map(|s| String::from(s));
+    pub fn description(mut self, d: Option<&'a str>) -> Self {
+        self.description = d;
         self
     }
 
     /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.rs`.
-    pub fn input(mut self, i: Option<&str>) -> Self {
-        self.input = i.map(|i| PathBuf::from(i));
+    pub fn input(mut self, i: Option<&'a str>) -> Self {
+        self.input = i;
         self
     }
     
@@ -115,15 +141,15 @@ impl Wix {
     /// The `License.txt` file is installed into the installation location along side the `bin`
     /// folder. Note, the file can be in any format with any name, but it is automatically renamed
     /// to `License.txt` during creation of the installer.
-    pub fn license_file(mut self, l: Option<&str>) -> Self {
-        self.license_path = l.map(|l| PathBuf::from(l));
+    pub fn license_file(mut self, l: Option<&'a str>) -> Self {
+        self.license_path = l;
         self
     }
 
     /// Overrides the first author in the `authors` field of the package's manifest (Cargo.toml) as
     /// the manufacturer within the installer.
-    pub fn manufacturer(mut self, m: Option<&str>) -> Self {
-        self.manufacturer = m.map(|s| String::from(s));
+    pub fn manufacturer(mut self, m: Option<&'a str>) -> Self {
+        self.manufacturer = m;
         self
     }
 
@@ -131,8 +157,8 @@ impl Wix {
     ///
     /// This override the product name determined from the `name` field in the package's
     /// manifest (Cargo.toml).
-    pub fn product_name(mut self, p: Option<&str>) -> Self {
-        self.product_name = p.map(|s| String::from(s));
+    pub fn product_name(mut self, p: Option<&'a str>) -> Self {
+        self.product_name = p;
         self
     }
 
@@ -148,8 +174,8 @@ impl Wix {
     /// Normally the `signtool.exe` is installed in the `bin` folder of the Windows SDK
     /// installation. THe default is to use the PATH system environment variable. This will
     /// override any value obtained from the environment.
-    pub fn sign_path(mut self, s: Option<&str>) -> Self {
-        self.sign_path = s.map(|s| PathBuf::from(s));
+    pub fn sign_path(mut self, s: Option<&'a str>) -> Self {
+        self.sign_path = s;
         self
     }
 
@@ -157,11 +183,32 @@ impl Wix {
     ///
     /// The default is to _not_ use a timestamp server, even though it is highly recommended. Use
     /// this method to enable signing with the timestamp.
-    pub fn timestamp(mut self, t: Option<&str>) -> Self {
-        self.timestamp = t.map(|t| String::from(t));
+    pub fn timestamp(mut self, t: Option<&'a str>) -> Self {
+        self.timestamp = t;
         self
     }
 
+    /// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
+    /// create an installer for the package.
+    pub fn init(self, force: bool) -> Result<()> {
+        let mut main_wxs_path = PathBuf::from(WIX);
+        if !main_wxs_path.exists() {
+            fs::create_dir(&main_wxs_path)?;
+        }
+        main_wxs_path.push(WIX_SOURCE_FILE_NAME);
+        main_wxs_path.set_extension(WIX_SOURCE_FILE_EXTENSION);
+        if main_wxs_path.exists() && !force {
+            Err(Error::Generic(
+                format!("The '{}' file already exists. Use the '--force' flag to overwrite the contents.", 
+                    main_wxs_path.display())
+            ))
+        } else {
+            let mut main_wxs = File::create(main_wxs_path)?;
+            super::write_wix_source(&mut main_wxs)?;
+            Ok(())
+        }
+    }
+   
     /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
     /// (msi).
     pub fn run(self) -> Result<()> {
@@ -178,103 +225,32 @@ impl Wix {
         let mut cargo_file = File::open(cargo_file_path)?;
         let mut cargo_file_content = String::new();
         cargo_file.read_to_string(&mut cargo_file_content)?;
-        let cargo_values = cargo_file_content.parse::<Value>()?;
-        let pkg_version = cargo_values
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("version"))
-            .and_then(|v| v.as_str())
-            .ok_or(Error::Manifest(String::from("version")))?;
+        let manifest = cargo_file_content.parse::<Value>()?;
+        let pkg_version = self.get_version(&manifest)?;
         debug!("pkg_version = {:?}", pkg_version);
-        let product_name = if let Some(p) = self.product_name {
-            Ok(p)
-        } else {
-            cargo_values.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map(|s| String::from(s))
-                .ok_or(Error::Manifest(String::from("name")))
-        }?;
+        let product_name = self.get_product_name(&manifest)?;
         debug!("product_name = {:?}", product_name);
-        let description = if let Some(d) = self.description {
-            Ok(d)
-        } else {
-            cargo_values.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("description"))
-                .and_then(|d| d.as_str())
-                .map(|s| String::from(s))
-                .ok_or(Error::Manifest(String::from("description")))
-        }?;
+        let description = self.get_description(&manifest)?;
         debug!("description = {:?}", description);
-        let homepage = cargo_values.get("package")
+        let homepage = manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("homepage"))
             .and_then(|d| d.as_str());
         debug!("homepage = {:?}", homepage);
-        let license_name = if let Some(ref l) = self.license_path {
-            l.file_name()
-                .and_then(|f| f.to_str())
-                .map(|s| String::from(s))
-                .ok_or(Error::Generic(
-                    format!("The '{}' license path does not contain a file name.", l.display())
-                ))
-        } else {
-            cargo_values.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|s| Path::new(s).file_name().and_then(|f| f.to_str()))
-                .or(Some("License.txt"))
-                .map(|s| String::from(s))
-                .ok_or(Error::Generic(
-                    format!("The 'license-file' field value does not contain a file name.")
-                )) 
-        }?;
+        let license_name = self.get_license_name(&manifest)?;
         debug!("license_name = {:?}", license_name);
-        let license_source = self.license_path.unwrap_or(
-            // TODO: Add generation of license file from `license` field
-            cargo_values.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .map(|s| PathBuf::from(s))
-                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
-        );
+        let license_source = self.get_license_source(&manifest);
         debug!("license_source = {:?}", license_source);
-        let manufacturer = if let Some(m) = self.manufacturer {
-            Ok(m)
-        } else {
-            cargo_values.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("authors"))
-                .and_then(|a| a.as_array())
-                .and_then(|a| a.get(0)) 
-                .and_then(|f| f.as_str())
-                .and_then(|s| {
-                    // Strip email if it exists.
-                    let re = Regex::new(r"<(.*?)>").unwrap();
-                    Some(re.replace_all(s, ""))
-                })
-                .map(|s| String::from(s.trim()))
-                .ok_or(Error::Manifest(String::from("authors")))
-        }?;
+        let manufacturer = self.get_manufacturer(&manifest)?;
         debug!("manufacturer = {}", manufacturer);
-        let help_url = cargo_values
+        let help_url = manifest
             .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
             .and_then(|h| h.as_str())
             .ok_or(Error::Manifest(String::from("documentation")))?;
-        let binary_name = self.binary_name.unwrap_or(
-            cargo_values.get("bin")
-                .and_then(|b| b.as_table())
-                .and_then(|t| t.get("name")) 
-                .and_then(|n| n.as_str())
-                .map(|s| String::from(s))
-                .unwrap_or(product_name.clone())
-        );
+        debug!("help_url = {:?}", help_url);
+        let binary_name = self.get_binary_name(&manifest)?;
         debug!("binary_name = {:?}", binary_name);
         let platform = if cfg!(target_arch = "x86_64") {
             Platform::X64
@@ -282,43 +258,22 @@ impl Wix {
             Platform::X86
         };
         debug!("platform = {:?}", platform);
-        let main_wxs = if let Some(p) = self.input {
-            if p.exists() {
-                if p.is_dir() {
-                    Err(Error::Generic(format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", p.display())))
-                } else {
-                    trace!("Using the '{}' WiX source file", p.display());
-                    Ok(p)
-                }
-            } else {
-                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template > {0}' command to create it.", p.display())))
-            }
-        } else {
-            trace!("Using the default WiX source file");
-            let mut main_wxs = PathBuf::from(WIX);
-            main_wxs.push(WIX_SOURCE_FILE_NAME);
-            main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
-            if main_wxs.exists() {
-                Ok(main_wxs)
-            } else {
-               Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", main_wxs.display())))
-            }
-        }?;
-        debug!("main_wxs = {:?}", main_wxs);
-        let mut main_wixobj = PathBuf::from("target");
-        main_wixobj.push(WIX);
-        main_wixobj.push("build");
-        main_wixobj.push(WIX_SOURCE_FILE_NAME);
-        main_wixobj.set_extension("wixobj");
-        debug!("main_wixobj = {:?}", main_wixobj);
-        let mut main_msi = PathBuf::from("target");
-        main_msi.push(WIX);
+        let source_wxs = self.get_wxs_source()?;
+        debug!("source_wxs = {:?}", source_wxs);
+        let mut source_wixobj = PathBuf::from("target");
+        source_wixobj.push(WIX);
+        source_wixobj.push("build");
+        source_wixobj.push(WIX_SOURCE_FILE_NAME);
+        source_wixobj.set_extension("wixobj");
+        debug!("source_wixobj = {:?}", source_wixobj);
+        let mut destination_msi = PathBuf::from("target");
+        destination_msi.push(WIX);
         // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
         // format, the `set_extension` method will replace the Patch version number and
         // architecture/platform with `msi`.  Instead, just include the extension in the formatted
         // name.
-        main_msi.push(&format!("{}-{}-{}.msi", product_name, pkg_version, platform.arch()));
-        debug!("main_msi = {:?}", main_msi);
+        destination_msi.push(&format!("{}-{}-{}.msi", product_name, pkg_version, platform.arch()));
+        debug!("destination_msi = {:?}", destination_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
         info!("Building release binary");
@@ -334,15 +289,7 @@ impl Wix {
         }
         // Compile the installer
         info!("Compiling installer");
-        let mut compiler = if let Some(ref b) = self.bin_path {
-            trace!("Using the '{}' path to the WiX Toolset compiler", b.display());
-            Command::new(b.join(WIX_COMPILER))
-        } else {
-            env::var(WIX_PATH_KEY).map(|s| {
-                trace!("Using the '{}' path to the WiX Toolset compiler", s);
-                Command::new(PathBuf::from(s).join(WIX_COMPILER))
-            }).unwrap_or(Command::new(WIX_COMPILER))
-        };
+        let mut compiler = self.get_compiler();
         debug!("compiler = {:?}", compiler);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_COMPILER);
@@ -360,23 +307,15 @@ impl Wix {
             .arg(format!("-dLicenseSource={}", license_source.display()))
             .arg(format!("-dHelp={}", help_url))
             .arg("-o")
-            .arg(&main_wixobj)
-            .arg(&main_wxs)
+            .arg(&source_wixobj)
+            .arg(&source_wxs)
             .status()?;
         if !status.success() {
             return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(0)));
         }
         // Link the installer
         info!("Linking the installer");
-        let mut linker = if let Some(ref b) = self.bin_path {
-            trace!("Using the '{}' path to the WiX Toolset linker", b.display());
-            Command::new(b.join(WIX_LINKER))
-        } else {
-            env::var(WIX_PATH_KEY).map(|s| {
-                trace!("Using the '{}' path to the WiX Toolset linker", s);
-                Command::new(PathBuf::from(s).join(WIX_LINKER))
-            }).unwrap_or(Command::new(WIX_LINKER))
-        };
+        let mut linker = self.get_linker(); 
         debug!("linker = {:?}", linker);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
@@ -387,9 +326,9 @@ impl Wix {
             .arg("-ext")
             .arg("WixUIExtension")
             .arg("-cultures:en-us")
-            .arg(&main_wixobj)
+            .arg(&source_wixobj)
             .arg("-out")
-            .arg(&main_msi)
+            .arg(&destination_msi)
             .status()?;
         if !status.success() {
             return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(0)));
@@ -397,12 +336,7 @@ impl Wix {
         // Sign the installer
         if self.sign {
             info!("Signing the installer");
-            let mut signer = if let Some(ref s) = self.sign_path {
-                trace!("Using the '{}' path to the Windows SDK signtool", s.display());
-                Command::new(s.join(SIGNTOOL))
-            } else {
-                Command::new(SIGNTOOL)
-            };
+            let mut signer = self.get_signer();
             debug!("signer = {:?}", signer);
             if self.capture_output {
                 trace!("Capturing the {} output", SIGNTOOL);
@@ -423,16 +357,238 @@ impl Wix {
                 signer.arg("/t");
                 signer.arg(server.url());
             }
-            let status = signer.arg(&main_msi).status()?;
+            let status = signer.arg(&destination_msi).status()?;
             if !status.success() {
                 return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(0)));
             }
         }
         Ok(())
     }
+
+    /// Gets the binary name.
+    ///
+    /// This is the name of the executable (exe) file.
+    fn get_binary_name(&self, manifest: &Value) -> Result<String> {
+        if let Some(b) = self.binary_name {
+            Ok(b.to_owned())
+        } else {
+            manifest.get("bin")
+                .and_then(|b| b.as_table())
+                .and_then(|t| t.get("name")) 
+                .and_then(|n| n.as_str())
+                .map_or(self.get_product_name(manifest), |s| Ok(String::from(s)))
+        }
+    }
+
+    /// Gets the command for the compiler application (`candle.exe`).
+    fn get_compiler(&self) -> Command {
+        if let Some(b) = self.bin_path {
+            trace!("Using the '{}' path to the WiX Toolset compiler", b);
+            Command::new(PathBuf::from(b).join(WIX_COMPILER))
+        } else {
+            env::var(WIX_PATH_KEY).map(|s| {
+                trace!("Using the '{}' path to the WiX Toolset compiler", s);
+                Command::new(PathBuf::from(s).join(WIX_COMPILER))
+            }).unwrap_or(Command::new(WIX_COMPILER))
+        }
+    }
+
+    /// Gets the copyright holder.
+    ///
+    /// If no copyright holder was explicitly specified, then the manufacturer is used.
+    fn get_copyright_holder(&self, manifest: &Value) -> Result<String> {
+        if let Some(y) = self.copyright_year {
+            Ok(y.to_owned())
+        } else {
+            self.get_manufacturer(manifest)
+        }
+    }
+
+    /// Gets the copyright year.
+    fn get_copyright_year(&self) -> String {
+        if let Some(c) = self.copyright_year {
+            c.to_owned()
+        } else {
+            String::from("YYYY")
+        }
+    }
+
+    /// Gets the description.
+    ///
+    /// If no description is explicitly set using the builder pattern, then the description from
+    /// the package's manifest (Cargo.toml) is used.
+    fn get_description(&self, manifest: &Value) -> Result<String> {
+        if let Some(d) = self.description {
+            Ok(d.to_owned())
+        } else {
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("description"))
+                .and_then(|d| d.as_str())
+                .map(|s| String::from(s))
+                .ok_or(Error::Manifest(String::from("description")))
+        }
+    }
+
+    /// Gets the license name.
+    ///
+    /// If a path to a license file is specified, then the file name will be used. If no license
+    /// path is specified, then the file name from the `license-file` field in the package's
+    /// manifest is used.
+    fn get_license_name(&self, manifest: &Value) -> Result<String> {
+        if let Some(l) = self.license_path.map(|s| PathBuf::from(s)) {
+            l.file_name()
+                .and_then(|f| f.to_str())
+                .map(|s| String::from(s))
+                .ok_or(Error::Generic(
+                    format!("The '{}' license path does not contain a file name.", l.display())
+                ))
+        } else {
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("license-file"))
+                .and_then(|l| l.as_str())
+                .and_then(|s| Path::new(s).file_name().and_then(|f| f.to_str()))
+                .or(Some("License.txt"))
+                .map(|s| String::from(s))
+                .ok_or(Error::Generic(
+                    format!("The 'license-file' field value does not contain a file name.")
+                )) 
+        }
+    }
+
+    /// Gets the license source file.
+    ///
+    /// This is the license file that is placed in the installation location alongside the `bin`
+    /// folder for the executable (exe) file.
+    fn get_license_source(&self, manifest: &Value) -> PathBuf {
+        self.license_path.map(|l| PathBuf::from(l)).unwrap_or(
+            // TODO: Add generation of license file from `license` field
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("license-file"))
+                .and_then(|l| l.as_str())
+                .map(|s| PathBuf::from(s))
+                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
+        )
+    }
+
+    /// Gets the command for the linker application (`light.exe`).
+    fn get_linker(&self) -> Command {
+        if let Some(b) = self.bin_path {
+            trace!("Using the '{}' path to the WiX Toolset linker", b);
+            Command::new(PathBuf::from(b).join(WIX_LINKER))
+        } else {
+            env::var(WIX_PATH_KEY).map(|s| {
+                trace!("Using the '{}' path to the WiX Toolset linker", s);
+                Command::new(PathBuf::from(s).join(WIX_LINKER))
+            }).unwrap_or(Command::new(WIX_LINKER))
+        }
+    }
+
+    /// Gets the manufacturer.
+    ///
+    /// The manufacturer is displayed in the Add/Remove Programs (ARP) control panel under the
+    /// "Publisher" column. If no manufacturer is explicitly set using the builder pattern, then
+    /// the first author from the `authors` field in the package's manifest (Cargo.toml) is used.
+    fn get_manufacturer(&self, manifest: &Value) -> Result<String> {
+        if let Some(m) = self.manufacturer {
+            Ok(m.to_owned())
+        } else {
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("authors"))
+                .and_then(|a| a.as_array())
+                .and_then(|a| a.get(0)) 
+                .and_then(|f| f.as_str())
+                .and_then(|s| {
+                    // Strip email if it exists.
+                    let re = Regex::new(r"<(.*?)>").unwrap();
+                    Some(re.replace_all(s, ""))
+                })
+                .map(|s| String::from(s.trim()))
+                .ok_or(Error::Manifest(String::from("authors")))
+        }
+    }
+
+    /// Gets the product name.
+    fn get_product_name(&self, manifest: &Value) -> Result<String> {
+        if let Some(p) = self.product_name {
+            Ok(p.to_owned())
+        } else {
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("name"))
+                .and_then(|n| n.as_str())
+                .map(|s| String::from(s))
+                .ok_or(Error::Manifest(String::from("name")))
+        }
+    }
+
+    /// Gets the command for the `signtool` application.
+    fn get_signer(&self) -> Command {
+        if let Some(s) = self.sign_path {
+            trace!("Using the '{}' path to the Windows SDK signtool", s);
+            Command::new(PathBuf::from(s).join(SIGNTOOL))
+        } else {
+            Command::new(SIGNTOOL)
+        }
+    }
+
+    /// Gets the WiX Source (wxs) file.
+    fn get_wxs_source(&self) -> Result<PathBuf> {
+        if let Some(p) = self.input.map(|s| PathBuf::from(s)) {
+            if p.exists() {
+                if p.is_dir() {
+                    Err(Error::Generic(format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", p.display())))
+                } else {
+                    trace!("Using the '{}' WiX source file", p.display());
+                    Ok(p)
+                }
+            } else {
+                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template > {0}' command to create it.", p.display())))
+            }
+        } else {
+            trace!("Using the default WiX source file");
+            let mut main_wxs = PathBuf::from(WIX);
+            main_wxs.push(WIX_SOURCE_FILE_NAME);
+            main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
+            if main_wxs.exists() {
+                Ok(main_wxs)
+            } else {
+               Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", main_wxs.display())))
+            }
+        }
+    }
+
+    /// Gets the package version.
+    fn get_version(&self, cargo_toml: &Value) -> Result<String> {
+        cargo_toml.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("version"))
+            .and_then(|v| v.as_str())
+            .map(|s| String::from(s))
+            .ok_or(Error::Manifest(String::from("version")))
+    }
+
+    /// Renders the MIT license in the Rich Text Format (RTF).
+    ///
+    /// This will be automatically included in the Windows installer (msi) and displayed in the license
+    /// dialog.
+    fn write_mit_license<W: Write>(&self, writer: &mut W, manifest: &Value) -> Result<()> {
+        trace!("Writing MIT license");
+        let template = mustache::compile_str(MIT_LICENSE_TEMPLATE)?;
+        let data = MapBuilder::new()
+            .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
+            .insert_str("copyright-year", self.get_copyright_year())
+            .insert_str("product-name", self.get_product_name(manifest)?)
+            .build();
+        template.render_data(writer, &data)?;
+        Ok(())
+    }
 }
 
-impl Default for Wix {
+impl<'a> Default for Wix<'a> {
     fn default() -> Self {
         Wix::new()
     }
