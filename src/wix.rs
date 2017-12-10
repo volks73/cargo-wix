@@ -19,7 +19,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use super::{Error, Platform, TimestampServer};
+use super::{Error, Platform, Result, TimestampServer};
 use toml::Value;
 
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
@@ -164,7 +164,7 @@ impl Wix {
 
     /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
     /// (msi).
-    pub fn run(self) -> Result<(), Error> {
+    pub fn run(self) -> Result<()> {
         debug!("binary_name = {:?}", self.binary_name);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("description = {:?}", self.description);
