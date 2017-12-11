@@ -21,8 +21,9 @@ use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use super::{Error, License, Platform, Result, TimestampServer};
+use super::{Error, License, Platform, Result, Template, TimestampServer};
 use toml::Value;
+use uuid::Uuid;
 
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
@@ -146,14 +147,32 @@ impl<'a> Wix<'a> {
         self
     }
 
-    /// Prints a license template to stdout.
-    ///
-    /// The template is filled with the copyright year and holder as defined in the package's
-    /// manifest (Cargo.toml).
-    pub fn print_license(self, license: License) -> Result<()> {
+    /// Renders the template for the license and writes it to stdout.
+    fn print_license(&self, license: License) -> Result<()> {
         let manifest = get_manifest()?;
-        self.write_eula(&mut io::stdout(), &license, &manifest)?;
+        self.write_license(&mut io::stdout(), &license, &manifest)?;
         Ok(())
+    }
+
+    /// Prints a template to stdout.
+    ///
+    /// In the case of a license template, the copyright year and holder are filled by the current
+    /// year and package's manifest (Cargo.toml). The output for a license template is also in the
+    /// Rich Text Format (RTF). In the case of a WiX Source (WXS) template, the output is in XML.
+    /// The UpgradeCode and Path Component's GUIDs are generated each time the WXS template is
+    /// printed. 
+    pub fn print_template(self, template: Template) -> Result<()> {
+        match template {
+            Template::Apache2 => self.print_license(License::Apache2),
+            Template::Gpl3 => self.print_license(License::Gpl3),
+            Template::Mit => self.print_license(License::Mit),
+            Template::Wxs => self.print_wix_source(),
+        }
+    }
+
+    /// Generates unique GUIDs for appropriate values and writes the rendered template to stdout.
+    fn print_wix_source(&self) -> Result<()> {
+        self.write_wix_source(&mut io::stdout())
     }
 
     /// Sets the product name.
@@ -208,7 +227,7 @@ impl<'a> Wix<'a> {
         } else {
             info!("Creating the 'wix\\main.wxs' file");
             let mut main_wxs = File::create(main_wxs_path)?;
-            super::write_wix_source(&mut main_wxs)?;
+            self.write_wix_source(&mut main_wxs)?;
         }
         let manifest = get_manifest()?;
         let license_name = self.get_manifest_license_name(&manifest);
@@ -220,7 +239,7 @@ impl<'a> Wix<'a> {
             license_path.push("License");
             license_path.set_extension(RTF_FILE_EXTENSION);
             let mut rtf = File::create(license_path)?;
-            self.write_eula(&mut rtf, &license, &manifest)?;
+            self.write_license(&mut rtf, &license, &manifest)?;
         }
         Ok(())
     }
@@ -629,11 +648,22 @@ impl<'a> Wix<'a> {
     ///
     /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_eula<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
+    fn write_license<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(license.template())?;
         let data = MapBuilder::new()
             .insert_str("copyright-year", self.get_copyright_year())
             .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
+            .build();
+        template.render_data(writer, &data)?;
+        Ok(())
+    }
+
+    /// Generates unique GUIDs for appropriate values and renders the template.
+    fn write_wix_source<W: Write>(&self, writer: &mut W) -> Result<()> {
+        let template = mustache::compile_str(Template::Wxs.template())?;
+        let data = MapBuilder::new()
+            .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
+            .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .build();
         template.render_data(writer, &data)?;
         Ok(())

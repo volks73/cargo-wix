@@ -72,15 +72,13 @@ extern crate regex;
 extern crate toml;
 extern crate uuid;
 
-use mustache::MapBuilder;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
 use std::fs;
-use std::io::{self, Write};
+use std::io;
 use std::path::PathBuf;
 use std::str::FromStr;
-use uuid::Uuid;
 
 pub use self::wix::Wix;
 
@@ -102,22 +100,6 @@ static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf.mustache");
 
 /// The MIT Rich Text Format (RTF) license template.
 static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf.mustache");
-
-/// Generates unique GUIDs for appropriate values in the template and renders to a writer.
-fn write_wix_source<W: Write>(writer: &mut W) -> Result<()> {
-    let template = mustache::compile_str(WIX_SOURCE_TEMPLATE)?;
-    let data = MapBuilder::new()
-        .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-        .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-        .build();
-    template.render_data(writer, &data)?;
-    Ok(())
-}
-
-/// Generates unique GUIDs for appropriate values in the template and prints to stdout.
-pub fn print_wxs() -> Result<()> {
-    write_wix_source(&mut io::stdout())
-}
 
 /// Removes the `target\wix` folder.
 pub fn clean() -> Result<()> {
@@ -241,6 +223,57 @@ impl From<toml::de::Error> for Error {
 impl From<mustache::Error> for Error {
     fn from(err: mustache::Error) -> Error {
         Error::Mustache(err)
+    }
+}
+
+/// The different templates that can be printed using the `--print-template` option.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Template {
+    Apache2,
+    Gpl3,
+    Mit,
+    Wxs,
+}
+
+impl Template {
+    /// Gets the possible string representations of each variant.
+    pub fn possible_values() -> Vec<&'static str> {
+        vec![License::Apache2.id(), License::Gpl3.id(), License::Mit.id(), WIX]
+    }
+
+    /// Gets the template.
+    pub fn template(&self) -> &str {
+        match *self {
+            Template::Apache2 => APACHE2_LICENSE_TEMPLATE,
+            Template::Gpl3 => GPL3_LICENSE_TEMPLATE,
+            Template::Mit => MIT_LICENSE_TEMPLATE,
+            Template::Wxs => WIX_SOURCE_TEMPLATE,
+        }
+    }
+}
+
+impl fmt::Display for Template {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Template::Apache2 => write!(f, "{}", License::Apache2.id()),
+            Template::Gpl3 => write!(f, "{}", License::Gpl3.id()),
+            Template::Mit => write!(f, "{}", License::Mit.id()),
+            Template::Wxs => write!(f, "{}", WIX)
+        }
+    }
+}
+
+impl FromStr for Template {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s.to_lowercase().trim() {
+            "apache-2.0" => Ok(Template::Apache2),
+            "gpl-3.0" => Ok(Template::Gpl3),
+            "mit" => Ok(Template::Mit),
+            "wxs" => Ok(Template::Wxs),
+            _ => Err(Error::Generic(format!("Cannot convert from '{}' to License variant", s))),
+        }
     }
 }
 

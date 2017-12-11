@@ -22,7 +22,7 @@ use ansi_term::Colour;
 use clap::{App, Arg, SubCommand};
 use std::error::Error;
 use std::io::Write;
-use cargo_wix::License;
+use cargo_wix::Template;
 
 const SUBCOMMAND_NAME: &str = "wix";
 const ERROR_COLOR: Colour = Colour::Fixed(9); // Bright red
@@ -56,8 +56,7 @@ fn main() {
                     .long("clean")
                     .conflicts_with("init")
                     .conflicts_with("sign")
-                    .conflicts_with("print-wxs")
-                    .conflicts_with("print-license"))
+                    .conflicts_with("print-template"))
                 .arg(Arg::with_name("description")
                     .help("Overrides the 'description' field of the package's manifest (Cargo.toml) as the description within the installer.")
                     .long("description")
@@ -78,8 +77,7 @@ fn main() {
                     .long("init")
                     .conflicts_with("clean")
                     .conflicts_with("purge")
-                    .conflicts_with("print-wxs")
-                    .conflicts_with("print-license"))
+                    .conflicts_with("print-template"))
                 .arg(Arg::with_name("license")
                     .help("Overrides the 'license-file' field of the package's manfiest (Cargo.toml) as the file to be converted to the 'License.txt' file that is added to the install location along side the 'bin' folder by the installer.")
                     .long("license")
@@ -93,23 +91,15 @@ fn main() {
                 .arg(Arg::with_name("no-capture")
                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                     .long("nocapture"))
-                .arg(Arg::with_name("print-license")
-                     .help("Prints a license template to stdout in the Rich Text Format (RTF). Supported license values are case sensitive and matches the strings used for the 'license' field in a package's manifest. [values: Apache-2.0, GPL-3.0, MIT]")
-                     .long("print-license")
+                .arg(Arg::with_name("print-template")
+                     .help("Prints a template to stdout. In the case of a license template, the output is in the Rich Text Format (RTF) and for a WiX Source file, the output is in XML. [values: Apache-2.0, GPL-3.0, MIT, wxs]")
+                     .long("print-template")
                      .hide_possible_values(true)
-                     .possible_values(&License::possible_values())
+                     .possible_values(&Template::possible_values())
                      .takes_value(true)
                      .conflicts_with("init")
-                     .conflicts_with("print-wxs")
                      .conflicts_with("clean")
                      .conflicts_with("purge"))
-                .arg(Arg::with_name("print-wxs")
-                    .help("Prints a WiX Source (wxs) template to stdout to use with this subcommand. The template provided with this subcommand uses XML preprocessor variables to set values based on fields in the project's manifest (Cargo.toml). Redirection can be used to save the contents to a file. Note, each time this flag is used, new GUIDs are generated for the respective GUID placeholders within the template, i.e. the UpgradeCode and the Path component's GUID. Modification of the template is encouraged but avoid modification of the XML preprocessor variables to ensure proper function.")
-                    .long("print-wxs")
-                    .conflicts_with("init")
-                    .conflicts_with("print-license")
-                    .conflicts_with("clean")
-                    .conflicts_with("purge"))
                 .arg(Arg::with_name("product-name")
                     .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as the product name within the installer.")
                     .long("product-name")
@@ -121,8 +111,7 @@ fn main() {
                     .conflicts_with("init")
                     .conflicts_with("sign")
                     .conflicts_with("clean")
-                    .conflicts_with("print-wxs")
-                    .conflicts_with("print-license"))
+                    .conflicts_with("print-template"))
                 .arg(Arg::with_name("sign")
                     .help("The Windows installer (msi) will be signed using the SignTool application available in the Windows 10 SDK. The signtool is invoked with the '/a' flag to automatically obtain an appropriate certificate from the Windows certificate manager. The default is to also use the Comodo timestamp server with the '/t' flag.")
                     .short("s")
@@ -179,14 +168,12 @@ fn main() {
         .timestamp(matches.value_of("timestamp"));
     let result = if matches.is_present("init") {
         wix.init(matches.is_present("force"))
-    } else if matches.is_present("print-wxs") {
-        cargo_wix::print_wxs()
     } else if matches.is_present("clean") {
         cargo_wix::clean()
     } else if matches.is_present("purge") {
         cargo_wix::purge()
-    } else if matches.is_present("print-license") {
-        wix.print_license(value_t!(matches, "print-license", License).unwrap())
+    } else if matches.is_present("print-template") {
+        wix.print_template(value_t!(matches, "print-template", Template).unwrap())
     } else {
         wix.run()
     };
