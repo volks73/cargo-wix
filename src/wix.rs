@@ -230,8 +230,8 @@ impl<'a> Wix<'a> {
         debug!("sign = {:?}", self.sign);
         debug!("timestamp = {:?}", self.timestamp);
         let manifest = get_manifest()?;
-        let pkg_version = self.get_version(&manifest)?;
-        debug!("pkg_version = {:?}", pkg_version);
+        let version = self.get_version(&manifest)?;
+        debug!("version = {:?}", version);
         let product_name = self.get_product_name(&manifest)?;
         debug!("product_name = {:?}", product_name);
         let description = self.get_description(&manifest)?;
@@ -248,17 +248,13 @@ impl<'a> Wix<'a> {
         debug!("help_url = {:?}", help_url);
         let binary_name = self.get_binary_name(&manifest)?;
         debug!("binary_name = {:?}", binary_name);
-        let platform = if cfg!(target_arch = "x86_64") {
-            Platform::X64
-        } else {
-            Platform::X86
-        };
+        let platform = self.get_platform();
         debug!("platform = {:?}", platform);
         let source_wxs = self.get_wxs_source()?;
         debug!("source_wxs = {:?}", source_wxs);
         let source_wixobj = self.get_source_wixobj(); 
         debug!("source_wixobj = {:?}", source_wixobj);
-        let destination_msi = self.get_destination_msi(&product_name, &pkg_version, &platform);
+        let destination_msi = self.get_destination_msi(&product_name, &version, &platform);
         debug!("destination_msi = {:?}", destination_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
@@ -284,7 +280,7 @@ impl<'a> Wix<'a> {
             compiler.stderr(Stdio::null());
         } 
         let status = compiler
-            .arg(format!("-dVersion={}", pkg_version))
+            .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
             .arg(format!("-dProductName={}", product_name))
             .arg(format!("-dBinaryName={}", binary_name))
@@ -505,6 +501,15 @@ impl<'a> Wix<'a> {
                 })
                 .map(|s| String::from(s.trim()))
                 .ok_or(Error::Manifest(String::from("authors")))
+        }
+    }
+
+    /// Gets the platform.
+    fn get_platform(&self) -> Platform {
+        if cfg!(target_arch = "x86_64") {
+            Platform::X64
+        } else {
+            Platform::X86
         }
     }
 
