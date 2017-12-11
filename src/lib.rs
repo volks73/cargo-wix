@@ -124,10 +124,10 @@ pub fn clean() -> Result<()> {
     target_wix.push(WIX);
     if target_wix.exists() {
         trace!("The 'target\\wix' folder exists");
-        info!("Removing the 'target\\wix' folder");
+        warn!("Removing the 'target\\wix' folder");
         fs::remove_dir_all(target_wix)?;
     } else {
-        warn!("The 'target\\wix' folder does not exist");
+        trace!("The 'target\\wix' folder does not exist");
     }
     Ok(())
 }
@@ -145,7 +145,7 @@ pub fn purge() -> Result<()> {
         warn!("Removing the 'wix' folder");
         fs::remove_dir_all(wix)?;
     } else {
-        warn!("The 'wix' folder does not exist");
+        trace!("The 'wix' folder does not exist");
     }
     Ok(())
 }
@@ -386,10 +386,10 @@ impl FromStr for License {
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s.to_lowercase().trim() {
-            "apache2" => Ok(License::Apache2),
+            "apache-2.0" => Ok(License::Apache2),
             "gpl-3.0" => Ok(License::Gpl3),
             "mit" => Ok(License::Mit),
-            _ => Err(Error::Generic(String::from("Cannot convert from string to License variant"))),
+            _ => Err(Error::Generic(format!("Cannot convert from '{}' to License variant", s))),
         }
     }
 }
