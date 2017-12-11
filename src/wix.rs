@@ -200,11 +200,7 @@ impl<'a> Wix<'a> {
             super::write_wix_source(&mut main_wxs)?;
         }
         let manifest = get_manifest()?;
-        let license_name = manifest.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("license"))
-            .and_then(|l| l.as_str())
-            .and_then(|s| s.split("/").next());
+        let license_name = self.get_manifest_license_name(&manifest);
         debug!("license_name = {:?}", license_name);
         if let Some(l) = license_name {
             info!("Creating the 'wix\\License.{}' file", RTF_FILE_EXTENSION);
@@ -213,7 +209,7 @@ impl<'a> Wix<'a> {
             license_path.push("License");
             license_path.set_extension(RTF_FILE_EXTENSION);
             let mut rtf = File::create(license_path)?;
-            self.write_license(&mut rtf, &license, &manifest)?;
+            self.write_eula(&mut rtf, &license, &manifest)?;
         }
         Ok(())
     }
@@ -437,6 +433,7 @@ impl<'a> Wix<'a> {
                     format!("The '{}' license path does not contain a file name.", l.display())
                 ))
         } else {
+            // TODO: Look for `license` field
             manifest.get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
@@ -450,19 +447,34 @@ impl<'a> Wix<'a> {
         }
     }
 
+    /// Gets the name of the license from the `license` field in the package's manifest
+    /// (Cargo.toml).
+    fn get_manifest_license_name(&self, manifest: &Value) -> Option<String> {
+        manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("license"))
+            .and_then(|l| l.as_str())
+            .and_then(|s| s.split("/").next())
+            .map(|s| String::from(s))
+    }
+
     /// Gets the license source file.
     ///
     /// This is the license file that is placed in the installation location alongside the `bin`
     /// folder for the executable (exe) file.
     fn get_license_source(&self, manifest: &Value) -> PathBuf {
+        // Order of precedence:
+        //
+        // 1. CLI (-l,--license)
+        // 2. Manifest `license-file`
+        // 3. LICENSE file in root
         self.license_path.map(|l| PathBuf::from(l)).unwrap_or(
-            // TODO: Add generation of license file from `license` field
             manifest.get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
                 .map(|s| PathBuf::from(s))
-                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
+                .unwrap_or_else(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
         )
     }
 
@@ -605,11 +617,11 @@ impl<'a> Wix<'a> {
             .ok_or(Error::Manifest(String::from("version")))
     }
 
-    /// Renders the MIT license in the Rich Text Format (RTF).
+    /// Renders the license in the Rich Text Format (RTF) as an End User's License Agreement (EULA).
     ///
-    /// This will be automatically included in the Windows installer (msi) and displayed in the license
+    /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_license<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
+    fn write_eula<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(license.template())?;
         let data = MapBuilder::new()
             .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
@@ -619,6 +631,7 @@ impl<'a> Wix<'a> {
         template.render_data(writer, &data)?;
         Ok(())
     }
+    
 }
 
 impl<'a> Default for Wix<'a> {
