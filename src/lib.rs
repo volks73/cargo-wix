@@ -57,13 +57,13 @@
 //! extensive documentation and tutorials for information about writing, customizing, and using wxs
 //! files. The documentation here is only for this subcommand.
 //!
-//! The [template](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) is embedded
-//! in the binary installation of the subcommand and it can be printed using the `cargo wix
-//! --print-wxs` command from the command prompt (cmd.exe). Note, each time the `cargo wix
-//! --print-wxs` command is invoked, new GUIDs are generated for fields that require them.
-//! Thus, a developer does not need to worry about generating GUIDs and can begin using the
-//! template immediately with this subcommand or the WiX Toolset's `candle.exe` and `light.exe`
-//! applications.
+//! The [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) is
+//! embedded in the binary installation of the subcommand and it can be printed to stdout using the
+//! `cargo wix --print-template wxs` command from the command prompt (cmd.exe). Note, each time the
+//! `cargo wix --print-template wxs` command is invoked, new GUIDs are generated for fields that
+//! require them.  Thus, a developer does not need to worry about generating GUIDs and can begin
+//! using the template immediately with this subcommand or the WiX Toolset's `candle.exe` and
+//! `light.exe` applications.
 
 extern crate chrono;
 #[macro_use] extern crate log;
