@@ -236,10 +236,7 @@ impl<'a> Wix<'a> {
         debug!("product_name = {:?}", product_name);
         let description = self.get_description(&manifest)?;
         debug!("description = {:?}", description);
-        let homepage = manifest.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("homepage"))
-            .and_then(|d| d.as_str());
+        let homepage = self.get_homepage(&manifest);
         debug!("homepage = {:?}", homepage);
         let license_name = self.get_license_name(&manifest)?;
         debug!("license_name = {:?}", license_name);
@@ -247,12 +244,7 @@ impl<'a> Wix<'a> {
         debug!("license_source = {:?}", license_source);
         let manufacturer = self.get_manufacturer(&manifest)?;
         debug!("manufacturer = {}", manufacturer);
-        let help_url = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
-            .and_then(|h| h.as_str())
-            .ok_or(Error::Manifest(String::from("documentation")))?;
+        let help_url = self.get_help_url(&manifest)?;
         debug!("help_url = {:?}", help_url);
         let binary_name = self.get_binary_name(&manifest)?;
         debug!("binary_name = {:?}", binary_name);
@@ -435,6 +427,15 @@ impl<'a> Wix<'a> {
         }
     }
 
+    /// Gets the URL of the project's homepage from the manifest (Cargo.toml).
+    fn get_homepage(&self, manifest: &Value) -> Option<String> {
+        manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("homepage"))
+            .and_then(|d| d.as_str())
+            .map(|s| String::from(s))
+    }
+
     /// Gets the license name.
     ///
     /// If a path to a license file is specified, then the file name will be used. If no license
@@ -538,6 +539,16 @@ impl<'a> Wix<'a> {
         } else {
             Command::new(SIGNTOOL)
         }
+    }
+
+    /// Gets the URL that appears in the installer's extended details.
+    fn get_help_url(&self, manifest: &Value) -> Result<String> {
+        manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
+            .and_then(|h| h.as_str())
+            .map(|s| String::from(s))
+            .ok_or(Error::Manifest(String::from("documentation")))
     }
 
     /// Gets the WiX Source (wxs) file.
