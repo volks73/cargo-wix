@@ -142,7 +142,7 @@ pub fn purge() -> Result<()> {
     let wix = PathBuf::from(WIX);
     if wix.exists() {
         trace!("The 'wix' folder exists");
-        info!("Removing the 'wix' folder");
+        warn!("Removing the 'wix' folder");
         fs::remove_dir_all(wix)?;
     } else {
         warn!("The 'wix' folder does not exist");
