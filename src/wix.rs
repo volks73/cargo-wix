@@ -474,7 +474,7 @@ impl<'a> Wix<'a> {
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
                 .map(|s| PathBuf::from(s))
-                .unwrap_or_else(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
+                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
         )
     }
 
