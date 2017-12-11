@@ -268,7 +268,7 @@ impl<'a> Wix<'a> {
         }
         let status = builder.arg("build").arg("--release").status()?;
         if !status.success() {
-            return Err(Error::Command(CARGO, status.code().unwrap_or(0)));
+            return Err(Error::Command(CARGO, status.code().unwrap_or(100)));
         }
         // Compile the installer
         info!("Compiling the installer");
@@ -294,7 +294,7 @@ impl<'a> Wix<'a> {
             .arg(&source_wxs)
             .status()?;
         if !status.success() {
-            return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(0)));
+            return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(100)));
         }
         // Link the installer
         info!("Linking the installer");
@@ -314,7 +314,7 @@ impl<'a> Wix<'a> {
             .arg(&destination_msi)
             .status()?;
         if !status.success() {
-            return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(0)));
+            return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(100)));
         }
         // Sign the installer
         if self.sign {
@@ -342,7 +342,7 @@ impl<'a> Wix<'a> {
             }
             let status = signer.arg(&destination_msi).status()?;
             if !status.success() {
-                return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(0)));
+                return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(100)));
             }
         }
         Ok(())
