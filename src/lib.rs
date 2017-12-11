@@ -65,6 +65,7 @@
 //! template immediately with this subcommand or the WiX Toolset's `candle.exe` and `light.exe`
 //! applications.
 
+extern crate chrono;
 #[macro_use] extern crate log;
 extern crate mustache;
 extern crate regex;

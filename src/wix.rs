@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use chrono::{Datelike, Utc};
 use mustache::{self, MapBuilder};
 use regex::Regex;
 use std::env;
@@ -209,7 +210,7 @@ impl<'a> Wix<'a> {
             license_path.push("License");
             license_path.set_extension(RTF_FILE_EXTENSION);
             let mut rtf = File::create(license_path)?;
-            self.write_eula(&mut rtf, &license)?;
+            self.write_eula(&mut rtf, &license, &manifest)?;
         }
         Ok(())
     }
@@ -372,6 +373,26 @@ impl<'a> Wix<'a> {
         }
     }
 
+    /// Gets the copyright holder.
+    ///
+    /// The default is use the manufacturer.
+    fn get_copyright_holder(&self, manifest: &Value) -> Result<String> {
+        if let Some(h) = self.copyright_holder {
+            Ok(h.to_owned())
+        } else {
+            self.get_manufacturer(manifest)
+        }
+    }
+
+    /// Gets the copyright year.
+    ///
+    /// The default is to use the current year.
+    fn get_copyright_year(&self) -> String {
+        self.copyright_year
+            .map(|y| String::from(y))
+            .unwrap_or(Utc::now().year().to_string())
+    }
+
     /// Gets the description.
     ///
     /// If no description is explicitly set using the builder pattern, then the description from
@@ -412,7 +433,6 @@ impl<'a> Wix<'a> {
                     format!("The '{}' license path does not contain a file name.", l.display())
                 ))
         } else {
-            // TODO: Look for `license` field
             manifest.get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
@@ -599,9 +619,11 @@ impl<'a> Wix<'a> {
     ///
     /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_eula<W: Write>(&self, writer: &mut W, license: &License) -> Result<()> {
+    fn write_eula<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(license.template())?;
         let data = MapBuilder::new()
+            .insert_str("copyright-year", self.get_copyright_year())
+            .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
             .build();
         template.render_data(writer, &data)?;
         Ok(())
