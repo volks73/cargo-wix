@@ -94,7 +94,7 @@ fn main() {
                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                     .long("nocapture"))
                 .arg(Arg::with_name("print-license")
-                     .help("Prints a license template to stdout in the Rich Text Format (RTF). [values: Apache-2.0, GPL-3.0, MIT]")
+                     .help("Prints a license template to stdout in the Rich Text Format (RTF). Supported license values are case sensitive and matches the strings used for the 'license' field in a package's manifest. [values: Apache-2.0, GPL-3.0, MIT]")
                      .long("print-license")
                      .hide_possible_values(true)
                      .possible_values(&License::possible_values())
