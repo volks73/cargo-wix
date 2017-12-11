@@ -364,6 +364,11 @@ impl License {
         }
     }
 
+    /// Gets the possible string representations of each variant.
+    pub fn possible_values() -> Vec<&'static str> {
+        vec![License::Apache2.id(), License::Gpl3.id(), License::Mit.id()]
+    }
+
     /// Gets the Rich Text Format (RTF) template for a license.
     pub fn template(&self) -> &str {
         match *self {

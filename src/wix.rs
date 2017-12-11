@@ -17,7 +17,7 @@ use mustache::{self, MapBuilder};
 use regex::Regex;
 use std::env;
 use std::fs::{self, File};
-use std::io::{Read, Write};
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
@@ -144,6 +144,16 @@ impl<'a> Wix<'a> {
     pub fn manufacturer(mut self, m: Option<&'a str>) -> Self {
         self.manufacturer = m;
         self
+    }
+
+    /// Prints a license template to stdout.
+    ///
+    /// The template is filled with the copyright year and holder as defined in the package's
+    /// manifest (Cargo.toml).
+    pub fn print_license(self, license: License) -> Result<()> {
+        let manifest = get_manifest()?;
+        self.write_eula(&mut io::stdout(), &license, &manifest)?;
+        Ok(())
     }
 
     /// Sets the product name.
