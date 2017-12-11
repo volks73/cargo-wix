@@ -86,9 +86,9 @@ fn main() {
                 .arg(Arg::with_name("no-capture")
                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                     .long("nocapture"))
-                .arg(Arg::with_name("print-template")
-                    .help("Prints a template WiX Source (wxs) file to use with this subcommand to stdout. The template provided with this subcommand uses xml preprocessor varaibles to set values based on fields in the rust project's manifest file (Cargo.toml). Only the '{{replace-with-a-guid}}' placeholders within the template need to be modified with unique GUIDs by hand. Redirection can be used to save the contents to 'main.wxs' and then placed in the 'wix' subfolder.")
-                    .long("print-template"))
+                .arg(Arg::with_name("print-wxs")
+                    .help("Prints a WiX Source (wxs) template to stdout to use with this subcommand. The template provided with this subcommand uses XML preprocessor variables to set values based on fields in the project's manifest (Cargo.toml). Redirection can be used to save the contents to a file. Note, each time this flag is used, new GUIDs are generated for the respective GUID placeholders within the template, i.e. the UpgradeCode and the Path component's GUID. Modification of the template is encouraged but avoid modification of the XML preprocessor variables to ensure proper function.")
+                    .long("print-wxs"))
                 .arg(Arg::with_name("product-name")
                     .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as the product name within the installer.")
                     .long("product-name")
@@ -156,8 +156,8 @@ fn main() {
         .timestamp(matches.value_of("timestamp"));
     let result = if matches.is_present("init") {
         wix.init(matches.is_present("force"))
-    } else if matches.is_present("print-template") {
-        cargo_wix::print_template()
+    } else if matches.is_present("print-wxs") {
+        cargo_wix::print_wxs()
     } else if matches.is_present("clean") {
         cargo_wix::clean()
     } else if matches.is_present("purge") {

@@ -59,8 +59,8 @@
 //!
 //! The [template](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) is embedded
 //! in the binary installation of the subcommand and it can be printed using the `cargo wix
-//! --print-template` command from the command prompt (cmd.exe). Note, each time the `cargo wix
-//! --print-template` command is invoked, new GUIDs are generated for fields that require them.
+//! --print-wxs` command from the command prompt (cmd.exe). Note, each time the `cargo wix
+//! --print-wxs` command is invoked, new GUIDs are generated for fields that require them.
 //! Thus, a developer does not need to worry about generating GUIDs and can begin using the
 //! template immediately with this subcommand or the WiX Toolset's `candle.exe` and `light.exe`
 //! applications.
@@ -115,7 +115,7 @@ fn write_wix_source<W: Write>(writer: &mut W) -> Result<()> {
 }
 
 /// Generates unique GUIDs for appropriate values in the template and prints to stdout.
-pub fn print_template() -> Result<()> {
+pub fn print_wxs() -> Result<()> {
     write_wix_source(&mut io::stdout())
 }
 

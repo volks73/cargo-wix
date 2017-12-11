@@ -60,10 +60,10 @@ A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by sp
 C:\Path\To\Project\>cargo wix Path\To\WiX\Source\file.wxs
 ```
 
-The `--print-template` flag, which prints a WiX Source (wxs) template to stdout, can be used to create the `main.wxs` file. A [template.wxs](https://github.com/volks73/cargo-wix/blob/master/src/template.wxs) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
+The `--print-wxs` flag, which prints a WiX Source (wxs) template to stdout, can be used to create the `main.wxs` file. A [template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
 
 ```dos
-C:\Path\To\Project\>cargo --print-template > example.wxs
+C:\Path\To\Project\>cargo --print-wxs > example.wxs
 C:\Path\To\Project\>cargo wix example.wxs
 ```
 
