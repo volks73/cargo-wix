@@ -92,16 +92,16 @@ pub type Result<T> = std::result::Result<T, Error>;
 use wix::WIX;
 
 /// The WiX Source (wxs) template.
-static WIX_SOURCE_TEMPLATE: &str = include_str!("template.wxs");
+static WIX_SOURCE_TEMPLATE: &str = include_str!("wxs.mustache");
 
 /// The Apache-2.0 Rich Text Format (RTF) license template.
-static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.rtf");
+static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.mustache");
 
 /// The GPL-3.0 Rich Text Format (RTF) license template.
-static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf");
+static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.mustache");
 
 /// The MIT Rich Text Format (RTF) license template.
-static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf");
+static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.mustache");
 
 /// Generates unique GUIDs for appropriate values in the template and renders to a writer.
 fn write_wix_source<W: Write>(writer: &mut W) -> Result<()> {
