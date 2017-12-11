@@ -21,7 +21,7 @@ use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use super::{Error, License, Platform, Result, Template, TimestampServer};
+use super::{Error, Platform, Result, Template, TimestampServer};
 use toml::Value;
 use uuid::Uuid;
 
@@ -148,7 +148,7 @@ impl<'a> Wix<'a> {
     }
 
     /// Renders the template for the license and writes it to stdout.
-    fn print_license(&self, license: License) -> Result<()> {
+    fn print_license(&self, license: Template) -> Result<()> {
         let manifest = get_manifest()?;
         self.write_license(&mut io::stdout(), &license, &manifest)?;
         Ok(())
@@ -163,9 +163,9 @@ impl<'a> Wix<'a> {
     /// printed. 
     pub fn print_template(self, template: Template) -> Result<()> {
         match template {
-            Template::Apache2 => self.print_license(License::Apache2),
-            Template::Gpl3 => self.print_license(License::Gpl3),
-            Template::Mit => self.print_license(License::Mit),
+            t @ Template::Apache2 => self.print_license(t),
+            t @ Template::Gpl3 => self.print_license(t),
+            t @ Template::Mit => self.print_license(t),
             Template::Wxs => self.print_wix_source(),
         }
     }
@@ -234,7 +234,7 @@ impl<'a> Wix<'a> {
         debug!("license_name = {:?}", license_name);
         if let Some(l) = license_name {
             info!("Creating the 'wix\\License.{}' file", RTF_FILE_EXTENSION);
-            let license = License::from_str(&l)?;
+            let license = Template::from_str(&l)?;
             let mut license_path = PathBuf::from(WIX);
             license_path.push("License");
             license_path.set_extension(RTF_FILE_EXTENSION);
@@ -648,8 +648,8 @@ impl<'a> Wix<'a> {
     ///
     /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_license<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
-        let template = mustache::compile_str(license.template())?;
+    fn write_license<W: Write>(&self, writer: &mut W, template: &Template, manifest: &Value) -> Result<()> {
+        let template = mustache::compile_str(template.to_str())?;
         let data = MapBuilder::new()
             .insert_str("copyright-year", self.get_copyright_year())
             .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
@@ -660,7 +660,7 @@ impl<'a> Wix<'a> {
 
     /// Generates unique GUIDs for appropriate values and renders the template.
     fn write_wix_source<W: Write>(&self, writer: &mut W) -> Result<()> {
-        let template = mustache::compile_str(Template::Wxs.template())?;
+        let template = mustache::compile_str(Template::Wxs.to_str())?;
         let data = MapBuilder::new()
             .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())

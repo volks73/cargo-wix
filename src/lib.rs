@@ -226,57 +226,6 @@ impl From<mustache::Error> for Error {
     }
 }
 
-/// The different templates that can be printed using the `--print-template` option.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Template {
-    Apache2,
-    Gpl3,
-    Mit,
-    Wxs,
-}
-
-impl Template {
-    /// Gets the possible string representations of each variant.
-    pub fn possible_values() -> Vec<&'static str> {
-        vec![License::Apache2.id(), License::Gpl3.id(), License::Mit.id(), WIX]
-    }
-
-    /// Gets the template.
-    pub fn template(&self) -> &str {
-        match *self {
-            Template::Apache2 => APACHE2_LICENSE_TEMPLATE,
-            Template::Gpl3 => GPL3_LICENSE_TEMPLATE,
-            Template::Mit => MIT_LICENSE_TEMPLATE,
-            Template::Wxs => WIX_SOURCE_TEMPLATE,
-        }
-    }
-}
-
-impl fmt::Display for Template {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Template::Apache2 => write!(f, "{}", License::Apache2.id()),
-            Template::Gpl3 => write!(f, "{}", License::Gpl3.id()),
-            Template::Mit => write!(f, "{}", License::Mit.id()),
-            Template::Wxs => write!(f, "{}", WIX)
-        }
-    }
-}
-
-impl FromStr for Template {
-    type Err = Error;
-
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        match s.to_lowercase().trim() {
-            "apache-2.0" => Ok(Template::Apache2),
-            "gpl-3.0" => Ok(Template::Gpl3),
-            "mit" => Ok(Template::Mit),
-            "wxs" => Ok(Template::Wxs),
-            _ => Err(Error::Generic(format!("Cannot convert from '{}' to License variant", s))),
-        }
-    }
-}
-
 /// The different values for the `Platform` attribute of the `Package` element.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Platform {
@@ -332,6 +281,67 @@ impl Default for Platform {
     }
 }
 
+/// The different templates that can be printed using the `--print-template` option.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Template {
+    Apache2,
+    Gpl3,
+    Mit,
+    Wxs,
+}
+
+impl Template {
+    /// Gets the ID for the template.
+    ///
+    /// In the case of a license template, the ID is the SPDX ID which is also used for the
+    /// `license` field in the package's manifest (Cargo.toml). This is also the same value used
+    /// with the `--print-template` option.
+    pub fn id(&self) -> &str {
+        match *self {
+            Template::Apache2 => "Apache-2.0",
+            Template::Gpl3 => "GPL-3.0",
+            Template::Mit => "MIT",
+            Template::Wxs => "WXS",
+        }
+    }
+
+    /// Gets the possible string representations of each variant.
+    pub fn possible_values() -> Vec<&'static str> {
+        vec![Template::Apache2.id(), Template::Gpl3.id(), Template::Mit.id(), Template::Wxs.id()]
+    }
+
+    /// Gets the embedded contents of the template as a string.
+    pub fn to_str(&self) -> &str {
+        match *self {
+            Template::Apache2 => APACHE2_LICENSE_TEMPLATE,
+            Template::Gpl3 => GPL3_LICENSE_TEMPLATE,
+            Template::Mit => MIT_LICENSE_TEMPLATE,
+            Template::Wxs => WIX_SOURCE_TEMPLATE,
+        }
+    }
+}
+
+impl fmt::Display for Template {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.id())
+    }
+}
+
+impl FromStr for Template {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s.to_lowercase().trim() {
+            "apache-2.0" => Ok(Template::Apache2),
+            "gpl-3.0" => Ok(Template::Gpl3),
+            "mit" => Ok(Template::Mit),
+            "wxs" => Ok(Template::Wxs),
+            _ => Err(Error::Generic(format!("Cannot convert from '{}' to a Template variant", s))),
+        }
+    }
+}
+
+
 /// The aliases for the URLs to different Microsoft Authenticode timestamp servers.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TimestampServer {
@@ -368,67 +378,6 @@ impl FromStr for TimestampServer {
             "comodo" => Ok(TimestampServer::Comodo),
             "verisign" => Ok(TimestampServer::Verisign),
             u @ _ => Ok(TimestampServer::Custom(String::from(u)))
-        }
-    }
-}
-
-/// The licenses that are automatically placed in the license dialog of the Windows installer.
-///
-/// If a license is _not_ a variant for this enum or a custom license is used, then the Rich Text
-/// Format (RTF) file for the license must be manually generated and added to the installer by
-/// modifying the WiX Source (wxs) file.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum License {
-    /// The Apache-2.0 license.
-    Apache2,
-    /// The GPL-3.0 license.
-    Gpl3,
-    /// The MIT license.
-    Mit,
-}
-
-impl License {
-    /// Gets the SPDX ID for the license.
-    pub fn id(&self) -> &str {
-        match *self {
-            License::Apache2 => "Apache-2.0",
-            License::Gpl3 => "GPL-3.0",
-            License::Mit => "MIT",
-        }
-    }
-
-    /// Gets the possible string representations of each variant.
-    pub fn possible_values() -> Vec<&'static str> {
-        vec![License::Apache2.id(), License::Gpl3.id(), License::Mit.id()]
-    }
-
-    /// Gets the Rich Text Format (RTF) template for a license.
-    pub fn template(&self) -> &str {
-        match *self {
-            License::Apache2 => APACHE2_LICENSE_TEMPLATE,
-            License::Gpl3 => GPL3_LICENSE_TEMPLATE,
-            License::Mit => MIT_LICENSE_TEMPLATE,
-        }
-    }
-
-    // TODO: Add url() method that returns a URL to the license.
-}
-
-impl fmt::Display for License {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.id())
-    }
-}
-
-impl FromStr for License {
-    type Err = Error;
-
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        match s.to_lowercase().trim() {
-            "apache-2.0" => Ok(License::Apache2),
-            "gpl-3.0" => Ok(License::Gpl3),
-            "mit" => Ok(License::Mit),
-            _ => Err(Error::Generic(format!("Cannot convert from '{}' to License variant", s))),
         }
     }
 }

@@ -92,7 +92,7 @@ fn main() {
                     .help("By default, this subcommand captures, or hides, all output from the builder, compiler, linker, and signer for the binary and Windows installer, respectively. Use this flag to show the output.")
                     .long("nocapture"))
                 .arg(Arg::with_name("print-template")
-                     .help("Prints a template to stdout. In the case of a license template, the output is in the Rich Text Format (RTF) and for a WiX Source file, the output is in XML. [values: Apache-2.0, GPL-3.0, MIT, wxs]")
+                     .help("Prints a template to stdout. In the case of a license template, the output is in the Rich Text Format (RTF) and for a WiX Source file, the output is in XML. New GUIDS are generated for the 'UpgradeCode' and Path Component each time the 'WXS' template is printed. Values are case insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
                      .long("print-template")
                      .hide_possible_values(true)
                      .possible_values(&Template::possible_values())
