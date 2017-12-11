@@ -565,7 +565,6 @@ impl<'a> Wix<'a> {
     fn get_source_wixobj(&self) -> PathBuf {
         let mut source_wixobj = PathBuf::from("target");
         source_wixobj.push(WIX);
-        source_wixobj.push("build");
         source_wixobj.push(WIX_SOURCE_FILE_NAME);
         source_wixobj.set_extension("wixobj");
         source_wixobj
@@ -627,6 +626,13 @@ impl<'a> Wix<'a> {
             .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
             .insert_str("copyright-year", self.get_copyright_year())
             .insert_str("product-name", self.get_product_name(manifest)?)
+            // The GPL-3.0 has a section on how to apply the license to a new program. This
+            // includes a hypothical `show w` and `show c` commands. Eventually it would be nice to
+            // replace these with actual commands that implement the functionality in the program.
+            // TODO: Add manifest or CLI alternative
+            .insert_str("warrenty-command", "show w")
+            // TODO: Add manifest or CLI alternative
+            .insert_str("conditions-command", "show c")
             .build();
         template.render_data(writer, &data)?;
         Ok(())
