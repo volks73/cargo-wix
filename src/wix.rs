@@ -256,19 +256,9 @@ impl<'a> Wix<'a> {
         debug!("platform = {:?}", platform);
         let source_wxs = self.get_wxs_source()?;
         debug!("source_wxs = {:?}", source_wxs);
-        let mut source_wixobj = PathBuf::from("target");
-        source_wixobj.push(WIX);
-        source_wixobj.push("build");
-        source_wixobj.push(WIX_SOURCE_FILE_NAME);
-        source_wixobj.set_extension("wixobj");
+        let source_wixobj = self.get_source_wixobj(); 
         debug!("source_wixobj = {:?}", source_wixobj);
-        let mut destination_msi = PathBuf::from("target");
-        destination_msi.push(WIX);
-        // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
-        // format, the `set_extension` method will replace the Patch version number and
-        // architecture/platform with `msi`.  Instead, just include the extension in the formatted
-        // name.
-        destination_msi.push(&format!("{}-{}-{}.msi", product_name, pkg_version, platform.arch()));
+        let destination_msi = self.get_destination_msi(&product_name, &pkg_version, &platform);
         debug!("destination_msi = {:?}", destination_msi);
         // Build the binary with the release profile. If a release binary has already been built, then
         // this will essentially do nothing.
@@ -539,6 +529,28 @@ impl<'a> Wix<'a> {
         } else {
             Command::new(SIGNTOOL)
         }
+    }
+
+    /// Gets the destination for the linker.
+    fn get_destination_msi(&self, product_name: &str, version: &str, platform: &Platform) -> PathBuf {
+        let mut destination_msi = PathBuf::from("target");
+        destination_msi.push(WIX);
+        // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
+        // format, the `set_extension` method will replace the Patch version number and
+        // architecture/platform with `msi`.  Instead, just include the extension in the formatted
+        // name.
+        destination_msi.push(&format!("{}-{}-{}.msi", product_name, version, platform.arch()));
+        destination_msi
+    }
+
+    /// Gets the destination for the compiler output/linker input.
+    fn get_source_wixobj(&self) -> PathBuf {
+        let mut source_wixobj = PathBuf::from("target");
+        source_wixobj.push(WIX);
+        source_wixobj.push("build");
+        source_wixobj.push(WIX_SOURCE_FILE_NAME);
+        source_wixobj.set_extension("wixobj");
+        source_wixobj
     }
 
     /// Gets the URL that appears in the installer's extended details.
