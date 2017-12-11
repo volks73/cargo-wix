@@ -157,10 +157,9 @@ impl<'a> Wix<'a> {
     /// Prints a template to stdout.
     ///
     /// In the case of a license template, the copyright year and holder are filled by the current
-    /// year and package's manifest (Cargo.toml). The output for a license template is also in the
-    /// Rich Text Format (RTF). In the case of a WiX Source (WXS) template, the output is in XML.
-    /// The UpgradeCode and Path Component's GUIDs are generated each time the WXS template is
-    /// printed. 
+    /// year and the manufacturer. The output for a license template is also in the Rich Text
+    /// Format (RTF). In the case of a WiX Source (WXS) template, the output is in XML. The
+    /// UpgradeCode's and Path Component's GUIDs are generated each time the WXS template is printed. 
     pub fn print_template(self, template: Template) -> Result<()> {
         match template {
             t @ Template::Apache2 => self.print_license(t),
