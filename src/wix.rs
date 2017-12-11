@@ -209,7 +209,7 @@ impl<'a> Wix<'a> {
             license_path.push("License");
             license_path.set_extension(RTF_FILE_EXTENSION);
             let mut rtf = File::create(license_path)?;
-            self.write_eula(&mut rtf, &license, &manifest)?;
+            self.write_eula(&mut rtf, &license)?;
         }
         Ok(())
     }
@@ -369,27 +369,6 @@ impl<'a> Wix<'a> {
                 trace!("Using the '{}' path to the WiX Toolset compiler", s);
                 Command::new(PathBuf::from(s).join(WIX_COMPILER))
             }).unwrap_or(Command::new(WIX_COMPILER))
-        }
-    }
-
-    /// Gets the copyright holder.
-    ///
-    /// If no copyright holder was explicitly specified, then the manufacturer is used.
-    fn get_copyright_holder(&self, manifest: &Value) -> Result<String> {
-        if let Some(y) = self.copyright_year {
-            Ok(y.to_owned())
-        } else {
-            self.get_manufacturer(manifest)
-        }
-    }
-
-    /// Gets the copyright year.
-    fn get_copyright_year(&self) -> String {
-        if let Some(c) = self.copyright_year {
-            c.to_owned()
-        } else {
-            // TODO: Change this to current year.
-            String::from("YYYY")
         }
     }
 
@@ -620,24 +599,13 @@ impl<'a> Wix<'a> {
     ///
     /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
     /// dialog.
-    fn write_eula<W: Write>(&self, writer: &mut W, license: &License, manifest: &Value) -> Result<()> {
+    fn write_eula<W: Write>(&self, writer: &mut W, license: &License) -> Result<()> {
         let template = mustache::compile_str(license.template())?;
         let data = MapBuilder::new()
-            .insert_str("copyright-holder", self.get_copyright_holder(manifest)?)
-            .insert_str("copyright-year", self.get_copyright_year())
-            .insert_str("product-name", self.get_product_name(manifest)?)
-            // The GPL-3.0 has a section on how to apply the license to a new program. This
-            // includes a hypothical `show w` and `show c` commands. Eventually it would be nice to
-            // replace these with actual commands that implement the functionality in the program.
-            // TODO: Add manifest or CLI alternative
-            .insert_str("warrenty-command", "show w")
-            // TODO: Add manifest or CLI alternative
-            .insert_str("conditions-command", "show c")
             .build();
         template.render_data(writer, &data)?;
         Ok(())
     }
-    
 }
 
 impl<'a> Default for Wix<'a> {
