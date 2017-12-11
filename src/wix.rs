@@ -264,6 +264,7 @@ impl<'a> Wix<'a> {
         // this will essentially do nothing.
         info!("Building the release binary");
         let mut builder = Command::new(CARGO);
+        debug!("builder = {:?}", builder);
         if self.capture_output {
             trace!("Capturing the '{}' output", CARGO);
             builder.stdout(Stdio::null());
