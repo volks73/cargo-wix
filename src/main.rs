@@ -178,7 +178,7 @@ fn main() {
     } else if matches.is_present("print-template") {
         wix.print_template(value_t!(matches, "print-template", Template).unwrap())
     } else {
-        wix.run()
+        wix.build()
     };
     match result {
         Ok(_) => {

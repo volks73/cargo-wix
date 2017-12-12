@@ -244,9 +244,9 @@ impl<'a> Wix<'a> {
         Ok(())
     }
    
-    /// Runs the subcommand to build the release binary, compile, link, and possibly sign the installer
-    /// (msi).
-    pub fn run(self) -> Result<()> {
+    /// Builds the project using the release profile, builds the installer (msi), and optionally
+    /// sign the output. 
+    pub fn build(self) -> Result<()> {
         debug!("binary_name = {:?}", self.binary_name);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("description = {:?}", self.description);
