@@ -214,6 +214,7 @@ impl<'a> Wix<'a> {
     pub fn init(self, force: bool) -> Result<()> {
         let mut main_wxs_path = PathBuf::from(WIX);
         if !main_wxs_path.exists() {
+            info!("Creating the '{}' directory", main_wxs_path.display());
             fs::create_dir(&main_wxs_path)?;
         }
         main_wxs_path.push(WIX_SOURCE_FILE_NAME);
