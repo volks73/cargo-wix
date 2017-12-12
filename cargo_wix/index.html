@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#15-392' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#15-449' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='cargo-wix' class='section-header'><a href='#cargo-wix'>cargo-wix</a></h1>
 <p>The goal of the cargo-wix project and <code>cargo wix</code> subcommand is to make it easy to create
@@ -82,13 +82,26 @@ subcommand is only really useful on a Windows machine.</p>
 
 <p>The WiX Toolset provides a compiler (<code>candle.exe</code>) and linker (<code>light.exe</code>). These can be found
 in the <code>bin</code> directory of the installation location for the WiX Toolset. This subcommand uses
-these two applications with the <code>std::process::Command</code> module to create an installer. The WiX
-Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided with
-this subcommand that attempts to meet the majority of use cases for developers, so extensive
-knowledge of the WiX Toolset and Windows installer technologies is not required (but always
-recommended). Modification of the template is encouraged, but please consult the WiX Toolset&#39;s
-extensive documentation and tutorials for information about writing, customizing, and using wxs
-files. The documentation here is only for this subcommand.</p>
+these two applications with the <code>std::process::Command</code> module to create an installer.
+Generally, it is best to add the WiX Toolset <code>bin</code> folder to the PATH system environment
+variable, but a WIX_PATH environment variable or the <code>-B,--bin-path</code> option can be used to
+specify a path (relative or absolute) to the WiX Toolset <code>bin</code> folder. The order of precedence
+(descending) is: <code>-B,--bin-path</code> option, WIX_PATH environment variable, and then the PATH
+system environment variable.</p>
+
+<p>The Windows SDK provides a signer (<code>signtool</code>) application for signing installers. The
+application is installed in the <code>bin</code> folder of the Windows SDK installation. The location of
+the <code>bin</code> folder varies depending on the version. It is recommended to use the Developer Prompt
+to ensure the <code>signtool</code> application is available; however, it is possible to specify the path
+to the Windows SDK <code>bin</code> folder using the <code>-S,--sign-path</code> option at the command line. Since
+signing is optional.</p>
+
+<p>The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided
+with this subcommand that attempts to meet the majority of use cases for developers, so
+extensive knowledge of the WiX Toolset and Windows installer technologies is not required (but
+always recommended). Modification of the template is encouraged, but please consult the WiX
+Toolset&#39;s extensive documentation and tutorials for information about writing, customizing, and
+using wxs files. The documentation here is only for this subcommand.</p>
 
 <p>The <a href="https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache">WXS template</a> is
 embedded in the binary installation of the subcommand and it can be printed to stdout using the
@@ -97,6 +110,50 @@ embedded in the binary installation of the subcommand and it can be printed to s
 require them.  Thus, a developer does not need to worry about generating GUIDs and can begin
 using the template immediately with this subcommand or the WiX Toolset&#39;s <code>candle.exe</code> and
 <code>light.exe</code> applications.</p>
+
+<p>In addition to the WXS template, there are several license templates which are used to generate
+an End User License Agreement (EULA) during the <code>cargo wix --init</code> command. Depending on the
+license ID(s) in the <code>license</code> field for a package&#39;s manifest (Cargo.toml), a license file
+in the Rich Text Format (RTF) is generated from a template and placed in the <code>wix</code> folder. This
+RTF file is then displayed in the license dialog of the installer. See the help information on
+the <code>--print-template</code> option for information about supported licenses. If the <code>license</code> field
+is not used or the license ID is not supported, then the EULA will not be automatically created
+during initialization and it will have to be created manually with a text editor or other
+authoring tool.</p>
+
+<p>During creation of the installer, the <code>cargo wix</code> subcommand will look for a LICENSE file in
+the root of the project. If the file exists, then it is used as the source file for the
+<code>License.txt</code> file that is placed alongside the <code>bin</code> folder during installation of the project
+with the Windows installer (msi). If a LICENSE file does not exist, then the <code>-l,--license</code>
+option should be used to specify a path to a file that can be used.</p>
+
+<p>If a custom license is used, then the <code>license-file</code> field should be used with the package&#39;s
+manifest. The path specified for the <code>license-file</code> field is used to create a &quot;sidecar&quot; license
+file that is installed alongside the <code>bin</code> folder during installation. Basically, if a custom
+license is used, everything should be manually setup and modified.</p>
+
+<p>Generally, any value that is obtained from the package&#39;s manifest (Cargo.toml) can be
+overridden at the command line with an appropriate option. For example, the manufacturer, which
+is displayed as the &quot;Publisher&quot; in the Add/Remove Programs (ARP) control panel is obtained from
+the first author listed in the <code>authors</code> field of a package&#39;s manifest, but it can be
+overridden using the <code>-m,--manufacturer</code> option. The default in most cases is to use a value
+from a field in the package&#39;s manifest.</p>
+
+<p>The <code>cargo wix</code> subcommand uses the package name for the product name. The default install
+location is at <code>C:\Program Files\[Product Name]</code>, where <code>[Product Name]</code> is replaced with the
+product name determined from the package name. This can be overridden with the
+<code>-p,--product-name</code> option. The binary name, which is the <code>name</code> field for the <code>[[bin]]</code>
+section, is used for the executable file name, i.e. &quot;name.exe&quot;. This can also be overridden
+using the <code>-b,--bin-name</code> option. The package description is used in multiple places for the
+installer, including the text that appears in the blue UAC dialog when using a signed
+installer. This can be overridden using the <code>-d,--description</code> option.</p>
+
+<p>An unmodified WXS file from the embedded template will create an installer that installs the
+executable file in a <code>bin</code> folder within the installation directory selected by the end-user
+during installation. It will add a <code>License.txt</code> file to the same folder as the <code>bin</code> folder
+from a <code>LICENSE</code> file, and it will add the <code>bin</code> folder to the PATH system environment variable
+so that the executable can be called from anywhere with a commmand prompt. Most of these
+behaviors can be adjusted during the installation process of the Windows installer.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
