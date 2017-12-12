@@ -618,7 +618,7 @@ impl<'a> Wix<'a> {
                     Ok(p)
                 }
             } else {
-                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template > {0}' command to create it.", p.display())))
+                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template WXS > {0}' command to create it.", p.display())))
             }
         } else {
             trace!("Using the default WiX source file");

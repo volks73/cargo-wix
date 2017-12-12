@@ -306,8 +306,17 @@ impl Template {
     }
 
     /// Gets the possible string representations of each variant.
-    pub fn possible_values() -> Vec<&'static str> {
-        vec![Template::Apache2.id(), Template::Gpl3.id(), Template::Mit.id(), Template::Wxs.id()]
+    pub fn possible_values() -> Vec<String> {
+        vec![
+            Template::Apache2.id().to_owned(), 
+            Template::Apache2.id().to_lowercase(), 
+            Template::Gpl3.id().to_owned(), 
+            Template::Gpl3.id().to_lowercase(), 
+            Template::Mit.id().to_owned(), 
+            Template::Mit.id().to_lowercase(), 
+            Template::Wxs.id().to_owned(),
+            Template::Wxs.id().to_lowercase(),
+        ]
     }
 
     /// Gets the embedded contents of the template as a string.
