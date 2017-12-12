@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `init` fn in crate `cargo_wix`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, init">
+    <meta name="description" content="API documentation for the Rust `purge` fn in crate `cargo_wix`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, purge">
 
-    <title>cargo_wix::init - Rust</title>
+    <title>cargo_wix::purge - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='index.html'>cargo_wix</a></p><script>window.sidebarCurrent = {name: 'init', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='index.html'>cargo_wix</a></p><script>window.sidebarCurrent = {name: 'purge', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,13 +44,16 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>cargo_wix</a>::<wbr><a class="fn" href=''>init</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>cargo_wix</a>::<wbr><a class="fn" href=''>purge</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#113-130' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn init(force: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>, <a class="enum" href="../cargo_wix/enum.Error.html" title="enum cargo_wix::Error">Error</a>&gt;</pre><div class='docblock'><p>Creates the necessary sub-folders and files to immediately use the <code>cargo wix</code> subcommand to
-create an installer for the package.</p>
+               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#123-134' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn purge() -&gt; <a class="type" href="../cargo_wix/type.Result.html" title="type cargo_wix::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>&gt;</pre><div class='docblock'><p>Removes the <code>target\wix</code> folder and the <code>wix</code> folder.</p>
+
+<p><strong>Use with caution!</strong> All contents of both folders are removed, including files that may be
+located in the folders but not used or related to the creation of Windows installers via the
+WiX Toolset.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 

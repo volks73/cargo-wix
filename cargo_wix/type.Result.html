@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `init` fn in crate `cargo_wix`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, init">
+    <meta name="description" content="API documentation for the Rust `Result` type in crate `cargo_wix`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Result">
 
-    <title>cargo_wix::init - Rust</title>
+    <title>cargo_wix::Result - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
@@ -17,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc fn">
+<body class="rustdoc type">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -29,7 +29,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='index.html'>cargo_wix</a></p><script>window.sidebarCurrent = {name: 'init', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Type Definition Result</p><p class='location'><a href='index.html'>cargo_wix</a></p><script>window.sidebarCurrent = {name: 'Result', ty: 'type', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -44,13 +44,12 @@
     </nav>
 
     <section id='main' class="content">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>cargo_wix</a>::<wbr><a class="fn" href=''>init</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Type Definition <a href='index.html'>cargo_wix</a>::<wbr><a class="type" href=''>Result</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#113-130' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn init(force: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>, <a class="enum" href="../cargo_wix/enum.Error.html" title="enum cargo_wix::Error">Error</a>&gt;</pre><div class='docblock'><p>Creates the necessary sub-folders and files to immediately use the <code>cargo wix</code> subcommand to
-create an installer for the package.</p>
+               </span><a class='srclink' href='../src/cargo_wix/lib.rs.html#88' title='goto source code'>[src]</a></span></h1>
+<pre class='rust typedef'>type Result&lt;T&gt; = <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;T, <a class="enum" href="../cargo_wix/enum.Error.html" title="enum cargo_wix::Error">Error</a>&gt;;</pre><div class='docblock'><p>A specialized <code>Result</code> type for cargo-wix operations.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
