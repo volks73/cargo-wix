@@ -691,6 +691,28 @@ fn get_manifest() -> Result<Value> {
 mod tests {
     use super::*;
 
+    static TEST_MANIFEST: &str = r#"[package]
+name = "cargo-wix"
+description = "Build Windows installers using the Wix Toolset"
+version = "0.0.2"
+authors = ["Christopher Field <cfield2@gmail.com>"]
+license = "Apache-2.0/MIT"
+repository = "https://github.com/volks73/cargo-wix"
+documentation = "https://volks73.github.io/cargo-wix"
+homepage = "https://github.com/volks73/cargo-wix"
+readme = "README.md"
+
+[[bin]]
+name = "cargo-wix"
+doc = false
+
+[lib]
+name = "cargo_wix""#;
+
+    fn manifest() -> Value {
+        TEST_MANIFEST.parse::<Value>().unwrap()
+    }
+
     #[test]
     fn defaults_are_correct() {
         let wix = Wix::new();
@@ -819,6 +841,67 @@ mod tests {
         let re = Regex::new(r"<(.*?)>").unwrap();
         let actual = re.replace_all("cfield2@gmail.com", "");
         assert_eq!(actual.trim(), EXPECTED);
+    }
+
+    #[test]
+    fn get_binary_name_default_is_correct() {
+        const EXPECTED: &str = "cargo-wix";
+        let wix = Wix::new();
+        let actual = wix.get_binary_name(&manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED); 
+    }
+
+    #[test]
+    fn get_binary_name_is_correct() {
+        const EXPECTED: &str = "test";
+        let wix = Wix::new().binary_name(Some(EXPECTED));
+        let actual = wix.get_binary_name(&manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_compiler_default_is_correct() {
+        let compiler = Wix::new().get_compiler();
+        assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(WIX_COMPILER)));
+    }
+
+    #[test]
+    fn get_compiler_bin_path_is_correct() {
+        const TEST_PATH: &str = "C:\\bin";
+        let compiler = Wix::new().bin_path(Some(TEST_PATH)).get_compiler();
+        assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new("C:\\bin\\candle")));
+    }
+
+    // TODO: Add test for correct path using WIX_PATH environment variable
+
+    #[test]
+    fn get_copyright_holder_default_is_correct() {
+        let wix = Wix::new();
+        let actual = wix.get_copyright_holder(&manifest()).unwrap();
+        assert_eq!(&actual, "Christopher Field");
+    }
+
+    #[test]
+    fn get_copyright_holder_is_correct() {
+        const EXPECTED: &str = "Test";
+        let wix = Wix::new().copyright_holder(Some(EXPECTED));
+        let actual = wix.get_copyright_holder(&manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_copyright_year_default_is_correct() {
+        let wix = Wix::new();
+        let actual = wix.get_copyright_year();
+        assert_eq!(actual, Utc::now().year().to_string());
+    }
+
+    #[test]
+    fn get_copyright_year_is_correct() {
+        const EXPECTED: &str = "1980";
+        let wix = Wix::new().copyright_year(Some(EXPECTED));
+        let actual = wix.get_copyright_year();
+        assert_eq!(&actual, EXPECTED);
     }
 }
 
