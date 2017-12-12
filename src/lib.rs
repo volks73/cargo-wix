@@ -49,13 +49,26 @@
 //!
 //! The WiX Toolset provides a compiler (`candle.exe`) and linker (`light.exe`). These can be found
 //! in the `bin` directory of the installation location for the WiX Toolset. This subcommand uses
-//! these two applications with the `std::process::Command` module to create an installer. The WiX
-//! Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided with
-//! this subcommand that attempts to meet the majority of use cases for developers, so extensive
-//! knowledge of the WiX Toolset and Windows installer technologies is not required (but always
-//! recommended). Modification of the template is encouraged, but please consult the WiX Toolset's
-//! extensive documentation and tutorials for information about writing, customizing, and using wxs
-//! files. The documentation here is only for this subcommand.
+//! these two applications with the `std::process::Command` module to create an installer.
+//! Generally, it is best to add the WiX Toolset `bin` folder to the PATH system environment
+//! variable, but a WIX_PATH environment variable or the `-B,--bin-path` option can be used to
+//! specify a path (relative or absolute) to the WiX Toolset `bin` folder. The order of precedence
+//! (descending) is: `-B,--bin-path` option, WIX_PATH environment variable, and then the PATH
+//! system environment variable.
+//!
+//! The Windows SDK provides a signer (`signtool`) application for signing installers. The
+//! application is installed in the `bin` folder of the Windows SDK installation. The location of
+//! the `bin` folder varies depending on the version. It is recommended to use the Developer Prompt
+//! to ensure the `signtool` application is available; however, it is possible to specify the path
+//! to the Windows SDK `bin` folder using the `-S,--sign-path` option at the command line. Since
+//! signing is optional.
+//!
+//! The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A template is provided
+//! with this subcommand that attempts to meet the majority of use cases for developers, so
+//! extensive knowledge of the WiX Toolset and Windows installer technologies is not required (but
+//! always recommended). Modification of the template is encouraged, but please consult the WiX
+//! Toolset's extensive documentation and tutorials for information about writing, customizing, and
+//! using wxs files. The documentation here is only for this subcommand.
 //!
 //! The [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) is
 //! embedded in the binary installation of the subcommand and it can be printed to stdout using the
@@ -64,6 +77,50 @@
 //! require them.  Thus, a developer does not need to worry about generating GUIDs and can begin
 //! using the template immediately with this subcommand or the WiX Toolset's `candle.exe` and
 //! `light.exe` applications.
+//!
+//! In addition to the WXS template, there are several license templates which are used to generate
+//! an End User License Agreement (EULA) during the `cargo wix --init` command. Depending on the
+//! license ID(s) in the `license` field for a package's manifest (Cargo.toml), a license file
+//! in the Rich Text Format (RTF) is generated from a template and placed in the `wix` folder. This
+//! RTF file is then displayed in the license dialog of the installer. See the help information on
+//! the `--print-template` option for information about supported licenses. If the `license` field
+//! is not used or the license ID is not supported, then the EULA will not be automatically created
+//! during initialization and it will have to be created manually with a text editor or other
+//! authoring tool.
+//!
+//! During creation of the installer, the `cargo wix` subcommand will look for a LICENSE file in
+//! the root of the project. If the file exists, then it is used as the source file for the
+//! `License.txt` file that is placed alongside the `bin` folder during installation of the project
+//! with the Windows installer (msi). If a LICENSE file does not exist, then the `-l,--license`
+//! option should be used to specify a path to a file that can be used.
+//!
+//! If a custom license is used, then the `license-file` field should be used with the package's
+//! manifest. The path specified for the `license-file` field is used to create a "sidecar" license
+//! file that is installed alongside the `bin` folder during installation. Basically, if a custom
+//! license is used, everything should be manually setup and modified.
+//!
+//! Generally, any value that is obtained from the package's manifest (Cargo.toml) can be
+//! overridden at the command line with an appropriate option. For example, the manufacturer, which
+//! is displayed as the "Publisher" in the Add/Remove Programs (ARP) control panel is obtained from
+//! the first author listed in the `authors` field of a package's manifest, but it can be
+//! overridden using the `-m,--manufacturer` option. The default in most cases is to use a value
+//! from a field in the package's manifest.
+//!
+//! The `cargo wix` subcommand uses the package name for the product name. The default install
+//! location is at `C:\Program Files\[Product Name]`, where `[Product Name]` is replaced with the
+//! product name determined from the package name. This can be overridden with the
+//! `-p,--product-name` option. The binary name, which is the `name` field for the `[[bin]]`
+//! section, is used for the executable file name, i.e. "name.exe". This can also be overridden
+//! using the `-b,--bin-name` option. The package description is used in multiple places for the
+//! installer, including the text that appears in the blue UAC dialog when using a signed
+//! installer. This can be overridden using the `-d,--description` option.
+//!
+//! An unmodified WXS file from the embedded template will create an installer that installs the
+//! executable file in a `bin` folder within the installation directory selected by the end-user
+//! during installation. It will add a `License.txt` file to the same folder as the `bin` folder
+//! from a `LICENSE` file, and it will add the `bin` folder to the PATH system environment variable
+//! so that the executable can be called from anywhere with a commmand prompt. Most of these
+//! behaviors can be adjusted during the installation process of the Windows installer.
 
 extern crate chrono;
 #[macro_use] extern crate log;
