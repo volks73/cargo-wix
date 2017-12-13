@@ -51,6 +51,7 @@ pub struct Wix<'a> {
     license_path: Option<&'a str>,
     manufacturer: Option<&'a str>,
     no_build: bool,
+    output: Option<&'a str>,
     product_name: Option<&'a str>,
     sign: bool,
     sign_path: Option<&'a str>,
@@ -71,6 +72,7 @@ impl<'a> Wix<'a> {
             license_path: None,
             manufacturer: None,
             no_build: false,
+            output: None,
             product_name: None,
             sign: false,
             sign_path: None,
@@ -158,6 +160,16 @@ impl<'a> Wix<'a> {
     /// a separate process.
     pub fn no_build(mut self, n: bool) -> Self {
         self.no_build = n;
+        self
+    }
+
+    /// Sets the output file.
+    ///
+    /// The default is to create a MSI file with the `<product-name>-<version>-<arch>.msi` file
+    /// name and extension in the `target\wix` folder. Use this method to override the destination
+    /// and file name of the Windows installer.
+    pub fn output(mut self, o: Option<&'a str>) -> Self {
+        self.output = o;
         self
     }
 
@@ -614,14 +626,18 @@ impl<'a> Wix<'a> {
 
     /// Gets the destination for the linker.
     fn get_destination_msi(&self, product_name: &str, version: &str, platform: &Platform) -> PathBuf {
-        let mut destination_msi = PathBuf::from("target");
-        destination_msi.push(WIX);
-        // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
-        // format, the `set_extension` method will replace the Patch version number and
-        // architecture/platform with `msi`.  Instead, just include the extension in the formatted
-        // name.
-        destination_msi.push(&format!("{}-{}-{}.msi", product_name, version, platform.arch()));
-        destination_msi
+        if let Some(o) = self.output {
+            PathBuf::from(o)
+        } else {
+            let mut destination_msi = PathBuf::from("target");
+            destination_msi.push(WIX);
+            // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
+            // format, the `set_extension` method will replace the Patch version number and
+            // architecture/platform with `msi`.  Instead, just include the extension in the formatted
+            // name.
+            destination_msi.push(&format!("{}-{}-{}.msi", product_name, version, platform.arch()));
+            destination_msi
+        }
     }
 
     /// Gets the destination for the compiler output/linker input.
@@ -1168,6 +1184,30 @@ license-file = "LICENSE-CUSTOM""#;
         let signer = Wix::new().get_signer();
         env::remove_var(SIGNTOOL_PATH_KEY);
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    fn get_destination_msi_is_correct_with_defaults() {
+        const PRODUCT_NAME: &str = "test";
+        const VERSION: &str = "1.2.3";
+        const PLATFORM: Platform = Platform::X64;
+        let mut expected = PathBuf::from("target");
+        expected.push(WIX);
+        expected.push(format!("{}-{}-{}.msi", PRODUCT_NAME, VERSION, PLATFORM.arch()));
+        let actual = Wix::new().get_destination_msi(PRODUCT_NAME, VERSION, &PLATFORM);
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn get_destination_msi_is_correct_with_some_value() {
+        const PRODUCT_NAME: &str = "test";
+        const VERSION: &str = "1.2.3";
+        const PLATFORM: Platform = Platform::X64;
+        let mut expected = PathBuf::from("C:");
+        expected.push("output");
+        expected.push("installer.msi");
+        let actual = Wix::new().output(expected.to_str()).get_destination_msi(PRODUCT_NAME, VERSION, &PLATFORM);
+        assert_eq!(actual, expected);
     }
 }
 
