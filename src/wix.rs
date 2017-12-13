@@ -934,6 +934,7 @@ license-file = "LICENSE-CUSTOM""#;
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_COMPILER);
         let compiler = Wix::new().get_compiler();
+        env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
     }
 
@@ -1062,6 +1063,34 @@ license-file = "LICENSE-CUSTOM""#;
         }).unwrap();
         let actual = Wix::new().license_file(expected.to_str()).get_license_source(&minimal_manifest());
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn get_linker_is_correct_with_default() {
+        let linker = Wix::new().get_linker();
+        assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(WIX_LINKER)));
+    }
+
+    #[test]
+    fn get_linker_is_correct_with_some_value() {
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_LINKER);
+        let linker = Wix::new().bin_path(test_path.to_str()).get_linker();
+        assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    fn get_linker_is_correct_with_environment_variable() {
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        env::set_var(WIX_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_LINKER);
+        let linker = Wix::new().get_linker();
+        env::remove_var(WIX_PATH_KEY);
+        assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
     }
 }
 
