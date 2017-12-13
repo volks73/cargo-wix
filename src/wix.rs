@@ -714,9 +714,10 @@ name = "cargo_wix""#;
     static MINIMAL_MANIFEST: &str = r#"[package]
 name = "minimal-project"
 version = "0.0.1"
-authors = ["Christopher Field <cfield2@gmail.com>"]
+authors = ["Christopher Field <cfield2@gmail.com>"]"#;
 
-[dependencies]"#;
+    static LICENSE_FILE_MANIFEST: &str = r#"[package]
+license-file = "LICENSE-CUSTOM""#;
 
     fn complete_manifest() -> Value {
         COMPLETE_MANIFEST.parse::<Value>().unwrap()
@@ -724,6 +725,10 @@ authors = ["Christopher Field <cfield2@gmail.com>"]
 
     fn minimal_manifest() -> Value {
         MINIMAL_MANIFEST.parse::<Value>().unwrap()
+    }
+
+    fn license_file_manifest() -> Value {
+        LICENSE_FILE_MANIFEST.parse::<Value>().unwrap()
     }
 
     #[test]
@@ -948,6 +953,32 @@ authors = ["Christopher Field <cfield2@gmail.com>"]
     fn get_homepage_is_correct_with_complete_manifest() {
         let actual = Wix::new().get_homepage(&complete_manifest());
         assert_eq!(actual, Some(String::from("https://github.com/volks73/cargo-wix")));
+    }
+
+    #[test]
+    fn get_license_name_is_correct_with_complete_manifest() {
+        let actual = Wix::new().get_license_name(&complete_manifest()).unwrap();
+        assert_eq!(&actual, "License.txt");
+    }
+
+    #[test]
+    fn get_license_name_is_correct_with_minimal_manifest() {
+        let actual = Wix::new().get_license_name(&minimal_manifest()).unwrap();
+        assert_eq!(&actual, "License.txt");
+    }
+
+    #[test]
+    fn get_license_name_is_correct_with_license_file_manifest() {
+        let actual = Wix::new().get_license_name(&license_file_manifest()).unwrap();
+        assert_eq!(&actual, "LICENSE-CUSTOM");
+    }
+
+    #[test]
+    fn get_license_name_is_correct_with_license_file() {
+        let actual = Wix::new().license_file(Some("C:\\License.doc"))
+            .get_license_name(&license_file_manifest())
+            .unwrap();
+        assert_eq!(&actual, "License.doc");
     }
 }
 
