@@ -49,6 +49,7 @@ pub struct Wix<'a> {
     input: Option<&'a str>,
     license_path: Option<&'a str>,
     manufacturer: Option<&'a str>,
+    no_build: bool,
     product_name: Option<&'a str>,
     sign: bool,
     sign_path: Option<&'a str>,
@@ -68,6 +69,7 @@ impl<'a> Wix<'a> {
             input: None,
             license_path: None,
             manufacturer: None,
+            no_build: false,
             product_name: None,
             sign: false,
             sign_path: None,
@@ -144,6 +146,17 @@ impl<'a> Wix<'a> {
     /// the manufacturer within the installer.
     pub fn manufacturer(mut self, m: Option<&'a str>) -> Self {
         self.manufacturer = m;
+        self
+    }
+
+    /// Skips the building of the project with the release profile.
+    ///
+    /// If `true`, the project will _not_ be built using the release profile, i.e. the `cargo build
+    /// --release` command will not be executed. The default is to build the project before each
+    /// creation. This is useful if building the project is more involved or is handled in
+    /// a separate process.
+    pub fn no_build(mut self, n: bool) -> Self {
+        self.no_build = n;
         self
     }
 
@@ -287,19 +300,23 @@ impl<'a> Wix<'a> {
         debug!("source_wixobj = {:?}", source_wixobj);
         let destination_msi = self.get_destination_msi(&product_name, &version, &platform);
         debug!("destination_msi = {:?}", destination_msi);
-        // Build the binary with the release profile. If a release binary has already been built, then
-        // this will essentially do nothing.
-        info!("Building the release binary");
-        let mut builder = Command::new(CARGO);
-        debug!("builder = {:?}", builder);
-        if self.capture_output {
-            trace!("Capturing the '{}' output", CARGO);
-            builder.stdout(Stdio::null());
-            builder.stderr(Stdio::null());
-        }
-        let status = builder.arg("build").arg("--release").status()?;
-        if !status.success() {
-            return Err(Error::Command(CARGO, status.code().unwrap_or(100)));
+        if self.no_build {
+            warn!("Skipped building the release binary");
+        } else {
+            // Build the binary with the release profile. If a release binary has already been built, then
+            // this will essentially do nothing.
+            info!("Building the release binary");
+            let mut builder = Command::new(CARGO);
+            debug!("builder = {:?}", builder);
+            if self.capture_output {
+                trace!("Capturing the '{}' output", CARGO);
+                builder.stdout(Stdio::null());
+                builder.stderr(Stdio::null());
+            }
+            let status = builder.arg("build").arg("--release").status()?;
+            if !status.success() {
+                return Err(Error::Command(CARGO, status.code().unwrap_or(100)));
+            }
         }
         // Compile the installer
         info!("Compiling the installer");
@@ -746,6 +763,7 @@ license-file = "LICENSE-CUSTOM""#;
         assert!(wix.input.is_none());
         assert!(wix.license_path.is_none());
         assert!(wix.manufacturer.is_none());
+        assert!(!wix.no_build);
         assert!(wix.product_name.is_none());
         assert!(!wix.sign);
         assert!(wix.timestamp.is_none());
@@ -811,6 +829,12 @@ license-file = "LICENSE-CUSTOM""#;
         const EXPECTED: Option<&str> = Some("Tester");
         let wix = Wix::new().manufacturer(EXPECTED);
         assert_eq!(wix.manufacturer, EXPECTED);
+    }
+
+    #[test]
+    fn no_build_works() {
+        let wix = Wix::new().no_build(true);
+        assert!(wix.no_build);
     }
 
     #[test]
