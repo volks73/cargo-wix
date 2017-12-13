@@ -525,6 +525,7 @@ impl<'a> Wix<'a> {
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
                 .map(|s| PathBuf::from(s))
+                // TODO: Add check that the default license exists
                 .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
         )
     }
@@ -1027,6 +1028,40 @@ license-file = "LICENSE-CUSTOM""#;
             .get_license_name(&license_file_manifest())
             .unwrap();
         assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_manifest_license_name_is_correct_with_complete_manifest() {
+        const EXPECTED: &str = "Apache-2.0";
+        let actual = Wix::new().get_manifest_license_name(&complete_manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_manifest_license_name_is_none_with_minimal_manifest() {
+        let actual = Wix::new().get_manifest_license_name(&minimal_manifest());
+        assert!(actual.is_none());
+    }
+
+    #[test]
+    fn get_license_source_is_correct_with_complete_manifest() {
+        let actual = Wix::new().get_license_source(&complete_manifest());
+        assert_eq!(actual.to_str().unwrap(), DEFAULT_LICENSE_FILE_NAME);
+    }
+
+    #[test]
+    fn get_license_source_is_correct_with_minimal_manifest() {
+        let actual = Wix::new().get_license_source(&minimal_manifest());
+        assert_eq!(actual.to_str().unwrap(), DEFAULT_LICENSE_FILE_NAME);
+    }
+
+    #[test]
+    fn get_license_source_is_correct_with_some_value() {
+        let expected = env::home_dir().map(|h| {
+            h.join(DEFAULT_LICENSE_FILE_NAME)
+        }).unwrap();
+        let actual = Wix::new().license_file(expected.to_str()).get_license_source(&minimal_manifest());
+        assert_eq!(actual, expected);
     }
 }
 
