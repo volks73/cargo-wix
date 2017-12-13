@@ -240,6 +240,8 @@ impl<'a> Wix<'a> {
             license_path.set_extension(RTF_FILE_EXTENSION);
             let mut rtf = File::create(license_path)?;
             self.write_license(&mut rtf, &license, &manifest)?;
+        } else {
+            warn!("Could not generate an appropriate license file in the Rich Text Format (RTF). Please manually create one to avoid errors during installer creation.");
         }
         Ok(())
     }
