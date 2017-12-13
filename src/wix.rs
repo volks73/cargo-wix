@@ -468,12 +468,13 @@ impl<'a> Wix<'a> {
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
-                .and_then(|s| Path::new(s).file_name().and_then(|f| f.to_str()))
-                .or(Some("License.txt"))
-                .map(|s| String::from(s))
-                .ok_or(Error::Generic(
-                    format!("The 'license-file' field value does not contain a file name.")
-                )) 
+                .map_or(Ok(String::from("License.txt")), |l| {
+                    Path::new(l).file_name()
+                        .and_then(|f| f.to_str())
+                        .map(|s| String::from(s))
+                        .ok_or(Error::Generic(
+                            format!("The 'license-file' field value does not contain a file name.")))
+                })
         }
     }
 
