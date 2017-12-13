@@ -888,9 +888,12 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_compiler_is_correct_with_some_value() {
-        const TEST_PATH: &str = "C:\\bin";
-        let compiler = Wix::new().bin_path(Some(TEST_PATH)).get_compiler();
-        assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new("C:\\bin\\candle")));
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push("candle");
+        let compiler = Wix::new().bin_path(test_path.to_str()).get_compiler();
+        assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
     }
 
     // TODO: Add test for correct path using WIX_PATH environment variable
@@ -978,7 +981,7 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_license_name_is_correct_with_license_file() {
-        let actual = Wix::new().license_file(Some("C:\\License.doc"))
+        let actual = Wix::new().license_file(Some("License.doc"))
             .get_license_name(&license_file_manifest())
             .unwrap();
         assert_eq!(&actual, "License.doc");
