@@ -691,7 +691,7 @@ fn get_manifest() -> Result<Value> {
 mod tests {
     use super::*;
 
-    static TEST_MANIFEST: &str = r#"[package]
+    static COMPLETE_MANIFEST: &str = r#"[package]
 name = "cargo-wix"
 description = "Build Windows installers using the Wix Toolset"
 version = "0.0.2"
@@ -709,8 +709,19 @@ doc = false
 [lib]
 name = "cargo_wix""#;
 
-    fn manifest() -> Value {
-        TEST_MANIFEST.parse::<Value>().unwrap()
+    static MINIMAL_MANIFEST: &str = r#"[package]
+name = "minimal-project"
+version = "0.0.1"
+authors = ["Christopher Field <cfield2@gmail.com>"]
+
+[dependencies]"#;
+
+    fn complete_manifest() -> Value {
+        COMPLETE_MANIFEST.parse::<Value>().unwrap()
+    }
+
+    fn minimal_manifest() -> Value {
+        MINIMAL_MANIFEST.parse::<Value>().unwrap()
     }
 
     #[test]
@@ -844,29 +855,29 @@ name = "cargo_wix""#;
     }
 
     #[test]
-    fn get_binary_name_default_is_correct() {
+    fn get_binary_name_is_correct_with_default() {
         const EXPECTED: &str = "cargo-wix";
         let wix = Wix::new();
-        let actual = wix.get_binary_name(&manifest()).unwrap();
+        let actual = wix.get_binary_name(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED); 
     }
 
     #[test]
-    fn get_binary_name_is_correct() {
+    fn get_binary_name_is_correct_with_some_value() {
         const EXPECTED: &str = "test";
         let wix = Wix::new().binary_name(Some(EXPECTED));
-        let actual = wix.get_binary_name(&manifest()).unwrap();
+        let actual = wix.get_binary_name(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED);
     }
 
     #[test]
-    fn get_compiler_default_is_correct() {
+    fn get_compiler_is_correct_with_default() {
         let compiler = Wix::new().get_compiler();
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(WIX_COMPILER)));
     }
 
     #[test]
-    fn get_compiler_bin_path_is_correct() {
+    fn get_compiler_is_correct_with_some_value() {
         const TEST_PATH: &str = "C:\\bin";
         let compiler = Wix::new().bin_path(Some(TEST_PATH)).get_compiler();
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new("C:\\bin\\candle")));
@@ -875,33 +886,66 @@ name = "cargo_wix""#;
     // TODO: Add test for correct path using WIX_PATH environment variable
 
     #[test]
-    fn get_copyright_holder_default_is_correct() {
+    fn get_copyright_holder_is_correct_with_default() {
         let wix = Wix::new();
-        let actual = wix.get_copyright_holder(&manifest()).unwrap();
+        let actual = wix.get_copyright_holder(&complete_manifest()).unwrap();
         assert_eq!(&actual, "Christopher Field");
     }
 
     #[test]
-    fn get_copyright_holder_is_correct() {
+    fn get_copyright_holder_is_correct_with_some_value() {
         const EXPECTED: &str = "Test";
         let wix = Wix::new().copyright_holder(Some(EXPECTED));
-        let actual = wix.get_copyright_holder(&manifest()).unwrap();
+        let actual = wix.get_copyright_holder(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED);
     }
 
     #[test]
-    fn get_copyright_year_default_is_correct() {
+    fn get_copyright_year_is_correct_with_default() {
         let wix = Wix::new();
         let actual = wix.get_copyright_year();
         assert_eq!(actual, Utc::now().year().to_string());
     }
 
     #[test]
-    fn get_copyright_year_is_correct() {
+    fn get_copyright_year_is_correct_with_some_value() {
         const EXPECTED: &str = "1980";
         let wix = Wix::new().copyright_year(Some(EXPECTED));
         let actual = wix.get_copyright_year();
         assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_description_is_correct_with_default() {
+        const EXPECTED: &str = "Build Windows installers using the Wix Toolset";
+        let wix = Wix::new();
+        let actual = wix.get_description(&complete_manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_description_is_correct_with_some_value() {
+        const EXPECTED: &str = "description";
+        let wix = Wix::new().description(Some(EXPECTED));
+        let actual = wix.get_description(&complete_manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    #[should_panic]
+    fn get_description_fails_with_minimal_manifest() {
+        Wix::new().get_description(&minimal_manifest()).unwrap();
+    }
+
+    #[test]
+    fn get_homepage_is_correct_with_default() {
+        assert!(Wix::new().get_homepage(&minimal_manifest()).is_none());
+    }
+
+    #[test]
+    fn get_homepage_is_correct_with_complete_manifest() {
+        let actual = Wix::new().get_homepage(&complete_manifest());
+        assert_eq!(actual, Some(String::from("https://github.com/volks73/cargo-wix")));
     }
 }
 
