@@ -230,6 +230,9 @@ impl<'a> Wix<'a> {
             self.write_wix_source(&mut main_wxs)?;
         }
         let manifest = get_manifest()?;
+        if self.get_description(&manifest).is_err() {
+            warn!("The 'description' field is missing from the package's manifest (Cargo.toml). Please consider adding the field with a non-empty value to avoid errors during installer creation.");
+        }
         let license_name = self.get_manifest_license_name(&manifest);
         debug!("license_name = {:?}", license_name);
         if let Some(l) = license_name {
