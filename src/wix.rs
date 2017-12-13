@@ -852,9 +852,12 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn sign_path_works() {
-        const EXPECTED: Option<&str> = Some("C:\\Program Files\\Windows Kit\\bin");
-        let wix = Wix::new().sign_path(EXPECTED);
-        assert_eq!(wix.sign_path, EXPECTED);
+        let mut expected = PathBuf::from("C:");
+        expected.push("Program Files");
+        expected.push("Windows Kit");
+        expected.push("bin");
+        let wix = Wix::new().sign_path(expected.to_str());
+        assert_eq!(wix.sign_path, expected.to_str());
     }
 
     #[test]
@@ -868,7 +871,7 @@ license-file = "LICENSE-CUSTOM""#;
     fn strip_email_works() {
         const EXPECTED: &str = "Christopher R. Field";
         let re = Regex::new(r"<(.*?)>").unwrap();
-        let actual = re.replace_all("Christopher R. Field <cfield2@gmail.com>", "");
+        let actual = re.replace_all("Christopher R. Field <user2@example.com>", "");
         assert_eq!(actual.trim(), EXPECTED);
     }
 
@@ -882,9 +885,9 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn strip_email_works_with_only_email() {
-        const EXPECTED: &str = "cfield2@gmail.com";
+        const EXPECTED: &str = "user1@example.com";
         let re = Regex::new(r"<(.*?)>").unwrap();
-        let actual = re.replace_all("cfield2@gmail.com", "");
+        let actual = re.replace_all("user1@example.com", "");
         assert_eq!(actual.trim(), EXPECTED);
     }
 
@@ -915,12 +918,21 @@ license-file = "LICENSE-CUSTOM""#;
         let mut test_path = PathBuf::from("C:");
         test_path.push("bin");
         let mut expected = PathBuf::from(&test_path);
-        expected.push("candle");
+        expected.push(WIX_COMPILER);
         let compiler = Wix::new().bin_path(test_path.to_str()).get_compiler();
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
     }
 
-    // TODO: Add test for correct path using WIX_PATH environment variable
+    #[test]
+    fn get_compiler_is_correct_with_environment_variable() {
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        env::set_var(WIX_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_COMPILER);
+        let compiler = Wix::new().get_compiler();
+        assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
+    }
 
     #[test]
     fn get_copyright_holder_is_correct_with_default() {
