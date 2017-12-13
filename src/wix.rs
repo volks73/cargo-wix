@@ -735,7 +735,7 @@ name = "cargo_wix""#;
     static MINIMAL_MANIFEST: &str = r#"[package]
 name = "minimal-project"
 version = "0.0.1"
-authors = ["Christopher Field <cfield2@gmail.com>"]"#;
+authors = ["Christopher Field"]"#;
 
     static LICENSE_FILE_MANIFEST: &str = r#"[package]
 license-file = "LICENSE-CUSTOM""#;
@@ -1091,6 +1091,25 @@ license-file = "LICENSE-CUSTOM""#;
         let linker = Wix::new().get_linker();
         env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    fn get_manufacturer_is_correct_with_complete_manifest() {
+        let actual = Wix::new().get_manufacturer(&complete_manifest()).unwrap();
+        assert_eq!(&actual, "Christopher Field");
+    }
+
+    #[test]
+    fn get_manufacturer_is_correct_with_minimal_manifest() {
+        let actual = Wix::new().get_manufacturer(&minimal_manifest()).unwrap();
+        assert_eq!(&actual, "Christopher Field");
+    }
+
+    #[test]
+    fn get_manufacturer_is_correct_with_some_value() {
+        const EXPECTED: &str = "Test Manufacturer";
+        let actual = Wix::new().manufacturer(Some(EXPECTED)).get_manufacturer(&complete_manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
     }
 }
 
