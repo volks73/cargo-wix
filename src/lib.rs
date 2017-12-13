@@ -203,7 +203,7 @@ pub enum Error {
     /// An I/O operation failed.
     Io(io::Error),
     /// A needed field within the `Cargo.toml` manifest could not be found.
-    Manifest(String),
+    Manifest(&'static str),
     /// An error occurred with rendering the template using the mustache renderer.
     Mustache(mustache::Error),
     /// Parsing of the `Cargo.toml` manifest failed.

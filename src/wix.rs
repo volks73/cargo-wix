@@ -270,7 +270,7 @@ impl<'a> Wix<'a> {
         debug!("license_source = {:?}", license_source);
         let manufacturer = self.get_manufacturer(&manifest)?;
         debug!("manufacturer = {}", manufacturer);
-        let help_url = self.get_help_url(&manifest)?;
+        let help_url = self.get_help_url(&manifest);
         debug!("help_url = {:?}", help_url);
         let binary_name = self.get_binary_name(&manifest)?;
         debug!("binary_name = {:?}", binary_name);
@@ -305,17 +305,21 @@ impl<'a> Wix<'a> {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         } 
-        let status = compiler
-            .arg(format!("-dVersion={}", version))
+        compiler.arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
             .arg(format!("-dProductName={}", product_name))
             .arg(format!("-dBinaryName={}", binary_name))
             .arg(format!("-dDescription={}", description))
             .arg(format!("-dManufacturer={}", manufacturer))
             .arg(format!("-dLicenseName={}", license_name))
-            .arg(format!("-dLicenseSource={}", license_source.display()))
-            .arg(format!("-dHelp={}", help_url))
-            .arg("-o")
+            .arg(format!("-dLicenseSource={}", license_source.display()));
+        if let Some(h) = help_url {
+            trace!("Using '{}' for the help URL", h);
+            compiler.arg(format!("-dHelp={}", h));
+        } else {
+            warn!("A help URL could not be found. Considering adding the 'documentation', 'homepage', or 'repository' fields to the package's manifest.");
+        }
+        let status = compiler.arg("-o")
             .arg(&source_wixobj)
             .arg(&source_wxs)
             .status()?;
@@ -427,16 +431,12 @@ impl<'a> Wix<'a> {
     /// If no description is explicitly set using the builder pattern, then the description from
     /// the package's manifest (Cargo.toml) is used.
     fn get_description(&self, manifest: &Value) -> Result<String> {
-        if let Some(d) = self.description {
-            Ok(d.to_owned())
-        } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("description"))
-                .and_then(|d| d.as_str())
-                .map(|s| String::from(s))
-                .ok_or(Error::Manifest(String::from("description")))
-        }
+        self.description.or_else(|| manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("description"))
+            .and_then(|d| d.as_str()))
+            .map(|s| String::from(s))
+            .ok_or(Error::Manifest("description"))
     }
 
     /// Gets the URL of the project's homepage from the manifest (Cargo.toml).
@@ -540,7 +540,7 @@ impl<'a> Wix<'a> {
                     Some(re.replace_all(s, ""))
                 })
                 .map(|s| String::from(s.trim()))
-                .ok_or(Error::Manifest(String::from("authors")))
+                .ok_or(Error::Manifest("authors"))
         }
     }
 
@@ -563,7 +563,7 @@ impl<'a> Wix<'a> {
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
                 .map(|s| String::from(s))
-                .ok_or(Error::Manifest(String::from("name")))
+                .ok_or(Error::Manifest("name"))
         }
     }
 
@@ -599,13 +599,12 @@ impl<'a> Wix<'a> {
     }
 
     /// Gets the URL that appears in the installer's extended details.
-    fn get_help_url(&self, manifest: &Value) -> Result<String> {
+    fn get_help_url(&self, manifest: &Value) -> Option<String> {
         manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
             .and_then(|h| h.as_str())
             .map(|s| String::from(s))
-            .ok_or(Error::Manifest(String::from("documentation")))
     }
 
     /// Gets the WiX Source (wxs) file.
@@ -641,7 +640,7 @@ impl<'a> Wix<'a> {
             .and_then(|t| t.get("version"))
             .and_then(|v| v.as_str())
             .map(|s| String::from(s))
-            .ok_or(Error::Manifest(String::from("version")))
+            .ok_or(Error::Manifest("version"))
     }
 
     /// Renders the license in the Rich Text Format (RTF) as an End User's License Agreement (EULA).
