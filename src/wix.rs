@@ -771,9 +771,11 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn bin_path_works() {
-        const EXPECTED: Option<&str> = Some("C:\\WiX Toolset\\bin");
-        let wix = Wix::new().bin_path(EXPECTED);
-        assert_eq!(wix.bin_path, EXPECTED);
+        let mut expected = PathBuf::from("C:");
+        expected.push("WiX Toolset");
+        expected.push("bin");
+        let wix = Wix::new().bin_path(expected.to_str());
+        assert_eq!(wix.bin_path, expected.to_str());
     }
 
     #[test]
@@ -1017,10 +1019,14 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_license_name_is_correct_with_license_file() {
-        let actual = Wix::new().license_file(Some("License.doc"))
+        const EXPECTED: &str = "License.doc";
+        let test_path = env::home_dir().map(|h| {
+            h.join(EXPECTED)
+        }).unwrap();
+        let actual = Wix::new().license_file(test_path.to_str())
             .get_license_name(&license_file_manifest())
             .unwrap();
-        assert_eq!(&actual, "License.doc");
+        assert_eq!(&actual, EXPECTED);
     }
 }
 
