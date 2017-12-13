@@ -30,6 +30,7 @@ pub const CARGO: &str = "cargo";
 pub const DEFAULT_LICENSE_FILE_NAME: &str = "LICENSE";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
+pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
 pub const WIX: &str = "wix";
 pub const WIX_COMPILER: &str = "candle";
 pub const WIX_LINKER: &str = "light";
@@ -425,11 +426,11 @@ impl<'a> Wix<'a> {
     /// Gets the command for the compiler application (`candle.exe`).
     fn get_compiler(&self) -> Command {
         if let Some(b) = self.bin_path {
-            trace!("Using the '{}' path to the WiX Toolset compiler", b);
+            trace!("Using the '{}' path to the WiX Toolset's 'bin' folder", b);
             Command::new(PathBuf::from(b).join(WIX_COMPILER))
         } else {
             env::var(WIX_PATH_KEY).map(|s| {
-                trace!("Using the '{}' path to the WiX Toolset compiler", s);
+                trace!("Using the '{}' path to the WiX Toolset's 'bin' folder", s);
                 Command::new(PathBuf::from(s).join(WIX_COMPILER))
             }).unwrap_or(Command::new(WIX_COMPILER))
         }
@@ -601,10 +602,13 @@ impl<'a> Wix<'a> {
     /// Gets the command for the `signtool` application.
     fn get_signer(&self) -> Command {
         if let Some(s) = self.sign_path {
-            trace!("Using the '{}' path to the Windows SDK signtool", s);
+            trace!("Using the '{}' path to the Windows SDK 'bin' folder", s);
             Command::new(PathBuf::from(s).join(SIGNTOOL))
         } else {
-            Command::new(SIGNTOOL)
+            env::var(SIGNTOOL_PATH_KEY).map(|s| {
+                trace!("Using the '{}' path to the Windows SDK 'bin' folder", s);
+                Command::new(PathBuf::from(s).join(SIGNTOOL))
+            }).unwrap_or(Command::new(SIGNTOOL))
         }
     }
 
@@ -1151,6 +1155,18 @@ license-file = "LICENSE-CUSTOM""#;
         let mut expected = PathBuf::from(&test_path);
         expected.push(SIGNTOOL);
         let signer = Wix::new().sign_path(test_path.to_str()).get_signer();
+        assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    fn get_signer_is_correct_with_environment_variable() {
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        env::set_var(SIGNTOOL_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(SIGNTOOL);
+        let signer = Wix::new().get_signer();
+        env::remove_var(SIGNTOOL_PATH_KEY);
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
     }
 }
