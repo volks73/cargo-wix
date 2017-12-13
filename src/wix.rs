@@ -249,9 +249,9 @@ impl<'a> Wix<'a> {
         Ok(())
     }
    
-    /// Builds the project using the release profile, builds the installer (msi), and optionally
-    /// sign the output. 
-    pub fn build(self) -> Result<()> {
+    /// Builds the project using the release profile, creates the installer (msi), and optionally
+    /// signs the output. 
+    pub fn create(self) -> Result<()> {
         debug!("binary_name = {:?}", self.binary_name);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("description = {:?}", self.description);
