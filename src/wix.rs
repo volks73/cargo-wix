@@ -1111,5 +1111,40 @@ license-file = "LICENSE-CUSTOM""#;
         let actual = Wix::new().manufacturer(Some(EXPECTED)).get_manufacturer(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED);
     }
+
+    #[test]
+    fn get_product_name_is_correct_with_complete_manifest() {
+        let actual = Wix::new().get_product_name(&complete_manifest()).unwrap();
+        assert_eq!(&actual, "cargo-wix");
+    }
+
+    #[test]
+    fn get_product_name_is_correct_with_minimal_manifest() {
+        let actual = Wix::new().get_product_name(&minimal_manifest()).unwrap();
+        assert_eq!(&actual, "minimal-project");
+    }
+
+    #[test]
+    fn get_product_name_is_correct_with_some_value() {
+        const EXPECTED: &str = "Test Product Name";
+        let actual = Wix::new().product_name(Some(EXPECTED)).get_product_name(&complete_manifest()).unwrap();
+        assert_eq!(&actual, EXPECTED);
+    }
+
+    #[test]
+    fn get_signer_is_correct_with_default() {
+        let signer = Wix::new().get_signer();
+        assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(SIGNTOOL)));
+    }
+
+    #[test]
+    fn get_signer_is_correct_with_some_value() {
+        let mut test_path = PathBuf::from("C:");
+        test_path.push("bin");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(SIGNTOOL);
+        let signer = Wix::new().sign_path(test_path.to_str()).get_signer();
+        assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
+    }
 }
 
