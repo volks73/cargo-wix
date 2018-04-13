@@ -19,8 +19,7 @@ doc = false
 name = "cargo_wix"
 
 [dependencies]
-ansi_term = "0.11"
-atty = "0.2"
+termcolor = "0.3.6"
 chrono = "0.4"
 clap = "2.30"
 log = "0.4"
