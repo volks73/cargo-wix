@@ -186,9 +186,11 @@ fn main() {
             std::process::exit(0);
         },
         Err(e) => {
-            let mut stderr = StandardStream::stderr(ColorChoice::Auto);
-            let _ = stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true));
-            let _ = writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e);
+            {
+                let mut stderr = StandardStream::stderr(ColorChoice::Auto);
+                let _ = stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true));
+                let _ = writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e);
+            }
             std::process::exit(e.code());
         }
     }
