@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate ansi_term;
-extern crate atty;
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
-extern crate loggerv;
+extern crate env_logger;
+extern crate log;
 extern crate termcolor;
 
 use clap::{App, Arg, SubCommand};
+use env_logger::Builder;
+use env_logger::fmt::Color as LogColor;
+use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
 use cargo_wix::Template;
@@ -28,19 +30,6 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
-    // Based on documentation for the ansi_term crate, Windows 10 supports ANSI escape characters,
-    // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
-    // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
-    // avoid build errors on non-windows platforms, a cfg guard should be put in place.
-    //
-    // This was briefly removed as part of the switch from using the `ansi_term` crate to using the
-    // `termcolor` crate, but the `loggerv` crate uses the `ansi_term` crate for coloring and this
-    // is needed to avoid printing ANSI escape characters when they are NOT supported in the
-    // logging messages. This can be removed if and when the logging crate is changed from the
-    // `loggerv` crate or the `loggerv` crate changes its coloring implementation.
-    if atty::is(atty::Stream::Stdout) {
-        #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
-    }   
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
@@ -162,13 +151,47 @@ fn main() {
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = matches.occurrences_of("verbose");
-    loggerv::Logger::new()
-        .verbosity(verbosity)
-        .line_numbers(verbosity > 3)
-        .module_path(false)
-        .level(true)
-        .init()
-        .expect("logger to initiate");
+    // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
+    // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
+    // level is later configured with the verbosity using the `filter` method. There are many
+    // questions related to implementing  support for environment variables: 
+    //
+    // 1. What should the environment variable be called, WIX_LOG, CARGO_WIX_LOG, CARGO_LOG, etc.?
+    //    WIX_LOG might conflict with a system variable that is used for the Wix Toolset. CARGO_LOG
+    //    is too generic. The only viable one is CARGO_WIX_LOG.
+    // 2. How is the environment variable supposed to work with the verbosity without crazy side
+    //    effects? What if the level is set to TRACE with the environment variable, but the
+    //    verbosity is only one? 
+    // 3. Should the RUST_LOG environment variable be "obeyed" for a cargo subcommand?
+    //
+    // For now, implementing environment variable support is held off and only the verbosity is
+    // used to set the log level.
+    let mut builder = Builder::new();
+    builder.format(|buf, record| {
+        // This implmentation for a format is copied from the default format implemented for the
+        // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
+        // message and change the colors to match the previous colors used by the `loggerv` crate.
+        let mut level_style = buf.style();
+        let level = record.level();
+        match level {
+            // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
+            // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
+            // same white color.
+            Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
+            Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
+            Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
+            Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
+            Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+        };
+        let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+        let write_args = writeln!(buf, "{}", record.args());
+        write_level.and(write_args)
+    }).filter(Some("cargo_wix"), match verbosity {
+        0 => LevelFilter::Warn,
+        1 => LevelFilter::Info,
+        2 => LevelFilter::Debug,
+        _ => LevelFilter::Trace,
+    }).init();
     let wix = cargo_wix::Wix::new()
         .bin_path(matches.value_of("bin-path"))
         .binary_name(matches.value_of("binary-name"))

@@ -19,12 +19,10 @@ doc = false
 name = "cargo_wix"
 
 [dependencies]
-ansi_term = "0.11"
-atty = "0.2"
 chrono = "0.4"
 clap = "2.30"
+env_logger = "0.5.7"
 log = "0.4"
-loggerv = "0.7.1"
 mustache = "0.9"
 regex = "0.2"
 termcolor = "0.3.6"
