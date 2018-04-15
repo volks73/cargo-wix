@@ -12,29 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate ansi_term;
-extern crate atty;
+extern crate termcolor;
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
 extern crate loggerv;
 
-use ansi_term::Colour;
 use clap::{App, Arg, SubCommand};
 use std::error::Error;
 use std::io::Write;
 use cargo_wix::Template;
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
-const ERROR_COLOR: Colour = Colour::Fixed(9); // Bright red
 
 fn main() {
-    // Based on documentation for the ansi_term crate, Windows 10 supports ANSI escape characters,
-    // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
-    // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
-    // avoid build errors on non-windows platforms, a cfg guard should be put in place.
-    if atty::is(atty::Stream::Stdout) {
-        #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
-    }
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
@@ -195,12 +186,11 @@ fn main() {
             std::process::exit(0);
         },
         Err(e) => {
-            let mut tag = format!("Error[{}] ({})", e.code(), e.description());
-            if atty::is(atty::Stream::Stderr) {
-                tag = ERROR_COLOR.paint(tag).to_string()
+            {
+                let mut stderr = StandardStream::stderr(ColorChoice::Auto);
+                let _ = stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true));
+                let _ = writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e);
             }
-            writeln!(&mut std::io::stderr(), "{}: {}", tag, e)
-                .expect("Writing to stderr");
             std::process::exit(e.code());
         }
     }
