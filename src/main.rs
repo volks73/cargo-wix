@@ -182,14 +182,12 @@ fn main() {
         wix.create()
     };
     match result {
-        Ok(_) => {
-            std::process::exit(0);
-        },
+        Ok(_) => std::process::exit(0),
         Err(e) => {
             {
                 let mut stderr = StandardStream::stderr(ColorChoice::Auto);
-                let _ = stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true));
-                let _ = writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e);
+                stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true)).expect("Coloring stderr");
+                writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e).expect("Write to stderr");
             }
             std::process::exit(e.code());
         }
