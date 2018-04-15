@@ -276,7 +276,7 @@ impl<'a> Wix<'a> {
             .and_then(|t| t.get("license-file")).is_none() {
             let license_file = Path::new(DEFAULT_LICENSE_FILE_NAME);
             if !license_file.exists() {
-                warn!("A '{}' file does not exist in the project root. Please consider adding a such a file to avoid errors during installer creation.", DEFAULT_LICENSE_FILE_NAME);
+                warn!("A '{}' file does not exist in the project root. Please consider adding such a file to avoid errors during installer creation.", DEFAULT_LICENSE_FILE_NAME);
             }
         }
         Ok(())
