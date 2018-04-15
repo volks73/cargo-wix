@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate termcolor;
+extern crate ansi_term;
+extern crate atty;
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
 extern crate loggerv;
+extern crate termcolor;
 
 use clap::{App, Arg, SubCommand};
 use std::error::Error;
@@ -26,6 +28,19 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    // Based on documentation for the ansi_term crate, Windows 10 supports ANSI escape characters,
+    // but it must be enabled first. The ansi_term crate provides a function for enabling ANSI
+    // support in Windows, but it is conditionally compiled and only exists for Windows builds. To
+    // avoid build errors on non-windows platforms, a cfg guard should be put in place.
+    //
+    // This was briefly removed as part of the switch from using the `ansi_term` crate to using the
+    // `termcolor` crate, but the `loggerv` crate uses the `ansi_term` crate for coloring and this
+    // is needed to avoid printing ANSI escape characters when they are NOT supported in the
+    // logging messages. This can be removed if and when the logging crate is changed from the
+    // `loggerv` crate or the `loggerv` crate changes its coloring implementation.
+    if atty::is(atty::Stream::Stdout) {
+        #[cfg(windows)] ansi_term::enable_ansi_support().expect("Enable ANSI support on Windows");
+    }   
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
