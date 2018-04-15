@@ -1,7 +1,7 @@
 [package]
 name = "cargo-wix"
 description = "Build Windows installers using the Wix Toolset"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Christopher Field <cfield2@gmail.com>"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/volks73/cargo-wix"
@@ -20,7 +20,6 @@ name = "cargo_wix"
 
 [dependencies]
 chrono = "0.4"
-clap = "2.30"
 env_logger = "0.5.7"
 log = "0.4"
 mustache = "0.9"
@@ -28,4 +27,9 @@ regex = "0.2"
 termcolor = "0.3.6"
 toml = "0.4"
 uuid = { version = "0.5", features = ["v4"] }
+
+[dependencies.clap]
+version = "2.31"
+default-features = false
+features = ["suggestions", "vec_map"]
 
