@@ -360,7 +360,8 @@ impl<'a> Wix<'a> {
             trace!("Using '{}' for the help URL", h);
             compiler.arg(format!("-dHelp={}", h));
         } else {
-            warn!("A help URL could not be found. Considering adding the 'documentation', 'homepage', or 'repository' fields to the package's manifest.");
+            warn!("A help URL could not be found. Considering adding the 'documentation', \
+                  'homepage', or 'repository' fields to the package's manifest.");
         }
         let status = compiler.arg("-o")
             .arg(&source_wixobj)
@@ -368,10 +369,10 @@ impl<'a> Wix<'a> {
             .status().map_err(|err| {
                 if err.kind() == ErrorKind::NotFound {
                     Error::Generic(format!(
-                        "The compiler application ({}) could not be found in the PATH environment
-                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is
-                        installed and the WiX Toolset's 'bin' folder has been added to the PATH
-                        environment variable, or use the '-B,--bin-path' command line argument or
+                        "The compiler application ({}) could not be found in the PATH environment \
+                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                        installed and the WiX Toolset's 'bin' folder has been added to the PATH \
+                        environment variable, or use the '-B,--bin-path' command line argument or \
                         the {} environment variable.", 
                         WIX_COMPILER,
                         WIX_PATH_KEY
@@ -402,10 +403,10 @@ impl<'a> Wix<'a> {
             .status().map_err(|err| {
                 if err.kind() == ErrorKind::NotFound {
                     Error::Generic(format!(
-                        "The linker application ({}) could not be found in the PATH environment
-                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is
-                        installed and the WiX Toolset's 'bin' folder has been added to the PATH
-                        environment variable, or use the '-B,--bin-path' command line argument or
+                        "The linker application ({}) could not be found in the PATH environment \
+                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                        installed and the WiX Toolset's 'bin' folder has been added to the PATH \
+                        environment variable, or use the '-B,--bin-path' command line argument or \
                         the {} environment variable.", 
                         WIX_LINKER,
                         WIX_PATH_KEY
@@ -441,7 +442,19 @@ impl<'a> Wix<'a> {
                 signer.arg("/t");
                 signer.arg(server.url());
             }
-            let status = signer.arg(&destination_msi).status()?;
+            let status = signer.arg(&destination_msi).status().map_err(|err| {
+                if err.kind() == ErrorKind::NotFound {
+                    Error::Generic(format!(
+                        "The {0} application could not be found. Please check the Windows 10 SDK \
+                        (https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) is \
+                        installed and you are using the x64 or x86 Native Build Tools prompt so the \
+                        {0} application is available.",
+                        SIGNTOOL
+                    ))
+                } else {
+                    err.into()
+                }
+            })?;
             if !status.success() {
                 return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(100)));
             }
