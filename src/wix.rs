@@ -28,6 +28,7 @@ use uuid::Uuid;
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
 pub const DEFAULT_LICENSE_FILE_NAME: &str = "LICENSE";
+pub const EXE_FILE_EXTENSION: &str = "exe";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
@@ -438,9 +439,11 @@ impl<'a> Wix<'a> {
     /// Gets the command for the compiler application (`candle.exe`).
     fn get_compiler(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.map(|s| {
-            let p = PathBuf::from(s);
+            let mut p = PathBuf::from(s);
             trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the compiler", p.display());
-            p.join(WIX_COMPILER)
+            p.push(WIX_COMPILER);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
         }) {
             if !path.exists() {
                 path.pop(); // Remove the `candle` application from the path
@@ -456,9 +459,11 @@ impl<'a> Wix<'a> {
             }
         } else {
             if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-                let p = PathBuf::from(s);
+                let mut p = PathBuf::from(s);
                 trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the compiler", p.display());
-                p.join(WIX_COMPILER)
+                p.push(WIX_COMPILER);
+                p.set_extension(EXE_FILE_EXTENSION);
+                p
             }) {
                 if !path.exists() {
                     path.pop(); // Remove the `candle` application from the path
@@ -584,9 +589,11 @@ impl<'a> Wix<'a> {
     /// Gets the command for the linker application (`light.exe`).
     fn get_linker(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.map(|s| {
-            let p = PathBuf::from(s);
+            let mut p = PathBuf::from(s);
             trace!("Using the '{}' path to the WiX Toolset 'bin' folder for the linker", p.display());
-            p.join(WIX_LINKER)
+            p.push(WIX_LINKER);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
         }) {
             if !path.exists() {
                 path.pop(); // Remove the 'light' application from the path
@@ -602,9 +609,11 @@ impl<'a> Wix<'a> {
             }
         } else {
             if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-                let p = PathBuf::from(s);
+                let mut p = PathBuf::from(s);
                 trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the linker", p.display());
-                p.join(WIX_LINKER)
+                p.push(WIX_LINKER);
+                p.set_extension(EXE_FILE_EXTENSION);
+                p
             }) {
                 if !path.exists() {
                     path.pop(); // Remove the `candle` application from the path
@@ -1001,28 +1010,34 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_compiler_is_correct_with_default() {
-        let compiler = Wix::new().get_compiler();
+        let compiler = Wix::new().get_compiler().unwrap();
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(WIX_COMPILER)));
     }
 
     #[test]
     fn get_compiler_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("c:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("WiX Toolset v3.11");
         test_path.push("bin");
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_COMPILER);
-        let compiler = Wix::new().bin_path(test_path.to_str()).get_compiler();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let compiler = Wix::new().bin_path(test_path.to_str()).get_compiler().unwrap();
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
     }
 
     #[test]
     fn get_compiler_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("c:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("WiX Toolset v3.11");
         test_path.push("bin");
         env::set_var(WIX_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_COMPILER);
-        let compiler = Wix::new().get_compiler();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let compiler = Wix::new().get_compiler().unwrap();
         env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
     }
@@ -1156,28 +1171,34 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_linker_is_correct_with_default() {
-        let linker = Wix::new().get_linker();
+        let linker = Wix::new().get_linker().unwrap();
         assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(WIX_LINKER)));
     }
 
     #[test]
     fn get_linker_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("C:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("WiX Toolset v3.11");
         test_path.push("bin");
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_LINKER);
-        let linker = Wix::new().bin_path(test_path.to_str()).get_linker();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let linker = Wix::new().bin_path(test_path.to_str()).get_linker().unwrap();
         assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
     }
 
     #[test]
     fn get_linker_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("C:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("WiX Toolset v3.11");
         test_path.push("bin");
         env::set_var(WIX_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_LINKER);
-        let linker = Wix::new().get_linker();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let linker = Wix::new().get_linker().unwrap();
         env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
     }
