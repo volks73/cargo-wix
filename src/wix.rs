@@ -1368,28 +1368,40 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_signer_is_correct_with_default() {
-        let signer = Wix::new().get_signer();
+        let signer = Wix::new().get_signer().unwrap();
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(SIGNTOOL)));
     }
 
     #[test]
     fn get_signer_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("C:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("Windows Kits");
+        test_path.push("10");
         test_path.push("bin");
+        test_path.push("10.0.15063.0");
+        test_path.push("x64");
         let mut expected = PathBuf::from(&test_path);
         expected.push(SIGNTOOL);
-        let signer = Wix::new().sign_path(test_path.to_str()).get_signer();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let signer = Wix::new().sign_path(test_path.to_str()).get_signer().unwrap();
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
     }
 
     #[test]
     fn get_signer_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("C:");
+        let mut test_path = PathBuf::from("C:\\");
+        test_path.push("Program Files (x86)");
+        test_path.push("Windows Kits");
+        test_path.push("10");
         test_path.push("bin");
+        test_path.push("10.0.15063.0");
+        test_path.push("x64");
         env::set_var(SIGNTOOL_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(SIGNTOOL);
-        let signer = Wix::new().get_signer();
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let signer = Wix::new().get_signer().unwrap();
         env::remove_var(SIGNTOOL_PATH_KEY);
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
     }
