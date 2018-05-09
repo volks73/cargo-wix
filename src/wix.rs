@@ -421,7 +421,7 @@ impl<'a> Wix<'a> {
         // Sign the installer
         if self.sign {
             info!("Signing the installer");
-            let mut signer = self.get_signer();
+            let mut signer = self.get_signer()?;
             debug!("signer = {:?}", signer);
             if self.capture_output {
                 trace!("Capturing the {} output", SIGNTOOL);
@@ -724,15 +724,50 @@ impl<'a> Wix<'a> {
     }
 
     /// Gets the command for the `signtool` application.
-    fn get_signer(&self) -> Command {
-        if let Some(s) = self.sign_path {
-            trace!("Using the '{}' path to the Windows SDK 'bin' folder", s);
-            Command::new(PathBuf::from(s).join(SIGNTOOL))
+    fn get_signer(&self) -> Result<Command> {
+        if let Some(mut path) = self.sign_path.map(|s| {
+            let mut p = PathBuf::from(s);
+            trace!("Using the '{}' path to the Windows SDK 'bin' folder for the signer", p.display());
+            p.push(SIGNTOOL);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
+        }) {
+            if !path.exists() {
+                path.pop(); // Remove the 'signtool' application from the path
+                Err(Error::Generic(format!(
+                    "The signer application ('{}') does not exist at the '{}' path specified via \
+                    the '-S, --sign-path' command line argument. Please check the path is correct and \
+                    the signer application exists at the path.",
+                    SIGNTOOL, 
+                    path.display()
+                )))
+            } else {
+                Ok(Command::new(path))
+            }
         } else {
-            env::var(SIGNTOOL_PATH_KEY).map(|s| {
-                trace!("Using the '{}' path to the Windows SDK 'bin' folder", s);
-                Command::new(PathBuf::from(s).join(SIGNTOOL))
-            }).unwrap_or(Command::new(SIGNTOOL))
+            if let Some(mut path) = env::var_os(SIGNTOOL_PATH_KEY).map(|s| {
+                let mut p = PathBuf::from(s);
+                trace!("Using the '{}' path to the Windows SDK 'bin' folder for the signer", p.display());
+                p.push(SIGNTOOL);
+                p.set_extension(EXE_FILE_EXTENSION);
+                p
+            }) {
+                if !path.exists() {
+                    path.pop(); // Remove the `signtool` application from the path
+                    Err(Error::Generic(format!(
+                        "The signer application ('{}') does not exist at the '{}' path specified \
+                        via the {} environment variable. Please check the path is correct and the \
+                        signer application exists at the path.",
+                        SIGNTOOL,
+                        path.display(),
+                        SIGNTOOL_PATH_KEY
+                    )))
+                } else {
+                    Ok(Command::new(path))
+                }
+            } else {
+                Ok(Command::new(SIGNTOOL))
+            }
         }
     }
 
