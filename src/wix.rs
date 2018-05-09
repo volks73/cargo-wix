@@ -17,7 +17,7 @@ use mustache::{self, MapBuilder};
 use regex::Regex;
 use std::env;
 use std::fs::{self, File};
-use std::io::{self, Read, Write};
+use std::io::{self, Read, Write, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
@@ -365,7 +365,21 @@ impl<'a> Wix<'a> {
         let status = compiler.arg("-o")
             .arg(&source_wixobj)
             .arg(&source_wxs)
-            .status()?;
+            .status().map_err(|err| {
+                if err.kind() == ErrorKind::NotFound {
+                    Error::Generic(format!(
+                        "The compiler application ({}) could not be found in the PATH environment
+                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is
+                        installed and the WiX Toolset's 'bin' folder has been added to the PATH
+                        environment variable, or use the '-B,--bin-path' command line argument or
+                        the {} environment variable.", 
+                        WIX_COMPILER,
+                        WIX_PATH_KEY
+                    ))
+                } else {
+                    err.into()
+                }
+            })?;
         if !status.success() {
             return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(100)));
         }
@@ -385,7 +399,21 @@ impl<'a> Wix<'a> {
             .arg(&source_wixobj)
             .arg("-out")
             .arg(&destination_msi)
-            .status()?;
+            .status().map_err(|err| {
+                if err.kind() == ErrorKind::NotFound {
+                    Error::Generic(format!(
+                        "The linker application ({}) could not be found in the PATH environment
+                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is
+                        installed and the WiX Toolset's 'bin' folder has been added to the PATH
+                        environment variable, or use the '-B,--bin-path' command line argument or
+                        the {} environment variable.", 
+                        WIX_LINKER,
+                        WIX_PATH_KEY
+                    ))
+                } else {
+                    err.into()
+                }
+            })?;
         if !status.success() {
             return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(100)));
         }
