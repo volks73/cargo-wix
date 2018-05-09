@@ -1028,6 +1028,16 @@ license-file = "LICENSE-CUSTOM""#;
     }
 
     #[test]
+    #[should_panic]
+    fn get_compiler_fails_with_nonexistent_path_from_some_value() {
+        let test_path = PathBuf::from("C:\\");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_COMPILER);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        Wix::new().bin_path(test_path.to_str()).get_compiler().unwrap();
+    }
+
+    #[test]
     fn get_compiler_is_correct_with_environment_variable() {
         let mut test_path = PathBuf::from("c:\\");
         test_path.push("Program Files (x86)");
@@ -1040,6 +1050,19 @@ license-file = "LICENSE-CUSTOM""#;
         let compiler = Wix::new().get_compiler().unwrap();
         env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    #[should_panic]
+    fn get_compiler_fails_with_nonexistent_path_from_environment_variable() {
+        let test_path = PathBuf::from("C:\\");
+        env::set_var(WIX_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_COMPILER);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let result = Wix::new().get_compiler();
+        env::remove_var(WIX_PATH_KEY);
+        result.unwrap();
     }
 
     #[test]
@@ -1165,7 +1188,8 @@ license-file = "LICENSE-CUSTOM""#;
         let expected = env::home_dir().map(|h| {
             h.join(DEFAULT_LICENSE_FILE_NAME)
         }).unwrap();
-        let actual = Wix::new().license_file(expected.to_str()).get_license_source(&minimal_manifest());
+        let actual = Wix::new().license_file(expected.to_str())
+            .get_license_source(&minimal_manifest());
         assert_eq!(actual, expected);
     }
 
@@ -1189,6 +1213,16 @@ license-file = "LICENSE-CUSTOM""#;
     }
 
     #[test]
+    #[should_panic]
+    fn get_linker_fails_with_nonexistent_path_from_some_value() {
+        let test_path = PathBuf::from("C:\\");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_LINKER);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        Wix::new().bin_path(test_path.to_str()).get_linker().unwrap();
+    }
+
+    #[test]
     fn get_linker_is_correct_with_environment_variable() {
         let mut test_path = PathBuf::from("C:\\");
         test_path.push("Program Files (x86)");
@@ -1201,6 +1235,19 @@ license-file = "LICENSE-CUSTOM""#;
         let linker = Wix::new().get_linker().unwrap();
         env::remove_var(WIX_PATH_KEY);
         assert_eq!(format!("{:?}", linker), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    #[should_panic]
+    fn get_linker_fails_with_nonexistent_path_from_environment_variable() {
+        let test_path = PathBuf::from("C:\\");
+        env::set_var(WIX_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(WIX_LINKER);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let result = Wix::new().get_linker();
+        env::remove_var(WIX_PATH_KEY);
+        result.unwrap();
     }
 
     #[test]
@@ -1218,7 +1265,8 @@ license-file = "LICENSE-CUSTOM""#;
     #[test]
     fn get_manufacturer_is_correct_with_some_value() {
         const EXPECTED: &str = "Test Manufacturer";
-        let actual = Wix::new().manufacturer(Some(EXPECTED)).get_manufacturer(&complete_manifest()).unwrap();
+        let actual = Wix::new().manufacturer(Some(EXPECTED))
+            .get_manufacturer(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED);
     }
 
@@ -1237,7 +1285,8 @@ license-file = "LICENSE-CUSTOM""#;
     #[test]
     fn get_product_name_is_correct_with_some_value() {
         const EXPECTED: &str = "Test Product Name";
-        let actual = Wix::new().product_name(Some(EXPECTED)).get_product_name(&complete_manifest()).unwrap();
+        let actual = Wix::new().product_name(Some(EXPECTED))
+            .get_product_name(&complete_manifest()).unwrap();
         assert_eq!(&actual, EXPECTED);
     }
 
@@ -1289,7 +1338,8 @@ license-file = "LICENSE-CUSTOM""#;
         let mut expected = PathBuf::from("C:");
         expected.push("output");
         expected.push("installer.msi");
-        let actual = Wix::new().output(expected.to_str()).get_destination_msi(PRODUCT_NAME, VERSION, &PLATFORM);
+        let actual = Wix::new().output(expected.to_str())
+            .get_destination_msi(PRODUCT_NAME, VERSION, &PLATFORM);
         assert_eq!(actual, expected);
     }
 }
