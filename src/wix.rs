@@ -370,7 +370,7 @@ impl<'a> Wix<'a> {
         }
         // Link the installer
         info!("Linking the installer");
-        let mut linker = self.get_linker(); 
+        let mut linker = self.get_linker()?; 
         debug!("linker = {:?}", linker);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
@@ -439,7 +439,7 @@ impl<'a> Wix<'a> {
     fn get_compiler(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.map(|s| {
             let p = PathBuf::from(s);
-            trace!("Using the '{}' path to the WiX Toolset's 'bin' folder", p.display());
+            trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the compiler", p.display());
             p.join(WIX_COMPILER)
         }) {
             if !path.exists() {
@@ -457,7 +457,7 @@ impl<'a> Wix<'a> {
         } else {
             if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
                 let p = PathBuf::from(s);
-                trace!("Using the '{}' path to the WiX Toolset's 'bin' folder", p.display());
+                trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the compiler", p.display());
                 p.join(WIX_COMPILER)
             }) {
                 if !path.exists() {
@@ -582,15 +582,46 @@ impl<'a> Wix<'a> {
     }
 
     /// Gets the command for the linker application (`light.exe`).
-    fn get_linker(&self) -> Command {
-        if let Some(b) = self.bin_path {
-            trace!("Using the '{}' path to the WiX Toolset linker", b);
-            Command::new(PathBuf::from(b).join(WIX_LINKER))
+    fn get_linker(&self) -> Result<Command> {
+        if let Some(mut path) = self.bin_path.map(|s| {
+            let p = PathBuf::from(s);
+            trace!("Using the '{}' path to the WiX Toolset 'bin' folder for the linker", p.display());
+            p.join(WIX_LINKER)
+        }) {
+            if !path.exists() {
+                path.pop(); // Remove the 'light' application from the path
+                Err(Error::Generic(format!(
+                    "The linker application ('{}') does not exist at the '{}' path specified via \
+                    the '-B, --bin-path' command line argument. Please check the path is correct \
+                    and the linker application exists at the path.",
+                    WIX_LINKER,
+                    path.display()
+                )))
+            } else {
+                Ok(Command::new(path))
+            }
         } else {
-            env::var(WIX_PATH_KEY).map(|s| {
-                trace!("Using the '{}' path to the WiX Toolset linker", s);
-                Command::new(PathBuf::from(s).join(WIX_LINKER))
-            }).unwrap_or(Command::new(WIX_LINKER))
+            if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
+                let p = PathBuf::from(s);
+                trace!("Using the '{}' path to the WiX Toolset's 'bin' folder for the linker", p.display());
+                p.join(WIX_LINKER)
+            }) {
+                if !path.exists() {
+                    path.pop(); // Remove the `candle` application from the path
+                    Err(Error::Generic(format!(
+                        "The linker application ('{}') does not exist at the '{}' path specified \
+                        via the {} environment variable. Please check the path is correct and the \
+                        linker application exists at the path.",
+                        WIX_LINKER,
+                        path.display(),
+                        WIX_PATH_KEY
+                    )))
+                } else {
+                    Ok(Command::new(path))
+                }
+            } else {
+                Ok(Command::new(WIX_LINKER))
+            }
         }
     }
 
