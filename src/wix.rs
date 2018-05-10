@@ -1090,12 +1090,18 @@ license-file = "LICENSE-CUSTOM""#;
         assert_eq!(format!("{:?}", compiler), format!("{:?}", Command::new(WIX_COMPILER)));
     }
 
+    fn wix_toolset_bin_folder() -> PathBuf {
+        let mut wix_toolset_bin = PathBuf::from("C:\\");
+        wix_toolset_bin.push("Program Files (x86)");
+        // TODO: Change this to be version independent
+        wix_toolset_bin.push("WiX Toolset v3.11");
+        wix_toolset_bin.push("bin");
+        wix_toolset_bin
+    }
+
     #[test]
     fn get_compiler_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("c:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("WiX Toolset v3.11");
-        test_path.push("bin");
+        let test_path = wix_toolset_bin_folder();
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_COMPILER);
         expected.set_extension(EXE_FILE_EXTENSION);
@@ -1115,10 +1121,7 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_compiler_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("c:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("WiX Toolset v3.11");
-        test_path.push("bin");
+        let test_path = wix_toolset_bin_folder();
         env::set_var(WIX_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_COMPILER);
@@ -1277,10 +1280,7 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_linker_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("C:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("WiX Toolset v3.11");
-        test_path.push("bin");
+        let test_path = wix_toolset_bin_folder();
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_LINKER);
         expected.set_extension(EXE_FILE_EXTENSION);
@@ -1300,10 +1300,7 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_linker_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("C:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("WiX Toolset v3.11");
-        test_path.push("bin");
+        let test_path = wix_toolset_bin_folder();
         env::set_var(WIX_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(WIX_LINKER);
