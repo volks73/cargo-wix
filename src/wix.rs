@@ -1405,6 +1405,16 @@ license-file = "LICENSE-CUSTOM""#;
     }
 
     #[test]
+    #[should_panic]
+    fn get_signer_fails_with_nonexistent_path_from_some_value() {
+        let test_path = PathBuf::from("C:\\");
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(SIGNTOOL);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        Wix::new().sign_path(test_path.to_str()).get_signer().unwrap();
+    }
+
+    #[test]
     fn get_signer_is_correct_with_environment_variable() {
         let test_path = windows_10_bin_folder();
         env::set_var(SIGNTOOL_PATH_KEY, &test_path);
@@ -1414,6 +1424,19 @@ license-file = "LICENSE-CUSTOM""#;
         let signer = Wix::new().get_signer().unwrap();
         env::remove_var(SIGNTOOL_PATH_KEY);
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(expected)));
+    }
+
+    #[test]
+    #[should_panic]
+    fn get_signer_fails_with_nonexistent_path_from_environment_variable() {
+        let test_path = PathBuf::from("C:\\");
+        env::set_var(SIGNTOOL_PATH_KEY, &test_path);
+        let mut expected = PathBuf::from(&test_path);
+        expected.push(SIGNTOOL);
+        expected.set_extension(EXE_FILE_EXTENSION);
+        let result = Wix::new().get_signer();
+        env::remove_var(SIGNTOOL_PATH_KEY);
+        result.unwrap();
     }
 
     #[test]
