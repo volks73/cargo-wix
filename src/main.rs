@@ -265,7 +265,26 @@ fn main() {
             {
                 let mut stderr = StandardStream::stderr(ColorChoice::Auto);
                 stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true)).expect("Coloring stderr");
-                writeln!(&mut stderr, "Error[{}] ({}): {}", e.code(), e.description(), e).expect("Write to stderr");
+                write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.description()).expect("Write tag to stderr");
+                // This prevents "leaking" the color seetings to the console after the
+                // sub-command/application has completed and ensures the message is not printed in
+                // Red.
+                //
+                // See:
+                //
+                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47) 
+                // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
+                stderr.reset().expect("Revert color settings after printing the tag");
+                stderr.set_color(ColorSpec::new().set_fg(Some(Color::White)).set_bold(false)).expect("Coloring stderr");
+                writeln!(&mut stderr, "{}", e).expect("Write message to stderr");
+                // This prevents "leaking" the color settings to the console after the
+                // sub-command/application has completed.
+                //
+                // See:
+                //
+                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47) 
+                // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
+                stderr.reset().expect("Revert color settings after printing the message");
             }
             std::process::exit(e.code());
         }
