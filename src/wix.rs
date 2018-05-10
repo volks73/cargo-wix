@@ -1372,15 +1372,31 @@ license-file = "LICENSE-CUSTOM""#;
         assert_eq!(format!("{:?}", signer), format!("{:?}", Command::new(SIGNTOOL)));
     }
 
+    fn windows_10_bin_folder() -> PathBuf {
+        let mut windows_10_bin = PathBuf::from("C:\\");
+        windows_10_bin.push("Program Files (x86)");
+        windows_10_bin.push("Windows Kits");
+        windows_10_bin.push("10");
+        windows_10_bin.push("bin");
+        let version_folder = fs::read_dir(&windows_10_bin).unwrap().filter_map(|entry| {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                Some(path)
+            } else {
+                None
+            }
+        }).find(|path| {
+            let name = path.file_name().unwrap();
+            name != "arm" && name != "arm64" && name != "x64" && name != "x86" 
+        }).unwrap();
+        windows_10_bin.push(version_folder);
+        windows_10_bin.push("x64");
+        windows_10_bin
+    }
+
     #[test]
     fn get_signer_is_correct_with_some_value() {
-        let mut test_path = PathBuf::from("C:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("Windows Kits");
-        test_path.push("10");
-        test_path.push("bin");
-        test_path.push("10.0.15063.0");
-        test_path.push("x64");
+        let test_path = windows_10_bin_folder();
         let mut expected = PathBuf::from(&test_path);
         expected.push(SIGNTOOL);
         expected.set_extension(EXE_FILE_EXTENSION);
@@ -1390,13 +1406,7 @@ license-file = "LICENSE-CUSTOM""#;
 
     #[test]
     fn get_signer_is_correct_with_environment_variable() {
-        let mut test_path = PathBuf::from("C:\\");
-        test_path.push("Program Files (x86)");
-        test_path.push("Windows Kits");
-        test_path.push("10");
-        test_path.push("bin");
-        test_path.push("10.0.15063.0");
-        test_path.push("x64");
+        let test_path = windows_10_bin_folder();
         env::set_var(SIGNTOOL_PATH_KEY, &test_path);
         let mut expected = PathBuf::from(&test_path);
         expected.push(SIGNTOOL);
