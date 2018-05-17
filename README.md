@@ -26,11 +26,9 @@ The cargo-wix project can be installed on any platform supported by the Rust pro
 - [Cargo](http://doc.crates.io)
 - [Rust](https://www.rust-lang.org)
 - [WiX Toolset](http://wixtoolset.org)
-- [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk), needed for optionally signing the installer
+- [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) (Optional), needed for signing the installer
 
-The SignTool application is used to optionally sign an installer. It is available as part of the Windows 10 SDK.
-
-__Note__, the WiX Toolset `bin` folder must be added to the PATH system environment variable for the `cargo wix` subcommand to work properly. The typical location for the WiX Toolset `bin` folder is: `C:\Program Files (x86)\WiX Toolset\bin`. Please add this path to the PATH system environment variable.
+__Note__, the WiX Toolset `bin` folder must be added to the PATH system environment variable for the `cargo wix` subcommand to work properly. The default location for the WiX Toolset `bin` folder is: `C:\Program Files (x86)\WiX Toolset\bin` or `C:\Program Files (x86)\Wix Toolset v3.11\bin`. Please add this path to the PATH system environment variable before using this cargo subcommand.
 
 After installing and configuring the dependencies, execute the following command to install the `cargo-wix` subcommand:
 
@@ -40,9 +38,7 @@ C:\>cargo install cargo-wix
 
 ## Usage
 
-__Important__, start and use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the [VC Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) or Windows 10 SDK. This will ensure the `signtool` command is available in the PATH environment variable if signing the installer with the `cargo-wix` subcommand. If not signing the installer, then any command prompt can be used. 
-
-Navigate to the project's root folder and run the subcommand:
+Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
 
 ```dos
 C:\Path\To\Project\>cargo wix --init
@@ -71,7 +67,7 @@ C:\Path\To\Project\>cargo wix example.wxs
 
 The WiX source file can be customized using a text editor, but modification of the XML preprocessor variables should be avoided to ensure the `cargo wix` command works properly. 
 
-To sign the installer (msi) as part of the build process, use the `--sign` flag with the subcommand as follows:
+To sign the installer (msi) as part of the build process, ensure the `signtool` command is available in the PATH system environment variable or use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the Windows 10 SDK, and use the `--sign` flag with the subcommand as follows: 
 
 ```dos
 C:\Path\To\Project\>cargo wix --sign
