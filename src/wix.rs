@@ -258,7 +258,9 @@ impl<'a> Wix<'a> {
         }
         let manifest = get_manifest()?;
         if self.get_description(&manifest).is_err() {
-            warn!("The 'description' field is missing from the package's manifest (Cargo.toml). Please consider adding the field with a non-empty value to avoid errors during installer creation.");
+            warn!("The 'description' field is missing from the package's manifest (Cargo.toml). \
+                  Please consider adding the field with a non-empty value to avoid errors during \
+                  installer creation.");
         }
         let license_name = self.get_manifest_license_name(&manifest);
         debug!("license_name = {:?}", license_name);
@@ -271,13 +273,17 @@ impl<'a> Wix<'a> {
             let mut rtf = File::create(license_path)?;
             self.write_license(&mut rtf, &license, &manifest)?;
         } else {
-            warn!("Could not generate an appropriate license file in the Rich Text Format (RTF). Please manually create one to avoid errors during installer creation.");
+            warn!("Could not generate an appropriate EULA in the Rich Text Format (RTF) from the \
+                  project's 'license' field. Please manually create one to avoid errors during \
+                  installer creation.");
         }
         if manifest.get("package").and_then(|p| p.as_table())
             .and_then(|t| t.get("license-file")).is_none() {
             let license_file = Path::new(DEFAULT_LICENSE_FILE_NAME);
             if !license_file.exists() {
-                warn!("A '{}' file does not exist in the project root. Please consider adding such a file to avoid errors during installer creation.", DEFAULT_LICENSE_FILE_NAME);
+                warn!("A '{}' file does not exist in the project root. Please consider adding such \
+                      a file to avoid errors during installer creation.",
+                      DEFAULT_LICENSE_FILE_NAME);
             }
         }
         Ok(())
@@ -810,13 +816,21 @@ impl<'a> Wix<'a> {
         if let Some(p) = self.input.map(|s| PathBuf::from(s)) {
             if p.exists() {
                 if p.is_dir() {
-                    Err(Error::Generic(format!("The '{}' path is not a file. Please check the path and ensure it is to a WiX Source (wxs) file.", p.display())))
+                    Err(Error::Generic(format!(
+                        "The '{}' path is not a file. Please check the path and ensure it is to \
+                        a WiX Source (wxs) file.", 
+                        p.display()
+                    )))
                 } else {
                     trace!("Using the '{}' WiX source file", p.display());
                     Ok(p)
                 }
             } else {
-                Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --print-template WXS > {0}' command to create it.", p.display())))
+                Err(Error::Generic(format!(
+                    "The '{0}' file does not exist. Consider using the 'cargo wix --print-template \
+                    WXS > {0}' command to create it.", 
+                    p.display()
+                )))
             }
         } else {
             trace!("Using the default WiX source file");
@@ -826,7 +840,11 @@ impl<'a> Wix<'a> {
             if main_wxs.exists() {
                 Ok(main_wxs)
             } else {
-               Err(Error::Generic(format!("The '{0}' file does not exist. Consider using the 'cargo wix --init' command to create it.", main_wxs.display())))
+               Err(Error::Generic(format!(
+                   "The '{0}' file does not exist. Consider using the 'cargo wix --init' command to \
+                   create it.", 
+                   main_wxs.display()
+               )))
             }
         }
     }
