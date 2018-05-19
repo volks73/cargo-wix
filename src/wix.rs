@@ -392,24 +392,25 @@ impl<'a> Wix<'a> {
             warn!("A help URL could not be found. Considering adding the 'documentation', \
                   'homepage', or 'repository' fields to the package's manifest.");
         }
-        let status = compiler.arg("-o")
+        compiler.arg("-o")
             .arg(&source_wixobj)
-            .arg(&source_wxs)
-            .status().map_err(|err| {
-                if err.kind() == ErrorKind::NotFound {
-                    Error::Generic(format!(
-                        "The compiler application ({}) could not be found in the PATH environment \
-                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                        installed and the WiX Toolset's 'bin' folder has been added to the PATH \
-                        environment variable, or use the '-B,--bin-path' command line argument or \
-                        the {} environment variable.", 
-                        WIX_COMPILER,
-                        WIX_PATH_KEY
-                    ))
-                } else {
-                    err.into()
-                }
-            })?;
+            .arg(&source_wxs);
+        debug!("command = {:?}", compiler);
+        let status = compiler.status().map_err(|err| {
+            if err.kind() == ErrorKind::NotFound {
+                Error::Generic(format!(
+                    "The compiler application ({}) could not be found in the PATH environment \
+                    variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                    installed and the WiX Toolset's 'bin' folder has been added to the PATH \
+                    environment variable, or use the '-B,--bin-path' command line argument or \
+                    the {} environment variable.", 
+                    WIX_COMPILER,
+                    WIX_PATH_KEY
+                ))
+            } else {
+                err.into()
+            }
+        })?;
         if !status.success() {
             return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(100)));
         }
@@ -425,28 +426,28 @@ impl<'a> Wix<'a> {
         if let Some(l) = locale {
             linker.arg("-loc").arg(l);
         }
-        let status = linker
-            .arg("-ext")
+        linker.arg("-ext")
             .arg("WixUIExtension")
             .arg(format!("-cultures:{}", self.culture)) 
             .arg(&source_wixobj)
             .arg("-out")
-            .arg(&destination_msi)
-            .status().map_err(|err| {
-                if err.kind() == ErrorKind::NotFound {
-                    Error::Generic(format!(
-                        "The linker application ({}) could not be found in the PATH environment \
-                        variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                        installed and the WiX Toolset's 'bin' folder has been added to the PATH \
-                        environment variable, or use the '-B,--bin-path' command line argument or \
-                        the {} environment variable.", 
-                        WIX_LINKER,
-                        WIX_PATH_KEY
-                    ))
-                } else {
-                    err.into()
-                }
-            })?;
+            .arg(&destination_msi);
+        debug!("command = {:?}", linker);
+        let status = linker.status().map_err(|err| {
+            if err.kind() == ErrorKind::NotFound {
+                Error::Generic(format!(
+                    "The linker application ({}) could not be found in the PATH environment \
+                    variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                    installed and the WiX Toolset's 'bin' folder has been added to the PATH \
+                    environment variable, or use the '-B,--bin-path' command line argument or \
+                    the {} environment variable.", 
+                    WIX_LINKER,
+                    WIX_PATH_KEY
+                ))
+            } else {
+                err.into()
+            }
+        })?;
         if !status.success() {
             return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(100)));
         }
