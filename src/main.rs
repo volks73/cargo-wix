@@ -93,6 +93,12 @@ fn main() {
                     .long("license")
                     .short("l")
                     .takes_value(true))
+                .arg(Arg::with_name("locale")
+                    .help("Sets the path to a WiX localization file, '.wxl', which contains \
+                          localized strings.")
+                    .long("locale")
+                    .short("L")
+                    .takes_value(true))
                 .arg(Arg::with_name("manufacturer")
                     .help("Overrides the first author in the 'authors' field of the package's \
                           manifest (Cargo.toml) as the manufacturer within the installer.")
@@ -241,6 +247,7 @@ fn main() {
         .description(matches.value_of("description"))
         .input(matches.value_of("INPUT"))
         .license_file(matches.value_of("license"))
+        .locale(matches.value_of("locale"))
         .manufacturer(matches.value_of("manufacturer"))
         .no_build(matches.is_present("no-build"))
         .output(matches.value_of("output"))

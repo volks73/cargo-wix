@@ -50,6 +50,7 @@ pub struct Wix<'a> {
     description: Option<&'a str>,
     input: Option<&'a str>,
     license_path: Option<&'a str>,
+    locale: Option<&'a str>,
     manufacturer: Option<&'a str>,
     no_build: bool,
     output: Option<&'a str>,
@@ -71,6 +72,7 @@ impl<'a> Wix<'a> {
             description: None,
             input: None,
             license_path: None,
+            locale: None,
             manufacturer: None,
             no_build: false,
             output: None,
@@ -143,6 +145,14 @@ impl<'a> Wix<'a> {
     /// to `License.txt` during creation of the installer.
     pub fn license_file(mut self, l: Option<&'a str>) -> Self {
         self.license_path = l;
+        self
+    }
+
+    /// Sets the path to a WiX localization file, `.wxl`, for the linker (light.exe).
+    ///
+    /// The [WiX localization file](http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html) is an XML file that contains localization strings.
+    pub fn locale(mut self, l: Option<&'a str>) -> Self {
+        self.locale = l;
         self
     }
 
@@ -398,6 +408,9 @@ impl<'a> Wix<'a> {
             trace!("Capturing the '{}' output", WIX_LINKER);
             linker.stdout(Stdio::null());
             linker.stderr(Stdio::null());
+        }
+        if let Some(locale) = self.locale {
+            linker.arg("-loc").arg(locale);
         }
         let status = linker
             .arg("-ext")
