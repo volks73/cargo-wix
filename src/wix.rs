@@ -323,6 +323,8 @@ impl<'a> Wix<'a> {
         debug!("license_name = {:?}", license_name);
         let license_source = self.get_license_source(&manifest);
         debug!("license_source = {:?}", license_source);
+        let locale = self.get_locale()?;
+        debug!("locale = {:?}", locale);
         let manufacturer = self.get_manufacturer(&manifest)?;
         debug!("manufacturer = {}", manufacturer);
         let help_url = self.get_help_url(&manifest);
@@ -409,8 +411,8 @@ impl<'a> Wix<'a> {
             linker.stdout(Stdio::null());
             linker.stderr(Stdio::null());
         }
-        if let Some(locale) = self.locale {
-            linker.arg("-loc").arg(locale);
+        if let Some(l) = locale {
+            linker.arg("-loc").arg(l);
         }
         let status = linker
             .arg("-ext")
@@ -644,6 +646,25 @@ impl<'a> Wix<'a> {
                 // TODO: Add check that the default license exists
                 .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
         )
+    }
+
+    /// Gets the WiX localization file and checks if it exists.
+    ///
+    /// Returns `None` if no localization file is specified.
+    fn get_locale(&self) -> Result<Option<PathBuf>> {
+        if let Some(locale) = self.locale.map(PathBuf::from) {
+            if locale.exists() {
+                Ok(Some(locale))
+            } else {
+                Err(Error::Generic(format!(
+                    "The '{}' WiX localization file could not be found, or it does not exist. \
+                    Please check the path is correct and the file exists.",
+                    locale.display()
+                )))
+            }
+        } else {
+            Ok(None)
+        }
     }
 
     /// Gets the command for the linker application (`light.exe`).
