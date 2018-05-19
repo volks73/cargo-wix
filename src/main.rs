@@ -58,10 +58,8 @@ fn main() {
                     .conflicts_with("print-template"))
                 .arg(Arg::with_name("culture")
                     .help("Sets the culture for localization. Use with the '-L,--locale' option. \
-                          See the WixUI localization documentation \
-                          (http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html) \
-                          for more information about acceptable culture codes. The codes are case \
-                          insenstive.")
+                          See the WixUI localization documentation for more information about \
+                          acceptable culture codes. The codes are case insenstive.")
                     .long("culture")
                     .short("C")
                     .default_value(&default_culture)
