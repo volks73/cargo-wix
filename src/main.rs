@@ -24,12 +24,13 @@ use env_logger::fmt::Color as LogColor;
 use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
-use cargo_wix::Template;
+use cargo_wix::{Cultures, Template};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
@@ -55,6 +56,16 @@ fn main() {
                     .conflicts_with("init")
                     .conflicts_with("sign")
                     .conflicts_with("print-template"))
+                .arg(Arg::with_name("culture")
+                    .help("Sets the culture for localization. Use with the '-L,--locale' option. \
+                          See the WixUI localization documentation \
+                          (http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html) \
+                          for more information about acceptable culture codes. The codes are case \
+                          insenstive.")
+                    .long("culture")
+                    .short("C")
+                    .default_value(&default_culture)
+                    .takes_value(true))
                 .arg(Arg::with_name("description")
                     .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
                           as the description within the installer.")
@@ -244,6 +255,7 @@ fn main() {
         .capture_output(!matches.is_present("no-capture"))
         .copyright_holder(matches.value_of("holder"))
         .copyright_year(matches.value_of("year"))
+        .culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()))
         .description(matches.value_of("description"))
         .input(matches.value_of("INPUT"))
         .license_file(matches.value_of("license"))

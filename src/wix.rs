@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use Cultures;
 use chrono::{Datelike, Utc};
 use mustache::{self, MapBuilder};
 use regex::Regex;
@@ -47,6 +48,7 @@ pub struct Wix<'a> {
     capture_output: bool,
     copyright_year: Option<&'a str>,
     copyright_holder: Option<&'a str>,
+    culture: Cultures,
     description: Option<&'a str>,
     input: Option<&'a str>,
     license_path: Option<&'a str>,
@@ -69,6 +71,7 @@ impl<'a> Wix<'a> {
             capture_output: true,
             copyright_year: None,
             copyright_holder: None,
+            culture: Cultures::EnUs,
             description: None,
             input: None,
             license_path: None,
@@ -123,6 +126,12 @@ impl<'a> Wix<'a> {
         self
     }
 
+    /// Sets the culture to use with the linker (light.exe) for building a localized installer.
+    pub fn culture(mut self, c: Cultures) -> Self {
+        self.culture = c;
+        self
+    }
+
     /// Sets the description.
     ///
     /// This override the description determined from the `description` field in the package's
@@ -150,7 +159,9 @@ impl<'a> Wix<'a> {
 
     /// Sets the path to a WiX localization file, `.wxl`, for the linker (light.exe).
     ///
-    /// The [WiX localization file](http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html) is an XML file that contains localization strings.
+    /// The [WiX localization
+    /// file](http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html)
+    /// is an XML file that contains localization strings.
     pub fn locale(mut self, l: Option<&'a str>) -> Self {
         self.locale = l;
         self
@@ -417,7 +428,7 @@ impl<'a> Wix<'a> {
         let status = linker
             .arg("-ext")
             .arg("WixUIExtension")
-            .arg("-cultures:en-us")
+            .arg(format!("-cultures:{}", self.culture)) 
             .arg(&source_wixobj)
             .arg("-out")
             .arg(&destination_msi)

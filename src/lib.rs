@@ -448,6 +448,11 @@ impl FromStr for TimestampServer {
     }
 }
 
+/// The various culture codes for localization.
+///
+/// These are taken from the table in the [WixUI
+/// localization](http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html)
+/// documentation.
 #[derive(Clone, Debug)]
 pub enum Cultures {
     ArSa,
@@ -676,4 +681,9 @@ impl FromStr for Cultures {
     }
 }
 
+impl Default for Cultures {
+    fn default() -> Self {
+        Cultures::EnUs
+    }
+}
 
