@@ -424,6 +424,7 @@ impl<'a> Wix<'a> {
             linker.stderr(Stdio::null());
         }
         if let Some(l) = locale {
+            trace!("Using the a WiX localization file");
             linker.arg("-loc").arg(l);
         }
         linker.arg("-ext")
