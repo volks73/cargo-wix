@@ -51,10 +51,11 @@
 //! in the `bin` directory of the installation location for the WiX Toolset. This subcommand uses
 //! these two applications with the `std::process::Command` module to create an installer.
 //! Generally, it is best to add the WiX Toolset `bin` folder to the PATH system environment
-//! variable, but a WIX_PATH environment variable or the `-B,--bin-path` option can be used to
-//! specify a path (relative or absolute) to the WiX Toolset `bin` folder. The order of precedence
-//! (descending) is: `-B,--bin-path` option, WIX_PATH environment variable, and then the PATH
-//! system environment variable.
+//! variable, but a WIX system environment variable is created during the installation of the WiX
+//! Toolset. The `-B,--bin-path` option can also be used to specify a path (relative or absolute)
+//! to the WiX Toolset `bin` folder. The order of precedence (descending) is: `-B,--bin-path`
+//! option, WIX environment variable, and then the PATH system environment variable. An error will
+//! be displayed if the compiler and/or linker cannot be found.
 //!
 //! The Windows SDK provides a signer (`signtool`) application for signing installers. The
 //! application is installed in the `bin` folder of the Windows SDK installation. The location of
