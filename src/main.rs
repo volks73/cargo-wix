@@ -74,10 +74,13 @@ fn main() {
                     .takes_value(true))
                 .arg(Arg::with_name("description")
                     .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
-                          as the description within the installer.")
+                          as the description within the installer. This requires the '--init' flag. \
+                          The description can be changed after initialization by directly editing \
+                          the generated WiX Source file (wxs) in a text editor.")
                     .long("description")
                     .short("d")
-                    .takes_value(true))
+                    .takes_value(true)
+                    .requires("init"))
                 .arg(Arg::with_name("force")
                     .help("Overwrites any existing WiX Source files when using the '--init' flag. \
                           Use with caution.")
@@ -97,7 +100,9 @@ fn main() {
                           a 'main.wxs' WiX Source (wxs) file within the 'wix' sub-folder from the \
                           embedded template. The 'wix\\main.wxs' file that is created can \
                           immediately be used with this subcommand without modification to create \
-                          an installer for the project.")
+                          an installer for the package. The 'main.wxs' file is generated using \
+                          fields from the package's manifest file (Cargo.toml) and/or CLI \
+                          options.")
                     .long("init")
                     .conflicts_with("clean")
                     .conflicts_with("purge")
@@ -118,10 +123,14 @@ fn main() {
                     .takes_value(true))
                 .arg(Arg::with_name("manufacturer")
                     .help("Overrides the first author in the 'authors' field of the package's \
-                          manifest (Cargo.toml) as the manufacturer within the installer.")
+                          manifest (Cargo.toml) as the manufacturer within the installer. This \
+                          requires the '--init' flag. The manufacturer can be changed \
+                          initialization by directly editing the generated WiX Source file (wxs) in \
+                          a text editor.")
                     .long("manufacturer")
                     .short("m")
-                    .takes_value(true))
+                    .takes_value(true)
+                    .requires("init"))
                 .arg(Arg::with_name("no-build")
                     .help("Skips building the release binary. The installer is created, but the \
                           'cargo build --release' is not executed.")
@@ -157,10 +166,13 @@ fn main() {
                     .conflicts_with("purge"))
                 .arg(Arg::with_name("product-name")
                     .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as the \
-                          product name within the installer.")
+                          product name within the installer. This requires the '--init' flag. The \
+                          product name can be changed after initialization by directly editing the \
+                          generated WiX Source file (wxs) in a text editor.")
                     .long("product-name")
                     .short("p")
-                    .takes_value(true))
+                    .takes_value(true)
+                    .requires("init"))
                 .arg(Arg::with_name("purge")
                     .help("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
                     .long("purge")
