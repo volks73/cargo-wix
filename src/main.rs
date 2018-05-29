@@ -24,7 +24,7 @@ use env_logger::fmt::Color as LogColor;
 use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
-use cargo_wix::{Cultures, Template};
+use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
@@ -38,9 +38,17 @@ fn main() {
                 .version(crate_version!())
                 .about(crate_description!())
                 .arg(Arg::with_name("bin-path")
-                    .help("Specifies the path to the WiX Toolset's 'bin' folder, which should \
-                          contain the needed 'candle.exe' and 'light.exe' applications. The default \
-                          is to use the PATH system environment variable.")
+                    .help(&format!(
+                        "Specifies the path to the WiX Toolset's '{0}' folder, which should contain \
+                        the needed 'candle.exe' and 'light.exe' applications. The default is to use \
+                        the path specified with the {1} system environment variable that is created \
+                        during the installation of the WiX Toolset. Failing the existence of the \
+                        {1} system environment variable, the path specified in the PATH system \
+                        environment variable is used. This is useful when working with multiple \
+                        versions of the WiX Toolset.", 
+                        BINARY_FOLDER_NAME, 
+                        WIX_PATH_KEY
+                    ))
                     .long("bin-path")
                     .short("B")
                     .takes_value(true))

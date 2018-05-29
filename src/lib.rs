@@ -137,6 +137,8 @@ use std::io;
 use std::path::PathBuf;
 use std::str::FromStr;
 
+pub use self::wix::BINARY_FOLDER_NAME;
+pub use self::wix::WIX_PATH_KEY;
 pub use self::wix::Wix;
 
 mod wix;
