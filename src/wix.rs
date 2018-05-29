@@ -220,7 +220,7 @@ impl<'a> Wix<'a> {
 
     /// Generates unique GUIDs for appropriate values and writes the rendered template to stdout.
     fn print_wix_source(&self) -> Result<()> {
-        self.write_wix_source(&mut io::stdout())
+        self.write_wix_source(&mut io::stdout(), &get_manifest()?)
     }
 
     /// Sets the product name.
@@ -261,6 +261,7 @@ impl<'a> Wix<'a> {
     /// Creates the necessary sub-folders and files to immediately use the `cargo wix` subcommand to
     /// create an installer for the package.
     pub fn init(self, force: bool) -> Result<()> {
+        let manifest = get_manifest()?;
         let mut main_wxs_path = PathBuf::from(WIX);
         if !main_wxs_path.exists() {
             info!("Creating the '{}' directory", main_wxs_path.display());
@@ -276,9 +277,8 @@ impl<'a> Wix<'a> {
         } else {
             info!("Creating the 'wix\\main.wxs' file");
             let mut main_wxs = File::create(main_wxs_path)?;
-            self.write_wix_source(&mut main_wxs)?;
+            self.write_wix_source(&mut main_wxs, &manifest)?;
         }
-        let manifest = get_manifest()?;
         if self.get_description(&manifest).is_err() {
             warn!("The 'description' field is missing from the package's manifest (Cargo.toml). \
                   Please consider adding the field with a non-empty value to avoid errors during \
@@ -950,9 +950,13 @@ impl<'a> Wix<'a> {
     }
 
     /// Generates unique GUIDs for appropriate values and renders the template.
-    fn write_wix_source<W: Write>(&self, writer: &mut W) -> Result<()> {
+    fn write_wix_source<W: Write>(&self, writer: &mut W, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(Template::Wxs.to_str())?;
         let data = MapBuilder::new()
+            .insert_str("binary-name", self.get_binary_name(&manifest)?)
+            .insert_str("product-name", self.get_product_name(&manifest)?)
+            .insert_str("description", self.get_description(&manifest)?)
+            .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
             .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .build();

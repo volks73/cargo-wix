@@ -24,17 +24,17 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
     <Product 
         Id='*' 
-        Name='$(var.ProductName)' 
+        Name='{{product-name}}'
         UpgradeCode='{{upgrade-code-guid}}' 
-        Manufacturer='$(var.Manufacturer)'
+        Manufacturer='{{manufacturer}}'
         Language='1033' 
         Codepage='1252' 
         Version='$(var.Version)'>
 
         <Package Id='*' 
             Keywords='Installer' 
-            Description='$(var.Description)'
-            Manufacturer='$(var.Manufacturer)'
+            Description='{{description}}'
+            Manufacturer='{{manufacturer}}'
             InstallerVersion='450' 
             Languages='1033' 
             Compressed='yes' 
@@ -47,11 +47,11 @@
             DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.'/>
 
         <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
-        <Property Id='DiskPrompt' Value='$(var.ProductName) Installation'/>
+        <Property Id='DiskPrompt' Value='{{product-name}} Installation'/>
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
-                <Directory Id='APPLICATIONFOLDER' Name='$(var.ProductName)'>
+                <Directory Id='APPLICATIONFOLDER' Name='{{product-name}}'>
                     <Component Id='License' Guid='*' Win64='$(var.Win64)'>
                         <File 
                             Id='LicenseFile' 
@@ -71,12 +71,12 @@
                                 Action='set' 
                                 System='yes'/>
                         </Component>
-                        <Component Id='$(var.BinaryName)Binary' Guid='*' Win64='$(var.Win64)'>
+                        <Component Id='{{binary-name}}Binary' Guid='*' Win64='$(var.Win64)'>
                             <File 
-                                Id='$(var.BinaryName)EXE' 
-                                Name='$(var.BinaryName).exe' 
+                                Id='{{binary-name}}EXE' 
+                                Name='{{binary-name}}.exe' 
                                 DiskId='1' 
-                                Source='target\release\$(var.BinaryName).exe' 
+                                Source='target\release\{{binary-name}}.exe' 
                                 KeyPath='yes'/>
                         </Component>
                     </Directory>
@@ -94,7 +94,7 @@
             Display='expand' 
             Absent='disallow'>
             <ComponentRef Id='License'/>
-            <ComponentRef Id='$(var.BinaryName)Binary'/>
+            <ComponentRef Id='{{binary-name}}Binary'/>
             <Feature 
                 Id='Environment' 
                 Title='PATH Environment Variable' 
@@ -112,7 +112,7 @@
         -->
         <!--<Icon Id='ProductICO' SourceFile='wix\Product.ico'/>-->
         <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
-        <!--<Property Id='ARPHELPLINK' Value='$(var.Help)'/>-->
+        <!--<Property Id='ARPHELPLINK' Value='{{help-url}}'/>-->
 
         <UIRef Id='WixUI_FeatureTree'/>
         <WixVariable Id='WixUILicenseRtf' Value='wix\License.rtf'/>
