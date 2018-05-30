@@ -54,6 +54,7 @@
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
                 <Directory Id='APPLICATIONFOLDER' Name='{{product-name}}'>
+                    {{#license-source}}
                     <Component Id='License' Guid='*' Win64='$(var.Win64)'>
                         <File 
                             Id='LicenseFile' 
@@ -62,6 +63,7 @@
                             Source='{{license-source}}' 
                             KeyPath='yes'/>
                     </Component>
+                    {{/license-source}}
                     <Directory Id='Bin' Name='bin'>
                         <Component Id='Path' Guid='{{path-component-guid}}' Win64='$(var.Win64)' KeyPath='yes'>
                             <Environment 
@@ -95,7 +97,9 @@
             AllowAdvertise='no' 
             Display='expand' 
             Absent='disallow'>
+            {{#license-source}}
             <ComponentRef Id='License'/>
+            {{/license-source}}
             <ComponentRef Id='{{binary-name}}Binary'/>
             <Feature 
                 Id='Environment' 
@@ -117,7 +121,7 @@
         {{#help-url}}
         <!--<Property Id='ARPHELPLINK' Value='{{help-url}}'/>-->
         {{/help-url}}
-
+        
         <UIRef Id='WixUI_FeatureTree'/>
         <WixVariable Id='WixUILicenseRtf' Value='wix\License.rtf'/>
         <!-- 

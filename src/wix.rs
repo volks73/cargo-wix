@@ -642,7 +642,7 @@ impl<'a> Wix<'a> {
     ///
     /// This is the license file that is placed in the installation location alongside the `bin`
     /// folder for the executable (exe) file.
-    fn get_license_source(&self, manifest: &Value) -> PathBuf {
+    fn get_license_source(&self, manifest: &Value) -> PathBuf { // TODO: Change this to return an Option
         // Order of precedence:
         //
         // 1. CLI (-l,--license)
