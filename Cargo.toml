@@ -28,6 +28,10 @@ termcolor = "0.3.6"
 toml = "0.4"
 uuid = { version = "0.5", features = ["v4"] }
 
+[dev-dependencies]
+assert_cli = "0.6"
+tempfile = "3"
+
 [dependencies.clap]
 version = "2.31"
 default-features = false
