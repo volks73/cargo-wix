@@ -380,19 +380,15 @@ impl<'a> Wix<'a> {
         } 
         compiler.arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
-            .arg(format!("-dProductName={}", product_name))
-            .arg(format!("-dBinaryName={}", binary_name))
-            .arg(format!("-dDescription={}", description))
-            .arg(format!("-dManufacturer={}", manufacturer))
             .arg(format!("-dLicenseName={}", license_name))
             .arg(format!("-dLicenseSource={}", license_source.display()));
-        if let Some(h) = help_url {
-            trace!("Using '{}' for the help URL", h);
-            compiler.arg(format!("-dHelp={}", h));
-        } else {
-            warn!("A help URL could not be found. Considering adding the 'documentation', \
-                  'homepage', or 'repository' fields to the package's manifest.");
-        }
+        //if let Some(h) = help_url {
+            //trace!("Using '{}' for the help URL", h);
+            //compiler.arg(format!("-dHelp={}", h));
+        //} else {
+            //warn!("A help URL could not be found. Considering adding the 'documentation', \
+                  //'homepage', or 'repository' fields to the package's manifest.");
+        //}
         compiler.arg("-o")
             .arg(&source_wixobj)
             .arg(&source_wxs);
@@ -957,6 +953,9 @@ impl<'a> Wix<'a> {
             .insert_str("product-name", self.get_product_name(&manifest)?)
             .insert_str("description", self.get_description(&manifest)?)
             .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
+            .insert_str("license-name", self.get_license_name(&manifest)?)
+            // TODO: Add better error handling
+            .insert_str("license-source", self.get_license_source(&manifest).into_os_string().into_string().unwrap())
             .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .build();
