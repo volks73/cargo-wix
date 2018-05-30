@@ -594,25 +594,20 @@ impl<'a> Wix<'a> {
     /// If a path to a license file is specified, then the file name will be used. If no license
     /// path is specified, then the file name from the `license-file` field in the package's
     /// manifest is used.
-    fn get_license_name(&self, manifest: &Value) -> Result<String> {
+    fn get_license_name(&self, manifest: &Value) -> Option<String> {
         if let Some(l) = self.license_path.map(|s| PathBuf::from(s)) {
             l.file_name()
                 .and_then(|f| f.to_str())
                 .map(|s| String::from(s))
-                .ok_or(Error::Generic(
-                    format!("The '{}' license path does not contain a file name.", l.display())
-                ))
         } else {
             manifest.get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
-                .map_or(Ok(String::from("License.txt")), |l| {
+                .map_or(Some(String::from("License")), |l| {
                     Path::new(l).file_name()
                         .and_then(|f| f.to_str())
                         .map(|s| String::from(s))
-                        .ok_or(Error::Generic(
-                            format!("The 'license-file' field value does not contain a file name.")))
                 })
         }
     }
@@ -632,21 +627,40 @@ impl<'a> Wix<'a> {
     ///
     /// This is the license file that is placed in the installation location alongside the `bin`
     /// folder for the executable (exe) file.
-    fn get_license_source(&self, manifest: &Value) -> PathBuf { // TODO: Change this to return an Option
+    fn get_license_source(&self, manifest: &Value) -> Option<PathBuf> {
         // Order of precedence:
         //
         // 1. CLI (-l,--license)
         // 2. Manifest `license-file`
         // 3. LICENSE file in root
-        self.license_path.map(|l| PathBuf::from(l)).unwrap_or(
+        if let Some(path) = self.license_path.map(PathBuf::from) {
+            if path.exists() {
+                trace!("The '{}' path from the command line for the license exists",
+                       path.display());
+                Some(path)
+            } else {
+                error!("The '{}' path from the command line for the license does not exist",
+                      path.display());
+                None
+            }
+        } else {
             manifest.get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("license-file"))
                 .and_then(|l| l.as_str())
-                .map(|s| PathBuf::from(s))
-                // TODO: Add check that the default license exists
-                .unwrap_or(PathBuf::from(DEFAULT_LICENSE_FILE_NAME))
-        )
+                .and_then(|s| {
+                    let p = PathBuf::from(s);
+                    if p.exists() {
+                        trace!("The '{}' path from the 'license-file' field in the package's \
+                               manifest (Cargo.toml) exists.", p.display());
+                        Some(p)
+                    } else {
+                        warn!("The '{}' path from the 'license-file' field in the package's \
+                              manifest (Cargo.toml) does not exist.", p.display());
+                        None
+                    }
+                })
+        }
     }
 
     /// Gets the WiX localization file and checks if it exists.
@@ -865,7 +879,7 @@ impl<'a> Wix<'a> {
                 String::from(s)
             })
             .or_else(|| {
-                warn!("A help URL could not be found. Considering adding the 'documentation', \
+                warn!("A help URL could not be found. Consider adding the 'documentation', \
                       'homepage', or 'repository' fields to the package's manifest.");
                 None
             })
@@ -936,27 +950,23 @@ impl<'a> Wix<'a> {
     /// Generates unique GUIDs for appropriate values and renders the template.
     fn write_wix_source<W: Write>(&self, writer: &mut W, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(Template::Wxs.to_str())?;
-        let data = if let Some(url) = self.get_help_url(&manifest) {
-            MapBuilder::new().insert_str("help-url", url)
-        } else {
-            MapBuilder::new()
+        let mut map = MapBuilder::new()
+            .insert_str("binary-name", self.get_binary_name(&manifest)?)
+            .insert_str("product-name", self.get_product_name(&manifest)?)
+            .insert_str("description", self.get_description(&manifest))
+            .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
+            .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
+            .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
+        if let Some(url) = self.get_help_url(&manifest) {
+            map = map.insert_str("help-url", url);
         }
-        .insert_str("binary-name", self.get_binary_name(&manifest)?)
-        .insert_str("product-name", self.get_product_name(&manifest)?)
-        .insert_str("description", self.get_description(&manifest))
-        .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
-        .insert_str("license-name", self.get_license_name(&manifest)?)
-        // TODO: Add better error handling
-        .insert_str(
-            "license-source", 
-            self.get_license_source(&manifest)
-                .into_os_string()
-                .into_string()
-                .unwrap()
-        )
-        .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-        .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-        .build();
+        if let Some(name) = self.get_license_name(&manifest) {
+            map = map.insert_str("license-name", name);
+        }
+        if let Some(source) = self.get_license_source(&manifest) {
+            map = map.insert_str("license-source", source.into_os_string().into_string().unwrap());
+        }
+        let data = map.build();
         template.render_data(writer, &data)?;
         Ok(())
     }
