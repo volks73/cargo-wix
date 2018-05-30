@@ -312,8 +312,6 @@ impl<'a> Wix<'a> {
         debug!("version = {:?}", version);
         let product_name = self.get_product_name(&manifest)?;
         debug!("product_name = {:?}", product_name);
-        let description = self.get_description(&manifest);
-        debug!("description = {:?}", description);
         let homepage = self.get_homepage(&manifest);
         debug!("homepage = {:?}", homepage);
         let locale = self.get_locale()?;
@@ -420,6 +418,14 @@ impl<'a> Wix<'a> {
         // Sign the installer
         if self.sign {
             info!("Signing the installer");
+            let description = if let Some(d) = self.get_description(&manifest) {
+                trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
+                format!("{} - {}", product_name, d)
+            } else {
+                trace!("A description was not provided at the command line or in the package's manifest (Cargo.toml).");
+                product_name.clone()
+            };
+            debug!("description = {:?}", description);
             let mut signer = self.get_signer()?;
             debug!("signer = {:?}", signer);
             if self.capture_output {
@@ -557,17 +563,12 @@ impl<'a> Wix<'a> {
     ///
     /// If no description is explicitly set using the builder pattern, then the description from
     /// the package's manifest (Cargo.toml) is used.
-    fn get_description(&self, manifest: &Value) -> String {
+    fn get_description(&self, manifest: &Value) -> Option<String> {
         self.description.or_else(|| manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str()))
             .map(|s| String::from(s))
-            .unwrap_or_else(|| {
-                warn!("A description was not provided via the command line interface and/or the \
-                      package's manifest (Cargo.toml) does not contain the 'description' field.");
-                String::new()
-            })
     }
 
     /// Gets the URL of the project's homepage from the manifest (Cargo.toml).
@@ -869,7 +870,7 @@ impl<'a> Wix<'a> {
                 String::from(s)
             })
             .or_else(|| {
-                warn!("A help URL could not be found. Consider adding the 'documentation', \
+                warn!("A help URL could not be found. Please consider adding the 'documentation', \
                       'homepage', or 'repository' fields to the package's manifest.");
                 None
             })
@@ -923,10 +924,10 @@ impl<'a> Wix<'a> {
             .ok_or(Error::Manifest("version"))
     }
 
-    /// Renders the license in the Rich Text Format (RTF) as an End User's License Agreement (EULA).
+    /// Renders the EULA in the Rich Text Format (RTF).
     ///
     /// The EULA is automatically included in the Windows installer (msi) and displayed in the license
-    /// dialog.
+    /// agreement dialog.
     fn write_license<W: Write>(&self, writer: &mut W, template: &Template, manifest: &Value) -> Result<()> {
         let template = mustache::compile_str(template.to_str())?;
         let data = MapBuilder::new()
@@ -943,10 +944,16 @@ impl<'a> Wix<'a> {
         let mut map = MapBuilder::new()
             .insert_str("binary-name", self.get_binary_name(&manifest)?)
             .insert_str("product-name", self.get_product_name(&manifest)?)
-            .insert_str("description", self.get_description(&manifest))
             .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
             .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
+        if let Some(description) = self.get_description(&manifest) {
+            map = map.insert_str("description", description);
+        } else {
+            warn!("A description was not specified at the command line or in the package's manifest \
+                  (Cargo.toml). Please consider adding the 'description' field to the package's \
+                  manifest.");
+        }
         if let Some(url) = self.get_help_url(&manifest) {
             map = map.insert_str("help-url", url);
         }
