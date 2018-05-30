@@ -29,7 +29,6 @@ use uuid::Uuid;
 pub const BINARY_FOLDER_NAME: &str = "bin";
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
-pub const DEFAULT_LICENSE_FILE_NAME: &str = "LICENSE";
 pub const EXE_FILE_EXTENSION: &str = "exe";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
@@ -293,15 +292,6 @@ impl<'a> Wix<'a> {
             warn!("Could not generate an appropriate EULA in the Rich Text Format (RTF) from the \
                   project's 'license' field. Please manually create one to avoid errors during \
                   installer creation.");
-        }
-        if manifest.get("package").and_then(|p| p.as_table())
-            .and_then(|t| t.get("license-file")).is_none() {
-            let license_file = Path::new(DEFAULT_LICENSE_FILE_NAME);
-            if !license_file.exists() {
-                warn!("A '{}' file does not exist in the project root. Please consider adding such \
-                      a file to avoid errors during installer creation.",
-                      DEFAULT_LICENSE_FILE_NAME);
-            }
         }
         Ok(())
     }

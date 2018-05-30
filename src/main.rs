@@ -108,13 +108,16 @@ fn main() {
                     .conflicts_with("purge")
                     .conflicts_with("print-template"))
                 .arg(Arg::with_name("license")
-                    .help("Overrides the 'license-file' field of the package's manfiest \
-                          (Cargo.toml) as the file to be converted to the 'License.txt' file that \
-                          is added to the install location along side the 'bin' folder by the \
-                          installer.")
+                    .help("Overrides the 'license-file' field of the package's manifest \
+                          (Cargo.toml). This requires the '--init' flag. If an appropriate license \
+                          file does not exist, cannot be found, or is not specified, then no \
+                          license file is included in the installer. A file containing the license, \
+                          such as a TXT, PDF, or RTF  file, can later be added by directly editing \
+                          the generated WiX Source file (wxs) in a text editor.")
                     .long("license")
                     .short("l")
-                    .takes_value(true))
+                    .takes_value(true)
+                    .requires("init"))
                 .arg(Arg::with_name("locale")
                     .help("Sets the path to a WiX localization file, '.wxl', which contains \
                           localized strings.")
