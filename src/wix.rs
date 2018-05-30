@@ -279,11 +279,6 @@ impl<'a> Wix<'a> {
             let mut main_wxs = File::create(main_wxs_path)?;
             self.write_wix_source(&mut main_wxs, &manifest)?;
         }
-        if self.get_description(&manifest).is_err() {
-            warn!("The 'description' field is missing from the package's manifest (Cargo.toml). \
-                  Please consider adding the field with a non-empty value to avoid errors during \
-                  installer creation.");
-        }
         let license_name = self.get_manifest_license_name(&manifest);
         debug!("license_name = {:?}", license_name);
         if let Some(l) = license_name {
@@ -327,7 +322,7 @@ impl<'a> Wix<'a> {
         debug!("version = {:?}", version);
         let product_name = self.get_product_name(&manifest)?;
         debug!("product_name = {:?}", product_name);
-        let description = self.get_description(&manifest)?;
+        let description = self.get_description(&manifest);
         debug!("description = {:?}", description);
         let homepage = self.get_homepage(&manifest);
         debug!("homepage = {:?}", homepage);
@@ -380,7 +375,7 @@ impl<'a> Wix<'a> {
         } 
         compiler.arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
-        compiler.arg("-o")
+            .arg("-o")
             .arg(&source_wixobj)
             .arg(&source_wxs);
         debug!("command = {:?}", compiler);
@@ -582,13 +577,17 @@ impl<'a> Wix<'a> {
     ///
     /// If no description is explicitly set using the builder pattern, then the description from
     /// the package's manifest (Cargo.toml) is used.
-    fn get_description(&self, manifest: &Value) -> Result<String> {
+    fn get_description(&self, manifest: &Value) -> String {
         self.description.or_else(|| manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str()))
             .map(|s| String::from(s))
-            .ok_or(Error::Manifest("description"))
+            .unwrap_or_else(|| {
+                warn!("A description was not provided via the command line interface and/or the \
+                      package's manifest (Cargo.toml) does not contain the 'description' field.");
+                String::new()
+            })
     }
 
     /// Gets the URL of the project's homepage from the manifest (Cargo.toml).
@@ -954,7 +953,7 @@ impl<'a> Wix<'a> {
         }
         .insert_str("binary-name", self.get_binary_name(&manifest)?)
         .insert_str("product-name", self.get_product_name(&manifest)?)
-        .insert_str("description", self.get_description(&manifest)?)
+        .insert_str("description", self.get_description(&manifest))
         .insert_str("manufacturer", self.get_manufacturer(&manifest)?)
         .insert_str("license-name", self.get_license_name(&manifest)?)
         // TODO: Add better error handling

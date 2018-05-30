@@ -33,7 +33,9 @@
 
         <Package Id='*' 
             Keywords='Installer' 
+            {{#description}}
             Description='{{description}}'
+            {{/description}}
             Manufacturer='{{manufacturer}}'
             InstallerVersion='450' 
             Languages='1033' 
@@ -112,7 +114,9 @@
         -->
         <!--<Icon Id='ProductICO' SourceFile='wix\Product.ico'/>-->
         <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
+        {{#help-url}}
         <!--<Property Id='ARPHELPLINK' Value='{{help-url}}'/>-->
+        {{/help-url}}
 
         <UIRef Id='WixUI_FeatureTree'/>
         <WixVariable Id='WixUILicenseRtf' Value='wix\License.rtf'/>
