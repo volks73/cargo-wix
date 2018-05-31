@@ -125,7 +125,17 @@
         {{/help-url}}
         
         <UIRef Id='WixUI_FeatureTree'/>
-        <WixVariable Id='WixUILicenseRtf' Value='wix\License.rtf'/>
+        {{#eula}}
+        <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
+        {{/eula}}
+        {{^eula}}
+        <!--
+          Uncomment the next line and replace the value with the path to the
+          RTF file that will be used as the EULA for the license agreement dialog in the
+          installer.
+        -->
+        <!-- <WixVariable Id='WixUILicenseRtf' Value='Replace\with\Path\to\EULA\file.rtf'/> -->
+        {{/eula}
         <!-- 
           Uncomment the next three lines to customize the installer's Graphical
           User Interface (GUI). See the WiX Toolset documentation for details

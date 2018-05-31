@@ -142,6 +142,7 @@ pub use self::wix::BINARY_FOLDER_NAME;
 pub use self::wix::WIX_PATH_KEY;
 pub use self::wix::Wix;
 
+pub mod initialize;
 mod wix;
 
 /// A specialized `Result` type for cargo-wix operations.
