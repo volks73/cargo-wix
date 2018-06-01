@@ -316,15 +316,9 @@ impl Initialize {
                 )))
             }
         } else {
-            // TODO: Add handling license name exists and use that path instead. The EULA will be
-            // generated as `License.rtf` and placed in the output folder like everything else. At
-            // this point, only the path is needed so it can be added to the WiX Source file enable
-            // the license agreement dialog in the installer.
             Ok(manifest.get("package")
                 .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|s| {
+                .and_then(|t| t.get("license-file").and_then(|l| l.as_str()).and_then(|s| {
                     let p = PathBuf::from(s);
                     if (p.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION)) && p.exists() {
                         trace!("The '{}' path from the 'license-file' field in the package's \
@@ -334,7 +328,12 @@ impl Initialize {
                     } else {
                         None
                     }
-                }))
+                }).or(t.get("license").and_then(|_| {
+                    let mut p = PathBuf::from(WIX);
+                    p.push("License");
+                    p.set_extension(RTF_FILE_EXTENSION);
+                    Some(p.into_os_string().into_string().unwrap())
+                }))))
         }
     }
 
