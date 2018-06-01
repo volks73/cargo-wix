@@ -17,6 +17,7 @@ use mustache::{self, MapBuilder};
 use regex::Regex;
 use Result;
 use std::env;
+use std::fmt;
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -251,13 +252,15 @@ impl Initialize {
                       (Cargo.toml). The description can be added manually to the generated WiX
                       Source (wxs) file using a text editor.");
             }
-            if let Some(eula) = self.eula(&manifest)? {
-                map = map.insert_str("eula", eula);
-            } else {
-                warn!("An EULA was not specified at the command line or a RTF license file \
-                      specified in the package's manifest (Cargo.toml) does not exist. The license \
-                      agreement dialog will be excluded from the installer. An EULA can be added \
-                      manually to the generated WiX Source (wxs) file using a text editor.");
+            let eula = self.eula(&manifest)?; 
+            match eula {
+                Eula::Disabled => {
+                    warn!("An EULA was not specified at the command line or a RTF license file \
+                          specified in the package's manifest (Cargo.toml) does not exist. The license \
+                          agreement dialog will be excluded from the installer. An EULA can be added \
+                          manually to the generated WiX Source (wxs) file using a text editor.");
+                },
+                _ => map = map.insert_str("eula", eula.to_string()),
             }
             if let Some(url) = self.help_url(&manifest) {
                 map = map.insert_str("help-url", url);
@@ -280,6 +283,10 @@ impl Initialize {
             template.render_data(&mut main_wxs, &data)?;
         }
         // TODO: Add generation of EULA from license name
+        //
+        // If a license file with the RTF extension has not been specified at the command line or
+        // using the `license-file` field but the `license` field has been specified with a license
+        // that maps to an embedded template, then the wix\License.rtf file should be generated.
         Ok(())
     }
 
@@ -304,11 +311,11 @@ impl Initialize {
             .map(String::from))
     }
 
-    fn eula(&self, manifest: &Value) -> Result<Option<String>> {
+    fn eula(&self, manifest: &Value) -> Result<Eula> {
         if let Some(ref path) = self.eula {
             if path.exists() {
                 trace!("The '{}' path from the command line for the EULA exists", path.display());
-                Ok(path.to_str().map(String::from))
+                Ok(Eula::CommandLine(path.into()))
             } else {
                 Err(Error::Generic(format!(
                     "The '{}' path from the command line for the EULA does not exist", 
@@ -316,24 +323,41 @@ impl Initialize {
                 )))
             }
         } else {
-            Ok(manifest.get("package")
+            if let Some(license_file_path) = manifest.get("package")
                 .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file").and_then(|l| l.as_str()).and_then(|s| {
-                    let p = PathBuf::from(s);
-                    if (p.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION)) && p.exists() {
+                .and_then(|t| t.get("license-file"))
+                .and_then(|l| l.as_str())
+                .map(PathBuf::from) {
+                if license_file_path.exists() {
+                    if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {
                         trace!("The '{}' path from the 'license-file' field in the package's \
                                manifest (Cargo.toml) exists and it has the RTF file extension.",
-                               p.display());
-                        Some(p.into_os_string().into_string().unwrap())
+                               license_file_path.display()); 
+                        Ok(Eula::Manifest(license_file_path.into()))
                     } else {
-                        None
+                        Ok(Eula::Disabled)
                     }
-                }).or(t.get("license").and_then(|_| {
-                    let mut p = PathBuf::from(WIX);
-                    p.push("License");
-                    p.set_extension(RTF_FILE_EXTENSION);
-                    Some(p.into_os_string().into_string().unwrap())
-                }))))
+                } else {
+                    Err(Error::Generic(format!(
+                        "The '{}' file to be used for the EULA specified in the package's \
+                        manifest (Cargo.toml) using the 'license-file' field does not exist.", 
+                        license_file_path.display()
+                    )))
+                }
+            } else {
+                if let Some(license_name) = manifest.get("package")
+                    .and_then(|p| p.as_table())
+                    .and_then(|t| t.get("license"))
+                    .and_then(|n| n.as_str()) {
+                    if Template::is_known_license(license_name) {
+                        Ok(Eula::Generated(format!("License.{}", RTF_FILE_EXTENSION)))
+                    } else {
+                        Ok(Eula::Disabled)
+                    }
+                } else {
+                    Ok(Eula::Disabled)
+                }
+            }
         }
     }
 
@@ -446,6 +470,24 @@ impl Initialize {
         cargo_file.read_to_string(&mut cargo_file_content)?;
         let manifest = cargo_file_content.parse::<Value>()?;
         Ok(manifest)
+    }
+}
+
+enum Eula {
+    CommandLine(PathBuf),
+    Manifest(PathBuf),
+    Generated(String),
+    Disabled,
+}
+
+impl fmt::Display for Eula {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Eula::CommandLine(ref path) => path.display().fmt(f),
+            Eula::Manifest(ref path) => path.display().fmt(f),
+            Eula::Generated(ref name) => name.fmt(f),
+            Eula::Disabled => write!(f, "Disabled"),
+        }
     }
 }
 
