@@ -389,15 +389,6 @@ impl Template {
             Template::Wxs => WIX_SOURCE_TEMPLATE,
         }
     }
-
-    pub fn is_known_license(name: &str) -> bool {
-        match name.to_lowercase().trim() {
-            "apache-2.0" => false,
-            "gpl-3.0" => false,
-            "mit" => false,
-            _ => false,
-        }
-    }
 }
 
 impl fmt::Display for Template {
