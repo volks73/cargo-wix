@@ -25,6 +25,7 @@ use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
 use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
+use cargo_wix::initialize;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
@@ -289,7 +290,13 @@ fn main() {
         .sign_path(matches.value_of("sign-path"))
         .timestamp(matches.value_of("timestamp"));
     let result = if matches.is_present("init") {
-        wix.init(matches.is_present("force"))
+        let mut init = initialize::Builder::new();
+        init.binary_name(matches.value_of("binary-name"));
+        init.copyright_holder(matches.value_of("holder"));
+        init.copyright_year(matches.value_of("year"));
+        init.description(matches.value_of("description"));
+        init.eula(matches.value_of("eula"));
+        init.build().run()    
     } else if matches.is_present("clean") {
         cargo_wix::clean()
     } else if matches.is_present("purge") {

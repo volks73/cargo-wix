@@ -72,20 +72,20 @@ impl<'a> Builder<'a> {
     ///
     /// Generally, the binary name should _not_ have spaces or special characters. The
     /// `product_name` can contain spaces or special characters.
-    pub fn binary_name(&mut self, b: &'a str) -> &mut Self {
-        self.binary_name = Some(b);
+    pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
+        self.binary_name = b;
         self
     }
 
     /// Sets the copyright holder in the license dialog of the Windows installer (msi).
-    pub fn copyright_holder(&mut self, h: &'a str) -> &mut Self {
-        self.copyright_holder = Some(h);
+    pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
+        self.copyright_holder = h;
         self
     }
 
     /// Sets the copyright year in the license dialog of the Windows installer (msi).
-    pub fn copyright_year(&mut self, y: &'a str) -> &mut Self {
-        self.copyright_year = Some(y);
+    pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
+        self.copyright_year = y;
         self
     }
 
@@ -93,8 +93,8 @@ impl<'a> Builder<'a> {
     ///
     /// This overrides the description determined from the `description` field in the package's
     /// manifest (Cargo.toml).
-    pub fn description(&mut self, d: &'a str) -> &mut Self {
-        self.description = Some(d);
+    pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
+        self.description = d;
         self
     }
 
@@ -109,8 +109,8 @@ impl<'a> Builder<'a> {
     /// not have the `.rtf` extension, then the license agreement dialog is skipped and there is no
     /// EULA for the installer. This would override the default behavior and ensure the license
     /// agreement dialog is used.
-    pub fn eula(&mut self, e: &'a str) -> &mut Self {
-        self.eula = Some(e);
+    pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
+        self.eula = e;
         self
     }
 
@@ -127,8 +127,8 @@ impl<'a> Builder<'a> {
     /// (Cargo.toml): `documentation`, `homepage`, or `respository`. If none of these are
     /// specified, then the default is to exclude a help URL from the installer. This will override
     /// the default behavior and provide a help URL for the installer if none of the fields exist.
-    pub fn help_url(&mut self, h: &'a str) -> &mut Self {
-        self.help_url = Some(h);
+    pub fn help_url(&mut self, h: Option<&'a str>) -> &mut Self {
+        self.help_url = h;
         self
     }
 
@@ -137,8 +137,8 @@ impl<'a> Builder<'a> {
     ///
     /// A `wix` and `wix\main.wxs` file will be created in the same directory as the package's
     /// manifest. The default is to use the package's manifest in the current working directory.
-    pub fn input(&mut self, i: &'a str) -> &mut Self {
-        self.input = Some(i);
+    pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
+        self.input = i;
         self
     }
     
@@ -154,8 +154,8 @@ impl<'a> Builder<'a> {
     /// license name used in the `license` field of the package's manifest. If none of these fields
     /// are specified or overriden, then a license file is _not_ included in the installation
     /// directory and the license agreement dialog is skipped in the installer.
-    pub fn license(&mut self, l: &'a str) -> &mut Self {
-        self.license = Some(l);
+    pub fn license(&mut self, l: Option<&'a str>) -> &mut Self {
+        self.license = l;
         self
     }
 
@@ -163,16 +163,16 @@ impl<'a> Builder<'a> {
     ///
     /// Default is to use the first author in the `authors` field of the package's manifest
     /// (Cargo.toml). This would override the default value.
-    pub fn manufacturer(&mut self, m: &'a str) -> &mut Self {
-        self.manufacturer = Some(m);
+    pub fn manufacturer(&mut self, m: Option<&'a str>) -> &mut Self {
+        self.manufacturer = m;
         self
     }
 
     /// Sets the destination for creating all of the output from initialization. 
     ///
     /// The default is to create all initialization output in the current working directory.
-    pub fn output(&mut self, o: &'a str) -> &mut Self {
-        self.output = Some(o);
+    pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
+        self.output = o;
         self
     }
 
@@ -181,8 +181,8 @@ impl<'a> Builder<'a> {
     /// The default is to use the `name` field under the `package` section of the package's
     /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
     /// not found in the manifest.
-    pub fn product_name(&mut self, p: &'a str) -> &mut Self {
-        self.product_name = Some(p);
+    pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.product_name = p;
         self
     }
    
@@ -343,22 +343,28 @@ impl Initialize {
     }
 
     fn destination(&self) -> Result<PathBuf> {
-        if let Some(ref input) = self.input {
-            trace!("An input path has been explicitly specified");
-            if input.exists() && input.is_file() {
-                trace!("The input path exists and it is a file");
-                Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
-                    p.push(WIX);
-                    Some(p)
-                }).unwrap())
-            } else {
-                Err(Error::Generic(format!("The '{}' path does not exist or it is not a file.", input.display())))
-            }
+        if let Some(ref output) = self.output {
+            trace!("An output path has been explicity specified");
+            Ok(output.to_owned())
         } else {
-            trace!("An input path has NOT been explicitly specified, implicitly using the current working directory");
-            let mut cwd = env::current_dir()?;
-            cwd.push(WIX);
-            Ok(cwd)
+            trace!("An output path has NOT been explicity specified. Implicitly determine output.");
+            if let Some(ref input) = self.input {
+                trace!("An input path has been explicitly specified");
+                if input.exists() && input.is_file() {
+                    trace!("The input path exists and it is a file");
+                    Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
+                        p.push(WIX);
+                        Some(p)
+                    }).unwrap())
+                } else {
+                    Err(Error::Generic(format!("The '{}' path does not exist or it is not a file.", input.display())))
+                }
+            } else {
+                trace!("An input path has NOT been explicitly specified, implicitly using the current working directory");
+                let mut cwd = env::current_dir()?;
+                cwd.push(WIX);
+                Ok(cwd)
+            }
         }
     }
 
