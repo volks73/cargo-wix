@@ -93,7 +93,9 @@ fn main() {
                               dialog of the installer. The default is to disable the license \
                               agreement dialog unless one of the supported licenses (GPL-3.0, \
                               Apache-2.0, or MIT) is generated based on the value of the 'license' \
-                              field in the package's manifest (Cargo.toml).")
+                              field in the package's manifest (Cargo.toml). An EULA can be enabled \
+                              after initialization by directly modifying the WiX Source (wxs) file \
+                              with a text editor.")
                         .long("eula")
                         .short("E")
                         .takes_value(true))
@@ -101,6 +103,16 @@ fn main() {
                         .help("Overwrites any existing files that are generated during \
                               initialization. Use with caution.")
                         .long("force"))
+                    .arg(Arg::with_name("url")
+                        .help("Adds a URL to the installer that will be displayed in the Add/Remove \
+                              Programs control panel for the application. The default is to disable \
+                              it unless a URL is specified for either the 'homepage', \
+                              'documentation', or 'repository' fields in the package's manifest \
+                              (Cargo.toml). The help URL can be enabled after initialization by \
+                              directly modifying the WiX Source (wxs) file with a text editor.")
+                        .long("url")
+                        .short("U")
+                        .takes_value(true))
                     .arg(Arg::with_name("holder")
                         .help("Sets the copyright holder for the license during initialization. The \
                               default is to use the first author from the package's manifest \
@@ -305,7 +317,7 @@ fn main() {
         init.description(matches.value_of("description"));
         init.eula(matches.value_of("eula"));
         init.force(matches.is_present("force"));
-        init.help_url(matches.value_of("help-url"));
+        init.help_url(matches.value_of("url"));
         init.input(matches.value_of("input"));
         init.license(matches.value_of("license"));
         init.manufacturer(matches.value_of("manufacturer"));
