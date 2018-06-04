@@ -53,16 +53,9 @@ fn main() {
                     .long("bin-path")
                     .short("B")
                     .takes_value(true))
-                .arg(Arg::with_name("binary-name")
-                    .help("Overrides the 'name' field of the bin section of the package's manifest \
-                          (Cargo.toml) as the name of the executable within the installer.")
-                    .long("binary-name")
-                    .short("b")
-                    .takes_value(true))
                 .arg(Arg::with_name("clean")
                     .help("Deletes the 'target\\wix' folder.")
                     .long("clean")
-                    .conflicts_with("init")
                     .conflicts_with("sign")
                     .conflicts_with("print-template"))
                 .arg(Arg::with_name("culture")
@@ -73,68 +66,92 @@ fn main() {
                     .short("C")
                     .default_value(&default_culture)
                     .takes_value(true))
-                .arg(Arg::with_name("description")
-                    .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
-                          as the description within the installer. This requires the '--init' flag. \
-                          The description can be changed after initialization by directly editing \
-                          the generated WiX Source file (wxs) in a text editor.")
-                    .long("description")
-                    .short("d")
-                    .takes_value(true)
-                    .requires("init"))
-                .arg(Arg::with_name("force")
-                    .help("Overwrites any existing WiX Source files when using the '--init' flag. \
-                          Use with caution.")
-                    .long("force")
-                    .requires("init"))
-                .arg(Arg::with_name("holder")
-                    .help("Sets the copyright holder for the license during initialization. The \
-                          default is to use the first author from the package's manifest \
-                          (Cargo.toml). This requires the '--init' flag.")
-                    .long("holder")
-                    .short("H")
-                    .takes_value(true)
-                    .requires("init"))
-                .arg(Arg::with_name("init")
-                    .help("Initializes the package to be used with this subcommand. This creates \
-                          a 'wix` sub-folder within the root folder of the package and creates \
-                          a 'main.wxs' WiX Source (wxs) file within the 'wix' sub-folder from the \
-                          embedded template. The 'wix\\main.wxs' file that is created can \
-                          immediately be used with this subcommand without modification to create \
-                          an installer for the package. The 'main.wxs' file is generated using \
-                          fields from the package's manifest file (Cargo.toml) and/or CLI \
-                          options.")
-                    .long("init")
-                    .conflicts_with("clean")
-                    .conflicts_with("purge")
-                    .conflicts_with("print-template"))
-                .arg(Arg::with_name("license")
-                    .help("Overrides the 'license-file' field of the package's manifest \
-                          (Cargo.toml). This requires the '--init' flag. If an appropriate license \
-                          file does not exist, cannot be found, or is not specified, then no \
-                          license file is included in the installer. A file containing the license, \
-                          such as a TXT, PDF, or RTF  file, can later be added by directly editing \
-                          the generated WiX Source file (wxs) in a text editor.")
-                    .long("license")
-                    .short("l")
-                    .takes_value(true)
-                    .requires("init"))
+                .subcommand(SubCommand::with_name("init")
+                    .about("Uses a package's manifest (Cargo.toml) to generate a Wix Source (wxs) \
+                           file that can be used immediately without modification to create an \
+                           installer for the package. This will also generate an EULA in the Rich \
+                           Text Format (RTF) if 'license' field is specified with a supported \
+                           license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
+                           the 'wix' sub-folder by default.")
+                    .arg(Arg::with_name("binary-name")
+                        .help("Overrides the 'name' field of the 'bin' section of the package's \
+                              manifest (Cargo.toml) as the name of the executable within the \
+                              installer.")
+                        .long("binary-name")
+                        .short("b")
+                        .takes_value(true))
+                    .arg(Arg::with_name("description")
+                        .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
+                              as the description within the installer. The description can be \
+                              changed after initialization by directly modifying the WiX Source file \
+                              (wxs) with a text editor.")
+                        .long("description")
+                        .short("d")
+                        .takes_value(true))
+                    .arg(Arg::with_name("force")
+                        .help("Overwrites any existing files that are generated during \
+                              initialization. Use with caution.")
+                        .long("force"))
+                    .arg(Arg::with_name("holder")
+                        .help("Sets the copyright holder for the license during initialization. The \
+                              default is to use the first author from the package's manifest \
+                              (Cargo.toml). This is only used when generate a license based on the \
+                              value of the 'license' field in the package's manifest.")
+                        .long("holder")
+                        .short("H")
+                        .takes_value(true))
+                    .arg(Arg::with_name("manufacturer")
+                        .help("Overrides the first author in the 'authors' field of the package's \
+                              manifest (Cargo.toml) as the manufacturer within the installer. The \
+                              manufacturer can be changed after initialization by directly \
+                              modifying the WiX Source file (wxs) with a text editor.")
+                        .long("manufacturer")
+                        .short("m")
+                        .takes_value(true))
+                    .arg(Arg::with_name("output")
+                        .help("Sets the destination for all files generated during initialization. \
+                              The default is to create a 'wix' folder within the project then \
+                              generate all files in the 'wix' sub-folder.")
+                        .long("output")
+                        .short("o")
+                        .takes_value(true))
+                    .arg(Arg::with_name("product-name")
+                        .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as \
+                              the product name within the installer. The product name can be \
+                              changed after initialization by directly modifying the WiX Source \
+                              file (wxs) with a text editor.")
+                        .long("product-name")
+                        .short("p")
+                        .takes_value(true))
+                    .arg(Arg::with_name("year")
+                         .help("Sets the copyright year for the license during initialization. The \
+                               default is to use the current year. This is only used if a license \
+                               is generated from one of the supported licenses based on the value \
+                               of the 'license' field in the package's manifest (Cargo.toml).")
+                         .short("Y")
+                         .long("year")
+                         .takes_value(true))
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
+                              not used, then all output from initialization will be placed in \
+                              a 'wix' folder created alongside this path.")
+                        .index(1))
+                    .arg(Arg::with_name("license")
+                        .help("Overrides the 'license-file' field of the package's manifest \
+                              (Cargo.toml). This requires the '--init' flag. If an appropriate license \
+                              file does not exist, cannot be found, or is not specified, then no \
+                              license file is included in the installer. A file containing the license, \
+                              such as a TXT, PDF, or RTF  file, can later be added by directly editing \
+                              the generated WiX Source file (wxs) in a text editor.")
+                        .long("license")
+                        .short("l")
+                        .takes_value(true)))
                 .arg(Arg::with_name("locale")
                     .help("Sets the path to a WiX localization file, '.wxl', which contains \
                           localized strings.")
                     .long("locale")
                     .short("L")
                     .takes_value(true))
-                .arg(Arg::with_name("manufacturer")
-                    .help("Overrides the first author in the 'authors' field of the package's \
-                          manifest (Cargo.toml) as the manufacturer within the installer. This \
-                          requires the '--init' flag. The manufacturer can be changed \
-                          initialization by directly editing the generated WiX Source file (wxs) in \
-                          a text editor.")
-                    .long("manufacturer")
-                    .short("m")
-                    .takes_value(true)
-                    .requires("init"))
                 .arg(Arg::with_name("no-build")
                     .help("Skips building the release binary. The installer is created, but the \
                           'cargo build --release' is not executed.")
@@ -165,22 +182,11 @@ fn main() {
                         .map(|s| s.as_ref())
                         .collect::<Vec<&str>>())
                     .takes_value(true)
-                    .conflicts_with("init")
                     .conflicts_with("clean")
                     .conflicts_with("purge"))
-                .arg(Arg::with_name("product-name")
-                    .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as the \
-                          product name within the installer. This requires the '--init' flag. The \
-                          product name can be changed after initialization by directly editing the \
-                          generated WiX Source file (wxs) in a text editor.")
-                    .long("product-name")
-                    .short("p")
-                    .takes_value(true)
-                    .requires("init"))
                 .arg(Arg::with_name("purge")
                     .help("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
                     .long("purge")
-                    .conflicts_with("init")
                     .conflicts_with("sign")
                     .conflicts_with("clean")
                     .conflicts_with("print-template"))
@@ -209,13 +215,6 @@ fn main() {
                     .long("timestamp")
                     .takes_value(true)
                     .requires("sign"))
-                .arg(Arg::with_name("year")
-                     .help("Sets the copyright year for the license during initialization. The \
-                           default is to use the current year. This requires the '--init' flag.")
-                     .short("Y")
-                     .long("year")
-                     .takes_value(true)
-                     .requires("init"))
                 .arg(Arg::with_name("verbose")
                     .help("Sets the level of verbosity. The higher the level of verbosity, the more \
                           information that is printed and logged when the application is executed. \
