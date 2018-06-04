@@ -67,6 +67,7 @@ fn main() {
                     .default_value(&default_culture)
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
+                    .version(crate_version!())
                     .about("Uses a package's manifest (Cargo.toml) to generate a Wix Source (wxs) \
                            file that can be used immediately without modification to create an \
                            installer for the package. This will also generate an EULA in the Rich \
