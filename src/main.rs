@@ -88,6 +88,15 @@ fn main() {
                         .long("description")
                         .short("d")
                         .takes_value(true))
+                    .arg(Arg::with_name("eula")
+                        .help("Specifies a RTF file to use as the EULA for the license agreement \
+                              dialog of the installer. The default is to disable the license \
+                              agreement dialog unless one of the supported licenses (GPL-3.0, \
+                              Apache-2.0, or MIT) is generated based on the value of the 'license' \
+                              field in the package's manifest (Cargo.toml).")
+                        .long("eula")
+                        .short("E")
+                        .takes_value(true))
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
                               initialization. Use with caution.")
