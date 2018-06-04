@@ -123,19 +123,37 @@
         {{#help-url}}
         <!--<Property Id='ARPHELPLINK' Value='{{help-url}}'/>-->
         {{/help-url}}
-        
-        <UIRef Id='WixUI_FeatureTree'/>
-        {{#eula}}
-        <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
-        {{/eula}}
-        {{^eula}}
-        <!--
-          Uncomment the next line and replace the value with the path to the
-          RTF file that will be used as the EULA for the license agreement dialog in the
-          installer.
-        -->
-        <!-- <WixVariable Id='WixUILicenseRtf' Value='Replace\with\Path\to\EULA\file.rtf'/> -->
-        {{/eula}}
+
+        <UI> 
+            <UIRef Id='WixUI_FeatureTree'/>
+            {{#eula}}
+            <!--
+              Disabling the EULA dialog in the installer is a two step process:
+
+              1. Comment out or remove the `WixVariable` tag.
+              2. Uncomment the two `Publish` tags that follow the `WixVariable` 
+                 tag.
+            -->
+            <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
+            <!--<Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='2'>1</Publish>-->
+            <!--<Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='2'>1</Publish>-->
+            {{/eula}}
+            {{^eula}}
+            <!-- 
+              Enabling the EULA dialog in the installer is a three step process:
+
+              1. Uncomment the `WixVariable` tag.
+              2. Replace the `Value` attribute of the `WixVariable` tag with the 
+                 path to a RTF file that will be used as the EULA and displayed 
+                 in the license agreement dialog.
+              3. Comment out or remove the two `Publish` tags that follow the 
+                 `WixVariable` tag.
+            -->
+            <!-- <WixVariable Id='WixUILicenseRtf' Value='Replace\with\Path\to\EULA\file.rtf'/> -->
+            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='2'>1</Publish>
+            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='2'>1</Publish>
+            {{/eula}}
+        </UI>
         <!-- 
           Uncomment the next three lines to customize the installer's Graphical
           User Interface (GUI). See the WiX Toolset documentation for details
