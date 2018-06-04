@@ -309,20 +309,23 @@ fn main() {
         .sign(matches.is_present("sign"))
         .sign_path(matches.value_of("sign-path"))
         .timestamp(matches.value_of("timestamp"));
+    // TODO: Change to use the `subcommand_name` method and a match expression once all of the
+    // flags have been converted to subcommands.
     let result = if matches.is_present("init") {
+        let m = matches.subcommand_matches("init").unwrap();
         let mut init = initialize::Builder::new();
-        init.binary_name(matches.value_of("binary-name"));
-        init.copyright_holder(matches.value_of("holder"));
-        init.copyright_year(matches.value_of("year"));
-        init.description(matches.value_of("description"));
-        init.eula(matches.value_of("eula"));
-        init.force(matches.is_present("force"));
-        init.help_url(matches.value_of("url"));
-        init.input(matches.value_of("input"));
-        init.license(matches.value_of("license"));
-        init.manufacturer(matches.value_of("manufacturer"));
-        init.output(matches.value_of("output"));
-        init.product_name(matches.value_of("product-name"));
+        init.binary_name(m.value_of("binary-name"));
+        init.copyright_holder(m.value_of("holder"));
+        init.copyright_year(m.value_of("year"));
+        init.description(m.value_of("description"));
+        init.eula(m.value_of("eula"));
+        init.force(m.is_present("force"));
+        init.help_url(m.value_of("url"));
+        init.input(m.value_of("INPUT"));
+        init.license(m.value_of("license"));
+        init.manufacturer(m.value_of("manufacturer"));
+        init.output(m.value_of("output"));
+        init.product_name(m.value_of("product-name"));
         init.build().run()    
     } else if matches.is_present("clean") {
         cargo_wix::clean()

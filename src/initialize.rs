@@ -186,9 +186,9 @@ impl<'a> Builder<'a> {
         self
     }
    
-    /// Builds a read-only Initialize action.
-    pub fn build(&mut self) -> Initialize {
-        Initialize {
+    /// Builds a read-only initialization execution.
+    pub fn build(&mut self) -> Execution {
+        Execution {
             binary_name: self.binary_name.map(String::from),
             copyright_year: self.copyright_year.map(String::from),
             copyright_holder: self.copyright_holder.map(String::from),
@@ -206,7 +206,7 @@ impl<'a> Builder<'a> {
 }
 
 #[derive(Debug)]
-pub struct Initialize {
+pub struct Execution {
     binary_name: Option<String>,
     copyright_year: Option<String>,
     copyright_holder: Option<String>,
@@ -221,7 +221,7 @@ pub struct Initialize {
     product_name: Option<String>,
 }
 
-impl Initialize {
+impl Execution {
     pub fn run(self) -> Result<()> {
         let manifest = self.manifest()?;
         let mut destination = self.destination()?;
