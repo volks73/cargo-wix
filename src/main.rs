@@ -296,6 +296,13 @@ fn main() {
         init.copyright_year(matches.value_of("year"));
         init.description(matches.value_of("description"));
         init.eula(matches.value_of("eula"));
+        init.force(matches.is_present("force"));
+        init.help_url(matches.value_of("help-url"));
+        init.input(matches.value_of("input"));
+        init.license(matches.value_of("license"));
+        init.manufacturer(matches.value_of("manufacturer"));
+        init.output(matches.value_of("output"));
+        init.product_name(matches.value_of("product-name"));
         init.build().run()    
     } else if matches.is_present("clean") {
         cargo_wix::clean()
