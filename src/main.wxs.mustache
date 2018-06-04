@@ -93,6 +93,7 @@
                     </Component>
                     -->
                     {{/license-source}}
+
                     <Directory Id='Bin' Name='bin'>
                         <Component Id='Path' Guid='{{path-component-guid}}' Win64='$(var.Win64)' KeyPath='yes'>
                             <Environment 
@@ -140,6 +141,7 @@
             -->
             <!--<ComponentRef Id='License'/>-->
             {{/license-source}}
+
             <ComponentRef Id='{{binary-name}}Binary'/>
             <Feature 
                 Id='Environment' 
@@ -205,7 +207,9 @@
             <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='2'>1</Publish>
             <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='2'>1</Publish>
             {{/eula}}
+
         </UI>
+
         <!-- 
             Uncomment the next two `WixVaraible` tags to customize the
             installer's Graphical User Interface (GUI). See the WiX Toolset documentation
@@ -214,5 +218,7 @@
         -->
         <!--<WixVariable Id='WixUIBannerBmp' Value='wix\Banner.bmp'/>-->
         <!--<WixVariable Id='WixUIDialogBmp' Value='wix\Dialog.bmp'/>-->
+
     </Product>
+
 </Wix>
