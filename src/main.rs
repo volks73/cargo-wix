@@ -31,6 +31,15 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    // The "global" verbose flag for all subcommands.
+    let verbose = Arg::with_name("verbose")
+        .help("Sets the level of verbosity. The higher the level of verbosity, the more \
+              information that is printed and logged when the application is executed. \
+              This flag can be specified multiple times, where each occurrance \
+              increases the level and/or details written for each statement.")
+        .long("verbose")
+        .short("v")
+        .multiple(true);
     let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
@@ -153,6 +162,7 @@ fn main() {
                          .short("Y")
                          .long("year")
                          .takes_value(true))
+                    .arg(verbose.clone())
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
                               not used, then all output from initialization will be placed in \
@@ -237,20 +247,13 @@ fn main() {
                     .long("timestamp")
                     .takes_value(true)
                     .requires("sign"))
-                .arg(Arg::with_name("verbose")
-                    .help("Sets the level of verbosity. The higher the level of verbosity, the more \
-                          information that is printed and logged when the application is executed. \
-                          This flag can be specified multiple times, where each occurrance \
-                          increases the level and/or details written for each statement.")
-                    .long("verbose")
-                    .short("v")
-                    .multiple(true))
-                .arg(Arg::with_name("INPUT")
-                    .help("A WiX Source (wxs) file. The default is to use the 'wix\\main.wxs' file.")
-                    .index(1))
+                .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
-    let verbosity = matches.occurrences_of("verbose");
+    let verbosity = match matches.subcommand() {
+        ("init", Some(m)) => m,
+        _ => matches,
+    }.occurrences_of("verbose");
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
     // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
     // level is later configured with the verbosity using the `filter` method. There are many
