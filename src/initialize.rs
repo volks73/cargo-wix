@@ -224,8 +224,8 @@ pub struct Initialize {
 impl Initialize {
     pub fn run(self) -> Result<()> {
         let manifest = self.manifest()?;
-        // TODO: Change to use self.input
-        let mut destination = PathBuf::from(WIX);
+        let mut destination = self.destination()?;
+        debug!("destination = {:?}", destination);
         if !destination.exists() {
             info!("Creating the '{}' directory", destination.display());
             fs::create_dir(&destination)?;
@@ -340,6 +340,26 @@ impl Initialize {
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str())
             .map(String::from))
+    }
+
+    fn destination(&self) -> Result<PathBuf> {
+        if let Some(ref input) = self.input {
+            trace!("An input path has been explicitly specified");
+            if input.exists() && input.is_file() {
+                trace!("The input path exists and it is a file");
+                Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
+                    p.push(WIX);
+                    Some(p)
+                }).unwrap())
+            } else {
+                Err(Error::Generic(format!("The '{}' path does not exist or it is not a file.", input.display())))
+            }
+        } else {
+            trace!("An input path has NOT been explicitly specified, implicitly using the current working directory");
+            let mut cwd = env::current_dir()?;
+            cwd.push(WIX);
+            Ok(cwd)
+        }
     }
 
     fn eula(&self, manifest: &Value) -> Result<Eula> {
@@ -502,7 +522,6 @@ impl Initialize {
 
     fn manifest(&self) -> Result<Value> {
         let default_manifest = {
-            trace!("Using current working directory (cwd) for the Cargo.toml file");
             let mut cwd = env::current_dir()?;
             cwd.push(CARGO_MANIFEST_FILE);
             cwd
