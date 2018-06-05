@@ -373,7 +373,7 @@ fn main() {
                 let mut stderr = StandardStream::stderr(ColorChoice::Auto);
                 stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true)).expect("Coloring stderr");
                 write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.description()).expect("Write tag to stderr");
-                // This prevents "leaking" the color seetings to the console after the
+                // This prevents "leaking" the color settings to the console after the
                 // sub-command/application has completed and ensures the message is not printed in
                 // Red.
                 //
