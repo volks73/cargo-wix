@@ -99,7 +99,7 @@ impl<'a> Builder<'a> {
     /// The [WiX localization
     /// file](http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html)
     /// is an XML file that contains localization strings.
-    pub fn locale(mut self, l: Option<&'a str>) -> Self {
+    pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
         self.locale = l;
         self
     }
@@ -473,7 +473,7 @@ impl Execution {
             destination_msi.push(WIX);
             // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
             // format, the `set_extension` method will replace the Patch version number and
-            // architecture/platform with `msi`.  Instead, just include the extension in the formatted
+            // architecture/platform with `msi`. Instead, just include the extension in the formatted
             // name.
             destination_msi.push(&format!("{}-{}-{}.msi", name, version, platform.arch()));
             destination_msi

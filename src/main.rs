@@ -25,6 +25,7 @@ use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
 use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
+use cargo_wix::create;
 use cargo_wix::initialize;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
@@ -178,11 +179,26 @@ fn main() {
                         .long("license")
                         .short("l")
                         .takes_value(true)))
+                .arg(Arg::with_name("install-version")        
+                    .help("Overrides the version from the package's manifest (Cargo.toml), which \
+                          is used for the installer name and appears in the Add/Remove Programs \
+                          control panel.")
+                    .long("install-version")
+                    .short("I")
+                    .takes_value(true))
                 .arg(Arg::with_name("locale")
                     .help("Sets the path to a WiX localization file, '.wxl', which contains \
                           localized strings.")
                     .long("locale")
                     .short("L")
+                    .takes_value(true))
+                .arg(Arg::with_name("name")
+                    .help("Overrides the package's 'name' field in the manifest (Cargo.toml), which \
+                          is used in the name for the installer. This does not change the name of \
+                          the executable within the installer. The name of the executable can be \
+                          changed by modifying the WiX Source (wxs) file with a text editor.")
+                    .long("name")
+                    .short("N")
                     .takes_value(true))
                 .arg(Arg::with_name("no-build")
                     .help("Skips building the release binary. The installer is created, but the \
@@ -338,7 +354,17 @@ fn main() {
     } else if matches.is_present("print-template") {
         wix.print_template(value_t!(matches, "print-template", Template).unwrap())
     } else {
-        wix.create()
+        let mut create = create::Builder::new();
+        create.bin_path(matches.value_of("bin-path"));
+        create.capture_output(matches.is_present("capture-output"));
+        create.culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()));
+        create.input(matches.value_of("INPUT"));
+        create.locale(matches.value_of("locale"));
+        create.name(matches.value_of("name"));
+        create.no_build(matches.is_present("no-build"));
+        create.output(matches.value_of("output"));
+        create.version(matches.value_of("install-version"));
+        create.build().run()
     };
     match result {
         Ok(_) => std::process::exit(0),
