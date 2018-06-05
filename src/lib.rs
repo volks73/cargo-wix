@@ -142,6 +142,7 @@ use toml::Value;
 
 pub use self::wix::Wix;
 
+pub mod create;
 pub mod initialize;
 mod wix;
 

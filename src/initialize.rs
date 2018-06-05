@@ -72,8 +72,10 @@ impl<'a> Builder<'a> {
     /// (Cargo.toml) or the `name` field under the `package` section if the `bin` section does
     /// _not_ exist. This overrides either of these defaults.
     ///
-    /// Generally, the binary name should _not_ have spaces or special characters. The
-    /// `product_name` can contain spaces or special characters.
+    /// Generally, the binary name should _not_ have spaces or special characters. The binary name
+    /// is the name of the executable. This will _not_ appear in the Add/Remove Programs control
+    /// panel. Use the `product_name` method to change the name that appears in the Add/Remove
+    /// Programs control panel.
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
         self
@@ -183,6 +185,11 @@ impl<'a> Builder<'a> {
     /// The default is to use the `name` field under the `package` section of the package's
     /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
     /// not found in the manifest.
+    ///
+    /// This is different from the binary name in that it is the name that appears in the
+    /// Add/Remove Programs control panel, _not_ the name of the executable. The `binary_name`
+    /// method can be used to change the executable name. This value can have spaces and special
+    /// characters, where the binary (executable) name should avoid spaces and special characters.
     pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.product_name = p;
         self
@@ -216,8 +223,8 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     binary_name: Option<String>,
-    copyright_year: Option<String>,
     copyright_holder: Option<String>,
+    copyright_year: Option<String>,
     description: Option<String>,
     eula: Option<PathBuf>,
     force: bool,
@@ -231,6 +238,18 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
+        debug!("binary_name = {:?}", self.binary_name);
+        debug!("copyright_holder = {:?}", self.copyright_holder);
+        debug!("copyright_year = {:?}", self.copyright_year);
+        debug!("description = {:?}", self.description);
+        debug!("eula = {:?}", self.eula);
+        debug!("force = {:?}", self.force);
+        debug!("help_url = {:?}", self.help_url);
+        debug!("input = {:?}", self.input);
+        debug!("license = {:?}", self.license);
+        debug!("manufacturer = {:?}", self.manufacturer);
+        debug!("output = {:?}", self.output);
+        debug!("product_name = {:?}", self.product_name);
         let manifest = super::manifest(self.input.as_ref())?;
         let mut destination = self.destination()?;
         debug!("destination = {:?}", destination);
