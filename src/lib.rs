@@ -138,17 +138,27 @@ use std::io;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-pub use self::wix::BINARY_FOLDER_NAME;
-pub use self::wix::WIX_PATH_KEY;
 pub use self::wix::Wix;
 
 pub mod initialize;
 mod wix;
 
+pub const BINARY_FOLDER_NAME: &str = "bin";
+pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
+pub const CARGO: &str = "cargo";
+pub const EXE_FILE_EXTENSION: &str = "exe";
+pub const RTF_FILE_EXTENSION: &str = "rtf";
+pub const SIGNTOOL: &str = "signtool";
+pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
+pub const WIX: &str = "wix";
+pub const WIX_COMPILER: &str = "candle";
+pub const WIX_LINKER: &str = "light";
+pub const WIX_PATH_KEY: &str = "WIX";
+pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
+pub const WIX_SOURCE_FILE_NAME: &str = "main";
+
 /// A specialized `Result` type for cargo-wix operations.
 pub type Result<T> = std::result::Result<T, Error>;
-
-use wix::WIX;
 
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("main.wxs.mustache");
