@@ -20,13 +20,15 @@ use Result;
 use std::env;
 use std::fmt;
 use std::fs::{self, File};
-use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use Template;
 use toml::Value;
 use uuid::Uuid;
-use wix::{CARGO_MANIFEST_FILE, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX, RTF_FILE_EXTENSION};
+use WIX_SOURCE_FILE_NAME;
+use WIX_SOURCE_FILE_EXTENSION; 
+use WIX;
+use RTF_FILE_EXTENSION;
 
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]
@@ -205,6 +207,12 @@ impl<'a> Builder<'a> {
     }
 }
 
+impl<'a> Default for Builder<'a> {
+    fn default() -> Self {
+        Builder::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct Execution {
     binary_name: Option<String>,
@@ -223,7 +231,7 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
-        let manifest = self.manifest()?;
+        let manifest = super::manifest(self.input.as_ref())?;
         let mut destination = self.destination()?;
         debug!("destination = {:?}", destination);
         if !destination.exists() {
@@ -530,21 +538,6 @@ impl Execution {
                 .map(String::from)
                 .ok_or(Error::Manifest("name"))
         }
-    }
-
-    fn manifest(&self) -> Result<Value> {
-        let default_manifest = {
-            let mut cwd = env::current_dir()?;
-            cwd.push(CARGO_MANIFEST_FILE);
-            cwd
-        };
-        let cargo_file_path = self.input.as_ref().unwrap_or(&default_manifest);
-        debug!("cargo_file_path = {:?}", cargo_file_path);
-        let mut cargo_file = File::open(cargo_file_path)?;
-        let mut cargo_file_content = String::new();
-        cargo_file.read_to_string(&mut cargo_file_content)?;
-        let manifest = cargo_file_content.parse::<Value>()?;
-        Ok(manifest)
     }
 }
 

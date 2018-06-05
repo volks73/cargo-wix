@@ -132,11 +132,13 @@ extern crate uuid;
 
 use std::default::Default;
 use std::error::Error as StdError;
+use std::env;
 use std::fmt;
-use std::fs;
-use std::io;
+use std::fs::{self, File};
+use std::io::{self, Read};
 use std::path::PathBuf;
 use std::str::FromStr;
+use toml::Value;
 
 pub use self::wix::Wix;
 
@@ -171,6 +173,21 @@ static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf.mustache");
 
 /// The MIT Rich Text Format (RTF) license template.
 static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf.mustache");
+
+fn manifest(input: Option<&PathBuf>) -> Result<Value> {
+    let default_manifest = {
+        let mut cwd = env::current_dir()?;
+        cwd.push(CARGO_MANIFEST_FILE);
+        cwd
+    };
+    let cargo_file_path = input.unwrap_or(&default_manifest);
+    debug!("cargo_file_path = {:?}", cargo_file_path);
+    let mut cargo_file = File::open(cargo_file_path)?;
+    let mut cargo_file_content = String::new();
+    cargo_file.read_to_string(&mut cargo_file_content)?;
+    let manifest = cargo_file_content.parse::<Value>()?;
+    Ok(manifest)
+}
 
 /// Removes the `target\wix` folder.
 pub fn clean() -> Result<()> {
