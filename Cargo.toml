@@ -24,6 +24,7 @@ env_logger = "0.5.7"
 log = "0.4"
 mustache = "0.9"
 regex = "0.2"
+semver = "0.9"
 termcolor = "0.3.6"
 toml = "0.4"
 uuid = { version = "0.5", features = ["v4"] }

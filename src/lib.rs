@@ -127,6 +127,7 @@ extern crate chrono;
 #[macro_use] extern crate log;
 extern crate mustache;
 extern crate regex;
+extern crate semver;
 extern crate toml;
 extern crate uuid;
 
@@ -240,6 +241,8 @@ pub enum Error {
     Mustache(mustache::Error),
     /// Parsing of the `Cargo.toml` manifest failed.
     Toml(toml::de::Error),
+    /// Parsing error for a version string or field.
+    Version(semver::SemVerError),
 }
 
 impl Error {
@@ -256,6 +259,7 @@ impl Error {
             Error::Manifest(..) => 4,
             Error::Mustache(..) => 5,
             Error::Toml(..) => 6,
+            Error::Version(..) => 7,
         }
     }
 }
@@ -269,14 +273,16 @@ impl StdError for Error {
             Error::Manifest(..) => "Manifest",
             Error::Mustache(..) => "Mustache",
             Error::Toml(..) => "TOML",
+            Error::Version(..) => "Version",
         }
     }
 
     fn cause(&self) -> Option<&StdError> {
         match *self {
             Error::Io(ref err) => Some(err),
-            Error::Toml(ref err) => Some(err),
             Error::Mustache(ref err) => Some(err),
+            Error::Toml(ref err) => Some(err),
+            Error::Version(ref err) => Some(err),
             _ => None
         }
     }
@@ -286,32 +292,40 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::Command(ref command, ref code) => 
-                write!(f, "The '{}' application failed with exit code = {}. Consider using the '--nocapture' flag to obtain more information.", command, code),
-            Error::Generic(ref msg) => write!(f, "{}", msg),
-            Error::Io(ref err) => write!(f, "{}", err),
+                write!(f, "The '{}' application failed with exit code = {}. Consider using the \
+                       '--nocapture' flag to obtain more information.", command, code),
+            Error::Generic(ref msg) => msg.fmt(f),
+            Error::Io(ref err) => err.fmt(f),
             Error::Manifest(ref var) => 
                 write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
-            Error::Mustache(ref err) => write!(f, "{}", err),
-            Error::Toml(ref err) => write!(f, "{}", err),
+            Error::Mustache(ref err) => err.fmt(f),
+            Error::Toml(ref err) => err.fmt(f),
+            Error::Version(ref err) => err.fmt(f),
         }
     }
 }
 
 impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Error {
+    fn from(err: io::Error) -> Self {
         Error::Io(err)
     }
 }
 
+impl From<mustache::Error> for Error {
+    fn from(err: mustache::Error) -> Self {
+        Error::Mustache(err)
+    }
+}
+
 impl From<toml::de::Error> for Error {
-    fn from(err: toml::de::Error) -> Error {
+    fn from(err: toml::de::Error) -> Self {
         Error::Toml(err)
     }
 }
 
-impl From<mustache::Error> for Error {
-    fn from(err: mustache::Error) -> Error {
-        Error::Mustache(err)
+impl From<semver::SemVerError> for Error {
+    fn from(err: semver::SemVerError) -> Self {
+        Error::Version(err)
     }
 }
 

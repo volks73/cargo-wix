@@ -19,6 +19,7 @@ use Error;
 use EXE_FILE_EXTENSION;
 use Platform;
 use Result;
+use semver::Version;
 use std::env;
 use std::io::ErrorKind;
 use std::path::PathBuf;
@@ -42,6 +43,7 @@ pub struct Builder<'a> {
     name: Option<&'a str>,
     no_build: bool,
     output: Option<&'a str>,
+    version: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -56,6 +58,7 @@ impl<'a> Builder<'a> {
             name: None,
             no_build: false,
             output: None,
+            version: None,
         }
     }
 
@@ -141,6 +144,15 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the version.
+    ///
+    /// This overrides the default where the version is obtained from the `version` field of the
+    /// package's manifest (Cargo.toml). The version should be in the "Major.Minor.Patch" notation.
+    pub fn version(&mut self, v: Option<&'a str>) -> &mut Self {
+        self.version = v;
+        self
+    }
+
     /// Builds the project using the release profile, creates the installer (msi), and optionally
     /// signs the output. 
     pub fn build(&mut self) -> Execution {
@@ -153,6 +165,7 @@ impl<'a> Builder<'a> {
             name: self.name.map(String::from),
             no_build: self.no_build,
             output: self.output.map(PathBuf::from),
+            version: self.version.map(String::from),
         }
     }
 }
@@ -173,6 +186,7 @@ pub struct Execution {
     name: Option<String>,
     no_build: bool,
     output: Option<PathBuf>,
+    version: Option<String>,
 }
 
 impl Execution {
@@ -182,9 +196,10 @@ impl Execution {
         debug!("culture = {:?}", self.culture);
         debug!("input = {:?}", self.input);
         debug!("locale = {:?}", self.locale);
+        debug!("name = {:?}", self.name);
         debug!("no_build = {:?}", self.no_build);
         debug!("output = {:?}", self.output);
-        debug!("name = {:?}", self.name);
+        debug!("version = {:?}", self.version);
         let manifest = super::manifest(self.input.as_ref())?;
         let name = self.name(&manifest)?;
         debug!("name = {:?}", name);
@@ -450,7 +465,7 @@ impl Execution {
     }
 
     /// Gets the destination for the linker.
-    fn destination_msi(&self, name: &str, version: &str, platform: &Platform) -> PathBuf {
+    fn destination_msi(&self, name: &str, version: &Version, platform: &Platform) -> PathBuf {
         if let Some(ref o) = self.output {
             PathBuf::from(o)
         } else {
@@ -513,13 +528,17 @@ impl Execution {
     }
 
     /// Gets the package version.
-    fn version(&self, cargo_toml: &Value) -> Result<String> {
-        cargo_toml.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("version"))
-            .and_then(|v| v.as_str())
-            .map(|s| String::from(s))
-            .ok_or(Error::Manifest("version"))
+    fn version(&self, manifest: &Value) -> Result<Version> {
+        if let Some(ref v) = self.version {
+            Version::parse(v).map_err(Error::from)
+        } else {
+            manifest.get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("version"))
+                .and_then(|v| v.as_str())
+                .ok_or(Error::Manifest("version"))
+                .and_then(|s| Version::parse(s).map_err(Error::from))
+        }
     }
 }
 
