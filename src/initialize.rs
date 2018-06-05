@@ -541,6 +541,12 @@ impl Execution {
     }
 }
 
+impl Default for Execution {
+    fn default() -> Self {
+        Builder::new().build()
+    }
+}
+
 enum Eula {
     CommandLine(PathBuf),
     Manifest(PathBuf),
