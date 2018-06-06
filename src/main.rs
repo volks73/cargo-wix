@@ -63,6 +63,14 @@ fn main() {
                     .long("bin-path")
                     .short("B")
                     .takes_value(true))
+                .subcommand(SubCommand::with_name("clean")
+                    .version(crate_version!())
+                    .about("Deletes the 'target\\wix' folder.")
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). The 'target\\wix' folder that \
+                              exists alongside the package's manifest will be removed. This is \
+                              optional and the default is to use the current working directory.")
+                        .index(1)))
                 .arg(Arg::with_name("clean")
                     .help("Deletes the 'target\\wix' folder.")
                     .long("clean")
@@ -81,7 +89,7 @@ fn main() {
                     .about("Uses a package's manifest (Cargo.toml) to generate a Wix Source (wxs) \
                            file that can be used immediately without modification to create an \
                            installer for the package. This will also generate an EULA in the Rich \
-                           Text Format (RTF) if 'license' field is specified with a supported \
+                           Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
                     .arg(Arg::with_name("binary-name")

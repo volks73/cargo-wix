@@ -48,7 +48,7 @@ pub struct Builder<'a> {
 }
 
 impl<'a> Builder<'a> {
-    /// Creates a new `Wix` instance.
+    /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
             binary_name: None,
