@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use chrono::{Datelike, Utc};
 use Error;
 use eula::Eula;
-use mustache::{self, MapBuilder};
-use regex::Regex;
+use print;
 use Result;
 use std::env;
-use std::fs::{self, File};
+use std::fs;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
-use Template;
-use toml::Value;
-use uuid::Uuid;
 use WIX_SOURCE_FILE_NAME;
 use WIX_SOURCE_FILE_EXTENSION; 
 use WIX;
@@ -197,6 +191,8 @@ impl<'a> Builder<'a> {
    
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
+        let mut wxs_printer = print::wxs::Builder::new();
+        wxs_printer.binary_name(self.binary_name);
         Execution {
             binary_name: self.binary_name.map(String::from),
             copyright_year: self.copyright_year.map(String::from),
@@ -259,7 +255,7 @@ impl Execution {
         }
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
-        let eula = self.eula(&manifest)?; 
+        let eula = Eula::new(self.eula.as_ref(), &manifest)?; 
         if destination.exists() && !self.force {
             return Err(Error::Generic(format!(
                 "The '{}' file already exists. Use the '--force' flag to overwite the contents.",
@@ -267,50 +263,18 @@ impl Execution {
             )));
         } else {
             info!("Creating the '{}\\{}.{}' file", WIX, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION);
-            let mut main_wxs = File::create(&destination)?;
-            let template = mustache::compile_str(Template::Wxs.to_str())?;
-            let mut map = MapBuilder::new()
-                .insert_str("binary-name", self.binary_name(&manifest)?)
-                .insert_str("product-name", self.product_name(&manifest)?)
-                .insert_str("manufacturer", self.manufacturer(&manifest)?)
-                .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-                .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
-            if let Some(description) = self.description(&manifest) {
-                map = map.insert_str("description", description);
-            } else {
-                warn!("A description was not specified at the command line or in the package's manifest \
-                      (Cargo.toml). The description can be added manually to the generated WiX \
-                      Source (wxs) file using a text editor.");
-            }
-            match eula {
-                Eula::Disabled => {
-                    warn!("An EULA was not specified at the command line, a RTF license file was \
-                          not specified in the package's manifest (Cargo.toml), or the license ID \
-                          from the package's manifest is not recognized. The license agreement \
-                          dialog will be excluded from the installer. An EULA can be added manually \
-                          to the generated WiX Source (wxs) file using a text editor.");
-                },
-                _ => map = map.insert_str("eula", eula.to_string()),
-            }
-            if let Some(url) = self.help_url(&manifest) {
-                map = map.insert_str("help-url", url);
-            } else {
-                warn!("A help URL could not be found and it will be excluded from the installer. \
-                      A help URL can be added manually to the generated WiX Source (wxs) file \
-                      using a text editor.");
-            }
-            if let Some(name) = self.license_name(&manifest) {
-                map = map.insert_str("license-name", name);
-            }
-            if let Some(source) = self.license_source(&manifest)? {
-                map = map.insert_str("license-source", source);
-            } else {
-                warn!("A license file could not be found and it will be excluded from the \
-                      installer. A license file can be added manually to the generated WiX Source \
-                      (wxs) file using a text editor.");
-            }
-            let data = map.build();
-            template.render_data(&mut main_wxs, &data)?;
+            let eula_str = eula.to_string();
+            let mut wxs_printer = print::wxs::Builder::new();
+            wxs_printer.binary_name(self.binary_name.as_ref().map(String::as_ref));
+            wxs_printer.description(self.description.as_ref().map(String::as_ref));
+            wxs_printer.eula(Some(&eula_str));
+            wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
+            wxs_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.license(self.license.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
+            wxs_printer.output(destination.as_path().to_str());
+            wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
+            wxs_printer.build().run()?;
         }
         destination.pop(); // Remove main.wxs
         if let Eula::Generate(template) = eula {
@@ -323,51 +287,15 @@ impl Execution {
                 )));
             } else {
                 info!("Generating a EULA");
-                let mut rtf = File::create(destination)?;
-                let mustache_template = mustache::compile_str(template.to_str())?;
-                let data = MapBuilder::new()
-                    .insert_str("copyright-year", self.copyright_year())
-                    .insert_str("copyright-holder", self.copyright_holder(&manifest)?)
-                    .build();
-                mustache_template.render_data(&mut rtf, &data)?;
+                let mut eula_printer = print::license::Builder::new();
+                eula_printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
+                eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
+                eula_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+                eula_printer.output(destination.as_path().to_str());
+                eula_printer.build().run(template)?;
             }
         }
         Ok(())
-    }
-
-    fn binary_name(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref b) = self.binary_name {
-            Ok(b.to_owned())
-        } else {
-            manifest.get("bin")
-                .and_then(|b| b.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map(String::from)
-                .map_or(self.product_name(manifest), |s| Ok(s))
-        }
-    }
-
-    fn copyright_holder(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref h) = self.copyright_holder {
-            Ok(h.to_owned())
-        } else {
-            self.manufacturer(manifest)
-        }
-    }
-
-    fn copyright_year(&self) -> String {
-        self.copyright_year.clone()
-            .map(String::from)
-            .unwrap_or(Utc::now().year().to_string())
-    }
-
-    fn description(&self, manifest: &Value) -> Option<String> {
-        self.description.clone().or(manifest.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("description"))
-            .and_then(|d| d.as_str())
-            .map(String::from))
     }
 
     fn destination(&self) -> Result<PathBuf> {
@@ -397,169 +325,6 @@ impl Execution {
                 cwd.push(WIX);
                 Ok(cwd)
             }
-        }
-    }
-
-    fn eula(&self, manifest: &Value) -> Result<Eula> {
-        if let Some(ref path) = self.eula {
-            trace!("A path has been explicitly specified for a EULA");
-            debug!("path = {:?}", path);
-            if path.exists() {
-                trace!("The '{}' path from the command line for the EULA exists", path.display());
-                Ok(Eula::CommandLine(path.into()))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the EULA does not exist", 
-                    path.display()
-                )))
-            }
-        } else {
-            if let Some(license_file_path) = manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .map(PathBuf::from) {
-                trace!("The 'license-file' field is specified in the package's manifest (Cargo.toml)");
-                debug!("license_file_path = {:?}", license_file_path);
-                if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {
-                    trace!("The '{}' path from the 'license-file' field in the package's \
-                           manifest (Cargo.toml) has a RTF file extension.",
-                           license_file_path.display()); 
-                    if license_file_path.exists() {
-                        trace!("The '{}' path from the 'license-file' field of the package's \
-                               manifest (Cargo.toml) exists and has a RTF file extension.",
-                               license_file_path.exists());
-                        Ok(Eula::Manifest(license_file_path.into()))
-                    } else {
-                        Err(Error::Generic(format!(
-                            "The '{}' file to be used for the EULA specified in the package's \
-                            manifest (Cargo.toml) using the 'license-file' field does not exist.", 
-                            license_file_path.display()
-                        )))
-                    }
-                } else {
-                    trace!("The '{}' path from the 'license-file' field in the package's \
-                           manifest (Cargo.toml) exists but it does not have a RTF file \
-                           extension.",
-                           license_file_path.display());
-                    Ok(Eula::Disabled)
-                }
-            } else {
-                if let Some(license_name) = manifest.get("package")
-                    .and_then(|p| p.as_table())
-                    .and_then(|t| t.get("license"))
-                    .and_then(|n| n.as_str()) {
-                    trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
-                    debug!("license_name = {:?}", license_name);
-                    if let Ok(template) = Template::from_str(license_name) {
-                        trace!("An embedded template for the '{}' license from the package's \
-                               manifest (Cargo.toml) exists.", license_name);
-                        Ok(Eula::Generate(template))
-                    } else {
-                        trace!("The '{}' license from the package's manifest (Cargo.toml) is \
-                               unknown or an embedded template does not exist for it", license_name);
-                        Ok(Eula::Disabled)
-                    }
-                } else {
-                    trace!("The 'license' field is not specified in the package's manifest (Cargo.toml)");
-                    Ok(Eula::Disabled)
-                }
-            }
-        }
-    }
-
-    fn help_url(&self, manifest: &Value) -> Option<String> {
-        manifest.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
-            .and_then(|h| h.as_str())
-            .map(|s| {
-                trace!("Using '{}' for the help URL", s);
-                String::from(s)
-            })
-    }
-
-    fn license_name(&self, manifest: &Value) -> Option<String> {
-        if let Some(ref l) = self.license.clone().map(PathBuf::from) {
-            l.file_name().and_then(|f| f.to_str()).map(String::from)
-        } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|l| {
-                    Path::new(l).file_name()
-                        .and_then(|f| f.to_str())
-                        .map(String::from)
-                })
-        }
-    }
-
-    fn license_source(&self, manifest: &Value) -> Result<Option<String>> {
-        // Order of precedence:
-        //
-        // 1. CLI (-l,--license)
-        // 2. Manifest `license-file`
-        // 3. LICENSE file in root
-        if let Some(ref path) = self.license.clone().map(PathBuf::from) {
-            if path.exists() {
-                trace!("The '{}' path from the command line for the license exists",
-                       path.display());
-                Ok(path.to_str().map(String::from))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the license file does not exist", 
-                    path.display()
-                )))
-            }
-        } else {
-            Ok(manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|s| {
-                    let p = PathBuf::from(s);
-                    if p.exists() {
-                        trace!("The '{}' path from the 'license-file' field in the package's \
-                               manifest (Cargo.toml) exists.", p.display());
-                        Some(p.into_os_string().into_string().unwrap())
-                    } else {
-                        None
-                    }
-                }))
-        }
-    }
-
-    fn manufacturer(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref m) = self.manufacturer {
-            Ok(m.to_owned())
-        } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("authors"))
-                .and_then(|a| a.as_array())
-                .and_then(|a| a.get(0)) 
-                .and_then(|f| f.as_str())
-                .and_then(|s| {
-                    // Strip email if it exists.
-                    let re = Regex::new(r"<(.*?)>").unwrap();
-                    Some(re.replace_all(s, ""))
-                })
-                .map(|s| String::from(s.trim()))
-                .ok_or(Error::Manifest("authors"))
-        }
-    }
-
-    fn product_name(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref p) = self.product_name {
-            Ok(p.to_owned())
-        } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map(String::from)
-                .ok_or(Error::Manifest("name"))
         }
     }
 }

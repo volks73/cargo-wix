@@ -3,9 +3,7 @@ use eula::Eula;
 use manifest;
 use mustache::{self, MapBuilder};
 use Result;
-use RTF_FILE_EXTENSION;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 use Template;
 use toml::Value;
 use uuid::Uuid;
@@ -164,6 +162,12 @@ impl<'a> Builder<'a> {
     }
 }
 
+impl<'a> Default for Builder<'a> {
+    fn default() -> Self {
+        Builder::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct Execution {
     binary_name: Option<String>,
@@ -190,7 +194,6 @@ impl Execution {
         debug!("product_name = {:?}", self.product_name);
         let manifest = manifest(self.input.as_ref())?;
         let mut destination = super::destination(self.output.as_ref())?;
-        let eula = self.eula(&manifest)?;
         let template = mustache::compile_str(Template::Wxs.to_str())?;
         let mut map = MapBuilder::new()
             .insert_str("binary-name", self.binary_name(&manifest)?)
@@ -205,7 +208,7 @@ impl Execution {
                   (Cargo.toml). The description can be added manually to the generated WiX \
                   Source (wxs) file using a text editor.");
         }
-        match eula {
+        match Eula::new(self.eula.as_ref(), &manifest)? {
             Eula::Disabled => {
                 warn!("An EULA was not specified at the command line, a RTF license file was \
                       not specified in the package's manifest (Cargo.toml), or the license ID \
@@ -255,74 +258,6 @@ impl Execution {
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str())
             .map(String::from))
-    }
-
-    fn eula(&self, manifest: &Value) -> Result<Eula> {
-        if let Some(ref path) = self.eula {
-            trace!("A path has been explicitly specified for a EULA");
-            debug!("path = {:?}", path);
-            if path.exists() {
-                trace!("The '{}' path from the command line for the EULA exists", path.display());
-                Ok(Eula::CommandLine(path.into()))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the EULA does not exist", 
-                    path.display()
-                )))
-            }
-        } else {
-            if let Some(license_file_path) = manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .map(PathBuf::from) {
-                trace!("The 'license-file' field is specified in the package's manifest (Cargo.toml)");
-                debug!("license_file_path = {:?}", license_file_path);
-                if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {
-                    trace!("The '{}' path from the 'license-file' field in the package's \
-                           manifest (Cargo.toml) has a RTF file extension.",
-                           license_file_path.display()); 
-                    if license_file_path.exists() {
-                        trace!("The '{}' path from the 'license-file' field of the package's \
-                               manifest (Cargo.toml) exists and has a RTF file extension.",
-                               license_file_path.exists());
-                        Ok(Eula::Manifest(license_file_path.into()))
-                    } else {
-                        Err(Error::Generic(format!(
-                            "The '{}' file to be used for the EULA specified in the package's \
-                            manifest (Cargo.toml) using the 'license-file' field does not exist.", 
-                            license_file_path.display()
-                        )))
-                    }
-                } else {
-                    trace!("The '{}' path from the 'license-file' field in the package's \
-                           manifest (Cargo.toml) exists but it does not have a RTF file \
-                           extension.",
-                           license_file_path.display());
-                    Ok(Eula::Disabled)
-                }
-            } else {
-                if let Some(license_name) = manifest.get("package")
-                    .and_then(|p| p.as_table())
-                    .and_then(|t| t.get("license"))
-                    .and_then(|n| n.as_str()) {
-                    trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
-                    debug!("license_name = {:?}", license_name);
-                    if let Ok(template) = Template::from_str(license_name) {
-                        trace!("An embedded template for the '{}' license from the package's \
-                               manifest (Cargo.toml) exists.", license_name);
-                        Ok(Eula::Generate(template))
-                    } else {
-                        trace!("The '{}' license from the package's manifest (Cargo.toml) is \
-                               unknown or an embedded template does not exist for it", license_name);
-                        Ok(Eula::Disabled)
-                    }
-                } else {
-                    trace!("The 'license' field is not specified in the package's manifest (Cargo.toml)");
-                    Ok(Eula::Disabled)
-                }
-            }
-        }
     }
 
     fn help_url(&self, manifest: &Value) -> Option<String> {
