@@ -1,26 +1,9 @@
-// Copyright (C) 2017 Christopher R. Field.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-use chrono::{Datelike, Utc};
 use Error;
 use eula::Eula;
+use manifest;
 use mustache::{self, MapBuilder};
-use regex::Regex;
 use Result;
 use RTF_FILE_EXTENSION;
-use std::fs::File;
-use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use Template;
@@ -30,8 +13,6 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     binary_name: Option<&'a str>,
-    copyright_year: Option<&'a str>,
-    copyright_holder: Option<&'a str>,
     description: Option<&'a str>,
     eula: Option<&'a str>,
     help_url: Option<&'a str>,
@@ -40,7 +21,6 @@ pub struct Builder<'a> {
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
     product_name: Option<&'a str>,
-    template: Template,
 }
 
 impl<'a> Builder<'a> {
@@ -48,8 +28,6 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             binary_name: None,
-            copyright_year: None,
-            copyright_holder: None,
             description: None,
             eula: None,
             help_url: None,
@@ -58,7 +36,6 @@ impl<'a> Builder<'a> {
             manufacturer: None,
             output: None,
             product_name: None,
-            template: Template::Wxs,
         }
     }
 
@@ -74,18 +51,6 @@ impl<'a> Builder<'a> {
     /// Programs control panel.
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
-        self
-    }
-
-    /// Sets the copyright holder in the license dialog of the Windows installer (msi).
-    pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
-        self.copyright_holder = h;
-        self
-    }
-
-    /// Sets the copyright year in the license dialog of the Windows installer (msi).
-    pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
-        self.copyright_year = y;
         self
     }
 
@@ -184,16 +149,9 @@ impl<'a> Builder<'a> {
         self
     }
 
-    pub fn template(&mut self, t: Template) -> &mut Self {
-        self.template = t;
-        self
-    }
-
     pub fn build(&self) -> Execution {
         Execution {
             binary_name: self.binary_name.map(String::from),
-            copyright_holder: self.copyright_holder.map(String::from),
-            copyright_year: self.copyright_year.map(String::from),
             description: self.description.map(String::from),
             eula: self.eula.map(PathBuf::from),
             help_url: self.help_url.map(String::from),
@@ -202,21 +160,13 @@ impl<'a> Builder<'a> {
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
-            template: self.template,
         }
     }
 }
 
-impl<'a> Default for Builder<'a> {
-    fn default() -> Self {
-        Builder::new()
-    }
-}
-
+#[derive(Debug)]
 pub struct Execution {
     binary_name: Option<String>,
-    copyright_holder: Option<String>,
-    copyright_year: Option<String>,
     description: Option<String>,
     eula: Option<PathBuf>,
     help_url: Option<String>,
@@ -225,20 +175,65 @@ pub struct Execution {
     manufacturer: Option<String>,
     output: Option<PathBuf>,
     product_name: Option<String>,
-    template: Template,
 }
 
 impl Execution {
     pub fn run(self) -> Result<()> {
-        debug!("template = {:?}", self.template);
-        let manifest = super::manifest(self.input.as_ref())?;
-        let mut destination = self.destination()?;
-        match self.template {
-            t @ Template::Apache2 => self.print_license(t, &mut destination, manifest),
-            t @ Template::Gpl3 => self.print_license(t, &mut destination, manifest),
-            t @ Template::Mit => self.print_license(t, &mut destination, manifest),
-            Template::Wxs => self.print_wix_source(&mut destination, manifest),
+        debug!("binary_name = {:?}", self.binary_name);
+        debug!("description = {:?}", self.description);
+        debug!("eula = {:?}", self.eula);
+        debug!("help_url = {:?}", self.help_url);
+        debug!("input = {:?}", self.input);
+        debug!("license = {:?}", self.license);
+        debug!("manufacturer = {:?}", self.manufacturer);
+        debug!("output = {:?}", self.output);
+        debug!("product_name = {:?}", self.product_name);
+        let manifest = manifest(self.input.as_ref())?;
+        let mut destination = super::destination(self.output.as_ref())?;
+        let eula = self.eula(&manifest)?;
+        let template = mustache::compile_str(Template::Wxs.to_str())?;
+        let mut map = MapBuilder::new()
+            .insert_str("binary-name", self.binary_name(&manifest)?)
+            .insert_str("product-name", self.product_name(&manifest)?)
+            .insert_str("manufacturer", self.manufacturer(&manifest)?)
+            .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
+            .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
+        if let Some(description) = self.description(&manifest) {
+            map = map.insert_str("description", description);
+        } else {
+            warn!("A description was not specified at the command line or in the package's manifest \
+                  (Cargo.toml). The description can be added manually to the generated WiX \
+                  Source (wxs) file using a text editor.");
         }
+        match eula {
+            Eula::Disabled => {
+                warn!("An EULA was not specified at the command line, a RTF license file was \
+                      not specified in the package's manifest (Cargo.toml), or the license ID \
+                      from the package's manifest is not recognized. The license agreement \
+                      dialog will be excluded from the installer. An EULA can be added manually \
+                      to the generated WiX Source (wxs) file using a text editor.");
+            },
+            e => map = map.insert_str("eula", e.to_string()),
+        }
+        if let Some(url) = self.help_url(&manifest) {
+            map = map.insert_str("help-url", url);
+        } else {
+            warn!("A help URL could not be found and it will be excluded from the installer. \
+                  A help URL can be added manually to the generated WiX Source (wxs) file \
+                  using a text editor.");
+        }
+        if let Some(name) = self.license_name(&manifest) {
+            map = map.insert_str("license-name", name);
+        }
+        if let Some(source) = self.license_source(&manifest)? {
+            map = map.insert_str("license-source", source);
+        } else {
+            warn!("A license file could not be found and it will be excluded from the \
+                  installer. A license file can be added manually to the generated WiX Source \
+                  (wxs) file using a text editor.");
+        }
+        let data = map.build();
+        template.render_data(&mut destination, &data).map_err(Error::from)
     }
 
     fn binary_name(&self, manifest: &Value) -> Result<String> {
@@ -254,37 +249,12 @@ impl Execution {
         }
     }
 
-    fn copyright_holder(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref h) = self.copyright_holder {
-            Ok(h.to_owned())
-        } else {
-            self.manufacturer(manifest)
-        }
-    }
-
-    fn copyright_year(&self) -> String {
-        self.copyright_year.clone()
-            .map(String::from)
-            .unwrap_or(Utc::now().year().to_string())
-    }
-
     fn description(&self, manifest: &Value) -> Option<String> {
         self.description.clone().or(manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("description"))
             .and_then(|d| d.as_str())
             .map(String::from))
-    }
-
-    fn destination(&self) -> Result<Box<Write>> {
-        if let Some(ref output) = self.output {
-            trace!("An output path has been explicity specified");
-            let f = File::create(output)?;
-            Ok(Box::new(f))
-        } else {
-            trace!("An output path has NOT been explicity specified. Implicitly determine output.");
-            Ok(Box::new(io::stdout()))
-        }
     }
 
     fn eula(&self, manifest: &Value) -> Result<Eula> {
@@ -421,19 +391,7 @@ impl Execution {
         if let Some(ref m) = self.manufacturer {
             Ok(m.to_owned())
         } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("authors"))
-                .and_then(|a| a.as_array())
-                .and_then(|a| a.get(0)) 
-                .and_then(|f| f.as_str())
-                .and_then(|s| {
-                    // Strip email if it exists.
-                    let re = Regex::new(r"<(.*?)>").unwrap();
-                    Some(re.replace_all(s, ""))
-                })
-                .map(|s| String::from(s.trim()))
-                .ok_or(Error::Manifest("authors"))
+            super::first_author(&manifest)
         }
     }
 
@@ -448,80 +406,6 @@ impl Execution {
                 .map(String::from)
                 .ok_or(Error::Manifest("name"))
         }
-    }
-
-    /// Renders the template for the license and writes it to stdout.
-    fn print_license<W>(&self, license: Template, writer: &mut W, manifest: Value) -> Result<()> 
-        where W: Write,
-    {
-        debug!("copyright_holder = {:?}", self.copyright_holder);
-        debug!("copyright_year = {:?}", self.copyright_year);
-        let template = mustache::compile_str(license.to_str())?;
-        let data = MapBuilder::new()
-            .insert_str("copyright-year", self.copyright_year())
-            .insert_str("copyright-holder", self.copyright_holder(&manifest)?)
-            .build();
-        template.render_data(writer, &data)?;
-        Ok(())
-    }
-
-    fn print_wix_source<W>(&self, writer: &mut W, manifest: Value) -> Result<()> 
-        where W: Write
-    {
-        debug!("binary_name = {:?}", self.binary_name);
-        debug!("description = {:?}", self.description);
-        debug!("eula = {:?}", self.eula);
-        debug!("help_url = {:?}", self.help_url);
-        debug!("input = {:?}", self.input);
-        debug!("license = {:?}", self.license);
-        debug!("manufacturer = {:?}", self.manufacturer);
-        debug!("output = {:?}", self.output);
-        debug!("product_name = {:?}", self.product_name);
-        let template = mustache::compile_str(Template::Wxs.to_str())?;
-        let eula = self.eula(&manifest)?; 
-        let mut map = MapBuilder::new()
-            .insert_str("binary-name", self.binary_name(&manifest)?)
-            .insert_str("product-name", self.product_name(&manifest)?)
-            .insert_str("manufacturer", self.manufacturer(&manifest)?)
-            .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-            .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
-        if let Some(description) = self.description(&manifest) {
-            map = map.insert_str("description", description);
-        } else {
-            warn!("A description was not specified at the command line or in the package's manifest \
-                  (Cargo.toml). The description can be added manually to the generated WiX \
-                  Source (wxs) file using a text editor.");
-        }
-        match eula {
-            Eula::Disabled => {
-                warn!("An EULA was not specified at the command line, a RTF license file was \
-                      not specified in the package's manifest (Cargo.toml), or the license ID \
-                      from the package's manifest is not recognized. The license agreement \
-                      dialog will be excluded from the installer. An EULA can be added manually \
-                      to the generated WiX Source (wxs) file using a text editor.");
-            },
-            _ => map = map.insert_str("eula", eula.to_string()),
-        }
-        if let Some(url) = self.help_url(&manifest) {
-            map = map.insert_str("help-url", url);
-        } else {
-            warn!("A help URL could not be found and it will be excluded from the installer. \
-                  A help URL can be added manually to the generated WiX Source (wxs) file \
-                  using a text editor.");
-        }
-        if let Some(name) = self.license_name(&manifest) {
-            map = map.insert_str("license-name", name);
-        }
-        if let Some(source) = self.license_source(&manifest)? {
-            map = map.insert_str("license-source", source);
-        } else {
-            warn!("A license file could not be found and it will be excluded from the \
-                  installer. A license file can be added manually to the generated WiX Source \
-                  (wxs) file using a text editor.");
-        }
-        let data = map.build();
-        template.render_data(writer, &data)?;
-        Ok(())
     }
 }
 
