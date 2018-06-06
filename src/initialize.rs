@@ -255,7 +255,6 @@ impl Execution {
         }
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
-        let eula = Eula::new(self.eula.as_ref(), &manifest)?; 
         if destination.exists() && !self.force {
             return Err(Error::Generic(format!(
                 "The '{}' file already exists. Use the '--force' flag to overwite the contents.",
@@ -263,11 +262,10 @@ impl Execution {
             )));
         } else {
             info!("Creating the '{}\\{}.{}' file", WIX, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION);
-            let eula_str = eula.to_string();
             let mut wxs_printer = print::wxs::Builder::new();
             wxs_printer.binary_name(self.binary_name.as_ref().map(String::as_ref));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
-            wxs_printer.eula(Some(&eula_str));
+            wxs_printer.eula(self.eula.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.license(self.license.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
@@ -277,7 +275,7 @@ impl Execution {
             wxs_printer.build().run()?;
         }
         destination.pop(); // Remove main.wxs
-        if let Eula::Generate(template) = eula {
+        if let Eula::Generate(template) = Eula::new(self.eula.as_ref(), &manifest)? {
             destination.push("License");
             destination.set_extension(RTF_FILE_EXTENSION);
             if destination.exists() && !self.force {
