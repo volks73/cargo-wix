@@ -146,6 +146,7 @@ pub use self::wix::Wix;
 pub mod clean;
 pub mod create;
 pub mod initialize;
+pub mod purge;
 mod wix;
 
 pub const BINARY_FOLDER_NAME: &str = "bin";
