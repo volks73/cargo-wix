@@ -76,8 +76,8 @@ impl Execution {
             warn!("Removing the 'wix' folder");
             fs::remove_dir_all(wix)?;
         } else {
-            trace!("The 'target\\wix' folder does not exist");
-            info!("Nothing to clean");
+            trace!("The 'wix' folder does not exist");
+            info!("Nothing to purge");
         }
         Ok(())
     }

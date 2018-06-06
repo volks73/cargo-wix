@@ -135,7 +135,7 @@ use std::default::Default;
 use std::error::Error as StdError;
 use std::env;
 use std::fmt;
-use std::fs::{self, File};
+use std::fs::File;
 use std::io::{self, Read};
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -145,7 +145,9 @@ pub use self::wix::Wix;
 
 pub mod clean;
 pub mod create;
+mod eula;
 pub mod initialize;
+pub mod print;
 pub mod purge;
 mod wix;
 
@@ -192,38 +194,6 @@ fn manifest(input: Option<&PathBuf>) -> Result<Value> {
     cargo_file.read_to_string(&mut cargo_file_content)?;
     let manifest = cargo_file_content.parse::<Value>()?;
     Ok(manifest)
-}
-
-/// Removes the `target\wix` folder.
-pub fn clean() -> Result<()> {
-    let mut target_wix = PathBuf::from("target");
-    target_wix.push(WIX);
-    if target_wix.exists() {
-        trace!("The 'target\\wix' folder exists");
-        warn!("Removing the 'target\\wix' folder");
-        fs::remove_dir_all(target_wix)?;
-    } else {
-        trace!("The 'target\\wix' folder does not exist");
-    }
-    Ok(())
-}
-
-/// Removes the `target\wix` folder and the `wix` folder.
-///
-/// __Use with caution!__ All contents of both folders are removed, including files that may be
-/// located in the folders but not used or related to the creation of Windows installers via the
-/// WiX Toolset.
-pub fn purge() -> Result<()> {
-    clean()?;
-    let wix = PathBuf::from(WIX);
-    if wix.exists() {
-        trace!("The 'wix' folder exists");
-        warn!("Removing the 'wix' folder");
-        fs::remove_dir_all(wix)?;
-    } else {
-        trace!("The 'wix' folder does not exist");
-    }
-    Ok(())
 }
 
 /// The error type for cargo-wix-related operations and associated traits.
