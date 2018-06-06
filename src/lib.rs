@@ -143,6 +143,7 @@ use toml::Value;
 
 pub use self::wix::Wix;
 
+pub mod clean;
 pub mod create;
 pub mod initialize;
 mod wix;
@@ -154,6 +155,7 @@ pub const EXE_FILE_EXTENSION: &str = "exe";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
+pub const TARGET_FOLDER_NAME: &str = "target";
 pub const WIX: &str = "wix";
 pub const WIX_COMPILER: &str = "candle";
 pub const WIX_LINKER: &str = "light";

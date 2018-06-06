@@ -385,10 +385,14 @@ impl Execution {
                         Some(p)
                     }).unwrap())
                 } else {
-                    Err(Error::Generic(format!("The '{}' path does not exist or it is not a file.", input.display())))
+                    Err(Error::Generic(format!(
+                        "The '{}' path does not exist or it is not a file", 
+                        input.display()
+                    )))
                 }
             } else {
-                trace!("An input path has NOT been explicitly specified, implicitly using the current working directory");
+                trace!("An input path has NOT been explicitly specified, implicitly using the \
+                       current working directory");
                 let mut cwd = env::current_dir()?;
                 cwd.push(WIX);
                 Ok(cwd)
