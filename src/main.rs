@@ -25,8 +25,10 @@ use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
 use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
+use cargo_wix::clean;
 use cargo_wix::create;
 use cargo_wix::initialize;
+use cargo_wix::purge;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
@@ -71,11 +73,6 @@ fn main() {
                               exists alongside the package's manifest will be removed. This is \
                               optional and the default is to use the current working directory.")
                         .index(1)))
-                .arg(Arg::with_name("clean")
-                    .help("Deletes the 'target\\wix' folder.")
-                    .long("clean")
-                    .conflicts_with("sign")
-                    .conflicts_with("print-template"))
                 .arg(Arg::with_name("culture")
                     .help("Sets the culture for localization. Use with the '-L,--locale' option. \
                           See the WixUI localization documentation for more information about \
@@ -237,15 +234,16 @@ fn main() {
                         .iter()
                         .map(|s| s.as_ref())
                         .collect::<Vec<&str>>())
-                    .takes_value(true)
-                    .conflicts_with("clean")
-                    .conflicts_with("purge"))
-                .arg(Arg::with_name("purge")
-                    .help("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
-                    .long("purge")
-                    .conflicts_with("sign")
-                    .conflicts_with("clean")
-                    .conflicts_with("print-template"))
+                    .takes_value(true))
+                .subcommand(SubCommand::with_name("purge")
+                    .version(crate_version!())
+                    .about("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). The 'target\\wix' and 'wix' \
+                              folders that exists alongside the package's manifest will be removed. \
+                              This is optional and the default is to use the current working \
+                              directory.")
+                        .index(1)))
                 .arg(Arg::with_name("sign")
                     .help("The Windows installer (msi) will be signed using the SignTool \
                           application available in the Windows 10 SDK. The signtool is invoked with \
@@ -356,9 +354,15 @@ fn main() {
         init.product_name(m.value_of("product-name"));
         init.build().run()    
     } else if matches.is_present("clean") {
-        cargo_wix::clean()
+        let m = matches.subcommand_matches("clean").unwrap();
+        let mut clean = clean::Builder::new();
+        clean.input(m.value_of("INPUT"));
+        clean.build().run()
     } else if matches.is_present("purge") {
-        cargo_wix::purge()
+        let m = matches.subcommand_matches("purge").unwrap();
+        let mut purge = purge::Builder::new();
+        purge.input(m.value_of("INPUT"));
+        purge.build().run()
     } else if matches.is_present("print-template") {
         wix.print_template(value_t!(matches, "print-template", Template).unwrap())
     } else {
