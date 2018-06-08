@@ -43,6 +43,55 @@ fn main() {
         .long("verbose")
         .short("v")
         .multiple(true);
+    // The binary-name option for the `init` and `print` subcommands.
+    let binary_name = Arg::with_name("binary-name")
+        .help("Overrides the 'name' field of the 'bin' section of the package's \
+              manifest (Cargo.toml) as the name of the executable within the \
+              installer.")
+        .long("binary-name")
+        .short("b")
+        .takes_value(true);
+    // The description option for the `init` and `print` subcommands.
+    let description = Arg::with_name("description")
+        .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
+              as the description within the installer. The description can be \
+              changed after initialization by directly modifying the WiX Source file \
+              (wxs) with a text editor.")
+        .long("description")
+        .short("d")
+        .takes_value(true);
+    // The eula option for the `init` and `print` subcommands.
+    let eula = Arg::with_name("eula")
+        .help("Specifies a RTF file to use as the EULA for the license agreement \
+          dialog of the installer. The default is to disable the license \
+          agreement dialog unless one of the supported licenses (GPL-3.0, \
+          Apache-2.0, or MIT) is generated based on the value of the 'license' \
+          field in the package's manifest (Cargo.toml). An EULA can be enabled \
+          after initialization by directly modifying the WiX Source (wxs) file \
+          with a text editor.")
+        .long("eula")
+        .short("E")
+        .takes_value(true);
+    // The url option for the `init` and `print` subcommands
+    let url = Arg::with_name("url")
+        .help("Adds a URL to the installer that will be displayed in the Add/Remove \
+              Programs control panel for the application. The default is to disable \
+              it unless a URL is specified for either the 'homepage', \
+              'documentation', or 'repository' fields in the package's manifest \
+              (Cargo.toml). The help URL can be enabled after initialization by \
+              directly modifying the WiX Source (wxs) file with a text editor.")
+        .long("url")
+        .short("U")
+        .takes_value(true);
+    // The holder option for the `init` and `print` subcommands
+    let holder = Arg::with_name("holder")
+        .help("Sets the copyright holder for the license during initialization. The \
+              default is to use the first author from the package's manifest \
+              (Cargo.toml). This is only used when generate a license based on the \
+              value of the 'license' field in the package's manifest.")
+        .long("holder")
+        .short("H")
+        .takes_value(true);
     let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
@@ -89,54 +138,15 @@ fn main() {
                            Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
-                    .arg(Arg::with_name("binary-name")
-                        .help("Overrides the 'name' field of the 'bin' section of the package's \
-                              manifest (Cargo.toml) as the name of the executable within the \
-                              installer.")
-                        .long("binary-name")
-                        .short("b")
-                        .takes_value(true))
-                    .arg(Arg::with_name("description")
-                        .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
-                              as the description within the installer. The description can be \
-                              changed after initialization by directly modifying the WiX Source file \
-                              (wxs) with a text editor.")
-                        .long("description")
-                        .short("d")
-                        .takes_value(true))
-                    .arg(Arg::with_name("eula")
-                        .help("Specifies a RTF file to use as the EULA for the license agreement \
-                              dialog of the installer. The default is to disable the license \
-                              agreement dialog unless one of the supported licenses (GPL-3.0, \
-                              Apache-2.0, or MIT) is generated based on the value of the 'license' \
-                              field in the package's manifest (Cargo.toml). An EULA can be enabled \
-                              after initialization by directly modifying the WiX Source (wxs) file \
-                              with a text editor.")
-                        .long("eula")
-                        .short("E")
-                        .takes_value(true))
+                    .arg(binary_name)
+                    .arg(description)
+                    .arg(eula)
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
                               initialization. Use with caution.")
                         .long("force"))
-                    .arg(Arg::with_name("url")
-                        .help("Adds a URL to the installer that will be displayed in the Add/Remove \
-                              Programs control panel for the application. The default is to disable \
-                              it unless a URL is specified for either the 'homepage', \
-                              'documentation', or 'repository' fields in the package's manifest \
-                              (Cargo.toml). The help URL can be enabled after initialization by \
-                              directly modifying the WiX Source (wxs) file with a text editor.")
-                        .long("url")
-                        .short("U")
-                        .takes_value(true))
-                    .arg(Arg::with_name("holder")
-                        .help("Sets the copyright holder for the license during initialization. The \
-                              default is to use the first author from the package's manifest \
-                              (Cargo.toml). This is only used when generate a license based on the \
-                              value of the 'license' field in the package's manifest.")
-                        .long("holder")
-                        .short("H")
-                        .takes_value(true))
+                    .arg(url)
+                    .arg(holder)
                     .arg(Arg::with_name("manufacturer")
                         .help("Overrides the first author in the 'authors' field of the package's \
                               manifest (Cargo.toml) as the manufacturer within the installer. The \
@@ -222,19 +232,36 @@ fn main() {
                     .long("output")
                     .short("o")
                     .takes_value(true))
-                .arg(Arg::with_name("print-template")
-                    .help("Prints a template to stdout. In the case of a license template, the \
-                          output is in the Rich Text Format (RTF) and for a WiX Source file, the \
-                          output is in XML. New GUIDS are generated for the 'UpgradeCode' and Path \
-                          Component each time the 'WXS' template is printed. Values are case \
-                          insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
-                    .long("print-template")
-                    .hide_possible_values(true)
-                    .possible_values(&Template::possible_values()
-                        .iter()
-                        .map(|s| s.as_ref())
-                        .collect::<Vec<&str>>())
-                    .takes_value(true))
+                .subcommand(Subcommand::with_name("print")
+                    .version(crate_version!())                            
+                    .about("Prints a template to stdout or a file. In the case of a license \
+                           template, the output is in the Rich Text Format (RTF) and for a WiX \
+                           Source file (wxs), the output is in XML. New GUIDS are generated for the \
+                           'UpgradeCode' and Path Component each time the 'WXS' template is \
+                           printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                    .arg(Arg::with_name("TEMPLATE")
+                        .help("The template to print. This is required and values are case \
+                              insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                        .hide_possible_values(true)
+                        .possible_values(&Template::possible_values()
+                            .iter()
+                            .map(|s| s.as_ref())
+                            .collect::<Vec<&str>>())
+                        .required(true)
+                        .index(1))
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). The selected template will be \
+                              printed to stdout or a file based on the field values in this \
+                              manifest. The default is to use the manifest in the current working \
+                              directory (cwd). An error occurs if a manifest is not found.")
+                        .index(2))
+                    .arg(Arg::with_name("output")
+                        .help("Sets the destination for printing the template. The default is to \
+                              print/write the rendered template to stdout. If the destination, \
+                              a.k.a. file, does not exist, it will be created.")
+                        .long("output")
+                        .short("o")
+                        .takes_value(true)))
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
