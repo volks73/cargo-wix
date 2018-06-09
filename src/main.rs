@@ -316,8 +316,10 @@ fn main() {
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
+        ("clean", Some(m)) => m,
         ("init", Some(m)) => m,
         ("print", Some(m)) => m,
+        ("purge", Some(m)) => m,
         _ => matches,
     }.occurrences_of("verbose");
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
@@ -361,72 +363,72 @@ fn main() {
         2 => LevelFilter::Debug,
         _ => LevelFilter::Trace,
     }).init();
-    // TODO: Change to use the `subcommand_name` method and a match expression once all of the
-    // flags have been converted to subcommands.
-    let result = if matches.is_present("init") {
-        let m = matches.subcommand_matches("init").unwrap();
-        let mut init = initialize::Builder::new();
-        init.binary_name(m.value_of("binary-name"));
-        init.copyright_holder(m.value_of("holder"));
-        init.copyright_year(m.value_of("year"));
-        init.description(m.value_of("description"));
-        init.eula(m.value_of("eula"));
-        init.force(m.is_present("force"));
-        init.help_url(m.value_of("url"));
-        init.input(m.value_of("INPUT"));
-        init.license(m.value_of("license"));
-        init.manufacturer(m.value_of("manufacturer"));
-        init.output(m.value_of("output"));
-        init.product_name(m.value_of("product-name"));
-        init.build().run()    
-    } else if matches.is_present("clean") {
-        let m = matches.subcommand_matches("clean").unwrap();
-        let mut clean = clean::Builder::new();
-        clean.input(m.value_of("INPUT"));
-        clean.build().run()
-    } else if matches.is_present("purge") {
-        let m = matches.subcommand_matches("purge").unwrap();
-        let mut purge = purge::Builder::new();
-        purge.input(m.value_of("INPUT"));
-        purge.build().run()
-    } else if matches.is_present("print") {
-        let m = matches.subcommand_matches("print").unwrap();
-        let template = value_t!(m, "TEMPLATE", Template).unwrap();
-        match template {
-            Template::Wxs => {
-                let mut print = print::wxs::Builder::new();
-                print.binary_name(m.value_of("binary-name"));
-                print.description(m.value_of("description"));
-                print.eula(m.value_of("eula"));
-                print.help_url(m.value_of("url"));
-                print.input(m.value_of("INPUT"));
-                print.license(m.value_of("license"));
-                print.manufacturer(m.value_of("manufacturer"));
-                print.output(m.value_of("output"));
-                print.product_name(m.value_of("product-name"));
-                print.build().run()
-            },
-            t => {
-                let mut print = print::license::Builder::new();
-                print.copyright_holder(m.value_of("holder"));
-                print.copyright_year(m.value_of("year"));
-                print.input(m.value_of("INPUT"));
-                print.output(m.value_of("output"));
-                print.build().run(t)
-            },
+    let result = match matches.subcommand() {
+        ("clean", Some(m)) => {
+            let mut clean = clean::Builder::new();
+            clean.input(m.value_of("INPUT"));
+            clean.build().run()
+        },
+        ("init", Some(m)) => {
+            let mut init = initialize::Builder::new();
+            init.binary_name(m.value_of("binary-name"));
+            init.copyright_holder(m.value_of("holder"));
+            init.copyright_year(m.value_of("year"));
+            init.description(m.value_of("description"));
+            init.eula(m.value_of("eula"));
+            init.force(m.is_present("force"));
+            init.help_url(m.value_of("url"));
+            init.input(m.value_of("INPUT"));
+            init.license(m.value_of("license"));
+            init.manufacturer(m.value_of("manufacturer"));
+            init.output(m.value_of("output"));
+            init.product_name(m.value_of("product-name"));
+            init.build().run()    
+        },
+        ("print", Some(m)) => {
+            let template = value_t!(m, "TEMPLATE", Template).unwrap();
+            match template {
+                Template::Wxs => {
+                    let mut print = print::wxs::Builder::new();
+                    print.binary_name(m.value_of("binary-name"));
+                    print.description(m.value_of("description"));
+                    print.eula(m.value_of("eula"));
+                    print.help_url(m.value_of("url"));
+                    print.input(m.value_of("INPUT"));
+                    print.license(m.value_of("license"));
+                    print.manufacturer(m.value_of("manufacturer"));
+                    print.output(m.value_of("output"));
+                    print.product_name(m.value_of("product-name"));
+                    print.build().run()
+                },
+                t => {
+                    let mut print = print::license::Builder::new();
+                    print.copyright_holder(m.value_of("holder"));
+                    print.copyright_year(m.value_of("year"));
+                    print.input(m.value_of("INPUT"));
+                    print.output(m.value_of("output"));
+                    print.build().run(t)
+                },
+            }
+        },
+        ("purge", Some(m)) => {
+            let mut purge = purge::Builder::new();
+            purge.input(m.value_of("INPUT"));
+            purge.build().run()
+        } 
+        _ => {
+            let mut create = create::Builder::new();
+            create.bin_path(matches.value_of("bin-path"));
+            create.capture_output(matches.is_present("capture-output"));
+            create.culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()));
+            create.input(matches.value_of("INPUT"));
+            create.locale(matches.value_of("locale"));
+            create.name(matches.value_of("name"));
+            create.no_build(matches.is_present("no-build"));
+            create.output(matches.value_of("output"));
+            create.version(matches.value_of("install-version"));
+            create.build().run()
         }
-    } else {
-        let mut create = create::Builder::new();
-        create.bin_path(matches.value_of("bin-path"));
-        create.capture_output(matches.is_present("capture-output"));
-        create.culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()));
-        create.input(matches.value_of("INPUT"));
-        create.locale(matches.value_of("locale"));
-        create.name(matches.value_of("name"));
-        create.no_build(matches.is_present("no-build"));
-        create.output(matches.value_of("output"));
-        create.version(matches.value_of("install-version"));
-        create.build().run()
     };
     match result {
         Ok(_) => std::process::exit(0),
