@@ -72,6 +72,17 @@ fn main() {
         .long("eula")
         .short("E")
         .takes_value(true);
+    // The license option for the `init` and `print` subcommands.
+    let license = Arg::with_name("license")
+        .help("Overrides the 'license-file' field of the package's manifest \
+              (Cargo.toml). This requires the '--init' flag. If an appropriate license \
+              file does not exist, cannot be found, or is not specified, then no \
+              license file is included in the installer. A file containing the license, \
+              such as a TXT, PDF, or RTF  file, can later be added by directly editing \
+              the generated WiX Source file (wxs) in a text editor.")
+        .long("license")
+        .short("l")
+        .takes_value(true);
     // The url option for the `init` and `print` subcommands
     let url = Arg::with_name("url")
         .help("Adds a URL to the installer that will be displayed in the Add/Remove \
@@ -92,6 +103,32 @@ fn main() {
         .long("holder")
         .short("H")
         .takes_value(true);
+    // The manufacturer option for the `init` and `print` subcommands
+    let manufacturer = Arg::with_name("manufacturer")
+        .help("Overrides the first author in the 'authors' field of the package's \
+              manifest (Cargo.toml) as the manufacturer within the installer. The \
+              manufacturer can be changed after initialization by directly \
+              modifying the WiX Source file (wxs) with a text editor.")
+        .long("manufacturer")
+        .short("m")
+        .takes_value(true);
+    // The product name option for the `init` and `print` subcommands
+    let product_name = Arg::with_name("product-name")
+        .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as \
+              the product name within the installer. The product name can be \
+              changed after initialization by directly modifying the WiX Source \
+              file (wxs) with a text editor.")
+        .long("product-name")
+        .short("p")
+        .takes_value(true);
+    let year = Arg::with_name("year")
+         .help("Sets the copyright year for the license during initialization. The \
+               default is to use the current year. This is only used if a license \
+               is generated from one of the supported licenses based on the value \
+               of the 'license' field in the package's manifest (Cargo.toml).")
+         .short("Y")
+         .long("year")
+         .takes_value(true);
     let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
@@ -138,23 +175,21 @@ fn main() {
                            Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
-                    .arg(binary_name)
-                    .arg(description)
-                    .arg(eula)
+                    .arg(binary_name.clone())
+                    .arg(description.clone())
+                    .arg(eula.clone())
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
                               initialization. Use with caution.")
                         .long("force"))
-                    .arg(url)
-                    .arg(holder)
-                    .arg(Arg::with_name("manufacturer")
-                        .help("Overrides the first author in the 'authors' field of the package's \
-                              manifest (Cargo.toml) as the manufacturer within the installer. The \
-                              manufacturer can be changed after initialization by directly \
-                              modifying the WiX Source file (wxs) with a text editor.")
-                        .long("manufacturer")
-                        .short("m")
-                        .takes_value(true))
+                    .arg(holder.clone())
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
+                              not used, then all output from initialization will be placed in \
+                              a 'wix' folder created alongside this path.")
+                        .index(1))
+                    .arg(license.clone()))
+                    .arg(manufacturer.clone())
                     .arg(Arg::with_name("output")
                         .help("Sets the destination for all files generated during initialization. \
                               The default is to create a 'wix' folder within the project then \
@@ -162,38 +197,10 @@ fn main() {
                         .long("output")
                         .short("o")
                         .takes_value(true))
-                    .arg(Arg::with_name("product-name")
-                        .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as \
-                              the product name within the installer. The product name can be \
-                              changed after initialization by directly modifying the WiX Source \
-                              file (wxs) with a text editor.")
-                        .long("product-name")
-                        .short("p")
-                        .takes_value(true))
-                    .arg(Arg::with_name("year")
-                         .help("Sets the copyright year for the license during initialization. The \
-                               default is to use the current year. This is only used if a license \
-                               is generated from one of the supported licenses based on the value \
-                               of the 'license' field in the package's manifest (Cargo.toml).")
-                         .short("Y")
-                         .long("year")
-                         .takes_value(true))
+                    .arg(product_name.clone())
+                    .arg(url.clone())
                     .arg(verbose.clone())
-                    .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
-                              not used, then all output from initialization will be placed in \
-                              a 'wix' folder created alongside this path.")
-                        .index(1))
-                    .arg(Arg::with_name("license")
-                        .help("Overrides the 'license-file' field of the package's manifest \
-                              (Cargo.toml). This requires the '--init' flag. If an appropriate license \
-                              file does not exist, cannot be found, or is not specified, then no \
-                              license file is included in the installer. A file containing the license, \
-                              such as a TXT, PDF, or RTF  file, can later be added by directly editing \
-                              the generated WiX Source file (wxs) in a text editor.")
-                        .long("license")
-                        .short("l")
-                        .takes_value(true)))
+                    .arg(year.clone())
                 .arg(Arg::with_name("install-version")        
                     .help("Overrides the version from the package's manifest (Cargo.toml), which \
                           is used for the installer name and appears in the Add/Remove Programs \
@@ -232,13 +239,32 @@ fn main() {
                     .long("output")
                     .short("o")
                     .takes_value(true))
-                .subcommand(Subcommand::with_name("print")
+                .subcommand(SubCommand::with_name("print")
                     .version(crate_version!())                            
                     .about("Prints a template to stdout or a file. In the case of a license \
                            template, the output is in the Rich Text Format (RTF) and for a WiX \
                            Source file (wxs), the output is in XML. New GUIDS are generated for the \
                            'UpgradeCode' and Path Component each time the 'WXS' template is \
                            printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                    .arg(binary_name)
+                    .arg(description)
+                    .arg(eula)
+                    .arg(holder)
+                    .arg(Arg::with_name("INPUT")
+                        .help("A package's manifest (Cargo.toml). The selected template will be \
+                              printed to stdout or a file based on the field values in this \
+                              manifest. The default is to use the manifest in the current working \
+                              directory (cwd). An error occurs if a manifest is not found.")
+                        .index(2))
+                    .arg(license)
+                    .arg(manufacturer)
+                    .arg(Arg::with_name("output")
+                        .help("Sets the destination for printing the template. The default is to \
+                              print/write the rendered template to stdout. If the destination, \
+                              a.k.a. file, does not exist, it will be created.")
+                        .long("output")
+                        .short("o")
+                        .takes_value(true))
                     .arg(Arg::with_name("TEMPLATE")
                         .help("The template to print. This is required and values are case \
                               insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
@@ -249,19 +275,8 @@ fn main() {
                             .collect::<Vec<&str>>())
                         .required(true)
                         .index(1))
-                    .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). The selected template will be \
-                              printed to stdout or a file based on the field values in this \
-                              manifest. The default is to use the manifest in the current working \
-                              directory (cwd). An error occurs if a manifest is not found.")
-                        .index(2))
-                    .arg(Arg::with_name("output")
-                        .help("Sets the destination for printing the template. The default is to \
-                              print/write the rendered template to stdout. If the destination, \
-                              a.k.a. file, does not exist, it will be created.")
-                        .long("output")
-                        .short("o")
-                        .takes_value(true)))
+                    .arg(url)
+                    .arg(verbose.clone()))
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
@@ -301,6 +316,7 @@ fn main() {
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
         ("init", Some(m)) => m,
+        ("print", Some(m)) => m,
         _ => matches,
     }.occurrences_of("verbose");
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
