@@ -196,6 +196,27 @@ fn manifest(input: Option<&PathBuf>) -> Result<Value> {
     Ok(manifest)
 }
 
+fn description(description: Option<String>, manifest: &Value) -> Option<String> {
+    description.or(manifest.get("package")
+        .and_then(|p| p.as_table())
+        .and_then(|t| t.get("description"))
+        .and_then(|d| d.as_str())
+        .map(String::from))
+}
+
+fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<String> {
+    if let Some(p) = product_name {
+        Ok(p.to_owned())
+    } else {
+        manifest.get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("name"))
+            .and_then(|n| n.as_str())
+            .map(String::from)
+            .ok_or(Error::Manifest("name"))
+    }
+}
+
 /// The error type for cargo-wix-related operations and associated traits.
 ///
 /// Errors mostly originate from the dependencies, but custom instances of `Error` can be created

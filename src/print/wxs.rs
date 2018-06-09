@@ -1,7 +1,9 @@
+use description;
 use Error;
 use eula::Eula;
 use manifest;
 use mustache::{self, MapBuilder};
+use product_name;
 use Result;
 use std::path::{Path, PathBuf};
 use Template;
@@ -197,11 +199,11 @@ impl Execution {
         let template = mustache::compile_str(Template::Wxs.to_str())?;
         let mut map = MapBuilder::new()
             .insert_str("binary-name", self.binary_name(&manifest)?)
-            .insert_str("product-name", self.product_name(&manifest)?)
+            .insert_str("product-name", product_name(self.product_name.as_ref(), &manifest)?)
             .insert_str("manufacturer", self.manufacturer(&manifest)?)
             .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
-        if let Some(description) = self.description(&manifest) {
+        if let Some(description) = description(self.description.clone(), &manifest) {
             map = map.insert_str("description", description);
         } else {
             warn!("A description was not specified at the command line or in the package's manifest \
@@ -248,16 +250,8 @@ impl Execution {
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
                 .map(String::from)
-                .map_or(self.product_name(manifest), |s| Ok(s))
+                .map_or(product_name(self.product_name.as_ref(), manifest), |s| Ok(s))
         }
-    }
-
-    fn description(&self, manifest: &Value) -> Option<String> {
-        self.description.clone().or(manifest.get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("description"))
-            .and_then(|d| d.as_str())
-            .map(String::from))
     }
 
     fn help_url(&self, manifest: &Value) -> Option<String> {
@@ -327,19 +321,6 @@ impl Execution {
             Ok(m.to_owned())
         } else {
             super::first_author(&manifest)
-        }
-    }
-
-    fn product_name(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref p) = self.product_name {
-            Ok(p.to_owned())
-        } else {
-            manifest.get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map(String::from)
-                .ok_or(Error::Manifest("name"))
         }
     }
 }
