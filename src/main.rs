@@ -28,6 +28,7 @@ use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
 use cargo_wix::clean;
 use cargo_wix::create;
 use cargo_wix::initialize;
+use cargo_wix::print;
 use cargo_wix::purge;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
@@ -360,24 +361,6 @@ fn main() {
         2 => LevelFilter::Debug,
         _ => LevelFilter::Trace,
     }).init();
-    let wix = cargo_wix::Wix::new()
-        .bin_path(matches.value_of("bin-path"))
-        .binary_name(matches.value_of("binary-name"))
-        .capture_output(!matches.is_present("no-capture"))
-        .copyright_holder(matches.value_of("holder"))
-        .copyright_year(matches.value_of("year"))
-        .culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()))
-        .description(matches.value_of("description"))
-        .input(matches.value_of("INPUT"))
-        .license_file(matches.value_of("license"))
-        .locale(matches.value_of("locale"))
-        .manufacturer(matches.value_of("manufacturer"))
-        .no_build(matches.is_present("no-build"))
-        .output(matches.value_of("output"))
-        .product_name(matches.value_of("product-name"))
-        .sign(matches.is_present("sign"))
-        .sign_path(matches.value_of("sign-path"))
-        .timestamp(matches.value_of("timestamp"));
     // TODO: Change to use the `subcommand_name` method and a match expression once all of the
     // flags have been converted to subcommands.
     let result = if matches.is_present("init") {
@@ -406,8 +389,32 @@ fn main() {
         let mut purge = purge::Builder::new();
         purge.input(m.value_of("INPUT"));
         purge.build().run()
-    } else if matches.is_present("print-template") {
-        wix.print_template(value_t!(matches, "print-template", Template).unwrap())
+    } else if matches.is_present("print") {
+        let m = matches.subcommand_matches("print").unwrap();
+        let template = value_t!(m, "TEMPLATE", Template).unwrap();
+        match template {
+            Template::Wxs => {
+                let mut print = print::wxs::Builder::new();
+                print.binary_name(m.value_of("binary-name"));
+                print.description(m.value_of("description"));
+                print.eula(m.value_of("eula"));
+                print.help_url(m.value_of("url"));
+                print.input(m.value_of("INPUT"));
+                print.license(m.value_of("license"));
+                print.manufacturer(m.value_of("manufacturer"));
+                print.output(m.value_of("output"));
+                print.product_name(m.value_of("product-name"));
+                print.build().run()
+            },
+            t => {
+                let mut print = print::license::Builder::new();
+                print.copyright_holder(m.value_of("holder"));
+                print.copyright_year(m.value_of("year"));
+                print.input(m.value_of("INPUT"));
+                print.output(m.value_of("output"));
+                print.build().run(t)
+            },
+        }
     } else {
         let mut create = create::Builder::new();
         create.bin_path(matches.value_of("bin-path"));
