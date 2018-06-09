@@ -141,8 +141,6 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use toml::Value;
 
-pub use self::wix::Wix;
-
 pub mod clean;
 pub mod create;
 mod eula;
@@ -150,7 +148,6 @@ pub mod initialize;
 pub mod print;
 pub mod purge;
 pub mod sign;
-mod wix;
 
 pub const BINARY_FOLDER_NAME: &str = "bin";
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
