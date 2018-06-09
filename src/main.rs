@@ -30,20 +30,12 @@ use cargo_wix::create;
 use cargo_wix::initialize;
 use cargo_wix::print;
 use cargo_wix::purge;
+use cargo_wix::sign;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
-    // The "global" verbose flag for all subcommands.
-    let verbose = Arg::with_name("verbose")
-        .help("Sets the level of verbosity. The higher the level of verbosity, the more \
-              information that is printed and logged when the application is executed. \
-              This flag can be specified multiple times, where each occurrance \
-              increases the level and/or details written for each statement.")
-        .long("verbose")
-        .short("v")
-        .multiple(true);
     // The binary-name option for the `init` and `print` subcommands.
     let binary_name = Arg::with_name("binary-name")
         .help("Overrides the 'name' field of the 'bin' section of the package's \
@@ -122,6 +114,15 @@ fn main() {
         .long("product-name")
         .short("p")
         .takes_value(true);
+    // The "global" verbose flag for all subcommands.
+    let verbose = Arg::with_name("verbose")
+        .help("Sets the level of verbosity. The higher the level of verbosity, the more \
+              information that is printed and logged when the application is executed. \
+              This flag can be specified multiple times, where each occurrance \
+              increases the level and/or details written for each statement.")
+        .long("verbose")
+        .short("v")
+        .multiple(true);
     let year = Arg::with_name("year")
          .help("Sets the copyright year for the license during initialization. The \
                default is to use the current year. This is only used if a license \
@@ -288,31 +289,54 @@ fn main() {
                               This is optional and the default is to use the current working \
                               directory (cwd).")
                         .index(1)))
-                .arg(Arg::with_name("sign")
-                    .help("The Windows installer (msi) will be signed using the SignTool \
+                .subcommand(SubCommand::with_name("sign")
+                    .version(crate_version!())
+                    .about("The Windows installer (msi) will be signed using the SignTool \
                           application available in the Windows 10 SDK. The signtool is invoked with \
                           the '/a' flag to automatically obtain an appropriate certificate from the \
                           Windows certificate manager. The default is to also use the Comodo \
                           timestamp server with the '/t' flag.")
-                    .short("s")
-                    .long("sign"))
-                .arg(Arg::with_name("sign-path")
-                    .help("Specifies the path to the folder containg the 'signtool' application. \
-                          The default is to use the PATH system environment variable to locate the \
-                          application. This can only be used with the '-s,--sign' flag.")
-                    .long("sign-path")
-                    .short("S")
-                    .takes_value(true)
-                    .requires("sign"))
-                .arg(Arg::with_name("timestamp")
-                    .help("The alias or URL for the timestamp server used with the 'signtool' to \
-                          sign the installer. This can only be used with the '-s,--sign' flag. \
-                          Either an alias can be used or a URL. Available case-insensitive aliases \
-                          include: Comodo and Verisign.")
-                    .short("t")
-                    .long("timestamp")
-                    .takes_value(true)
-                    .requires("sign"))
+                    .arg(Arg::with_name("bin-path")
+                        .help("Specifies the path to the folder containg the 'signtool' application. \
+                              The default is to use the PATH system environment variable to locate the \
+                              application.")
+                        .long("bin-path")
+                        .short("B")
+                        .takes_value(true))
+                    .arg(Arg::with_name("description")
+                         .help("The information for the extended text of the ACL dialog that \
+                               appears. This will be appended to the product name and delimited by \
+                               a dash, '-'. The default is to use the description from the \
+                               package's manifest (Cargo.toml). This option will override the \
+                               default.")
+                         .long("description")
+                         .short("s")
+                         .takes_value(true))
+                    .arg(Arg::with_name("homepage")
+                         .help("The URL to the homepage for the product. This will be displayed in \
+                               the ACL dialog.")
+                         .long("homepage")
+                         .short("U")
+                         .takes_value(true))
+                    .arg(Arg::with_name("INPUT")
+                         .help("A package's manifest (Cargo.toml). The installer located in the \
+                               'target\\wix' folder alongside this manifest will be signed based on \
+                               the metadata within the manifest.")
+                         .index(1))
+                    .arg(Arg::with_name("no-capture")
+                         .help("By default, this subcommand captures, or hides, all output from the \
+                               signer. Use this flag to show the output.")
+                         .long("nocapture"))
+                    .arg(product_name)
+                    .arg(Arg::with_name("timestamp")
+                        .help("The alias or URL for the timestamp server used with the 'signtool' to \
+                              sign the installer. This can only be used with the '-s,--sign' flag. \
+                              Either an alias can be used or a URL. Available case-insensitive aliases \
+                              include: Comodo and Verisign.")
+                        .short("t")
+                        .long("timestamp")
+                        .takes_value(true))
+                    .arg(verbose.clone()))
                 .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
@@ -416,7 +440,18 @@ fn main() {
             let mut purge = purge::Builder::new();
             purge.input(m.value_of("INPUT"));
             purge.build().run()
-        } 
+        },
+        ("sign", Some(m)) => {
+            let mut sign = sign::Builder::new();
+            sign.bin_path(m.value_of("bin-path"));
+            sign.capture_output(m.is_present("capture-output"));
+            sign.description(m.value_of("description"));
+            sign.homepage(m.value_of("homepage"));
+            sign.input(m.value_of("INPUT"));
+            sign.product_name(m.value_of("product-name"));
+            sign.timestamp(m.value_of("timestamp"));
+            sign.build().run()
+        },
         _ => {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));

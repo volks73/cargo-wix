@@ -149,12 +149,14 @@ mod eula;
 pub mod initialize;
 pub mod print;
 pub mod purge;
+pub mod sign;
 mod wix;
 
 pub const BINARY_FOLDER_NAME: &str = "bin";
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
 pub const EXE_FILE_EXTENSION: &str = "exe";
+pub const MSI_FILE_EXTENSION: &str = "msi";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
