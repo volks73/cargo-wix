@@ -154,11 +154,11 @@ fn main() {
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
-                    .about("Deletes the 'target\\wix' folder.")
+                    .about("Deletes the 'target\\wix' folder if it exists.")
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). The 'target\\wix' folder that \
                               exists alongside the package's manifest will be removed. This is \
-                              optional and the default is to use the current working directory.")
+                              optional and the default is to use the current working directory (cwd).")
                         .index(1)))
                 .arg(Arg::with_name("culture")
                     .help("Sets the culture for localization. Use with the '-L,--locale' option. \
@@ -189,7 +189,7 @@ fn main() {
                               not used, then all output from initialization will be placed in \
                               a 'wix' folder created alongside this path.")
                         .index(1))
-                    .arg(license.clone()))
+                    .arg(license.clone())
                     .arg(manufacturer.clone())
                     .arg(Arg::with_name("output")
                         .help("Sets the destination for all files generated during initialization. \
@@ -201,7 +201,7 @@ fn main() {
                     .arg(product_name.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
-                    .arg(year.clone())
+                    .arg(year.clone()))
                 .arg(Arg::with_name("install-version")        
                     .help("Overrides the version from the package's manifest (Cargo.toml), which \
                           is used for the installer name and appears in the Add/Remove Programs \
@@ -280,12 +280,13 @@ fn main() {
                     .arg(verbose.clone()))
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
-                    .about("Deletes the 'target\\wix' and 'wix' folders. Use with caution.")
+                    .about("Deletes the 'target\\wix' and 'wix' folders if they exist. Use with \
+                            caution.")
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). The 'target\\wix' and 'wix' \
                               folders that exists alongside the package's manifest will be removed. \
                               This is optional and the default is to use the current working \
-                              directory.")
+                              directory (cwd).")
                         .index(1)))
                 .arg(Arg::with_name("sign")
                     .help("The Windows installer (msi) will be signed using the SignTool \
