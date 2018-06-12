@@ -444,7 +444,7 @@ fn main() {
         ("sign", Some(m)) => {
             let mut sign = sign::Builder::new();
             sign.bin_path(m.value_of("bin-path"));
-            sign.capture_output(m.is_present("capture-output"));
+            sign.capture_output(!m.is_present("no-capture"));
             sign.description(m.value_of("description"));
             sign.homepage(m.value_of("homepage"));
             sign.input(m.value_of("INPUT"));
@@ -455,7 +455,7 @@ fn main() {
         _ => {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
-            create.capture_output(matches.is_present("capture-output"));
+            create.capture_output(!matches.is_present("no-capture"));
             create.culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()));
             create.input(matches.value_of("INPUT"));
             create.locale(matches.value_of("locale"));
