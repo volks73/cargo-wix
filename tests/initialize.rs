@@ -31,20 +31,20 @@ pub const LICENSE_RTF_NAME: &str = "License.rtf";
 
 lazy_static!{
     static ref WIX: PathBuf = PathBuf::from(WIX_NAME);
+    static ref WIX_MAIN_WXS: PathBuf = PathBuf::from(WIX_NAME).join(MAIN_WXS_NAME);
+    static ref WIX_LICENSE_RTF: PathBuf = PathBuf::from(WIX_NAME).join(LICENSE_RTF_NAME);
 }
 
 #[test]
 fn default_execution_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
-    let wix_main_wxs = WIX.join(MAIN_WXS_NAME);
-    let wix_license_rtf = WIX.join(LICENSE_RTF_NAME);
     env::set_current_dir(package.path()).unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
     package.child(WIX.as_path()).assert(&path::exists());
-    package.child(wix_main_wxs).assert(&path::exists());
-    package.child(wix_license_rtf).assert(&path::missing());
+    package.child(WIX_MAIN_WXS.as_path()).assert(&path::exists());
+    package.child(WIX_LICENSE_RTF.as_path()).assert(&path::missing());
 }
 
