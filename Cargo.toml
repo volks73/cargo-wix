@@ -32,6 +32,7 @@ uuid = { version = "0.5", features = ["v4"] }
 [dev-dependencies]
 assert_cmd = "0.3"
 assert_fs = "0.2"
+lazy_static = "1"
 predicates = "0.5"
 tempfile = "3"
 

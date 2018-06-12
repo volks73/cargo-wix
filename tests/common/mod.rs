@@ -2,6 +2,11 @@ extern crate tempfile;
 
 use std::process::Command;
 
+#[allow(dead_code)]
+pub const WIX_NAME: &str = "wix";
+#[allow(dead_code)]
+pub const TARGET_NAME: &str = "target";
+
 pub fn create_test_package() -> tempfile::TempDir {
     // Use a prefix because the default `.tmp` is an invalid name for a Cargo package.
     // 

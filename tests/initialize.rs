@@ -14,25 +14,37 @@
 
 extern crate assert_fs;
 extern crate cargo_wix;
+#[macro_use] extern crate lazy_static;
 extern crate predicates;
 
 mod common;
 
 use assert_fs::prelude::*;
 use cargo_wix::initialize::Execution;
-use predicates::prelude::*;
+use common::WIX_NAME;
+use predicates::path;
 use std::env;
+use std::path::PathBuf;
+
+pub const MAIN_WXS_NAME: &str = "main.wxs";
+pub const LICENSE_RTF_NAME: &str = "License.rtf";
+
+lazy_static!{
+    static ref WIX: PathBuf = PathBuf::from(WIX_NAME);
+}
 
 #[test]
 fn default_execution_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
+    let wix_main_wxs = WIX.join(MAIN_WXS_NAME);
+    let wix_license_rtf = WIX.join(LICENSE_RTF_NAME);
     env::set_current_dir(package.path()).unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child("wix").assert(&predicate::path::exists());
-    package.child("wix\\main.wxs").assert(&predicate::path::exists());
-    package.child("wix\\License.rtf").assert(&predicate::path::missing());
+    package.child(WIX.as_path()).assert(&path::exists());
+    package.child(wix_main_wxs).assert(&path::exists());
+    package.child(wix_license_rtf).assert(&path::missing());
 }
 
