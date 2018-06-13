@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use CARGO_MANIFEST_FILE;
 use Error;
 use eula::Eula;
 use print;
 use Result;
 use std::env;
+use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 use WIX_SOURCE_FILE_NAME;
@@ -304,16 +306,20 @@ impl Execution {
             trace!("An output path has NOT been explicity specified. Implicitly determine output.");
             if let Some(ref input) = self.input {
                 trace!("An input path has been explicitly specified");
-                if input.exists() && input.is_file() {
-                    trace!("The input path exists and it is a file");
+                if input.exists() && 
+                   input.is_file() && 
+                   input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) 
+                {
+                    trace!("The input path exists, it is a file, and it is appears to be Cargo.toml");
                     Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
                         p.push(WIX);
                         Some(p)
                     }).unwrap())
                 } else {
                     Err(Error::Generic(format!(
-                        "The '{}' path does not exist or it is not a file", 
-                        input.display()
+                        "The '{}' path does not exist, it is not a file, or it does not appear to be a {} file.", 
+                        input.display(),
+                        CARGO_MANIFEST_FILE
                     )))
                 }
             } else {
@@ -330,6 +336,192 @@ impl Execution {
 impl Default for Execution {
     fn default() -> Self {
         Builder::new().build()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod builder {
+        use super::*;
+
+        #[test]
+        fn defaults_are_correct() {
+            let actual = Builder::new();
+            assert!(actual.binary_name.is_none());
+            assert!(actual.copyright_year.is_none());
+            assert!(actual.copyright_holder.is_none());
+            assert!(actual.description.is_none());
+            assert!(actual.eula.is_none());
+            assert!(!actual.force);
+            assert!(actual.help_url.is_none());
+            assert!(actual.input.is_none());
+            assert!(actual.license.is_none());
+            assert!(actual.manufacturer.is_none());
+            assert!(actual.output.is_none());
+            assert!(actual.product_name.is_none());
+        }
+
+        #[test]
+        fn binary_name_works() {
+            const EXPECTED: &str = "name";
+            let mut actual = Builder::new();
+            actual.binary_name(Some(EXPECTED));
+            assert_eq!(actual.binary_name, Some(EXPECTED));
+        }
+
+        #[test]
+        fn copyright_holder_works() {
+            const EXPECTED: &str = "holder";
+            let mut actual = Builder::new();
+            actual.copyright_holder(Some(EXPECTED));
+            assert_eq!(actual.copyright_holder, Some(EXPECTED));
+        }
+
+        #[test]
+        fn copyright_year_works() {
+            const EXPECTED: &str = "2018";
+            let mut actual = Builder::new();
+            actual.copyright_year(Some(EXPECTED));
+            assert_eq!(actual.copyright_year, Some(EXPECTED));
+        }
+
+        #[test]
+        fn description_works() {
+            const EXPECTED: &str = "description";
+            let mut actual = Builder::new();
+            actual.description(Some(EXPECTED));
+            assert_eq!(actual.description, Some(EXPECTED));
+        }
+
+        #[test]
+        fn eula_works() {
+            const EXPECTED: &str = "eula.rtf";
+            let mut actual = Builder::new();
+            actual.eula(Some(EXPECTED));
+            assert_eq!(actual.eula, Some(EXPECTED));
+        }
+
+        #[test]
+        fn force_works() {
+            let mut actual = Builder::new();
+            actual.force(true);
+            assert!(actual.force);
+        }
+
+        #[test]
+        fn help_url_works() {
+            const EXPECTED: &str = "http://github.com/volks73/cargo-wix";
+            let mut actual = Builder::new();
+            actual.help_url(Some(EXPECTED));
+            assert_eq!(actual.help_url, Some(EXPECTED));
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "input.wxs";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn license_works() {
+            const EXPECTED: &str = "License.txt";
+            let mut actual = Builder::new();
+            actual.license(Some(EXPECTED));
+            assert_eq!(actual.license, Some(EXPECTED));
+        }
+
+        #[test]
+        fn manufacturer_works() {
+            const EXPECTED: &str = "manufacturer";
+            let mut actual = Builder::new();
+            actual.manufacturer(Some(EXPECTED));
+            assert_eq!(actual.manufacturer, Some(EXPECTED));
+        }
+
+        #[test]
+        fn output_works() {
+            const EXPECTED: &str = "output";
+            let mut actual = Builder::new();
+            actual.output(Some(EXPECTED));
+            assert_eq!(actual.output, Some(EXPECTED));
+        }
+
+        #[test]
+        fn product_name_works() {
+            const EXPECTED: &str = "product name";
+            let mut actual = Builder::new();
+            actual.product_name(Some(EXPECTED));
+            assert_eq!(actual.product_name, Some(EXPECTED));
+        }
+    }
+
+    mod execution {
+        extern crate tempfile;
+
+        use std::fs::File;
+        use super::*;
+
+        #[test]
+        fn destination_is_correct_with_defaults() {
+            let mut expected = env::current_dir().unwrap();
+            expected.push(WIX);
+            let e = Execution::default();
+            let actual = e.destination().unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn destination_is_correct_with_output() {
+            let expected = PathBuf::from("output");
+            let mut e = Execution::default();
+            e.output = Some(expected.clone());
+            let actual = e.destination().unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn destination_is_correct_with_input() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
+            File::create(&temp_cargo_toml).unwrap();
+            let expected = temp_dir.path().join(WIX);
+            let mut e = Execution::default();
+            e.input = Some(temp_cargo_toml);
+            let actual = e.destination().unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        #[should_panic]
+        fn destination_fails_with_nonexistent_input() {
+            let mut e = Execution::default();
+            e.input = Some(PathBuf::from("not_real.toml"));
+            e.destination().unwrap();
+        }
+
+        #[test]
+        #[should_panic]
+        fn destination_fails_with_directory_input() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let mut e = Execution::default();
+            e.input = Some(temp_dir.path().into());
+            e.destination().unwrap();
+        }
+
+        #[test]
+        #[should_panic]
+        fn destination_fails_when_input_is_not_a_manifest() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
+            File::create(&not_a_manifest).unwrap();
+            let mut e = Execution::default();
+            e.input = Some(not_a_manifest);
+            e.destination().unwrap();
+        }
     }
 }
 
