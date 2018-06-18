@@ -455,6 +455,24 @@ mod tests {
             actual.product_name(Some(EXPECTED));
             assert_eq!(actual.product_name, Some(EXPECTED));
         }
+
+        #[test]
+        fn build_with_defaults_works() {
+            let mut b = Builder::new();
+            let default_execution = b.build();
+            assert!(default_execution.binary_name.is_none());
+            assert!(default_execution.copyright_year.is_none());
+            assert!(default_execution.copyright_holder.is_none());
+            assert!(default_execution.description.is_none());
+            assert!(default_execution.eula.is_none());
+            assert!(!default_execution.force);
+            assert!(default_execution.help_url.is_none());
+            assert!(default_execution.input.is_none());
+            assert!(default_execution.license.is_none());
+            assert!(default_execution.manufacturer.is_none());
+            assert!(default_execution.output.is_none());
+            assert!(default_execution.product_name.is_none());
+        }
     }
 
     mod execution {
@@ -546,8 +564,8 @@ mod tests {
         #[test]
         #[should_panic]
         fn destination_fails_when_cwd_has_no_manifest() {
-            let temp_dir = tempfile::tempdir().unwrap();
             let original = env::current_dir().unwrap();
+            let temp_dir = tempfile::tempdir().unwrap();
             env::set_current_dir(temp_dir.path()).unwrap();
             let e = Execution::default();
             let result = e.destination();
