@@ -326,8 +326,20 @@ impl Execution {
                 trace!("An input path has NOT been explicitly specified, implicitly using the \
                        current working directory");
                 let mut cwd = env::current_dir()?;
-                cwd.push(WIX);
-                Ok(cwd)
+                cwd.push(CARGO_MANIFEST_FILE);
+                if cwd.exists() && cwd.is_file() {
+                    trace!("The current working directory has a {} file", CARGO_MANIFEST_FILE);
+                    Ok(cwd.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
+                        p.push(WIX);
+                        Some(p)
+                    }).unwrap())
+                } else {
+                    Err(Error::Generic(format!(
+                        "The '{}' path does not exist, it is not a file, or it does not appear to be a {} file.",
+                        cwd.display(),
+                        CARGO_MANIFEST_FILE
+                    )))
+                }
             }
         }
     }
@@ -521,6 +533,18 @@ mod tests {
             let mut e = Execution::default();
             e.input = Some(not_a_manifest);
             e.destination().unwrap();
+        }
+
+        #[test]
+        #[should_panic]
+        fn destination_fails_when_cwd_has_no_manifest() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let original = env::current_dir().unwrap();
+            env::set_current_dir(temp_dir.path()).unwrap();
+            let e = Execution::default();
+            let result = e.destination();
+            env::set_current_dir(original).unwrap();
+            result.unwrap();
         }
     }
 }
