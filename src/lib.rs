@@ -136,8 +136,8 @@ use std::error::Error as StdError;
 use std::env;
 use std::fmt;
 use std::fs::File;
-use std::io::{self, Read};
-use std::path::PathBuf;
+use std::io::{self, ErrorKind, Read};
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use toml::Value;
 
@@ -255,6 +255,14 @@ impl Error {
             Error::Version(..) => 7,
         }
     }
+
+    pub fn already_exists(p: &Path) -> Self {
+        io::Error::new(ErrorKind::AlreadyExists, p.display().to_string()).into()
+    }
+
+    pub fn not_found(p: &Path) -> Self {
+        io::Error::new(ErrorKind::NotFound, p.display().to_string()).into()
+    }
 }
 
 impl StdError for Error {
@@ -288,7 +296,19 @@ impl fmt::Display for Error {
                 write!(f, "The '{}' application failed with exit code = {}. Consider using the \
                        '--nocapture' flag to obtain more information.", command, code),
             Error::Generic(ref msg) => msg.fmt(f),
-            Error::Io(ref err) => err.fmt(f),
+            Error::Io(ref err) => match err.kind() {
+                ErrorKind::AlreadyExists => if let Some(path) = err.get_ref() {
+                    write!(f, "The '{}' file already exists. Use the '--force' flag to overwrite the contents.", path)
+                } else {
+                    err.fmt(f)
+                },
+                ErrorKind::NotFound => if let Some(path) = err.get_ref() {
+                    write!(f, "The '{}' path does not exist", path)
+                } else {
+                    err.fmt(f)
+                }
+                _ => err.fmt(f),
+            },
             Error::Manifest(ref var) => 
                 write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
             Error::Mustache(ref err) => err.fmt(f),

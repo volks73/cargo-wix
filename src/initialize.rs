@@ -258,10 +258,7 @@ impl Execution {
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
         if destination.exists() && !self.force {
-            return Err(Error::Generic(format!(
-                "The '{}' file already exists. Use the '--force' flag to overwite the contents.",
-                destination.display()
-            )));
+            return Err(Error::already_exists(&destination));
         } else {
             info!("Creating the '{}\\{}.{}' file", WIX, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION);
             let mut wxs_printer = print::wxs::Builder::new();
@@ -281,10 +278,7 @@ impl Execution {
             destination.push("License");
             destination.set_extension(RTF_FILE_EXTENSION);
             if destination.exists() && !self.force {
-                return Err(Error::Generic(format!(
-                    "The '{}' file already exists. Use the '--force' flag to overwrite the contents.",
-                    destination.display()
-                )));
+                return Err(Error::already_exists(&destination));
             } else {
                 info!("Generating a EULA");
                 let mut eula_printer = print::license::Builder::new();
@@ -316,11 +310,7 @@ impl Execution {
                         Some(p)
                     }).unwrap())
                 } else {
-                    Err(Error::Generic(format!(
-                        "The '{}' path does not exist, it is not a file, or it does not appear to be a {} file.", 
-                        input.display(),
-                        CARGO_MANIFEST_FILE
-                    )))
+                    Err(Error::not_found(input))
                 }
             } else {
                 trace!("An input path has NOT been explicitly specified, implicitly using the \
@@ -334,11 +324,7 @@ impl Execution {
                         Some(p)
                     }).unwrap())
                 } else {
-                    Err(Error::Generic(format!(
-                        "The '{}' path does not exist, it is not a file, or it does not appear to be a {} file.",
-                        cwd.display(),
-                        CARGO_MANIFEST_FILE
-                    )))
+                    Err(Error::not_found(&cwd))
                 }
             }
         }
@@ -475,14 +461,22 @@ mod tests {
         extern crate tempfile;
 
         use std::fs::File;
+        use std::io::ErrorKind;
         use super::*;
 
         #[test]
         fn destination_is_correct_with_defaults() {
+            let original = env::current_dir().unwrap();
+            let temp_dir = tempfile::tempdir().unwrap();
+            env::set_current_dir(temp_dir.path()).unwrap();
+            let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
+            File::create(&temp_cargo_toml).unwrap();
             let mut expected = env::current_dir().unwrap();
             expected.push(WIX);
             let e = Execution::default();
-            let actual = e.destination().unwrap();
+            let result = e.destination();
+            env::set_current_dir(original).unwrap();
+            let actual = result.unwrap();
             assert_eq!(actual, expected);
         }
 
@@ -536,6 +530,20 @@ mod tests {
         }
 
         #[test]
+        fn destination_fails_correctly_when_input_is_not_a_manifest() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
+            File::create(&not_a_manifest).unwrap();
+            let mut e = Execution::default();
+            e.input = Some(not_a_manifest);
+            if let Error::Io(e) = e.destination().err().unwrap() {
+                assert_eq!(e.kind(), ErrorKind::NotFound);
+            } else {
+                panic!("Incorrect error");
+            }
+        }
+
+        #[test]
         #[should_panic]
         fn destination_fails_when_cwd_has_no_manifest() {
             let temp_dir = tempfile::tempdir().unwrap();
@@ -545,6 +553,22 @@ mod tests {
             let result = e.destination();
             env::set_current_dir(original).unwrap();
             result.unwrap();
+        }
+
+        #[test]
+        fn destination_fails_correctly_when_cwd_has_no_manifest() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let original = env::current_dir().unwrap();
+            env::set_current_dir(temp_dir.path()).unwrap();
+            let e = Execution::default();
+            let result = e.destination();
+            env::set_current_dir(original).unwrap();
+            let err = result.err().unwrap();
+            if let Error::Io(e) = err {
+                assert_eq!(e.kind(), ErrorKind::NotFound);
+            } else {
+                panic!("Incorrect error");
+            }
         }
     }
 }
