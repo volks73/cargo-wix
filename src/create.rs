@@ -653,6 +653,37 @@ mod tests {
             assert!(default_execution.output.is_none());
             assert!(default_execution.version.is_none());
         }
+
+        #[test]
+        fn build_with_all_works() {
+            const EXPECTED_BIN_PATH: &str = "C:\\Wix Toolset\\bin";
+            const EXPECTED_CULTURE: Cultures = Cultures::FrFr;
+            const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
+            const EXPECTED_LOCALE: &str = "C:\\tmp\\hello_world\\wix\\main.wxl";
+            const EXPECTED_NAME: &str = "Name";
+            const EXPECTED_OUTPUT: &str = "C:\\tmp\\hello_world\\output";
+            const EXPECTED_VERSION: &str = "1.2.3";
+            let mut b = Builder::new();
+            b.bin_path(Some(EXPECTED_BIN_PATH));
+            b.capture_output(false);
+            b.culture(EXPECTED_CULTURE);
+            b.input(Some(EXPECTED_INPUT));
+            b.locale(Some(EXPECTED_LOCALE));
+            b.name(Some(EXPECTED_NAME));
+            b.no_build(true);
+            b.output(Some(EXPECTED_OUTPUT));
+            b.version(Some(EXPECTED_VERSION));
+            let execution = b.build();
+            assert_eq!(execution.bin_path, Some(EXPECTED_BIN_PATH).map(PathBuf::from));
+            assert!(!execution.capture_output);
+            assert_eq!(execution.culture, EXPECTED_CULTURE);
+            assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
+            assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
+            assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
+            assert!(execution.no_build);
+            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.version, Some(EXPECTED_VERSION).map(String::from));
+        }
     }
 
     mod execution {
