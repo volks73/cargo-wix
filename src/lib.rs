@@ -511,7 +511,7 @@ impl FromStr for TimestampServer {
 /// These are taken from the table in the [WixUI
 /// localization](http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html)
 /// documentation.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Cultures {
     ArSa,
     BgBg,

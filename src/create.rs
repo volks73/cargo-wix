@@ -548,3 +548,114 @@ impl Default for Execution {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod builder {
+        use super::*;
+
+        #[test]
+        fn defaults_are_correct() {
+            let actual = Builder::new();
+            assert!(actual.bin_path.is_none());
+            assert!(actual.capture_output);
+            assert_eq!(actual.culture, Cultures::EnUs);
+            assert!(actual.input.is_none());
+            assert!(actual.locale.is_none());
+            assert!(actual.name.is_none());
+            assert!(!actual.no_build);
+            assert!(actual.output.is_none());
+            assert!(actual.version.is_none());
+        }
+
+        #[test]
+        fn bin_path_works() {
+            const EXPECTED: &str = "C:\\Wix Toolset\\bin";
+            let mut actual = Builder::new();
+            actual.bin_path(Some(EXPECTED));
+            assert_eq!(actual.bin_path, Some(EXPECTED));
+        }
+
+        #[test]
+        fn capture_output_works() {
+            let mut actual = Builder::new();
+            actual.capture_output(false);
+            assert!(!actual.capture_output);
+        }
+
+        #[test]
+        fn culture_works() {
+            const EXPECTED: Cultures = Cultures::FrFr;
+            let mut actual = Builder::new();
+            actual.culture(EXPECTED);
+            assert_eq!(actual.culture, EXPECTED);
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn locale_works() {
+            const EXPECTED: &str = "C:\\tmp\\hello_world\\wix\\main.wxl";
+            let mut actual = Builder::new();
+            actual.locale(Some(EXPECTED));
+            assert_eq!(actual.locale, Some(EXPECTED));
+        }
+
+        #[test]
+        fn name_works() {
+            const EXPECTED: &str = "Name";
+            let mut actual = Builder::new();
+            actual.name(Some(EXPECTED));
+            assert_eq!(actual.name, Some(EXPECTED));
+        }
+
+        #[test]
+        fn no_build_works() {
+            let mut actual = Builder::new();
+            actual.no_build(true);
+            assert!(actual.no_build);
+        }
+
+        #[test]
+        fn output_works() {
+            const EXPECTED: &str = "C:\\tmp\\hello_world\\output";
+            let mut actual = Builder::new();
+            actual.output(Some(EXPECTED));
+            assert_eq!(actual.output, Some(EXPECTED));
+        }
+
+        #[test]
+        fn version_works() {
+            const EXPECTED: &str = "1.2.3";
+            let mut actual = Builder::new();
+            actual.version(Some(EXPECTED));
+            assert_eq!(actual.version, Some(EXPECTED));
+        }
+
+        #[test]
+        fn build_with_defaults_works() {
+            let mut b = Builder::new();
+            let default_execution = b.build();
+            assert!(default_execution.bin_path.is_none());
+            assert!(default_execution.capture_output);
+            assert_eq!(default_execution.culture, Cultures::EnUs);
+            assert!(default_execution.input.is_none());
+            assert!(default_execution.locale.is_none());
+            assert!(default_execution.name.is_none());
+            assert!(!default_execution.no_build);
+            assert!(default_execution.output.is_none());
+            assert!(default_execution.version.is_none());
+        }
+    }
+
+    mod execution {
+    }
+}
+
