@@ -687,6 +687,23 @@ mod tests {
     }
 
     mod execution {
+        extern crate tempfile;
+
+        use super::*;
+
+        #[test]
+        fn compiler_is_correct_with_defaults() {
+            let expected = Command::new(env::var_os(WIX_PATH_KEY).map(|s| {
+                let mut p = PathBuf::from(s);
+                p.push(BINARY_FOLDER_NAME);
+                p.push(WIX_COMPILER);
+                p.set_extension(EXE_FILE_EXTENSION);
+                p
+            }).unwrap());
+            let e = Execution::default();
+            let actual = e.compiler().unwrap();
+            assert_eq!(format!("{:?}", actual), format!("{:?}", expected));
+        }
     }
 }
 
