@@ -473,6 +473,47 @@ mod tests {
             assert!(default_execution.output.is_none());
             assert!(default_execution.product_name.is_none());
         }
+
+        #[test]
+        fn build_with_all_works() {
+            const EXPECTED_BINARY_NAME: &str = "Binary Name";
+            const EXPECTED_COPYRIGHT_HOLDER: &str = "Copyright Holder";
+            const EXPECTED_COPYRIGHT_YEAR: &str = "Copyright Year";
+            const EXPECTED_DESCRIPTION: &str = "Description";
+            const EXPECTED_EULA: &str = "C:\\tmp\\eula.rtf";
+            const EXPECTED_URL: &str = "http://github.com/volks73/cargo-wix";
+            const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world";
+            const EXPECTED_LICENSE: &str = "C:\\tmp\\hello_world\\License.rtf";
+            const EXPECTED_MANUFACTURER: &str = "Manufacturer";
+            const EXPECTED_OUTPUT: &str = "C:\\tmp\\output";
+            const EXPECTED_PRODUCT_NAME: &str = "Product Name";
+            let mut b = Builder::new();
+            b.binary_name(Some(EXPECTED_BINARY_NAME));
+            b.copyright_holder(Some(EXPECTED_COPYRIGHT_HOLDER));
+            b.copyright_year(Some(EXPECTED_COPYRIGHT_YEAR));
+            b.description(Some(EXPECTED_DESCRIPTION));
+            b.eula(Some(EXPECTED_EULA));
+            b.force(true);
+            b.help_url(Some(EXPECTED_URL));
+            b.input(Some(EXPECTED_INPUT));
+            b.license(Some(EXPECTED_LICENSE));
+            b.manufacturer(Some(EXPECTED_MANUFACTURER));
+            b.output(Some(EXPECTED_OUTPUT));
+            b.product_name(Some(EXPECTED_PRODUCT_NAME));
+            let execution = b.build();
+            assert_eq!(execution.binary_name, Some(EXPECTED_BINARY_NAME).map(String::from));
+            assert_eq!(execution.copyright_year, Some(EXPECTED_COPYRIGHT_YEAR).map(String::from));
+            assert_eq!(execution.copyright_holder, Some(EXPECTED_COPYRIGHT_HOLDER).map(String::from));
+            assert_eq!(execution.description, Some(EXPECTED_DESCRIPTION).map(String::from));
+            assert_eq!(execution.eula, Some(EXPECTED_EULA).map(PathBuf::from));
+            assert!(execution.force);
+            assert_eq!(execution.help_url, Some(EXPECTED_URL).map(String::from));
+            assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
+            assert_eq!(execution.license, Some(EXPECTED_LICENSE).map(PathBuf::from));
+            assert_eq!(execution.manufacturer, Some(EXPECTED_MANUFACTURER).map(String::from));
+            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.product_name, Some(EXPECTED_PRODUCT_NAME).map(String::from));
+        }
     }
 
     mod execution {
