@@ -55,24 +55,21 @@ fn main() {
         .takes_value(true);
     // The eula option for the `init` and `print` subcommands.
     let eula = Arg::with_name("eula")
-        .help("Specifies a RTF file to use as the EULA for the license agreement \
-          dialog of the installer. The default is to disable the license \
-          agreement dialog unless one of the supported licenses (GPL-3.0, \
-          Apache-2.0, or MIT) is generated based on the value of the 'license' \
-          field in the package's manifest (Cargo.toml). An EULA can be enabled \
-          after initialization by directly modifying the WiX Source (wxs) file \
-          with a text editor.")
+        .help("Specifies a RTF file to use as the EULA for the license agreement dialog of the \
+              installer. The default is to disable the license agreement dialog unless one of the \
+              supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the value of \
+              the 'license' field in the package's manifest (Cargo.toml). An EULA can be enabled \
+              later by directly modifying the WiX Source (wxs) file with a text editor.")
         .long("eula")
         .short("E")
         .takes_value(true);
     // The license option for the `init` and `print` subcommands.
     let license = Arg::with_name("license")
-        .help("Overrides the 'license-file' field of the package's manifest \
-              (Cargo.toml). This requires the '--init' flag. If an appropriate license \
-              file does not exist, cannot be found, or is not specified, then no \
-              license file is included in the installer. A file containing the license, \
-              such as a TXT, PDF, or RTF  file, can later be added by directly editing \
-              the generated WiX Source file (wxs) in a text editor.")
+        .help("Overrides the 'license-file' field of the package's manifest (Cargo.toml). If an \
+              appropriate license file does not exist, cannot be found, or is not specified, then \
+              no license file is included in the installer. A file containing the license, such as \
+              a TXT, PDF, or RTF file, can be added later by directly editing the generated WiX \
+              Source file (wxs) in a text editor.")
         .long("license")
         .short("l")
         .takes_value(true);
