@@ -47,7 +47,7 @@ fn default_execution_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(TARGET_WIX_DIR.as_path()).assert(&predicate::path::exists());
-    package.child(expected_msi_file).assert(&predicate::path::exists());
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
 }
 

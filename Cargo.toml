@@ -20,24 +20,24 @@ name = "cargo_wix"
 
 [dependencies]
 chrono = "0.4"
-env_logger = "0.5.7"
+env_logger = "0.5"
 log = "0.4"
 mustache = "0.9"
-regex = "0.2"
+regex = "1"
 semver = "0.9"
-termcolor = "0.3.6"
+termcolor = "1"
 toml = "0.4"
-uuid = { version = "0.5", features = ["v4"] }
+uuid = { version = "0.7", features = ["v4"] }
 
 [dev-dependencies]
-assert_cmd = "0.3"
-assert_fs = "0.2"
+assert_cmd = "0.9"
+assert_fs = "0.9"
 lazy_static = "1"
-predicates = "0.5"
+predicates = "0.9"
 tempfile = "3"
 
 [dependencies.clap]
-version = "2.31"
+version = "2"
 default-features = false
 features = ["suggestions", "vec_map"]
 

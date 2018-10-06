@@ -201,8 +201,8 @@ impl Execution {
             .insert_str("binary-name", self.binary_name(&manifest)?)
             .insert_str("product-name", product_name(self.product_name.as_ref(), &manifest)?)
             .insert_str("manufacturer", self.manufacturer(&manifest)?)
-            .insert_str("upgrade-code-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase())
-            .insert_str("path-component-guid", Uuid::new_v4().hyphenated().to_string().to_uppercase());
+            .insert_str("upgrade-code-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
+            .insert_str("path-component-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase());
         if let Some(description) = description(self.description.clone(), &manifest) {
             map = map.insert_str("description", description);
         } else {

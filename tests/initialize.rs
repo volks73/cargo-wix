@@ -20,9 +20,10 @@ extern crate predicates;
 mod common;
 
 use assert_fs::prelude::*;
+use predicates::prelude::*;
+
 use cargo_wix::initialize::Execution;
 use common::WIX_NAME;
-use predicates::path;
 use std::env;
 use std::path::PathBuf;
 
@@ -37,14 +38,17 @@ lazy_static!{
 
 #[test]
 fn default_execution_works() {
+    // Save the current working directory so that we can change back to it at
+    // the end of the test. This avoids polluting the `tests` folder for the
+    // source code with test artifacts.
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(WIX.as_path()).assert(&path::exists());
-    package.child(WIX_MAIN_WXS.as_path()).assert(&path::exists());
-    package.child(WIX_LICENSE_RTF.as_path()).assert(&path::missing());
+    package.child(WIX.as_path()).assert(predicate::path::exists());
+    package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
+    package.child(WIX_LICENSE_RTF.as_path()).assert(predicate::path::missing());
 }
 
