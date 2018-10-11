@@ -13,7 +13,10 @@
 // limitations under the License.
 
 //! The entry point for the Command Line Interface (CLI) for the `cargo wix`
-//! subcommand.
+//! subcommand. See the [`lib`] documentation for more information on getting
+//! started and using the `cargo wix` subcommand.
+//!
+//! [`lib`]: lib.rs
 
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
