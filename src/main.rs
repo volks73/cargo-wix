@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// The entry point for the Command Line Interface (CLI) for the `cargo wix`
+/// subcommand.
+
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
 extern crate env_logger;
@@ -47,9 +50,7 @@ fn main() {
     // The description option for the `init` and `print` subcommands.
     let description = Arg::with_name("description")
         .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
-              as the description within the installer. The description can be \
-              changed after initialization by directly modifying the WiX Source file \
-              (wxs) with a text editor.")
+              as the description within the installer.")
         .long("description")
         .short("d")
         .takes_value(true);
@@ -168,7 +169,7 @@ fn main() {
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
                     .version(crate_version!())
-                    .about("Uses a package's manifest (Cargo.toml) to generate a Wix Source (wxs) \
+                    .about("Uses a package's manifest (Cargo.toml) to generate a WiX Source (wxs) \
                            file that can be used immediately without modification to create an \
                            installer for the package. This will also generate an EULA in the Rich \
                            Text Format (RTF) if the 'license' field is specified with a supported \
@@ -200,7 +201,7 @@ fn main() {
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
-                .arg(Arg::with_name("install-version")        
+                .arg(Arg::with_name("install-version")
                     .help("Overrides the version from the package's manifest (Cargo.toml), which \
                           is used for the installer name and appears in the Add/Remove Programs \
                           control panel.")
@@ -239,10 +240,10 @@ fn main() {
                     .short("o")
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("print")
-                    .version(crate_version!())                            
+                    .version(crate_version!())
                     .about("Prints a template to stdout or a file. In the case of a license \
                            template, the output is in the Rich Text Format (RTF) and for a WiX \
-                           Source file (wxs), the output is in XML. New GUIDS are generated for the \
+                           Source file (wxs), the output is in XML. New GUIDs are generated for the \
                            'UpgradeCode' and Path Component each time the 'WXS' template is \
                            printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
                     .arg(binary_name)
@@ -279,7 +280,7 @@ fn main() {
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' and 'wix' folders if they exist. Use with \
-                            caution.")
+                            caution!")
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). The 'target\\wix' and 'wix' \
                               folders that exists alongside the package's manifest will be removed. \
@@ -347,14 +348,14 @@ fn main() {
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
     // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
     // level is later configured with the verbosity using the `filter` method. There are many
-    // questions related to implementing  support for environment variables: 
+    // questions related to implementing  support for environment variables:
     //
     // 1. What should the environment variable be called, WIX_LOG, CARGO_WIX_LOG, CARGO_LOG, etc.?
-    //    WIX_LOG might conflict with a system variable that is used for the Wix Toolset. CARGO_LOG
+    //    WIX_LOG might conflict with a system variable that is used for the WiX Toolset. CARGO_LOG
     //    is too generic. The only viable one is CARGO_WIX_LOG.
     // 2. How is the environment variable supposed to work with the verbosity without crazy side
     //    effects? What if the level is set to TRACE with the environment variable, but the
-    //    verbosity is only one? 
+    //    verbosity is only one?
     // 3. Should the RUST_LOG environment variable be "obeyed" for a cargo subcommand?
     //
     // For now, implementing environment variable support is held off and only the verbosity is

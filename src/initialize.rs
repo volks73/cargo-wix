@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// The implementation for the `init` or, "initialize", command. The `init`
+/// command for the `cargo wix` subcommand is focused on creating a WiX Source
+/// file (wxs) based on the contents of the Cargo manifest file (Cargo.toml) for
+/// the project and any run-time based settings. The `init` command should
+/// generally be called before any other commands and it should only be called
+/// once per project. Once a WiX Source file (wxs) exists for the project, the
+/// `init` command does not need to be executed again.
+
 use CARGO_MANIFEST_FILE;
 use Error;
 use eula::Eula;

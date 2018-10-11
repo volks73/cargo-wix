@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// The `create` command is also the default command for the `cargo wix`
+/// subcommand. It creates a Windows installer from an existing WiX Source (wxs)
+/// file. By default, it looks for a `wix\main.wxs` file relative to the root of
+/// the Cargo project. A different WiX Source file can be set with the `input`
+/// method using the `Builder` struct.
+
 use BINARY_FOLDER_NAME;
 use CARGO;
 use Cultures;
