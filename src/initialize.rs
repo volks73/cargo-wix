@@ -149,7 +149,7 @@ impl<'a> Builder<'a> {
         self.input = i;
         self
     }
-    
+
     /// Sets the path to a file to be used as the
     /// [sidecar](https://en.wikipedia.org/wiki/Sidecar_file) license file.
     ///
