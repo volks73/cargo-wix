@@ -177,7 +177,6 @@
 //! using a signed installer. This can be overridden using the
 //! `-d,--description` option with the `cargo wix init` or `cargo wix sign`
 //! subcommands, respectively.
-//!
 
 extern crate chrono;
 #[macro_use] extern crate log;
