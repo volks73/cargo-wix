@@ -198,7 +198,7 @@ impl<'a> Builder<'a> {
         self.product_name = p;
         self
     }
-   
+
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
         let mut wxs_printer = print::wxs::Builder::new();

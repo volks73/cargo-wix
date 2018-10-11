@@ -28,8 +28,8 @@
 //!
 //! Next, add this to the `lib.rs` or `main.rs` file for your project:
 //!
-//! ```rust
-//! extern crate cargo_wix
+//! ```ignore
+//! extern crate cargo_wix;
 //! ```
 //!
 //! Please note the underscore instead of the dash.

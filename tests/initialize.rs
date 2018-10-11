@@ -22,7 +22,7 @@ mod common;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
-use cargo_wix::initialize::Execution;
+use cargo_wix::initialize::{Builder, Execution};
 use common::WIX_NAME;
 use std::env;
 use std::path::PathBuf;
@@ -50,5 +50,18 @@ fn default_execution_works() {
     package.child(WIX.as_path()).assert(predicate::path::exists());
     package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
     package.child(WIX_LICENSE_RTF.as_path()).assert(predicate::path::missing());
+}
+
+#[test]
+fn change_description_works() {
+    const EXPECTED: &str = "This is a description";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default().description(Some(EXPECTED)).build().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(WIX.as_path()).assert(predicate::path::exists());
+    package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
 }
 
