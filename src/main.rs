@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// The entry point for the Command Line Interface (CLI) for the `cargo wix`
-/// subcommand.
+//! The entry point for the Command Line Interface (CLI) for the `cargo wix`
+//! subcommand.
 
 extern crate cargo_wix;
 #[macro_use] extern crate clap;
