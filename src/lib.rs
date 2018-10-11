@@ -12,171 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # cargo-wix
+//! # cargo-wix Library
 //!
-//! The goal of the cargo-wix project and the `cargo wix` subcommand is to make
-//! it easy to create a Windows installer (msi) for any Rust project.
+//! The goal of the cargo-wix project and the `cargo-wix` crate/library is to
+//! make it easy to create a Windows installer (msi) for any Rust project.
 //!
-//! ## Quick Start
+//! ## Usage
 //!
-//! Ensure the [WiX Toolset](http://wixtoolset.org) is installed and a `WIX`
-//! system environment variable has been created. The installer for the WiX
-//! Toolset should create the `WIX` system environment variable automatically.
-//! Then, start or restart a command prompt (cmd.exe) and execute the following
-//! commands:
+//! First, add this to your `Cargo.toml`:
 //!
-//! ```dos
-//! C:\>cargo install cargo-wix
-//! C:\>cd Path\To\Project
-//! C:\Path\To\Project\>cargo wix init
-//! C:\Path\To\Project\>cargo wix
+//! ```toml
+//! [dependencies]
+//! cargo-wix = "0.1"
 //! ```
 //!
-//! The Windows installer (msi) will be in the `C:\Path\To\Project\target\wix`
-//! folder. The `cargo wix init` command will create a `wix` folder alongside
-//! the `src` folder and the project's manifest (Cargo.toml). The `wix` folder
-//! will contain the WiX Source file (`main.wxs`) that was automatically
-//! generated for the project based the contents of its manifest. The WiX Source
-//! file can be customized using an text editor, and once the file exists, the
-//! `cargo wix init` command does not need to be used again.
+//! Next, add this to the `lib.rs` or `main.rs` file for your project:
 //!
-//! The `cargo wix` command uses the `wix\main.wxs` file generated from the
-//! previous `cargo wix init` command as input for the WiX Toolset's "compiler"
-//! and "linker", i.e. `candle.exe` and `light.exe`, respectively, to create the
-//! Windows installer (msi). A variety of artifact files will be created in the
-//! `target\wix` folder. These can be ignored and/or deleted.
+//! ```rust
+//! extern crate cargo_wix
+//! ```
 //!
-//! The installer that is created will install the executable file in a `bin`
-//! folder within the destination selected by the user during installation. It
-//! will add a license file to the same folder as the `bin` folder, and it will
-//! add the `bin` folder to the `PATH` system environment variable so that the
-//! executable can be called from anywhere with a commmand prompt. Most of these
-//! behaviors can be adjusted during the installation process of the Windows
-//! installer. The default destination is `C:\Program Files\<project name>`,
-//! where `<project name>` is replaced with the name of the Rust project's name.
+//! Please note the underscore instead of the dash.
 //!
-//! ## Concepts
+//! ## Organization
 //!
 //! The cargo-wix project is primarily implemented as a cargo subcommand, but
 //! the core functionality is provided in a library (crate). Documentation for
 //! the binary and Command Line Interface (CLI) are provided with the `cargo wix
-//! --help` command, but documentation is provided here for the concepts and
-//! core functionality that govern the subcommand.
+//! --help` command and the module-level comments for the [`main.rs`] source
+//! file.
 //!
-//! The cargo-wix binary, and related `cargo wix` subcommand, use the WiX
-//! Toolset and the
-//! [SignTool](https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx)
-//! application available in the [Windows 10
-//! SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk).
-//! These are obviously Windows-only applications, so while the crate and binary
-//! can be built on any platform supported by the
-//! [Rust](https://www.rust-lang.org) programming language and
-//! [Cargo](https://crates.io), the `cargo wix` subcommand is only really useful
-//! in a Windows environment.
+//! Each subcommand is organized into a separate module. So, there is a
+//! `create`, `inititalize`, `print`, etc. module within the crate. Some of the
+//! modules are in a single Rust source file, while others are organized into
+//! sub-folders. Each module follows [Builder] design pattern, so there is a
+//! `Builder` and `Execution` struct for each module/subcommand. The `Builder`
+//! struct is used to customize the execution of the subcommand and builds an
+//! `Execution` struct. The `Execution` struct is responsible for actually
+//! executing the subcommand, which generally involves executing a process with
+//! the [`std::process::Command`] struct, but not always. Each method for the
+//! `Builder` struct generally corresponds to a CLI option or argument found in
+//! the binary [`cargo wix`] subcommand.
 //!
-//! The WiX Toolset provides a "compiler" (`candle.exe`) and "linker"
-//! (`light.exe`). These can be found in the `bin` directory of the installation
-//! location for the WiX Toolset. The value of the `WIX` system environment
-//! variable that is created during installation of the WiX Toolset is a path to
-//! the installation folder that contains the `bin` folder. The `WIX` system
-//! environment variable is used by the `cargo wix` subcommand and library with
-//! the [`std::process::Command`] module to create the installer. The
-//! `-B,--bin-path` option can be used to specify a path (relative or absolute)
-//! to the WiX Toolset `bin` folder. The `-B,--bin-path` option is useful if a
-//! different version of the WiX Toolset needs to be used to create the
-//! installer. The descending order of precedence is: (1) `-B,--bin-path` option
-//! then (2) `WIX` system environment variable. An error will be displayed if
-//! the compiler and/or linker cannot be found.
-//!
-//! The Windows SDK provides a signer (`signtool`) application for signing
-//! installers. The application is installed in the `bin` folder of the Windows
-//! SDK installation. The location of the `bin` folder varies depending on the
-//! version. It is recommended to use the Developer Prompt to ensure the
-//! `signtool` application is available; however, it is possible to specify the
-//! path to the Windows SDK `bin` folder using the `-B,--bin-path` option for
-//! the `cargo wix sign` subcommand. The descending order of precedence for
-//! locating the signer application is: (1) `-B,--bin-path` option then (2) the
-//! order used by the [`std::process::Command::status`] method. Signing an
-//! installer is optional.
-//!
-//! The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A
-//! template is provided with this subcommand that attempts to meet the majority
-//! of use cases for developers, so extensive knowledge of the WiX Toolset and
-//! Windows installer technologies is not required (but always recommended).
-//! Modification of the template is encouraged, but please consult the WiX
-//! Toolset's extensive [documentation](http://wixtoolset.org/documentation/)
-//! and [tutorials](https://www.firegiant.com/wix/tutorial/) for information
-//! about writing, customizing, and using wxs files. The documentation here is
-//! only for this subcommand.
-//!
-//! The
-//! [WXS](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache)
-//! template is embedded in the binary installation of the subcommand and it can
-//! be printed to stdout using the `cargo wix print wxs` command from the
-//! command prompt (cmd.exe). Note, each time the `cargo wix print wxs` command
-//! is invoked, new GUIDs are generated for fields that require them. Thus, a
-//! developer does not need to worry about generating GUIDs and can begin using
-//! the template immediately with this subcommand or the WiX Toolset's compiler
-//! (`candle.exe`) and linker (`light.exe`) applications.
-//!
-//! In addition to the WXS template, there are several license templates which
-//! are used to generate an End User License Agreement (EULA) during the `cargo
-//! wix init` command. Depending on the license ID(s) in the `license` field for
-//! a package's manifest (Cargo.toml), a license file in the Rich Text Format
-//! (RTF) is generated from a template and placed in the `wix` folder. This RTF
-//! file is then displayed in the license dialog of the installer. See the help
-//! information on the `print` command for information about supported licenses.
-//! If the `license` field is not used, or the license ID is not supported, then
-//! the EULA is _not_ automatically created during initialization and it will
-//! have to be created manually with a text editor or other authoring tool.
-//!
-//! The `cargo wix init` subcommand uses a combination of the
-//! [`license`](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
-//! and
-//! [`license-file`](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
-//! fields of the project's manifest (Cargo.toml) to determine if a
-//! [sidecar](https://en.wikipedia.org/wiki/Sidecar_file) license file should be
-//! included in the installation folder along side the `bin` folder. The
-//! `license` field appears to be the more commonly used field to describe the
-//! licensing for a Rust project and package, while the `license-file` field is
-//! used to specify a custom, or properitary, license for the project and
-//! package. The top three most common licenses for Rust projects are supported
-//! from the `license` field, i.e. MIT, Apache-2.0, and GPLv3. If any of these
-//! three supported open source licenses are used for the `license` field, then
-//! a `License.rtf` file is generated from an embedded template in the `wix`
-//! folder as part of the `cargo wix init` subcommand. This generated RTF file
-//! will be used as a sidecar file and the End User License Agreement (EULA)
-//! that is displayed in the license dialog of the installer. If the
-//! `license-file` field is used and it contains a path to a file with the
-//! `.rtf` extension, then this file will be used as a sidecar file and the End
-//! User License Agreement (EULA). If neither of these fields exist or contain
-//! valid values, then no sidecar file is included in the installation and no
-//! license dialog appears during installation. This default behavior can be
-//! overridden with the `-l,--license` and `-E,--eula` options for the `cargo
-//! wix init` subcommand.
-//!
-//! Generally, any value that is obtained from the package's manifest
-//! (Cargo.toml) can be overridden at the command line with an appropriate
-//! option. For example, the manufacturer, which is displayed as the "Publisher"
-//! in the Add/Remove Programs (ARP) control panel is obtained from the first
-//! author listed in the `authors` field of a project's manifest, but it can be
-//! overridden using the `-m,--manufacturer` option with the `cargo wix init`
-//! subcommand. The default in most cases is to use a value from a field in the
-//! project's manifest.
-//!
-//! The `cargo wix` subcommand uses the package name for the product name. The
-//! default install location is at `C:\Program Files\[Product Name]`, where
-//! `[Product Name]` is replaced with the product name determined from the
-//! package name. This can be overridden with the `-N,--name` option for the
-//! `cargo wix` subcommand or the `-p,--product-name` option for the `cargo wix
-//! init` subcommand. The binary name, which is the `name` field for the
-//! `[[bin]]` section, is used for the executable file name, i.e. "name.exe".
-//! This can also be overridden using the `-b,--bin-name` option for the `cargo
-//! wix init` subcommand. The package description is used in multiple places for
-//! the installer, including the text that appears in the blue UAC dialog when
-//! using a signed installer. This can be overridden using the
-//! `-d,--description` option with the `cargo wix init` or `cargo wix sign`
-//! subcommands, respectively.
+//! [`main.rs`]: https://volks73.github.io/cargo-wix/main.html
+//! [Builder]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
+//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [`cargo wix`]: https://volks73.github.io/cargo-wix/main.html
 
 extern crate chrono;
 #[macro_use] extern crate log;
