@@ -569,31 +569,28 @@ mod tests {
         }
 
         #[test]
-        #[should_panic]
         fn destination_fails_with_nonexistent_input() {
             let mut e = Execution::default();
             e.input = Some(PathBuf::from("not_real.toml"));
-            e.destination().unwrap();
+            assert!(e.destination().is_err());
         }
 
         #[test]
-        #[should_panic]
         fn destination_fails_with_directory_input() {
             let temp_dir = tempfile::tempdir().unwrap();
             let mut e = Execution::default();
             e.input = Some(temp_dir.path().into());
-            e.destination().unwrap();
+            assert!(e.destination().is_err());
         }
 
         #[test]
-        #[should_panic]
         fn destination_fails_when_input_is_not_a_manifest() {
             let temp_dir = tempfile::tempdir().unwrap();
             let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
             File::create(&not_a_manifest).unwrap();
             let mut e = Execution::default();
             e.input = Some(not_a_manifest);
-            e.destination().unwrap();
+            assert!(e.destination().is_err());
         }
 
         #[test]
@@ -611,7 +608,6 @@ mod tests {
         }
 
         #[test]
-        #[should_panic]
         fn destination_fails_when_cwd_has_no_manifest() {
             let original = env::current_dir().unwrap();
             let temp_dir = tempfile::tempdir().unwrap();
@@ -619,7 +615,7 @@ mod tests {
             let e = Execution::default();
             let result = e.destination();
             env::set_current_dir(original).unwrap();
-            result.unwrap();
+            assert!(result.is_err());
         }
 
         #[test]
