@@ -68,3 +68,19 @@ fn change_description_works() {
     assert_eq!(actual, EXPECTED);
 }
 
+#[test]
+fn change_help_url_works() {
+    const EXPECTED: &str = "http://www.example.com";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default().help_url(Some(EXPECTED)).build().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    let actual = common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "/wix:Wix/wix:Product/wix:Property[@Id='ARPHELPLINK']/@Value"
+    );
+    assert_eq!(actual, EXPECTED);
+}
+
