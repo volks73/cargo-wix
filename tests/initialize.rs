@@ -61,7 +61,10 @@ fn change_description_works() {
     let result = Builder::default().description(Some(EXPECTED)).build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(WIX.as_path()).assert(predicate::path::exists());
-    package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
+    let actual = common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "/wix:Wix/wix:Product/wix:Package/@Description"
+    );
+    assert_eq!(actual, EXPECTED);
 }
 

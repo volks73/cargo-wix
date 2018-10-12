@@ -35,6 +35,8 @@ assert_fs = "0.9"
 lazy_static = "1"
 predicates = "0.9"
 tempfile = "3"
+sxd-document = "0.2"
+sxd-xpath = "0.4"
 
 [dependencies.clap]
 version = "2"
