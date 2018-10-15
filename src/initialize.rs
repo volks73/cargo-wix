@@ -72,13 +72,15 @@ impl<'a> Builder<'a> {
 
     /// Sets the binary name.
     ///
-    /// The default is to use the `name` field under the `bin` section of the package's manifest
-    /// (Cargo.toml) or the `name` field under the `package` section if the `bin` section does
-    /// _not_ exist. This overrides either of these defaults.
+    /// The default is to use the `name` field under the `bin` section of the
+    /// package's manifest (Cargo.toml) or the `name` field under the `package`
+    /// section if the `bin` section does _not_ exist. This overrides either of
+    /// these defaults.
     ///
-    /// Generally, the binary name should _not_ have spaces or special characters. The binary name
-    /// is the name of the executable. This will _not_ appear in the Add/Remove Programs control
-    /// panel. Use the `product_name` method to change the name that appears in the Add/Remove
+    /// Generally, the binary name should _not_ have spaces or special
+    /// characters. The binary name is the name of the executable. This will
+    /// _not_ appear in the Add/Remove Programs control panel. Use the
+    /// `product_name` method to change the name that appears in the Add/Remove
     /// Programs control panel.
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
@@ -124,8 +126,8 @@ impl<'a> Builder<'a> {
 
     /// Sets the description.
     ///
-    /// This overrides the description determined from the `description` field in the package's
-    /// manifest (Cargo.toml).
+    /// This overrides the description determined from the `description` field
+    /// in the package's manifest (Cargo.toml).
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
         self
@@ -133,22 +135,24 @@ impl<'a> Builder<'a> {
 
     /// Sets the path to a custom EULA.
     ///
-    /// The default is to generate an EULA from an embedded template as a RTF file based on the
-    /// name of the license specified in the `license` field of the package's manifest
-    /// (Cargo.toml). If the `license` field is not specified or a template for the license does
-    /// not exist but the `license-file` field does specify a path to a file with the RTF
-    /// extension, then that RTF file is used as the EULA for the license agreement dialog in the
-    /// installer. Finally, if the `license-file` does not exist or it specifies a file that does
-    /// not have the `.rtf` extension, then the license agreement dialog is skipped and there is no
-    /// EULA for the installer. This would override the default behavior and ensure the license
-    /// agreement dialog is used.
+    /// The default is to generate an EULA from an embedded template as a RTF
+    /// file based on the name of the license specified in the `license` field
+    /// of the package's manifest (Cargo.toml). If the `license` field is not
+    /// specified or a template for the license does not exist but the
+    /// `license-file` field does specify a path to a file with the RTF
+    /// extension, then that RTF file is used as the EULA for the license
+    /// agreement dialog in the installer. Finally, if the `license-file` does
+    /// not exist or it specifies a file that does not have the `.rtf`
+    /// extension, then the license agreement dialog is skipped and there is no
+    /// EULA for the installer. This would override the default behavior and
+    /// ensure the license agreement dialog is used.
     pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
         self.eula = e;
         self
     }
 
-    /// Forces the generation of new output even if the various outputs already exists at the
-    /// destination.
+    /// Forces the generation of new output even if the various outputs already
+    /// exists at the destination.
     pub fn force(&mut self, f: bool) -> &mut Self {
         self.force = f;
         self
@@ -156,10 +160,12 @@ impl<'a> Builder<'a> {
 
     /// Sets the help URL.
     ///
-    /// The default is to obtain a URL from one of the following fields in the package's manifest
-    /// (Cargo.toml): `documentation`, `homepage`, or `respository`. If none of these are
-    /// specified, then the default is to exclude a help URL from the installer. This will override
-    /// the default behavior and provide a help URL for the installer if none of the fields exist.
+    /// The default is to obtain a URL from one of the following fields in the
+    /// package's manifest (Cargo.toml): `documentation`, `homepage`, or
+    /// `respository`. If none of these are specified, then the default is to
+    /// exclude a help URL from the installer. This will override the default
+    /// behavior and provide a help URL for the installer if none of the fields
+    /// exist.
     ///
     /// The help URL is the URL that appears in the Add/Remove Program control
     /// panel, a.k.a. `ARPHELPLINK`.
@@ -168,28 +174,31 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to a package's manifest (Cargo.toml) to be used to generate a WiX Source
-    /// (wxs) file from the embedded template.
+    /// Sets the path to a package's manifest (Cargo.toml) to be used to
+    /// generate a WiX Source (wxs) file from the embedded template.
     ///
-    /// A `wix` and `wix\main.wxs` file will be created in the same directory as the package's
-    /// manifest. The default is to use the package's manifest in the current working directory.
+    /// A `wix` and `wix\main.wxs` file will be created in the same directory as
+    /// the package's manifest. The default is to use the package's manifest in
+    /// the current working directory.
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
     }
 
-    /// Sets the path to a file to be used as the
-    /// [sidecar](https://en.wikipedia.org/wiki/Sidecar_file) license file.
+    /// Sets the path to a file to be used as the [sidecar] license file.
     ///
-    /// This will override the `license-file` field in the package's manifest (Cargo.toml). If the
-    /// file has the `.rtf` extension, then it will also be used for the EULA in the license
-    /// agreement dialog for the installer.
+    /// This will override the `license-file` field in the package's manifest
+    /// (Cargo.toml). If the file has the `.rtf` extension, then it will also be
+    /// used for the EULA in the license agreement dialog for the installer.
     ///
-    /// The default is to use the value specified in the `license-file` field of the package's
-    /// manifest or generate a license file and RTFed EULA from an embedded template based on the
-    /// license name used in the `license` field of the package's manifest. If none of these fields
-    /// are specified or overriden, then a license file is _not_ included in the installation
+    /// The default is to use the value specified in the `license-file` field of
+    /// the package's manifest or generate a license file and RTFed EULA from an
+    /// embedded template based on the license name used in the `license` field
+    /// of the package's manifest. If none of these fields are specified or
+    /// overriden, then a license file is _not_ included in the installation
     /// directory and the license agreement dialog is skipped in the installer.
+    ///
+    /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
     pub fn license(&mut self, l: Option<&'a str>) -> &mut Self {
         self.license = l;
         self

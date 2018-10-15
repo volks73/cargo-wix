@@ -84,3 +84,19 @@ fn change_help_url_works() {
     assert_eq!(actual, EXPECTED);
 }
 
+#[test]
+fn change_manufacturer_works() {
+    const EXPECTED: &str = "Example Manufacturer";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default().manufacturer(Some(EXPECTED)).build().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    let actual = common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "/wix:Wix/wix:Product/wix:Package/@Manufacturer"
+    );
+    assert_eq!(actual, EXPECTED);
+}
+
