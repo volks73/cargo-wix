@@ -204,15 +204,19 @@ impl<'a> Builder<'a> {
     /// This will override the `license-file` field in the package's manifest
     /// (Cargo.toml). If the file has the `.rtf` extension, then it will also be
     /// used for the EULA in the license agreement dialog for the installer.
+    /// Otherwise, the [`eula`] method can be used to set an RTF file as the
+    /// EULA for the license agreement dialog that is indepenent of the sidecar
+    /// license file.
     ///
     /// The default is to use the value specified in the `license-file` field of
-    /// the package's manifest or generate a license file and RTFed EULA from an
-    /// embedded template based on the license name used in the `license` field
+    /// the package's manifest or generate a license file and EULA from an
+    /// embedded template based on the license ID used in the `license` field
     /// of the package's manifest. If none of these fields are specified or
     /// overriden, then a license file is _not_ included in the installation
     /// directory and the license agreement dialog is skipped in the installer.
     ///
     /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
+    /// [`eula`]: #eula
     pub fn license(&mut self, l: Option<&'a str>) -> &mut Self {
         self.license = l;
         self

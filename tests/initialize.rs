@@ -26,6 +26,7 @@ use predicates::prelude::*;
 use cargo_wix::initialize::{Builder, Execution};
 use common::WIX_NAME;
 use std::env;
+use std::fs::File;
 use std::path::PathBuf;
 
 pub const MAIN_WXS_NAME: &str = "main.wxs";
@@ -38,7 +39,7 @@ lazy_static!{
 }
 
 #[test]
-fn default_execution_works() {
+fn default_works() {
     // Save the current working directory so that we can change back to it at
     // the end of the test. This avoids polluting the `tests` folder for the
     // source code with test artifacts.
@@ -54,7 +55,7 @@ fn default_execution_works() {
 }
 
 #[test]
-fn change_description_works() {
+fn description_works() {
     const EXPECTED: &str = "This is a description";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -70,7 +71,7 @@ fn change_description_works() {
 }
 
 #[test]
-fn change_help_url_works() {
+fn help_url_works() {
     const EXPECTED: &str = "http://www.example.com";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -86,7 +87,7 @@ fn change_help_url_works() {
 }
 
 #[test]
-fn change_manufacturer_works() {
+fn manufacturer_works() {
     const EXPECTED: &str = "Example Manufacturer";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -102,7 +103,7 @@ fn change_manufacturer_works() {
 }
 
 #[test]
-fn change_product_name_works() {
+fn product_name_works() {
     const EXPECTED: &str = "Example Product Name";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -125,7 +126,7 @@ fn change_product_name_works() {
 }
 
 #[test]
-fn change_binary_name_works() {
+fn _binary_name_works() {
     const EXPECTED: &str = "Example";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -171,3 +172,26 @@ fn output_works() {
     output.child(MAIN_WXS_NAME).assert(predicate::path::exists());
 }
 
+#[test]
+fn license_with_txt_file_works() {
+    const EXPECTED: &str = "License_Example.txt";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_license = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    let _license_handle = File::create(package_license.path()).unwrap();
+    let result = Builder::default()
+        .license(package_license.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), EXPECTED);
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), package_license.path().to_str().unwrap());
+}
