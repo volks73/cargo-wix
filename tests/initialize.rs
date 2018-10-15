@@ -16,6 +16,7 @@ extern crate assert_fs;
 extern crate cargo_wix;
 #[macro_use] extern crate lazy_static;
 extern crate predicates;
+extern crate tempfile;
 
 mod common;
 
@@ -143,7 +144,7 @@ fn change_binary_name_works() {
 }
 
 #[test]
-fn input_execution_works() {
+fn input_works() {
     let package = common::create_test_package();
     let result = Builder::default()
         .input(package.child("Cargo.toml").path().to_str())
@@ -153,5 +154,20 @@ fn input_execution_works() {
     package.child(WIX.as_path()).assert(predicate::path::exists());
     package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
     package.child(WIX_LICENSE_RTF.as_path()).assert(predicate::path::missing());
+}
+
+#[test]
+fn output_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let output = tempfile::Builder::new().prefix("cargo_wix_test_output_").tempdir().unwrap();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .output(output.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    output.child(MAIN_WXS_NAME).assert(predicate::path::exists());
 }
 

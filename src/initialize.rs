@@ -229,8 +229,14 @@ impl<'a> Builder<'a> {
 
     /// Sets the destination for creating all of the output from initialization.
     ///
-    /// The default is to create all initialization output in the current
-    /// working directory.
+    /// The default is to create all initialization output in the same folder as
+    /// the package's manifest (Cargo.toml). Thus, a `wix` folder will be
+    /// created within the same folder as the `Cargo.toml` file and all
+    /// initialization created files will be placed in the `wix` folder.
+    ///
+    /// This method can be used to override the default output destination and
+    /// have the files related to creating an installer placed in a different
+    /// location inside or outside of the package's project folder.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
