@@ -138,27 +138,27 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to a custom EULA.
+    /// Sets the path to a custom End User License Agreement (EULA).
+    ///
+    /// The EULA is the text that appears in the license agreement dialog of the
+    /// installer, where a checkbox is present for the user to agree to the
+    /// terms of the license. Typically, this is the same as the license file
+    /// that is included as a [sidecar] file in the installation destination of
+    /// the executable.
     ///
     /// The default is to generate an EULA from an embedded template as a RTF
     /// file based on the name of the license specified in the `license` field
-    /// of the package's manifest (Cargo.toml). If the `license` field is not
-    /// specified or a template for the license does not exist but the
-    /// `license-file` field does specify a path to a file with the RTF
-    /// extension, then that RTF file is used as the EULA for the license
-    /// agreement dialog in the installer. Finally, if the `license-file` does
-    /// not exist or it specifies a file that does not have the `.rtf`
-    /// extension, then the license agreement dialog is skipped and there is no
-    /// EULA for the installer. This would override the default behavior and
-    /// ensure the license agreement dialog is used.
-    pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
-        self.eula = e;
-        self
-    }
-
-    /// Forces the generation of new output even if the various outputs already
-    /// exists at the destination.
-    pub fn force(&mut self, f: bool) -> &mut Self {
+    /// of the package's manifest (Cargo.toml). This method can be used to
+    /// override the default and specify a custom EULA. A custom EULA must be in
+    /// the RTF format and have the `.rtf` file extension.
+    ///
+    /// If the `license` field is not specified or a template for the license
+    /// does not exist but the `license-file` field does specify a path to a
+    /// file with the RTF extension, then that RTF file is used as the EULA for
+    /// the license agreement dialog in the installer. Finally, if the
+    /// `license-file` does not exist or it specifies a file that does not have
+    /// the `.rtf` extension, then the license agreement dialog is skipped and
+    /// there is no EULA for the installer. This would override the defaul
         self.force = f;
         self
     }
