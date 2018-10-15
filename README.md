@@ -13,7 +13,7 @@ Start a command prompt (cmd.exe) and then execute the following commands:
 ```dos
 C:\>cargo install cargo-wix
 C:\>cd Path\To\Project
-C:\Path\To\Project\>cargo wix --init
+C:\Path\To\Project\>cargo wix init
 C:\Path\To\Project\>cargo wix
 ```
 
@@ -28,8 +28,6 @@ The cargo-wix project can be installed on any platform supported by the Rust pro
 - [WiX Toolset](http://wixtoolset.org)
 - [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) (Optional), needed for signing the installer
 
-__Note__, the WiX Toolset `bin` folder must be added to the PATH system environment variable for the `cargo wix` subcommand to work properly. The default location for the WiX Toolset `bin` folder is: `C:\Program Files (x86)\WiX Toolset\bin` or `C:\Program Files (x86)\Wix Toolset v3.11\bin`. Please add this path to the PATH system environment variable before using this cargo subcommand.
-
 After installing and configuring the dependencies, execute the following command to install the `cargo-wix` subcommand:
 
 ```dos
@@ -41,7 +39,7 @@ C:\>cargo install cargo-wix
 Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
 
 ```dos
-C:\Path\To\Project\>cargo wix --init
+C:\Path\To\Project\>cargo wix init
 ```
 
 This will create the `wix` folder in the project's root (along side the `Cargo.toml` file) and then it will create the `wix\main.wxs` file from the WiX Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file can be used without modification with the following command to create an installer for the project:
@@ -58,10 +56,10 @@ A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by sp
 C:\Path\To\Project\>cargo wix Path\To\WiX\Source\file.wxs
 ```
 
-The `--print-template` option, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
+The `print <template>` subcommand, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
 
 ```dos
-C:\Path\To\Project\>cargo --print-template wxs > example.wxs
+C:\Path\To\Project\>cargo print wxs > example.wxs
 C:\Path\To\Project\>cargo wix example.wxs
 ```
 
@@ -70,7 +68,7 @@ The WiX source file can be customized using a text editor, but modification of t
 To sign the installer (msi) as part of the build process, ensure the `signtool` command is available in the PATH system environment variable or use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the Windows 10 SDK, and use the `--sign` flag with the subcommand as follows: 
 
 ```dos
-C:\Path\To\Project\>cargo wix --sign
+C:\Path\To\Project\>cargo wix sign
 ```
 
 Use the `-h,--help` flag to display information about additional options and features.
@@ -78,6 +76,10 @@ Use the `-h,--help` flag to display information about additional options and fea
 ```dos
 C:\Path\To\Project\>cargo wix -h
 ```
+
+## Tests
+
+The tests can be run using the `cargo test -- --test-threads=1` command from the root folder of the project, i.e. the same location as the `Cargo.toml` file. The `--test-threads=1` option appears to be needed when running the integration tests because sometimes if the integration tests are run in parallel (default without the option) some of the tests will fail. I believe this is related to creating temporary test projects using Cargo. There appears to be some kind of race condition that causes Cargo to not create separate projects for each of the integration tests.
 
 ## License
 
