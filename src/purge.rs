@@ -36,10 +36,10 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the path to a package's manifest (Cargo.toml) to be cleaned.
+    /// Sets the path to a package's manifest (Cargo.toml) to be purge.
     ///
-    /// The default is to use the current working directory if a Cargo.toml file is found. This
-    /// method overrides the default.
+    /// The default is to use the current working directory if a Cargo.toml file
+    /// is found. This method overrides the default.
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self

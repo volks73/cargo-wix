@@ -141,3 +141,17 @@ fn change_binary_name_works() {
         &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED)
     ), format!("target\\release\\{}.exe", EXPECTED));
 }
+
+#[test]
+fn input_execution_works() {
+    let package = common::create_test_package();
+    let result = Builder::default()
+        .input(package.child("Cargo.toml").path().to_str())
+        .build()
+        .run();
+    assert!(result.is_ok());
+    package.child(WIX.as_path()).assert(predicate::path::exists());
+    package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
+    package.child(WIX_LICENSE_RTF.as_path()).assert(predicate::path::missing());
+}
+
