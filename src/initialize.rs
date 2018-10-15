@@ -85,13 +85,38 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the copyright holder in the license dialog of the Windows installer (msi).
+    /// Sets the copyright holder for the generated license file and EULA.
+    ///
+    /// The default is to use the first author from the `authors` field of the
+    /// package's manifest (Cargo.toml). This method can be used to override the
+    /// default and set a different copyright holder if and when a Rich Text
+    /// Format (RTF) license and EULA are generated based on the value of the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// This value is ignored and not used if an EULA is set with the [`eula`]
+    /// method, if a custom EULA is set using the `license-file` field in the
+    /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// ['eula']: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
     pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
         self.copyright_holder = h;
         self
     }
 
-    /// Sets the copyright year in the license dialog of the Windows installer (msi).
+    /// Sets the copyright year for the generated license file and EULA.
+    ///
+    /// The default is to use the current year. This method can be used to
+    /// override the default and set a specific year if and when a Rich Text
+    /// Format (RTF) license and EULA are generated based on the value of the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// This value is ignored and not used if an EULA is set with the [`eula`]
+    /// method, if a custom EULA is set using the `license-file` field in the
+    /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// ['eula']: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
     pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
         self.copyright_year = y;
         self
