@@ -83,6 +83,9 @@ impl<'a> Builder<'a> {
     /// [`product_name`]` method to change the name that appears in the Add/Remove
     /// Programs control panel.
     ///
+    /// The binary name should also match the executable that is created in the
+    /// `target\Release` folder as part of the build process for the package.
+    ///
     /// [`product_name`]: #product_name
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
