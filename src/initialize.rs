@@ -80,8 +80,10 @@ impl<'a> Builder<'a> {
     /// Generally, the binary name should _not_ have spaces or special
     /// characters. The binary name is the name of the executable. This will
     /// _not_ appear in the Add/Remove Programs control panel. Use the
-    /// `product_name` method to change the name that appears in the Add/Remove
+    /// [`product_name`]` method to change the name that appears in the Add/Remove
     /// Programs control panel.
+    ///
+    /// [`product_name`]: #product_name
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
         self
@@ -206,16 +208,17 @@ impl<'a> Builder<'a> {
 
     /// Sets the manufacturer.
     ///
-    /// Default is to use the first author in the `authors` field of the package's manifest
-    /// (Cargo.toml). This would override the default value.
+    /// Default is to use the first author in the `authors` field of the
+    /// package's manifest (Cargo.toml). This would override the default value.
     pub fn manufacturer(&mut self, m: Option<&'a str>) -> &mut Self {
         self.manufacturer = m;
         self
     }
 
-    /// Sets the destination for creating all of the output from initialization. 
+    /// Sets the destination for creating all of the output from initialization.
     ///
-    /// The default is to create all initialization output in the current working directory.
+    /// The default is to create all initialization output in the current
+    /// working directory.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
@@ -223,14 +226,23 @@ impl<'a> Builder<'a> {
 
     /// Sets the product name.
     ///
-    /// The default is to use the `name` field under the `package` section of the package's
-    /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
-    /// not found in the manifest.
+    /// The default is to use the `name` field under the `package` section of
+    /// the package's manifest (Cargo.toml). This overrides that value. An error
+    /// occurs if the `name` field is not found in the manifest.
     ///
-    /// This is different from the binary name in that it is the name that appears in the
-    /// Add/Remove Programs control panel, _not_ the name of the executable. The `binary_name`
-    /// method can be used to change the executable name. This value can have spaces and special
-    /// characters, where the binary (executable) name should avoid spaces and special characters.
+    /// The product name is also used for the disk prompt during installation
+    /// and the name of the default installation destination. For example, a
+    /// product anme of `Example` will have an installation destination of
+    /// `C:\Program Files\Example` as the default during installation.
+    ///
+    /// This is different from the binary name in that it is the name that
+    /// appears in the Add/Remove Programs control panel, _not_ the name of the
+    /// executable. The [`binary_name`] method can be used to change the
+    /// executable name. This value can have spaces and special characters,
+    /// where the binary (executable) name should avoid spaces and special
+    /// characters.
+    ///
+    /// [`binary_name`]: #binary_name
     pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.product_name = p;
         self

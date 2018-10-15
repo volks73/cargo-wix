@@ -109,9 +109,32 @@ fn change_product_name_works() {
     let result = Builder::default().product_name(Some(EXPECTED)).build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    let actual = common::evaluate_xpath(
+    assert_eq!(common::evaluate_xpath(
         package.child(WIX_MAIN_WXS.as_path()).path(),
         "/wix:Wix/wix:Product/@Name"
-    );
-    assert_eq!(actual, EXPECTED);
+    ), EXPECTED);
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "/wix:Wix/wix:Product/wix:Property[@Id='DiskPrompt']/@Value"
+    ), EXPECTED.to_string() + " Installation");
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:Directory[@Id='APPLICATIONFOLDER']/@Name"
+    ), EXPECTED);
 }
+
+// #[test]
+// fn change_binary_name_works() {
+//     const EXPECTED: &str = "Example.exe";
+//     let original_working_directory = env::current_dir().unwrap();
+//     let package = common::create_test_package();
+//     env::set_current_dir(package.path()).unwrap();
+//     let result = Builder::default().product_name(Some(EXPECTED)).build().run();
+//     env::set_current_dir(original_working_directory).unwrap();
+//     assert!(result.is_ok());
+//     let actual = common::evaluate_xpath(
+//         package.child(WIX_MAIN_WXS.as_path()).path(),
+//         "/wix:Wix/wix:Product/@Name"
+//     );
+//     assert_eq!(actual, EXPECTED);
+// }
