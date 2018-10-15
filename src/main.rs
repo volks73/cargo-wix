@@ -571,7 +571,7 @@ fn main() {
             init.manufacturer(m.value_of("manufacturer"));
             init.output(m.value_of("output"));
             init.product_name(m.value_of("product-name"));
-            init.build().run()    
+            init.build().run()
         },
         ("print", Some(m)) => {
             let template = value_t!(m, "TEMPLATE", Template).unwrap();
