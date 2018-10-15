@@ -224,7 +224,7 @@ impl Execution {
                   (Cargo.toml). The description can be added manually to the generated WiX \
                   Source (wxs) file using a text editor.");
         }
-        match Eula::new(self.eula.as_ref(), &manifest)? {
+        match self.eula(&manifest)? {
             Eula::Disabled => {
                 warn!("An EULA was not specified at the command line, a RTF \
                       license file was not specified in the package manifest's \
@@ -281,6 +281,28 @@ impl Execution {
             })
     }
 
+    fn eula(&self, manifest: &Value) -> Result<Eula> {
+        if let Some(ref path) = self.eula.clone().map(PathBuf::from) {
+            if path.exists() {
+                trace!("The '{}' path from the command line for the EULA exists",
+                       path.display());
+                Eula::new(Some(path), manifest)
+            } else {
+                Err(Error::Generic(format!(
+                    "The '{}' path from the command line for the EULA file does not exist",
+                    path.display()
+                )))
+            }
+        } else {
+            Eula::new(self.license.clone()
+                .map(PathBuf::from)
+                .filter(|p| p.extension().and_then(|p| p.to_str()) == Some("rtf"))
+                .as_ref(),
+                manifest
+            )
+        }
+    }
+
     fn license_name(&self, manifest: &Value) -> Option<String> {
         if let Some(ref l) = self.license.clone().map(PathBuf::from) {
             l.file_name().and_then(|f| f.to_str()).map(String::from)
@@ -310,7 +332,7 @@ impl Execution {
                 Ok(path.to_str().map(String::from))
             } else {
                 Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the license file does not exist", 
+                    "The '{}' path from the command line for the license file does not exist",
                     path.display()
                 )))
             }

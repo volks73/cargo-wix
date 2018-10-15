@@ -195,3 +195,31 @@ fn license_with_txt_file_works() {
         "//*/wix:File[@Id='LicenseFile']/@Source"
     ), package_license.path().to_str().unwrap());
 }
+
+#[test]
+fn license_with_rtf_file_works() {
+    const EXPECTED: &str = "License_Example.rtf";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_license = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    let _license_handle = File::create(package_license.path()).unwrap();
+    let result = Builder::default()
+        .license(package_license.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), EXPECTED);
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), package_license.path().to_str().unwrap());
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+    ), package_license.path().to_str().unwrap());
+}
