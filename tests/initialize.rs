@@ -223,3 +223,23 @@ fn license_with_rtf_file_works() {
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
     ), package_license.path().to_str().unwrap());
 }
+
+#[test]
+fn eula_works() {
+    const EXPECTED: &str = "EULA_Example.rtf";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_eula = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    let _eula_handle = File::create(package_eula.path()).unwrap();
+    let result = Builder::default()
+        .eula(package_eula.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+    ), package_eula.path().to_str().unwrap());
+}
