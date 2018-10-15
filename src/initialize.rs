@@ -160,6 +160,9 @@ impl<'a> Builder<'a> {
     /// (Cargo.toml): `documentation`, `homepage`, or `respository`. If none of these are
     /// specified, then the default is to exclude a help URL from the installer. This will override
     /// the default behavior and provide a help URL for the installer if none of the fields exist.
+    ///
+    /// The help URL is the URL that appears in the Add/Remove Program control
+    /// panel, a.k.a. `ARPHELPLINK`.
     pub fn help_url(&mut self, h: Option<&'a str>) -> &mut Self {
         self.help_url = h;
         self

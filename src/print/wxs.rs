@@ -113,7 +113,7 @@ impl<'a> Builder<'a> {
         self.input = i;
         self
     }
-    
+
     /// Sets the path to a file to be used as the
     /// [sidecar](https://en.wikipedia.org/wiki/Sidecar_file) license file.
     ///
@@ -234,8 +234,8 @@ impl Execution {
             },
             e => map = map.insert_str("eula", e.to_string()),
         }
-        if let Some(url) = self.help_url(&manifest) {
-            map = map.insert_str("help-url", url);
+        if let Some(url) = self.help_url.as_ref().or(Execution::help_url(&manifest).as_ref()) {
+            map = map.insert_str("help-url", url.to_owned());
         } else {
             warn!("A help URL could not be found and it will be excluded from the installer. \
                   A help URL can be added manually to the generated WiX Source (wxs) file \
@@ -268,7 +268,7 @@ impl Execution {
         }
     }
 
-    fn help_url(&self, manifest: &Value) -> Option<String> {
+    fn help_url(manifest: &Value) -> Option<String> {
         manifest.get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
