@@ -277,18 +277,15 @@ fn mit_license_id_works() {
     package.child(WIX.as_path()).assert(predicate::path::exists());
     package.child(WIX_MAIN_WXS.as_path()).assert(predicate::path::exists());
     package.child(WIX_LICENSE_RTF.as_path()).assert(predicate::path::exists());
-    let mut wxs_handle = File::open(package.child(WIX_MAIN_WXS.as_path()).path()).unwrap();
-    let mut wxs_content = String::new();
-    wxs_handle.read_to_string(&mut wxs_content).unwrap();
-    println!("{}", wxs_content);
-    // assert_eq!(common::evaluate_xpath(
-    //     package.child(WIX_MAIN_WXS.as_path()).path(),
-    //     "//*/wix:File[@Id='LicenseFile']/@Name"
-    // ), EXPECTED);
-    // assert_eq!(common::evaluate_xpath(
-    //     package.child(WIX_MAIN_WXS.as_path()).path(),
-    //     "//*/wix:File[@Id='LicenseFile']/@Source"
-    // ), package.child(WIX_LICENSE_RTF.as_path()).path().to_str().unwrap());
+    // TODO: Fix defaults when a license is generated so these assertions pass
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), LICENSE_RTF_NAME);
+    assert_eq!(common::evaluate_xpath(
+        package.child(WIX_MAIN_WXS.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), LICENSE_RTF_NAME);
     assert_eq!(common::evaluate_xpath(
         package.child(WIX_MAIN_WXS.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
