@@ -226,11 +226,13 @@ impl Execution {
         }
         match Eula::new(self.eula.as_ref(), &manifest)? {
             Eula::Disabled => {
-                warn!("An EULA was not specified at the command line, a RTF license file was \
-                      not specified in the package's manifest (Cargo.toml), or the license ID \
-                      from the package's manifest is not recognized. The license agreement \
-                      dialog will be excluded from the installer. An EULA can be added manually \
-                      to the generated WiX Source (wxs) file using a text editor.");
+                warn!("An EULA was not specified at the command line, a RTF \
+                      license file was not specified in the package manifest's \
+                      (Cargo.toml) 'license-file' field, or the license ID from the \
+                      package manifest's 'license' field is not recognized. The \
+                      license agreement dialog will be excluded from the installer. An \
+                      EULA can be added manually to the generated WiX Source (wxs) \
+                      file using a text editor.");
             },
             e => map = map.insert_str("eula", e.to_string()),
         }

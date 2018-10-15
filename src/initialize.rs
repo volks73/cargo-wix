@@ -158,7 +158,16 @@ impl<'a> Builder<'a> {
     /// the license agreement dialog in the installer. Finally, if the
     /// `license-file` does not exist or it specifies a file that does not have
     /// the `.rtf` extension, then the license agreement dialog is skipped and
-    /// there is no EULA for the installer. This would override the defaul
+    /// there is no EULA for the installer. This would override the default
+    /// behavior and ensure the license agreement dialog is used.
+    pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
+        self.eula = e;
+        self
+    }
+
+    /// Forces the generation of new output even if the various outputs already
+    /// exists at the destination.
+    pub fn force(&mut self, f: bool) -> &mut Self {
         self.force = f;
         self
     }
