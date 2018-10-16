@@ -22,7 +22,8 @@ mod common;
 use assert_fs::prelude::*;
 use cargo_wix::create::Execution;
 use cargo_wix::initialize;
-use common::{TARGET_NAME, WIX_NAME};
+use cargo_wix::WIX;
+use common::TARGET_NAME;
 use predicates::prelude::*;
 use std::env;
 use std::path::PathBuf;
@@ -30,7 +31,7 @@ use std::path::PathBuf;
 lazy_static!{
     static ref TARGET_WIX_DIR: PathBuf = {
         let mut p = PathBuf::from(TARGET_NAME);
-        p.push(WIX_NAME);
+        p.push(WIX);
         p
     };
 }

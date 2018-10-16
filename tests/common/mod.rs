@@ -10,8 +10,6 @@ use self::sxd_document::parser;
 use self::sxd_xpath::{Context, Factory};
 
 #[allow(dead_code)]
-pub const WIX_NAME: &str = "wix";
-#[allow(dead_code)]
 pub const TARGET_NAME: &str = "target";
 
 /// Create a new cargo project/package for a binary project in a temporary
