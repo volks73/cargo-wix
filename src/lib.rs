@@ -89,6 +89,7 @@ pub const BINARY_FOLDER_NAME: &str = "bin";
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
 pub const CARGO: &str = "cargo";
 pub const EXE_FILE_EXTENSION: &str = "exe";
+pub const LICENSE_FILE_NAME: &str = "License";
 pub const MSI_FILE_EXTENSION: &str = "msi";
 pub const RTF_FILE_EXTENSION: &str = "rtf";
 pub const SIGNTOOL: &str = "signtool";
@@ -368,6 +369,15 @@ impl Template {
             Template::Mit.id().to_lowercase(), 
             Template::Wxs.id().to_owned(),
             Template::Wxs.id().to_lowercase(),
+        ]
+    }
+
+    /// Gets the IDs of all supported licenses.
+    pub fn license_ids() -> Vec<String> {
+        vec![
+            Template::Apache2.id().to_owned(),
+            Template::Gpl3.id().to_owned(),
+            Template::Mit.id().to_owned(),
         ]
     }
 

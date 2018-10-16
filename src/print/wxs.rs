@@ -15,10 +15,12 @@
 use description;
 use Error;
 use eula::Eula;
+use LICENSE_FILE_NAME;
 use manifest;
 use mustache::{self, MapBuilder};
 use product_name;
 use Result;
+use RTF_FILE_EXTENSION;
 use std::path::{Path, PathBuf};
 use Template;
 use toml::Value;
@@ -244,9 +246,11 @@ impl Execution {
                   using a text editor.");
         }
         if let Some(name) = self.license_name(&manifest) {
+            println!("license-name");
             map = map.insert_str("license-name", name);
         }
         if let Some(source) = self.license_source(&manifest)? {
+            println!("license-source");
             map = map.insert_str("license-source", source);
         } else {
             warn!("A license file could not be found and it will be excluded from the \
@@ -309,22 +313,30 @@ impl Execution {
         } else {
             manifest.get("package")
                 .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|l| {
-                    Path::new(l).file_name()
-                        .and_then(|f| f.to_str())
-                        .map(String::from)
+                .and_then(|t| {
+                    t.get("license")
+                        .filter(|l| {
+                            if let Some(s) = l.as_str() {
+                                Template::license_ids().contains(&s.to_owned())
+                            } else {
+                                false
+                            }
+                        })
+                        .map(|_| String::from(LICENSE_FILE_NAME))
+                        .or_else(|| {
+                            t.get("license-file")
+                            .and_then(|l| l.as_str())
+                            .and_then(|l| {
+                                Path::new(l).file_name()
+                                    .and_then(|f| f.to_str())
+                                    .map(String::from)
+                            })
+                        })
                 })
         }
     }
 
     fn license_source(&self, manifest: &Value) -> Result<Option<String>> {
-        // Order of precedence:
-        //
-        // 1. CLI (-l,--license)
-        // 2. Manifest `license-file`
-        // 3. LICENSE file in root
         if let Some(ref path) = self.license.clone().map(PathBuf::from) {
             if path.exists() {
                 trace!("The '{}' path from the command line for the license exists",
@@ -339,18 +351,32 @@ impl Execution {
         } else {
             Ok(manifest.get("package")
                 .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license-file"))
-                .and_then(|l| l.as_str())
-                .and_then(|s| {
-                    let p = PathBuf::from(s);
-                    if p.exists() {
-                        trace!("The '{}' path from the 'license-file' field in the package's \
-                               manifest (Cargo.toml) exists.", p.display());
-                        Some(p.into_os_string().into_string().unwrap())
-                    } else {
-                        None
-                    }
-                }))
+               .and_then(|t| {
+                   t.get("license")
+                       .filter(|l| {
+                           if let Some(s) = l.as_str() {
+                               Template::license_ids().contains(&s.to_string())
+                           } else {
+                               false
+                           }
+                       })
+                       .map(|_| LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+                       .or_else(|| {
+                            t.get("license-file")
+                            .and_then(|l| l.as_str())
+                            .and_then(|s| {
+                                let p = PathBuf::from(s);
+                                if p.exists() {
+                                    trace!("The '{}' path from the 'license-file' field in the package's \
+                                        manifest (Cargo.toml) exists.", p.display());
+                                    Some(p.into_os_string().into_string().unwrap())
+                                } else {
+                                    None
+                                }
+                            })
+                       })
+               })
+            )
         }
     }
 
@@ -369,3 +395,36 @@ impl Default for Execution {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod builder {
+    }
+
+    mod execution {
+        use super::*;
+
+        #[test]
+        fn license_name_works() {
+            let manifest = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_name(&manifest).expect("License name");
+            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+        }
+
+        #[test]
+        fn license_source_works() {
+            let manifest = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_source(&manifest).expect("License source");
+            assert_eq!(actual, Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION));
+        }
+    }
+}

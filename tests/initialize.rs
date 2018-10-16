@@ -171,7 +171,7 @@ fn output_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    output.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
+    output.child(MAIN_WXS.as_str()).assert(predicate::path::exists());
 }
 
 #[test]
@@ -279,7 +279,7 @@ fn mit_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_FILE_NAME.to_owned());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Source"
