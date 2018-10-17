@@ -279,11 +279,15 @@ impl Execution {
             Ok(b.to_owned())
         } else {
             manifest.get("bin")
-                .and_then(|b| b.as_table())
+                .and_then(|b| b.as_array())
+                .and_then(|a| a.get(0))
+                .and_then(|e| e.as_table())
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
-                .map(String::from)
-                .map_or(product_name(self.product_name.as_ref(), manifest), |s| Ok(s))
+                .map_or(
+                    product_name(self.product_name.as_ref(), manifest),
+                    |s| Ok(String::from(s))
+                )
         }
     }
 
@@ -549,6 +553,7 @@ license = "XYZ""#;
             let actual = Execution::default().license_source(&manifest).expect("License source");
             assert_eq!(actual, Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION));
         }
+
         #[test]
         fn license_source_with_gpl3_license_field_works() {
             let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
@@ -568,6 +573,52 @@ license = "XYZ""#;
             let manifest = UNKNOWN_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().license_source(&manifest).unwrap();
             assert!(actual.is_none());
+        }
+
+        #[test]
+        fn binary_name_with_defaults_works() {
+            let manifest = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().binary_name(&manifest).unwrap();
+            assert_eq!(actual, "Example".to_owned());
+        }
+
+        #[test]
+        fn binary_name_with_bin_name_works() {
+            let manifest = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+
+[[bin]]
+name = "Different"
+"#.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().binary_name(&manifest).unwrap();
+            assert_eq!(actual, "Different".to_owned());
+        }
+
+        #[test]
+        fn binary_name_with_override_works() {
+            const EXPECTED: &str = "Override";
+            let manifest = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+
+[[bin]]
+name = "Different"
+"#.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::default()
+                .binary_name(Some(EXPECTED))
+                .build()
+                .binary_name(&manifest)
+                .unwrap();
+            assert_eq!(actual, String::from(EXPECTED));
         }
     }
 }
