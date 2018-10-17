@@ -57,13 +57,15 @@ impl<'a> Builder<'a> {
 
     /// Sets the binary name.
     ///
-    /// The default is to use the `name` field under the `bin` section of the package's manifest
-    /// (Cargo.toml) or the `name` field under the `package` section if the `bin` section does
-    /// _not_ exist. This overrides either of these defaults.
+    /// The default is to use the `name` field under the `bin` section of the
+    /// package's manifest (Cargo.toml) or the `name` field under the `package`
+    /// section if the `bin` section does _not_ exist. This overrides either of
+    /// these defaults.
     ///
-    /// Generally, the binary name should _not_ have spaces or special characters. The binary name
-    /// is the name of the executable. This will _not_ appear in the Add/Remove Programs control
-    /// panel. Use the `product_name` method to change the name that appears in the Add/Remove
+    /// Generally, the binary name should _not_ have spaces, special characters,
+    /// or a file extension. The binary name is the name of the executable. This
+    /// will _not_ appear in the Add/Remove Programs control panel. Use the
+    /// `product_name` method to change the name that appears in the Add/Remove
     /// Programs control panel.
     pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
         self.binary_name = b;
@@ -72,8 +74,8 @@ impl<'a> Builder<'a> {
 
     /// Sets the description.
     ///
-    /// This overrides the description determined from the `description` field in the package's
-    /// manifest (Cargo.toml).
+    /// This overrides the description determined from the `description` field
+    /// in the package's manifest (Cargo.toml).
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
         self
@@ -81,15 +83,17 @@ impl<'a> Builder<'a> {
 
     /// Sets the path to a custom EULA.
     ///
-    /// The default is to generate an EULA from an embedded template as a RTF file based on the
-    /// name of the license specified in the `license` field of the package's manifest
-    /// (Cargo.toml). If the `license` field is not specified or a template for the license does
-    /// not exist but the `license-file` field does specify a path to a file with the RTF
-    /// extension, then that RTF file is used as the EULA for the license agreement dialog in the
-    /// installer. Finally, if the `license-file` does not exist or it specifies a file that does
-    /// not have the `.rtf` extension, then the license agreement dialog is skipped and there is no
-    /// EULA for the installer. This would override the default behavior and ensure the license
-    /// agreement dialog is used.
+    /// The default is to generate an EULA from an embedded template as a RTF
+    /// file based on the name of the license specified in the `license` field
+    /// of the package's manifest (Cargo.toml). If the `license` field is not
+    /// specified or a template for the license does not exist but the
+    /// `license-file` field does specify a path to a file with the RTF
+    /// extension, then that RTF file is used as the EULA for the license
+    /// agreement dialog in the installer. Finally, if the `license-file` does
+    /// not exist or it specifies a file that does not have the `.rtf`
+    /// extension, then the license agreement dialog is skipped and there is no
+    /// EULA for the installer. This would override the default behavior and
+    /// ensure the license agreement dialog is used.
     pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
         self.eula = e;
         self
@@ -97,37 +101,41 @@ impl<'a> Builder<'a> {
 
     /// Sets the help URL.
     ///
-    /// The default is to obtain a URL from one of the following fields in the package's manifest
-    /// (Cargo.toml): `documentation`, `homepage`, or `respository`. If none of these are
-    /// specified, then the default is to exclude a help URL from the installer. This will override
-    /// the default behavior and provide a help URL for the installer if none of the fields exist.
+    /// The default is to obtain a URL from one of the following fields in the
+    /// package's manifest (Cargo.toml): `documentation`, `homepage`, or
+    /// `respository`. If none of these are specified, then the default is to
+    /// exclude a help URL from the installer. This will override the default
+    /// behavior and provide a help URL for the installer if none of the fields
+    /// exist.
     pub fn help_url(&mut self, h: Option<&'a str>) -> &mut Self {
         self.help_url = h;
         self
     }
 
-    /// Sets the path to a package's manifest (Cargo.toml) to be used to generate a WiX Source
-    /// (wxs) file from the embedded template.
+    /// Sets the path to a package's manifest (Cargo.toml) to be used to
+    /// generate a WiX Source (wxs) file from the embedded template.
     ///
-    /// A `wix` and `wix\main.wxs` file will be created in the same directory as the package's
-    /// manifest. The default is to use the package's manifest in the current working directory.
+    /// A `wix` and `wix\main.wxs` file will be created in the same directory as
+    /// the package's manifest. The default is to use the package's manifest in
+    /// the current working directory.
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
     }
 
-    /// Sets the path to a file to be used as the
-    /// [sidecar](https://en.wikipedia.org/wiki/Sidecar_file) license file.
+    /// Sets the path to a file to be used as the license [sidecar] file.
     ///
-    /// This will override the `license-file` field in the package's manifest (Cargo.toml). If the
-    /// file has the `.rtf` extension, then it will also be used for the EULA in the license
-    /// agreement dialog for the installer.
+    /// The default is to use the value specified in the `license-file` field of
+    /// the package's manifest (Cargo.toml) or generate a Rich Text Format (RTF)
+    /// license file from an embedded template based on the license ID used in
+    /// the `license` field of the package's manifest. If none of these fields
+    /// are specified or overriden, then a license sidecar file is _not_
+    /// included in the installation directory.
     ///
-    /// The default is to use the value specified in the `license-file` field of the package's
-    /// manifest or generate a license file and RTFed EULA from an embedded template based on the
-    /// license name used in the `license` field of the package's manifest. If none of these fields
-    /// are specified or overriden, then a license file is _not_ included in the installation
-    /// directory and the license agreement dialog is skipped in the installer.
+    /// This will override the default behavior and skip using either the
+    /// `license` or `license-file` fields in the package's manifest.
+    ///
+    /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
     pub fn license(&mut self, l: Option<&'a str>) -> &mut Self {
         self.license = l;
         self
@@ -135,16 +143,17 @@ impl<'a> Builder<'a> {
 
     /// Sets the manufacturer.
     ///
-    /// Default is to use the first author in the `authors` field of the package's manifest
-    /// (Cargo.toml). This would override the default value.
+    /// Default is to use the first author in the `authors` field of the
+    /// package's manifest (Cargo.toml). This would override the default value.
     pub fn manufacturer(&mut self, m: Option<&'a str>) -> &mut Self {
         self.manufacturer = m;
         self
     }
 
-    /// Sets the destination for creating all of the output from initialization. 
+    /// Sets the destination for creating all of the output from initialization.
     ///
-    /// The default is to create all initialization output in the current working directory.
+    /// The default is to create all initialization output in the current
+    /// working directory.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
@@ -152,19 +161,23 @@ impl<'a> Builder<'a> {
 
     /// Sets the product name.
     ///
-    /// The default is to use the `name` field under the `package` section of the package's
-    /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
-    /// not found in the manifest.
+    /// The default is to use the `name` field under the `package` section of
+    /// the package's manifest (Cargo.toml). This overrides that value. An error
+    /// occurs if the `name` field is not found in the manifest.
     ///
-    /// This is different from the binary name in that it is the name that appears in the
-    /// Add/Remove Programs control panel, _not_ the name of the executable. The `binary_name`
-    /// method can be used to change the executable name. This value can have spaces and special
-    /// characters, where the binary (executable) name should avoid spaces and special characters.
+    /// This is different from the binary name in that it is the name that
+    /// appears in the Add/Remove Programs (ARP) control panel, _not_ the name
+    /// of the executable. The [`binary_name`] method can be used to change the
+    /// executable name. This value can have spaces and special characters,
+    /// where the binary name should avoid spaces and special characters.
+    ///
+    /// [`binary_name`]: #binary_name
     pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.product_name = p;
         self
     }
 
+    /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
             binary_name: self.binary_name.map(String::from),
@@ -400,13 +413,86 @@ mod tests {
     use super::*;
 
     mod builder {
+        use super::*;
+
+        #[test]
+        fn binary_name_works() {
+            const EXPECTED: &str = "Example";
+            let mut actual = Builder::new();
+            actual.binary_name(Some(EXPECTED));
+            assert_eq!(actual.binary_name, Some(EXPECTED));
+        }
+
+        #[test]
+        fn description_works() {
+            const EXPECTED: &str = "This is a description.";
+            let mut actual = Builder::new();
+            actual.description(Some(EXPECTED));
+            assert_eq!(actual.description, Some(EXPECTED));
+        }
+
+        #[test]
+        fn eula_works() {
+            const EXPECTED: &str = "Example_Eula.rtf";
+            let mut actual = Builder::new();
+            actual.eula(Some(EXPECTED));
+            assert_eq!(actual.eula, Some(EXPECTED));
+        }
+
+        #[test]
+        fn help_url_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let mut actual = Builder::new();
+            actual.help_url(Some(EXPECTED));
+            assert_eq!(actual.help_url, Some(EXPECTED));
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "C:\\example\\Cargo.toml";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn license_works() {
+            const EXPECTED: &str = "C:\\example\\Example License.rtf";
+            let mut actual = Builder::new();
+            actual.license(Some(EXPECTED));
+            assert_eq!(actual.license, Some(EXPECTED));
+        }
+
+        #[test]
+        fn manufacturer_works() {
+            const EXPECTED: &str = "Example";
+            let mut actual = Builder::new();
+            actual.manufacturer(Some(EXPECTED));
+            assert_eq!(actual.manufacturer, Some(EXPECTED));
+        }
+
+        #[test]
+        fn output_works() {
+            const EXPECTED: &str = "C:\\example\\output";
+            let mut actual = Builder::new();
+            actual.output(Some(EXPECTED));
+            assert_eq!(actual.output, Some(EXPECTED));
+        }
+
+        #[test]
+        fn product_name_works() {
+            const EXPECTED: &str = "Example Product Name";
+            let mut actual = Builder::new();
+            actual.product_name(Some(EXPECTED));
+            assert_eq!(actual.product_name, Some(EXPECTED));
+        }
     }
 
     mod execution {
         use super::*;
 
         #[test]
-        fn license_name_works() {
+        fn license_name_with_license_manifest_field_works() {
             let manifest = r#"[package]
 name = "Example"
 version = "0.1.0"
@@ -417,7 +503,7 @@ license = "MIT""#.parse::<Value>().expect("Parsing TOML");
         }
 
         #[test]
-        fn license_source_works() {
+        fn license_source_with_manifest_license_field_works() {
             let manifest = r#"[package]
 name = "Example"
 version = "0.1.0"
