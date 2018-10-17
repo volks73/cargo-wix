@@ -491,26 +491,83 @@ mod tests {
     mod execution {
         use super::*;
 
-        #[test]
-        fn license_name_with_license_manifest_field_works() {
-            let manifest = r#"[package]
+        const MIT_MANIFEST: &str = r#"[package]
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+license = "MIT""#;
+
+        const GPL3_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "GPL-3.0""#;
+
+        const APACHE2_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "Apache-2.0""#;
+
+        const UNKNOWN_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "XYZ""#;
+
+        #[test]
+        fn license_name_with_mit_license_field_works() {
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().license_name(&manifest).expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
-        fn license_source_with_manifest_license_field_works() {
-            let manifest = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+        fn license_name_with_gpl3_license_field_works() {
+            let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_name(&manifest).expect("License name");
+            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+        }
+
+        #[test]
+        fn license_name_with_apache2_license_field_works() {
+            let manifest = APACHE2_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_name(&manifest).expect("License name");
+            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+        }
+
+        #[test]
+        fn license_name_with_unknown_license_field_works() {
+            let manifest = UNKNOWN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_name(&manifest);
+            assert!(actual.is_none());
+        }
+
+        #[test]
+        fn license_source_with_mit_license_field_works() {
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().license_source(&manifest).expect("License source");
             assert_eq!(actual, Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION));
+        }
+        #[test]
+        fn license_source_with_gpl3_license_field_works() {
+            let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_source(&manifest).expect("License source");
+            assert_eq!(actual, Some(String::from(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)));
+        }
+
+        #[test]
+        fn license_source_with_apache2_license_field_works() {
+            let manifest = APACHE2_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_source(&manifest).expect("License source");
+            assert_eq!(actual, Some(String::from(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)));
+        }
+
+        #[test]
+        fn license_source_with_unknown_license_field_works() {
+            let manifest = UNKNOWN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().license_source(&manifest).unwrap();
+            assert!(actual.is_none());
         }
     }
 }
