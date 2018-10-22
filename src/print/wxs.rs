@@ -499,25 +499,39 @@ mod tests {
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-license = "MIT""#;
+license = "MIT"
+"#;
 
         const GPL3_MANIFEST: &str = r#"[package]
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-license = "GPL-3.0""#;
+license = "GPL-3.0"
+"#;
 
         const APACHE2_MANIFEST: &str = r#"[package]
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-license = "Apache-2.0""#;
+license = "Apache-2.0"
+"#;
 
         const UNKNOWN_MANIFEST: &str = r#"[package]
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-license = "XYZ""#;
+
+"#;
+
+        const MIT_MANIFEST_BIN: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+
+[[bin]]
+name = "Different"
+"#;
 
         #[test]
         fn license_name_with_mit_license_field_works() {
@@ -577,26 +591,14 @@ license = "XYZ""#;
 
         #[test]
         fn binary_name_with_defaults_works() {
-            let manifest = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT""#.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().binary_name(&manifest).unwrap();
             assert_eq!(actual, "Example".to_owned());
         }
 
         #[test]
         fn binary_name_with_bin_name_works() {
-            let manifest = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-
-[[bin]]
-name = "Different"
-"#.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().binary_name(&manifest).unwrap();
             assert_eq!(actual, "Different".to_owned());
         }
@@ -604,15 +606,7 @@ name = "Different"
         #[test]
         fn binary_name_with_override_works() {
             const EXPECTED: &str = "Override";
-            let manifest = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-
-[[bin]]
-name = "Different"
-"#.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
             let actual = Builder::default()
                 .binary_name(Some(EXPECTED))
                 .build()
