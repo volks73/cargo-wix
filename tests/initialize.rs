@@ -289,3 +289,91 @@ fn mit_license_id_works() {
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
     ), LICENSE_RTF.to_owned());
 }
+
+#[test]
+fn apache2_license_id_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let package_manifest = package.child("Cargo.toml");
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("Apache-2.0")),
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
+    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
+    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::exists());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), LICENSE_FILE_NAME.to_owned());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), LICENSE_RTF.to_owned());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+    ), LICENSE_RTF.to_owned());
+}
+
+#[test]
+fn gpl3_license_id_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let package_manifest = package.child("Cargo.toml");
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("GPL-3.0")),
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
+    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
+    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::exists());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), LICENSE_FILE_NAME.to_owned());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), LICENSE_RTF.to_owned());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+    ), LICENSE_RTF.to_owned());
+}
