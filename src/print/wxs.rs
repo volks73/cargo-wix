@@ -533,6 +533,30 @@ license = "MIT"
 name = "Different"
 "#;
 
+        const DOCUMENTATION_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+documentation = "http://www.example.com"
+"#;
+
+        const HOMEPAGE_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+homepage = "http://www.example.com"
+"#;
+
+        const REPOSITORY_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+license = "MIT"
+repository = "http://www.example.com"
+"#;
+
         #[test]
         fn license_name_with_mit_license_field_works() {
             let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
@@ -633,6 +657,37 @@ name = "Different"
                 .manufacturer(&manifest)
                 .unwrap();
             assert_eq!(actual, String::from(EXPECTED));
+        }
+
+        #[test]
+        fn help_url_with_defaults_works() {
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::help_url(&manifest);
+            assert!(actual.is_none());
+        }
+
+        #[test]
+        fn help_url_with_documentation_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let manifest = DOCUMENTATION_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::help_url(&manifest);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
+
+        #[test]
+        fn help_url_with_homepage_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::help_url(&manifest);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
+
+        #[test]
+        fn help_url_with_repository_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let manifest = REPOSITORY_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::help_url(&manifest);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
         }
     }
 }
