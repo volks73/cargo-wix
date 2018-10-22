@@ -614,5 +614,25 @@ name = "Different"
                 .unwrap();
             assert_eq!(actual, String::from(EXPECTED));
         }
+
+        #[test]
+        fn manufacturer_with_defaults_works() {
+            const EXPECTED: &str = "First Last";
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().manufacturer(&manifest).unwrap();
+            assert_eq!(actual, String::from(EXPECTED));
+        }
+
+        #[test]
+        fn manufacturer_with_override_works() {
+            const EXPECTED: &str = "Example";
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::default()
+                .manufacturer(Some(EXPECTED))
+                .build()
+                .manufacturer(&manifest)
+                .unwrap();
+            assert_eq!(actual, String::from(EXPECTED));
+        }
     }
 }
