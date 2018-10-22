@@ -499,73 +499,72 @@ mod tests {
         use super::*;
 
         const MIN_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
 
         const MIT_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+        "#;
 
         const GPL3_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "GPL-3.0"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "GPL-3.0"
+        "#;
 
         const APACHE2_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "Apache-2.0"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "Apache-2.0"
+        "#;
 
         const UNKNOWN_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "XYZ"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "XYZ"
+        "#;
 
         const MIT_MANIFEST_BIN: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
 
-[[bin]]
-name = "Different"
-"#;
+            [[bin]]
+            name = "Different"
+        "#;
 
         const DOCUMENTATION_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-documentation = "http://www.example.com"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+            documentation = "http://www.example.com"
+        "#;
 
         const HOMEPAGE_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-homepage = "http://www.example.com"
-"#;
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+            homepage = "http://www.example.com"
+        "#;
 
         const REPOSITORY_MANIFEST: &str = r#"[package]
-name = "Example"
-version = "0.1.0"
-authors = ["First Last <first.last@example.com>"]
-license = "MIT"
-repository = "http://www.example.com"
-"#;
-
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+            repository = "http://www.example.com"
+        "#;
 
         #[test]
         fn license_name_with_mit_license_field_works() {
