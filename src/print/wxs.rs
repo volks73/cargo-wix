@@ -493,7 +493,16 @@ mod tests {
     }
 
     mod execution {
+        extern crate tempfile;
+
+        use std::fs::File;
         use super::*;
+
+        const MIN_MANIFEST: &str = r#"[package]
+name = "Example"
+version = "0.1.0"
+authors = ["First Last <first.last@example.com>"]
+"#;
 
         const MIT_MANIFEST: &str = r#"[package]
 name = "Example"
@@ -520,7 +529,7 @@ license = "Apache-2.0"
 name = "Example"
 version = "0.1.0"
 authors = ["First Last <first.last@example.com>"]
-
+license = "XYZ"
 "#;
 
         const MIT_MANIFEST_BIN: &str = r#"[package]
@@ -556,6 +565,7 @@ authors = ["First Last <first.last@example.com>"]
 license = "MIT"
 repository = "http://www.example.com"
 "#;
+
 
         #[test]
         fn license_name_with_mit_license_field_works() {
@@ -642,7 +652,7 @@ repository = "http://www.example.com"
         #[test]
         fn manufacturer_with_defaults_works() {
             const EXPECTED: &str = "First Last";
-            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::default().manufacturer(&manifest).unwrap();
             assert_eq!(actual, String::from(EXPECTED));
         }
@@ -650,7 +660,7 @@ repository = "http://www.example.com"
         #[test]
         fn manufacturer_with_override_works() {
             const EXPECTED: &str = "Example";
-            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Builder::default()
                 .manufacturer(Some(EXPECTED))
                 .build()
@@ -661,7 +671,7 @@ repository = "http://www.example.com"
 
         #[test]
         fn help_url_with_defaults_works() {
-            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::help_url(&manifest);
             assert!(actual.is_none());
         }
@@ -688,6 +698,109 @@ repository = "http://www.example.com"
             let manifest = REPOSITORY_MANIFEST.parse::<Value>().expect("Parsing TOML");
             let actual = Execution::help_url(&manifest);
             assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
+
+        #[test]
+        fn eula_with_defaults_works() {
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Disabled);
+        }
+
+        #[test]
+        fn eula_with_mit_license_field_works() {
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Generate(Template::Mit));
+        }
+
+        #[test]
+        fn eula_with_apache2_license_field_works() {
+            let manifest = APACHE2_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Generate(Template::Apache2));
+        }
+
+        #[test]
+        fn eula_with_gpl3_license_field_works() {
+            let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Generate(Template::Gpl3));
+        }
+
+        #[test]
+        fn eula_with_unknown_license_field_works() {
+            let manifest = UNKNOWN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Disabled);
+        }
+
+        #[test]
+        fn eula_with_override_works() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let license_file_path = temp_dir.path().join("Example.rtf");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::default()
+                .eula(license_file_path.to_str())
+                .build()
+                .eula(&manifest)
+                .unwrap();
+            assert_eq!(actual, Eula::CommandLine(license_file_path));
+        }
+
+        #[test]
+        fn eula_with_license_file_field_works() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let license_file_path = temp_dir.path().join("Example.rtf");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let manifest = format!("[package]
+                name = \"Example\"
+                version = \"0.1.0\"
+                authors = [\"First Last <first.last@example.com>\"]
+                license-file = {:?}
+                ", license_file_path).parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Manifest(license_file_path));
+        }
+
+        #[test]
+        fn eula_with_license_file_extension_works() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let license_file_path = temp_dir.path().join("Example.txt");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let manifest = format!("[package]
+                name = \"Example\"
+                version = \"0.1.0\"
+                authors = [\"First Last <first.last@example.com>\"]
+                license-file = {:?}
+                ", license_file_path).parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().eula(&manifest).unwrap();
+            assert_eq!(actual, Eula::Disabled);
+        }
+
+        #[test]
+        fn eula_with_wrong_file_extension_override_works() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let license_file_path = temp_dir.path().join("Example.txt");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::default()
+                .eula(license_file_path.to_str())
+                .build()
+                .eula(&manifest)
+                .unwrap();
+            assert_eq!(actual, Eula::CommandLine(license_file_path));
+        }
+
+        #[test]
+        fn eula_with_nonexistent_license_file_override_fails() {
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let result = Builder::default()
+                .eula(Some("Example.rtf"))
+                .build()
+                .eula(&manifest);
+            assert!(result.is_err());
         }
     }
 }

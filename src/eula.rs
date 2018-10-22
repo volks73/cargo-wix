@@ -7,7 +7,7 @@ use std::str::FromStr;
 use Template;
 use toml::Value;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Eula {
     CommandLine(PathBuf),
     Manifest(PathBuf),
