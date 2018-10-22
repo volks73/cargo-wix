@@ -128,7 +128,7 @@ fn product_name_works() {
 }
 
 #[test]
-fn _binary_name_works() {
+fn binary_name_works() {
     const EXPECTED: &str = "Example";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
