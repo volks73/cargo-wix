@@ -377,3 +377,94 @@ fn gpl3_license_id_works() {
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
     ), LICENSE_RTF.to_owned());
 }
+
+#[test]
+fn license_file_field_with_rtf_file_works() {
+    const EXPECTED: &str = "License_Example.rtf";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_license = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    let _license_handle = File::create(package_license.path()).unwrap();
+    let package_manifest = package.child("Cargo.toml");
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => t.insert(
+                    String::from("license-file"),
+                    Value::from(package_license.path().to_str().unwrap())
+                ),
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), EXPECTED);
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), package_license.path().to_str().unwrap());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+    ), package_license.path().to_str().unwrap());
+}
+
+#[test]
+fn license_file_field_with_txt_file_works() {
+    const EXPECTED: &str = "License_Example.txt";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_license = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    let _license_handle = File::create(package_license.path()).unwrap();
+    let package_manifest = package.child("Cargo.toml");
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => t.insert(
+                    String::from("license-file"),
+                    Value::from(package_license.path().to_str().unwrap())
+                ),
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Name"
+    ), EXPECTED);
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:File[@Id='LicenseFile']/@Source"
+    ), package_license.path().to_str().unwrap());
+}
+
