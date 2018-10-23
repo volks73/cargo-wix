@@ -40,31 +40,41 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the copyright holder in the license dialog of the Windows installer (msi).
+    /// Sets the copyright holder for the generated license.
+    ///
+    /// If the license template does not use a copyright holder, then this value
+    /// is ignored.
     pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
         self.copyright_holder = h;
         self
     }
 
-    /// Sets the copyright year in the license dialog of the Windows installer (msi).
+    /// Sets the copyright year for the generated license.
+    ///
+    /// If the license template does not use a copyright year, then this value
+    /// is ignored.
     pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
         self.copyright_year = y;
         self
     }
 
-    /// Sets the path to a package's manifest (Cargo.toml) to be used to generate a WiX Source
-    /// (wxs) file from the embedded template.
+    /// Sets the path to a package's manifest (Cargo.toml) to be used to
+    /// generate license in the Rich Text Format (RTF).
     ///
-    /// A `wix` and `wix\main.wxs` file will be created in the same directory as the package's
-    /// manifest. The default is to use the package's manifest in the current working directory.
+    /// By default, the license will be printed to `STDOUT` unless the
+    /// [`output`] method is used.
+    ///
+    /// [`output`]: #output
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
     }
-    
-    /// Sets the destination for creating all of the output from initialization. 
+
+    /// Sets the destination.
     ///
-    /// The default is to create all initialization output in the current working directory.
+    /// The default is to print all output to `STDOUT`. This method can be used
+    /// to specify that the generated license be written, or "printed", to a
+    /// file instead of `STDOUT`.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
@@ -128,6 +138,51 @@ impl Execution {
 impl Default for Execution {
     fn default() -> Self {
         Builder::new().build()
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+
+    mod builder {
+        use super::*;
+
+        #[test]
+        fn copyright_holder_works() {
+            const EXPECTED: &str = "Example";
+            let mut actual = Builder::new();
+            actual.copyright_holder(Some(EXPECTED));
+            assert_eq!(actual.copyright_holder, Some(EXPECTED));
+        }
+
+        #[test]
+        fn copyright_year_works() {
+            const EXPECTED: &str = "1970";
+            let mut actual = Builder::new();
+            actual.copyright_year(Some(EXPECTED));
+            assert_eq!(actual.copyright_year, Some(EXPECTED));
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "Example.wxs";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn output_works() {
+            const EXPECTED: &str = "C:\\Example\\output";
+            let mut actual = Builder::new();
+            actual.output(Some(EXPECTED));
+            assert_eq!(actual.output, Some(EXPECTED));
+        }
+    }
+
+    mod execution {
+        use super::*;
     }
 }
 

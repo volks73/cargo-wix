@@ -1,3 +1,17 @@
+// Copyright (C) 2017 Christopher R. Field.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 use Error;
 use Result;
 use RTF_FILE_EXTENSION;
@@ -23,7 +37,7 @@ impl Eula {
                 Ok(Eula::CommandLine(path.into()))
             } else {
                 Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the EULA does not exist", 
+                    "The '{}' path from the command line for the EULA does not exist",
                     path.display()
                 )))
             }
@@ -43,7 +57,7 @@ impl Eula {
             if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {
                 trace!("The '{}' path from the 'license-file' field in the package's \
                        manifest (Cargo.toml) has a RTF file extension.",
-                       license_file_path.display()); 
+                       license_file_path.display());
                 if license_file_path.exists() {
                     trace!("The '{}' path from the 'license-file' field of the package's \
                            manifest (Cargo.toml) exists and has a RTF file extension.",
@@ -52,7 +66,7 @@ impl Eula {
                 } else {
                     Err(Error::Generic(format!(
                         "The '{}' file to be used for the EULA specified in the package's \
-                        manifest (Cargo.toml) using the 'license-file' field does not exist.", 
+                        manifest (Cargo.toml) using the 'license-file' field does not exist.",
                         license_file_path.display()
                     )))
                 }
