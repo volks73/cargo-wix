@@ -29,7 +29,8 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<Write>> {
         let f = File::create(output)?;
         Ok(Box::new(f))
     } else {
-        trace!("An output path has NOT been explicity specified. Implicitly determine output.");
+        trace!("An output path has NOT been explicity specified. Implicitly \
+                determine output.");
         Ok(Box::new(io::stdout()))
     }
 }
