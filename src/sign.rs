@@ -31,7 +31,7 @@ use TimestampServer;
 use toml::Value;
 use WIX;
 
-/// A builder for running the subcommand.
+/// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
@@ -59,19 +59,19 @@ impl<'a> Builder<'a> {
 
     /// Sets the path to the folder containing the `signtool.exe` file.
     ///
-    /// Normally the `signtool.exe` is installed in the `bin` folder of the Windows SDK
-    /// installation. THe default is to use the PATH system environment variable. This will
-    /// override any value obtained from the environment.
+    // Normally the `signtool.exe` is installed in the `bin` folder of the
+    // Windows SDK installation. The default is to use the `PATH` system
+    // environment variable.
     pub fn bin_path(&mut self, b: Option<&'a str>) -> &mut Self {
         self.bin_path = b;
         self
     }
 
-    /// Enables or disables capturing of the output from the builder (`cargo`), compiler
-    /// (`candle`), linker (`light`), and signer (`signtool`).
+    /// Enables or disables capturing of the output from the `signtool`
+    /// application.
     ///
-    /// The default is to capture all output, i.e. display nothing in the console but the log
-    /// statements.
+    /// The default is to capture all output, i.e. display nothing in the
+    /// console but the log statements.
     pub fn capture_output(&mut self, c: bool) -> &mut Self {
         self.capture_output = c;
         self
@@ -79,20 +79,26 @@ impl<'a> Builder<'a> {
 
     /// Sets the description.
     ///
-    /// This override the description determined from the `description` field in the package's
-    /// manifest (Cargo.toml).
+    /// This override the description obtained from the `description` field in
+    /// the package's manifest (Cargo.toml).
+    ///
+    /// The description is displayed in the ACL dialog.
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
         self
     }
-    
+
     /// Sets the homepage URL that is displayed in the ACL dialog.
+    ///
+    /// The default is to use the value for the `homepage` field in the
+    /// package's manifest (Cargo.toml) if it exists; otherwise, a URL
+    /// is _not_ displayed in the ACL dialog.
     pub fn homepage(&mut self, h: Option<&'a str>) -> &mut Self {
         self.homepage = h;
         self
     }
 
-    /// Sets the path to a package's manifest (Cargo.toml). 
+    /// Sets the path to a package's manifest (Cargo.toml).
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
@@ -100,7 +106,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the product name.
     ///
-    /// This override the product name determined from the `name` field in the package's
+    /// The default is to use the value for the `name` field in the package's
     /// manifest (Cargo.toml).
     pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.product_name = p;
@@ -109,13 +115,14 @@ impl<'a> Builder<'a> {
 
     /// Sets the URL for the timestamp server used when signing an installer.
     ///
-    /// The default is to _not_ use a timestamp server, even though it is highly recommended. Use
-    /// this method to enable signing with the timestamp.
+    /// The default is to _not_ use a timestamp server, even though it is highly
+    /// recommended. Use this method to enable signing with the timestamp.
     pub fn timestamp(&mut self, t: Option<&'a str>) -> &mut Self {
         self.timestamp = t;
         self
     }
 
+    /// Creates an execution context for signing a package's installer.
     pub fn build(&mut self) -> Execution {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
@@ -184,7 +191,7 @@ impl Execution {
         }
         if let Some(t) = self.timestamp {
             let server = TimestampServer::from_str(&t)?;
-            trace!("Using the '{}' timestamp server to sign the installer", server); 
+            trace!("Using the '{}' timestamp server to sign the installer", server);
             signer.arg("/t");
             signer.arg(server.url());
         }
@@ -203,7 +210,7 @@ impl Execution {
         })?;
         if !status.success() {
             return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(100)));
-        }    
+        }
         Ok(())
     }
 
