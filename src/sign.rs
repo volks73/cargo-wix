@@ -283,7 +283,7 @@ impl Execution {
             if let Some(mut path) = env::var_os(SIGNTOOL_PATH_KEY).map(|s| {
                 let mut p = PathBuf::from(s);
                 trace!(
-                    "Using the '{}' path to the Windows SDK '{}' folder for the signer", 
+                    "Using the '{}' path to the Windows SDK '{}' folder for the signer",
                     p.display(),
                     BINARY_FOLDER_NAME
                 );
@@ -377,6 +377,93 @@ mod tests {
             let mut actual = Builder::new();
             actual.timestamp(Some(EXPECTED));
             assert_eq!(actual.timestamp, Some(EXPECTED));
+        }
+    }
+
+    mod execution {
+        extern crate tempfile;
+
+        use std::fs::File;
+        use super::*;
+
+        const MIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
+
+        const HOMEPAGE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            homepage = "http://www.example.com"
+        "#;
+
+        #[test]
+        fn homepage_without_homepage_field_works() {
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().homepage(&manifest);
+            assert!(actual.is_none());
+        }
+
+        #[test]
+        fn homepage_with_homepage_field_works() {
+            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().homepage(&manifest);
+            assert_eq!(actual, Some(String::from("http://www.example.com")));
+        }
+
+        #[test]
+        fn homepage_with_override_works() {
+            const EXPECTED: &str = "http://www.another.com";
+            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::new()
+                .homepage(Some(EXPECTED))
+                .build()
+                .homepage(&manifest);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
+
+        #[test]
+        fn msi_with_nonexistent_installer_fails() {
+            let result = Execution::default().msi();
+            assert!(result.is_err());
+        }
+
+        #[test]
+        fn msi_with_existing_file_works() {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let msi_path = temp_dir.path().join("Example.msi");
+            let _msi_handle = File::create(&msi_path).expect("Create file");
+            let actual = Builder::new()
+                .input(msi_path.to_str())
+                .build()
+                .msi()
+                .unwrap();
+            assert_eq!(actual, msi_path);
+        }
+
+        #[test]
+        fn signer_works() {
+            let result = Execution::default().signer();
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn signer_with_nonexisting_path_fails() {
+            let result = Builder::new()
+                .bin_path(Some("Example.exe"))
+                .build()
+                .signer();
+            assert!(result.is_err());
+        }
+
+        #[test]
+        fn signer_with_nonexistent_environment_path_fails() {
+            env::set_var(SIGNTOOL_PATH_KEY, "Example");
+            let result = Execution::default().signer();
+            env::remove_var(SIGNTOOL_PATH_KEY);
+            assert!(result.is_err());
         }
     }
 }
