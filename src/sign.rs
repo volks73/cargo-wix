@@ -142,6 +142,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+/// A context for signing a package's installer.
 #[derive(Debug)]
 pub struct Execution {
     bin_path: Option<PathBuf>,
@@ -154,6 +155,7 @@ pub struct Execution {
 }
 
 impl Execution {
+    /// Signs a package's installer.
     pub fn run(self) -> Result<()> {
         info!("Signing the installer");
         debug!("bin_path = {:?}", self.bin_path);
