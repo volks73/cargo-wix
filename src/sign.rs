@@ -317,3 +317,66 @@ impl Default for Execution {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod builder {
+        use super::*;
+
+        #[test]
+        fn bin_path_works() {
+            const EXPECTED: &str = "C:\\signtool.exe";
+            let mut actual = Builder::new();
+            actual.bin_path(Some(EXPECTED));
+            assert_eq!(actual.bin_path, Some(EXPECTED));
+        }
+
+        #[test]
+        fn capture_output_works() {
+            let mut actual = Builder::new();
+            actual.capture_output(false);
+            assert!(!actual.capture_output);
+        }
+
+        #[test]
+        fn description_works() {
+            const EXPECTED: &str = "This is a description";
+            let mut actual = Builder::new();
+            actual.description(Some(EXPECTED));
+            assert_eq!(actual.description, Some(EXPECTED));
+        }
+
+        #[test]
+        fn homepage_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let mut actual = Builder::new();
+            actual.homepage(Some(EXPECTED));
+            assert_eq!(actual.homepage, Some(EXPECTED));
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "C:\\Example";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn product_name_works() {
+            const EXPECTED: &str = "Example";
+            let mut actual = Builder::new();
+            actual.product_name(Some(EXPECTED));
+            assert_eq!(actual.product_name, Some(EXPECTED));
+        }
+
+        #[test]
+        fn timestamp_works() {
+            const EXPECTED: &str = "http://www.example.com";
+            let mut actual = Builder::new();
+            actual.timestamp(Some(EXPECTED));
+            assert_eq!(actual.timestamp, Some(EXPECTED));
+        }
+    }
+}
