@@ -44,6 +44,9 @@ impl<'a> Builder<'a> {
     ///
     /// If the license template does not use a copyright holder, then this value
     /// is ignored.
+    ///
+    /// The default is to use the first author from the `authors` field of the
+    /// package's manifest (Cargo.toml).
     pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
         self.copyright_holder = h;
         self
@@ -53,6 +56,8 @@ impl<'a> Builder<'a> {
     ///
     /// If the license template does not use a copyright year, then this value
     /// is ignored.
+    ///
+    /// The default is to use this year when generating the license.
     pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
         self.copyright_year = y;
         self
@@ -80,6 +85,7 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Builds an execution context based on the configuration.
     pub fn build(&self) -> Execution {
         Execution {
             copyright_holder: self.copyright_holder.map(String::from),
@@ -105,6 +111,7 @@ pub struct Execution {
 }
 
 impl Execution {
+    /// Prints a template based on built context.
     pub fn run(self, template: Template) -> Result<()> {
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
@@ -183,6 +190,47 @@ mod tests{
 
     mod execution {
         use super::*;
+
+        const MIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
+
+        #[test]
+        fn copyright_holder_works() {
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().copyright_holder(&manifest).unwrap();
+            assert_eq!(actual, String::from("First Last"));
+        }
+
+        #[test]
+        fn copyright_holder_with_override_works() {
+            const EXPECTED: &str = "Dr. Example";
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::new()
+                .copyright_holder(Some(EXPECTED))
+                .build()
+                .copyright_holder(&manifest)
+                .unwrap();
+            assert_eq!(actual, String::from(EXPECTED));
+        }
+
+        #[test]
+        fn copyright_year_works() {
+            let actual = Execution::default().copyright_year();
+            assert_eq!(actual, Utc::now().year().to_string());
+        }
+
+        #[test]
+        fn copyright_year_with_override_works() {
+            const EXPECTED: &str = "1982";
+            let actual = Builder::new()
+                .copyright_year(Some(EXPECTED))
+                .build()
+                .copyright_year();
+            assert_eq!(actual, String::from(EXPECTED));
+        }
     }
 }
 
