@@ -261,11 +261,9 @@ impl Execution {
                   using a text editor.");
         }
         if let Some(name) = self.license_name(&manifest) {
-            println!("license-name");
             map = map.insert_str("license-name", name);
         }
         if let Some(source) = self.license_source(&manifest)? {
-            println!("license-source");
             map = map.insert_str("license-source", source);
         } else {
             warn!("A license file could not be found and it will be excluded from the \
