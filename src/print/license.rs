@@ -167,7 +167,7 @@ mod tests{
 
         #[test]
         fn copyright_year_works() {
-            const EXPECTED: &str = "1970";
+            const EXPECTED: &str = "1982";
             let mut actual = Builder::new();
             actual.copyright_year(Some(EXPECTED));
             assert_eq!(actual.copyright_year, Some(EXPECTED));

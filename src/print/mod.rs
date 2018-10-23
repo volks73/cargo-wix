@@ -50,3 +50,35 @@ fn first_author(manifest: &Value) -> Result<String> {
         .ok_or(Error::Manifest("authors"))
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SINGLE_AUTHOR_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
+
+    const MULTIPLE_AUTHORS_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["1 Author <first.last@example.com>", "2 Author <2.author@example.com>", "3 author <3.author@example.com>"]
+        "#;
+
+    #[test]
+    fn first_author_with_single_author_works() {
+        let manifest = SINGLE_AUTHOR_MANIFEST.parse::<Value>().expect("Parsing TOML");
+        let actual = first_author(&manifest).unwrap();
+        assert_eq!(actual, String::from("First Last"));
+    }
+
+    #[test]
+    fn first_author_with_multiple_authors_works() {
+        let manifest = MULTIPLE_AUTHORS_MANIFEST.parse::<Value>().expect("Parsing TOML");
+        let actual = first_author(&manifest).unwrap();
+        assert_eq!(actual, String::from("1 Author"));
+    }
+}
+
+
