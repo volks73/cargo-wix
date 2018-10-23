@@ -26,6 +26,7 @@ use Template;
 use toml::Value;
 use uuid::Uuid;
 
+/// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     binary_name: Option<&'a str>,
@@ -199,6 +200,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+/// A context for printing a WiX Toolset source file (wxs).
 #[derive(Debug)]
 pub struct Execution {
     binary_name: Option<String>,

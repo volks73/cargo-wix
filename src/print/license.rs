@@ -21,6 +21,7 @@ use std::path::PathBuf;
 use Template;
 use toml::Value;
 
+/// A builder for creating an execution context to print a license.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     copyright_year: Option<&'a str>,
@@ -102,6 +103,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+/// A context for printing a license.
 #[derive(Debug)]
 pub struct Execution {
     copyright_holder: Option<String>,
@@ -111,7 +113,7 @@ pub struct Execution {
 }
 
 impl Execution {
-    /// Prints a template based on built context.
+    /// Prints a license based on the built context.
     pub fn run(self, template: Template) -> Result<()> {
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
