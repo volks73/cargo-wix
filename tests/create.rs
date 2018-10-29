@@ -135,6 +135,10 @@ fn eula_initialize_option_works() {
         "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
     ));
     env::set_current_dir(package.path()).unwrap();
+    let package_eula = package.child(EULA_FILE);
+    {
+        let _eula_handle = File::create(package_eula.path()).unwrap();
+    }
     initialize::Builder::new()
         .eula(Some(EULA_FILE))
         .build()
