@@ -127,7 +127,7 @@ fn description_initialize_option_works() {
 }
 
 #[test]
-fn eula_initialize_option_works() {
+fn eula_in_cwd_works() {
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -141,6 +141,33 @@ fn eula_initialize_option_works() {
     }
     initialize::Builder::new()
         .eula(Some(EULA_FILE))
+        .build()
+        .run()
+        .expect("Initialization");
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
+}
+
+#[test]
+fn eula_in_docs_works() {
+    const EULA_FILE: &str = "Eula_Example.rtf";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!(
+        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+    ));
+    env::set_current_dir(package.path()).unwrap();
+    let package_docs = package.child("docs");
+    fs::create_dir(package_docs.path()).unwrap();
+    let package_eula = package_docs.path().join(EULA_FILE);
+    {
+        let _eula_handle = File::create(&package_eula).unwrap();
+    }
+    initialize::Builder::new()
+        .eula(package_eula.to_str())
         .build()
         .run()
         .expect("Initialization");
