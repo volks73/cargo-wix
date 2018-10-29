@@ -224,6 +224,7 @@
             or removing the following `WixVariable` tag
         -->
         <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
+        {{/eula}}
         {{^eula}}
         <!--
             Enabling the EULA dialog in the installer requires uncommenting
