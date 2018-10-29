@@ -194,11 +194,10 @@
             <!--
               Disabling the EULA dialog in the installer is a two step process:
 
-              1. Comment out or remove the `WixVariable` tag.
-              2. Uncomment the two `Publish` tags that follow the `WixVariable`
-                 tag.
+                 1. Uncomment the following two `Publish` tags
+                 2. Comment out or remove the `<WiXVariable Id='WixUILicenseRtf'...` tag further down
+
             -->
-            <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
             <!--<Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='2'>1</Publish>-->
             <!--<Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='2'>1</Publish>-->
             {{/eula}}
@@ -206,19 +205,33 @@
             <!--
               Enabling the EULA dialog in the installer is a three step process:
 
-              1. Uncomment the `WixVariable` tag.
-              2. Replace the `Value` attribute of the `WixVariable` tag with the
-                 path to a RTF file that will be used as the EULA and displayed
-                 in the license agreement dialog.
-              3. Comment out or remove the two `Publish` tags that follow the
-                 `WixVariable` tag.
+                1. Comment out or remove the two `Publish` tags that follow the
+                   `WixVariable` tag.
+                2. Uncomment the `<WixVariable Id='WixUILicenseRtf' Value='Path\to\Eula.rft'>` tag futher down
+                3. Replace the `Value` attribute of the `WixVariable` tag with
+                   the path to a RTF file that will be used as the EULA and
+                   displayed in the license agreement dialog.
             -->
-            <!-- <WixVariable Id='WixUILicenseRtf' Value='Replace\with\Path\to\EULA\file.rtf'/> -->
             <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='2'>1</Publish>
             <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='2'>1</Publish>
             {{/eula}}
 
         </UI>
+
+        {{#eula}}
+        <!--
+            Disabling the EULA dialog in the installer requires commenting out
+            or removing the following `WixVariable` tag
+        -->
+        <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
+        {{^eula}}
+        <!--
+            Enabling the EULA dialog in the installer requires uncommenting
+            the following `WixUILicenseRTF` tag and changing the `Value`
+            attribute.
+        -->
+        <!-- <WixVariable Id='WixUILicenseRtf' Value='Relative\Path\to\Eula.rtf'/> -->
+        {{/eula}}
 
         <!--
           Uncomment the next two `WixVaraible` tags to customize the
