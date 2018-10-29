@@ -55,7 +55,7 @@ fn default_works() {
 }
 
 #[test]
-fn all_initialize_options_works() {
+fn all_init_options_works() {
     const LICENSE_FILE: &str = "License_Example.txt";
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -87,7 +87,7 @@ fn all_initialize_options_works() {
 }
 
 #[test]
-fn binary_name_initialize_option_works() {
+fn init_binary_name_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -107,7 +107,7 @@ fn binary_name_initialize_option_works() {
 }
 
 #[test]
-fn description_initialize_option_works() {
+fn init_description_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -127,7 +127,7 @@ fn description_initialize_option_works() {
 }
 
 #[test]
-fn eula_in_cwd_works() {
+fn init_eula_in_cwd_works() {
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -140,7 +140,7 @@ fn eula_in_cwd_works() {
         let _eula_handle = File::create(package_eula.path()).unwrap();
     }
     initialize::Builder::new()
-        .eula(Some(EULA_FILE))
+        .eula(package_eula.path().to_str())
         .build()
         .run()
         .expect("Initialization");
@@ -152,7 +152,7 @@ fn eula_in_cwd_works() {
 }
 
 #[test]
-fn eula_in_docs_works() {
+fn init_eula_in_docs_works() {
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -179,7 +179,7 @@ fn eula_in_docs_works() {
 }
 
 #[test]
-fn help_url_initialize_option_works() {
+fn init_help_url_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -199,7 +199,7 @@ fn help_url_initialize_option_works() {
 }
 
 #[test]
-fn license_initialize_option_works() {
+fn init_license_in_cwd_works() {
     const LICENSE_FILE: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -208,7 +208,9 @@ fn license_initialize_option_works() {
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_license = package.child(LICENSE_FILE);
-    let _license_handle = File::create(package_license.path()).unwrap();
+    {
+        let _license_handle = File::create(package_license.path()).unwrap();
+    }
     initialize::Builder::new()
         .license(package_license.path().to_str())
         .build()
@@ -222,7 +224,7 @@ fn license_initialize_option_works() {
 }
 
 #[test]
-fn manufacturer_initialize_option_works() {
+fn init_manufacturer_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -242,7 +244,7 @@ fn manufacturer_initialize_option_works() {
 }
 
 #[test]
-fn product_name_initialize_option_works() {
+fn init_product_name_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
