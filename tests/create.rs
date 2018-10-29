@@ -16,19 +16,21 @@ extern crate assert_fs;
 extern crate cargo_wix;
 #[macro_use] extern crate lazy_static;
 extern crate predicates;
+extern crate toml;
 
 mod common;
 
 use assert_fs::prelude::*;
-use cargo_wix::create::Execution;
+use cargo_wix::create::{Builder, Execution};
 use cargo_wix::initialize;
 use cargo_wix::WIX;
 use common::TARGET_NAME;
 use predicates::prelude::*;
 use std::env;
 use std::fs::{self, File};
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::PathBuf;
+use toml::Value;
 
 lazy_static!{
     static ref TARGET_WIX_DIR: PathBuf = {
@@ -55,7 +57,53 @@ fn default_works() {
 }
 
 #[test]
-fn all_init_options_works() {
+fn init_with_package_section_fields_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!(
+        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+    ));
+    env::set_current_dir(package.path()).unwrap();
+    let package_manifest = package.child("Cargo.toml");
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => {
+                    t.insert(String::from("description"), Value::from("This is a description"));
+                    t.insert(String::from("documentation"), Value::from("https://www.example.com/docs"));
+                    t.insert(String::from("homepage"), Value::from("https://www.example.com"));
+                    t.insert(String::from("license"), Value::from("MIT"));
+                    t.insert(String::from("repository"), Value::from("https://www.example.com/repo"));
+                },
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    initialize::Execution::default().run().unwrap();
+    let result = Builder::default().capture_output(false).build().run();
+    let mut wxs_handle = File::open(package.path().join(WIX).join("main.wxs")).unwrap();
+    let mut wxs_content = String::new();
+    wxs_handle.read_to_string(&mut wxs_content).unwrap();
+    println!("{}", wxs_content);
+    // let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
+}
+
+#[test]
+fn init_with_all_options_works() {
     const LICENSE_FILE: &str = "License_Example.txt";
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -65,9 +113,13 @@ fn all_init_options_works() {
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_license = package.child(LICENSE_FILE);
-    let _license_handle = File::create(package_license.path()).unwrap();
+    {
+        let _license_handle = File::create(package_license.path()).unwrap();
+    }
     let package_eula = package.child(EULA_FILE);
-    let _eula_handle = File::create(package_eula.path()).unwrap();
+    {
+        let _eula_handle = File::create(package_eula.path()).unwrap();
+    }
     initialize::Builder::new()
         .binary_name(Some("Example"))
         .description(Some("This is a description"))
@@ -87,7 +139,7 @@ fn all_init_options_works() {
 }
 
 #[test]
-fn init_binary_name_works() {
+fn init_with_binary_name_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -107,7 +159,7 @@ fn init_binary_name_works() {
 }
 
 #[test]
-fn init_description_works() {
+fn init_with_description_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -127,7 +179,7 @@ fn init_description_works() {
 }
 
 #[test]
-fn init_eula_in_cwd_works() {
+fn init_with_eula_in_cwd_works() {
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -152,7 +204,7 @@ fn init_eula_in_cwd_works() {
 }
 
 #[test]
-fn init_eula_in_docs_works() {
+fn init_with_eula_in_docs_works() {
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -179,7 +231,7 @@ fn init_eula_in_docs_works() {
 }
 
 #[test]
-fn init_help_url_works() {
+fn init_with_help_url_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -199,7 +251,7 @@ fn init_help_url_works() {
 }
 
 #[test]
-fn init_license_in_cwd_works() {
+fn init_with_license_in_cwd_works() {
     const LICENSE_FILE: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -224,7 +276,7 @@ fn init_license_in_cwd_works() {
 }
 
 #[test]
-fn init_license_in_docs_works() {
+fn init_with_license_in_docs_works() {
     const EULA_FILE: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -251,7 +303,7 @@ fn init_license_in_docs_works() {
 }
 
 #[test]
-fn init_manufacturer_works() {
+fn init_with_manufacturer_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
@@ -271,7 +323,7 @@ fn init_manufacturer_works() {
 }
 
 #[test]
-fn init_product_name_works() {
+fn init_with_product_name_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
