@@ -220,16 +220,16 @@
 
         {{#eula}}
         <!--
-            Disabling the EULA dialog in the installer requires commenting out
-            or removing the following `WixVariable` tag
+          Disabling the EULA dialog in the installer requires commenting out
+          or removing the following `WixVariable` tag
         -->
         <WixVariable Id='WixUILicenseRtf' Value='{{eula}}'/>
         {{/eula}}
         {{^eula}}
         <!--
-            Enabling the EULA dialog in the installer requires uncommenting
-            the following `WixUILicenseRTF` tag and changing the `Value`
-            attribute.
+          Enabling the EULA dialog in the installer requires uncommenting
+          the following `WixUILicenseRTF` tag and changing the `Value`
+          attribute.
         -->
         <!-- <WixVariable Id='WixUILicenseRtf' Value='Relative\Path\to\Eula.rtf'/> -->
         {{/eula}}

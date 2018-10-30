@@ -285,7 +285,7 @@ impl Execution {
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
                 .map_or(
-                    product_name(self.product_name.as_ref(), manifest),
+                    product_name(None, manifest),
                     |s| Ok(String::from(s))
                 )
         }

@@ -21,7 +21,7 @@ extern crate toml;
 mod common;
 
 use assert_fs::prelude::*;
-use cargo_wix::create::{Builder, Execution};
+use cargo_wix::create::Execution;
 use cargo_wix::initialize;
 use cargo_wix::WIX;
 use common::TARGET_NAME;
@@ -90,11 +90,6 @@ fn init_with_package_section_fields_works() {
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
     }
     initialize::Execution::default().run().unwrap();
-    // let result = Builder::default().capture_output(false).build().run();
-    // let mut wxs_handle = File::open(package.path().join(WIX).join("main.wxs")).unwrap();
-    // let mut wxs_content = String::new();
-    // wxs_handle.read_to_string(&mut wxs_content).unwrap();
-    // println!("{}", wxs_content);
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
@@ -335,6 +330,10 @@ fn init_with_product_name_option_works() {
         .build()
         .run()
         .unwrap();
+    let mut wxs_handle = File::open(package.child(PathBuf::from(WIX).join("main.wxs")).path()).unwrap();
+    let mut wxs_content = String::new();
+    wxs_handle.read_to_string(&mut wxs_content).unwrap();
+    println!("{}", wxs_content);
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
