@@ -94,7 +94,7 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.rs`.
+    /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.wxs`.
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
@@ -206,7 +206,7 @@ impl Execution {
         debug!("no_build = {:?}", self.no_build);
         debug!("output = {:?}", self.output);
         debug!("version = {:?}", self.version);
-        let manifest = super::manifest(self.input.as_ref())?;
+        let manifest = super::manifest(None)?;
         let name = self.name(&manifest)?;
         debug!("name = {:?}", name);
         let version = self.version(&manifest)?;
@@ -217,7 +217,7 @@ impl Execution {
         debug!("platform = {:?}", platform);
         let source_wxs = self.wxs_source()?;
         debug!("source_wxs = {:?}", source_wxs);
-        let source_wixobj = self.source_wixobj(); 
+        let source_wixobj = self.source_wixobj();
         debug!("source_wixobj = {:?}", source_wixobj);
         let destination_msi = self.destination_msi(&name, &version, &platform);
         debug!("destination_msi = {:?}", destination_msi);
@@ -502,7 +502,7 @@ impl Execution {
                 if p.is_dir() {
                     Err(Error::Generic(format!(
                         "The '{}' path is not a file. Please check the path and ensure it is to \
-                        a WiX Source (wxs) file.", 
+                        a WiX Source (wxs) file.",
                         p.display()
                     )))
                 } else {
@@ -511,8 +511,8 @@ impl Execution {
                 }
             } else {
                 Err(Error::Generic(format!(
-                    "The '{0}' file does not exist. Consider using the 'cargo wix --print-template \
-                    WXS > {0}' command to create it.", 
+                    "The '{0}' file does not exist. Consider using the 'cargo \
+                    wix print WXS > {0}' command to create it.",
                     p.display()
                 )))
             }
@@ -525,8 +525,8 @@ impl Execution {
                 Ok(main_wxs)
             } else {
                Err(Error::Generic(format!(
-                   "The '{0}' file does not exist. Consider using the 'cargo wix --init' command to \
-                   create it.", 
+                   "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
+                   create it.",
                    main_wxs.display()
                )))
             }
