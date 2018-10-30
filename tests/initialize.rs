@@ -151,7 +151,7 @@ fn binary_name_works() {
 fn input_works() {
     let package = common::create_test_package();
     let result = Builder::default()
-        .input(package.child("Cargo.toml").path().to_str())
+        .input(package.child(CARGO_MANIFEST_FILE).path().to_str())
         .build()
         .run();
     assert!(result.is_ok());
@@ -252,7 +252,7 @@ fn mit_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let package_manifest = package.child("Cargo.toml");
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
@@ -288,7 +288,7 @@ fn mit_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
 }
 
 #[test]
@@ -332,7 +332,7 @@ fn apache2_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
 }
 
 #[test]
@@ -340,7 +340,7 @@ fn gpl3_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let package_manifest = package.child("Cargo.toml");
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
@@ -376,7 +376,7 @@ fn gpl3_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
 }
 
 #[test]
@@ -387,7 +387,7 @@ fn license_file_field_with_rtf_file_works() {
     let package_license = package.child(EXPECTED);
     env::set_current_dir(package.path()).unwrap();
     let _license_handle = File::create(package_license.path()).unwrap();
-    let package_manifest = package.child("Cargo.toml");
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
@@ -434,7 +434,7 @@ fn license_file_field_with_txt_file_works() {
     let package_license = package.child(EXPECTED);
     env::set_current_dir(package.path()).unwrap();
     let _license_handle = File::create(package_license.path()).unwrap();
-    let package_manifest = package.child("Cargo.toml");
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
