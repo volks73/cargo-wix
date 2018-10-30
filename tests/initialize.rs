@@ -280,11 +280,11 @@ fn mit_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_FILE_NAME.to_owned());
+    ), LICENSE_RTF.to_owned());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
@@ -324,11 +324,11 @@ fn apache2_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_FILE_NAME.to_owned());
+    ), LICENSE_RTF.to_owned());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
@@ -368,11 +368,11 @@ fn gpl3_license_id_works() {
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_FILE_NAME.to_owned());
+    ), LICENSE_RTF.to_owned());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF.to_owned());
+    ), LICENSE_RTF_PATH.display().to_string());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
         "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
