@@ -33,15 +33,7 @@ pub enum Eula {
 impl Eula {
     pub fn new(p: Option<&PathBuf>, manifest: &Value) -> Result<Self> {
         if let Some(ref path) = p {
-            if path.exists() {
-                trace!("The '{}' path from the command line for the EULA exists", path.display());
-                Ok(Eula::CommandLine(path.into()))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the EULA does not exist",
-                    path.display()
-                )))
-            }
+            Ok(Eula::CommandLine(path.into()))
         } else {
             Eula::from_manifest(&manifest)
         }

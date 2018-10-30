@@ -320,16 +320,7 @@ impl Execution {
 
     fn eula(&self, manifest: &Value) -> Result<Eula> {
         if let Some(ref path) = self.eula.clone().map(PathBuf::from) {
-            if path.exists() {
-                trace!("The '{}' path from the command line for the EULA exists",
-                       path.display());
-                Eula::new(Some(path), manifest)
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the EULA file does not exist",
-                    path.display()
-                )))
-            }
+            Eula::new(Some(path), manifest)
         } else {
             Eula::new(self.license.clone()
                 .map(PathBuf::from)
@@ -371,16 +362,7 @@ impl Execution {
 
     fn license_source(&self, manifest: &Value) -> Result<Option<String>> {
         if let Some(ref path) = self.license.clone().map(PathBuf::from) {
-            if path.exists() {
-                trace!("The '{}' path from the command line for the license exists",
-                       path.display());
-                Ok(path.to_str().map(String::from))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' path from the command line for the license file does not exist",
-                    path.display()
-                )))
-            }
+            Ok(path.to_str().map(String::from))
         } else {
             Ok(manifest.get("package")
                 .and_then(|p| p.as_table())
@@ -834,16 +816,6 @@ mod tests {
                 .eula(&manifest)
                 .unwrap();
             assert_eq!(actual, Eula::CommandLine(license_file_path));
-        }
-
-        #[test]
-        fn eula_with_nonexistent_license_file_override_fails() {
-            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let result = Builder::default()
-                .eula(Some("Example.rtf"))
-                .build()
-                .eula(&manifest);
-            assert!(result.is_err());
         }
     }
 }

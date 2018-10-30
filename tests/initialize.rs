@@ -27,7 +27,7 @@ use predicates::prelude::*;
 use cargo_wix::{CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
 use cargo_wix::initialize::{Builder, Execution};
 use std::env;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use toml::Value;
@@ -151,11 +151,11 @@ fn binary_works() {
 #[test]
 fn input_works() {
     let package = common::create_test_package();
-    let result = Builder::default()
+    Builder::default()
         .input(package.child(CARGO_MANIFEST_FILE).path().to_str())
         .build()
-        .run();
-    assert!(result.is_ok());
+        .run()
+        .expect("OK result");
     package.child(WIX).assert(predicate::path::exists());
     package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
     package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::missing());
@@ -174,6 +174,41 @@ fn output_works() {
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
     output.child(MAIN_WXS.as_str()).assert(predicate::path::exists());
+}
+
+#[test]
+fn input_with_output_works() {
+    let package = common::create_test_package();
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
+    let output = package.path().join("assets").join("windows");
+    fs::create_dir(output.parent().unwrap()).unwrap();
+    fs::create_dir(&output).unwrap();
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package").and_then(|p| {
+            match p {
+                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("MIT")),
+                _ => panic!("The 'package' section is not a table"),
+            };
+            Some(p)
+        }).expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+    Builder::default()
+        .input(package.child(CARGO_MANIFEST_FILE).path().to_str())
+        .output(output.to_str())
+        .build()
+        .run()
+        .expect("OK result");
+    assert!(output.join(MAIN_WXS.as_str()).exists());
+    assert!(output.join(LICENSE_RTF.as_str()).exists());
 }
 
 #[test]
