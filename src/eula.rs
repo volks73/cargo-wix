@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use Error;
+use LICENSE_FILE_NAME;
 use Result;
 use RTF_FILE_EXTENSION;
 use std::fmt;
@@ -106,7 +107,7 @@ impl fmt::Display for Eula {
         match *self {
             Eula::CommandLine(ref path) => path.display().fmt(f),
             Eula::Manifest(ref path) => path.display().fmt(f),
-            Eula::Generate(..) => write!(f, "License.{}", RTF_FILE_EXTENSION),
+            Eula::Generate(..) => write!(f, "{}.{}", LICENSE_FILE_NAME, RTF_FILE_EXTENSION),
             Eula::Disabled => write!(f, "Disabled"),
         }
     }

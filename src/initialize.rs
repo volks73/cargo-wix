@@ -23,6 +23,7 @@
 use CARGO_MANIFEST_FILE;
 use Error;
 use eula::Eula;
+use LICENSE_FILE_NAME;
 use print;
 use Result;
 use std::env;
@@ -30,7 +31,7 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 use WIX_SOURCE_FILE_NAME;
-use WIX_SOURCE_FILE_EXTENSION; 
+use WIX_SOURCE_FILE_EXTENSION;
 use WIX;
 use RTF_FILE_EXTENSION;
 
@@ -334,16 +335,44 @@ impl Execution {
             info!("Creating the '{}' directory", destination.display());
             fs::create_dir(&destination)?;
         }
+        let eula_wxs_path = match Eula::new(self.eula.as_ref(), &manifest)? {
+            Eula::CommandLine(path) => Some(path),
+            Eula::Manifest(path) => Some(path),
+            Eula::Generate(template) => {
+                destination.push(LICENSE_FILE_NAME);
+                destination.set_extension(RTF_FILE_EXTENSION);
+                if destination.exists() && !self.force {
+                    return Err(Error::already_exists(&destination));
+                } else {
+                    info!("Generating an EULA");
+                    let mut eula_printer = print::license::Builder::new();
+                    eula_printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
+                    eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
+                    eula_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+                    eula_printer.output(destination.as_path().to_str());
+                    eula_printer.build().run(template)?;
+                }
+                destination.pop();
+                let mut relative = destination.strip_prefix(
+                    &super::package_root(self.input.as_ref())?
+                )?.to_owned();
+                relative.push(LICENSE_FILE_NAME);
+                relative.set_extension(RTF_FILE_EXTENSION);
+                Some(relative)
+            },
+            Eula::Disabled => None,
+        };
+        debug!("eula_wxs_path = {:?}", eula_wxs_path);
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
         if destination.exists() && !self.force {
             return Err(Error::already_exists(&destination));
         } else {
-            info!("Creating the '{}\\{}.{}' file", WIX, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION);
+            info!("Creating the '{}' file", destination.display());
             let mut wxs_printer = print::wxs::Builder::new();
             wxs_printer.binary_name(self.binary_name.as_ref().map(String::as_ref));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
-            wxs_printer.eula(self.eula.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.eula(eula_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.license(self.license.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
@@ -351,22 +380,6 @@ impl Execution {
             wxs_printer.output(destination.as_path().to_str());
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
-        }
-        destination.pop(); // Remove main.wxs
-        if let Eula::Generate(template) = Eula::new(self.eula.as_ref(), &manifest)? {
-            destination.push("License");
-            destination.set_extension(RTF_FILE_EXTENSION);
-            if destination.exists() && !self.force {
-                return Err(Error::already_exists(&destination));
-            } else {
-                info!("Generating a EULA");
-                let mut eula_printer = print::license::Builder::new();
-                eula_printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
-                eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
-                eula_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
-                eula_printer.output(destination.as_path().to_str());
-                eula_printer.build().run(template)?;
-            }
         }
         Ok(())
     }
@@ -379,11 +392,11 @@ impl Execution {
             trace!("An output path has NOT been explicity specified. Implicitly determine output.");
             if let Some(ref input) = self.input {
                 trace!("An input path has been explicitly specified");
-                if input.exists() && 
-                   input.is_file() && 
-                   input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) 
+                if input.exists() &&
+                   input.is_file() &&
+                   input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE))
                 {
-                    trace!("The input path exists, it is a file, and it is appears to be Cargo.toml");
+                    trace!("The input path exists, it is a file, and it appears to be {}", CARGO_MANIFEST_FILE);
                     Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
                         p.push(WIX);
                         Some(p)

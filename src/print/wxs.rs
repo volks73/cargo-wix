@@ -317,7 +317,7 @@ impl Execution {
         } else {
             Eula::new(self.license.clone()
                 .map(PathBuf::from)
-                .filter(|p| p.extension().and_then(|p| p.to_str()) == Some("rtf"))
+                .filter(|p| p.extension().and_then(|p| p.to_str()) == Some(RTF_FILE_EXTENSION))
                 .as_ref(),
                 manifest
             )

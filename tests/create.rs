@@ -90,12 +90,12 @@ fn init_with_package_section_fields_works() {
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
     }
     initialize::Execution::default().run().unwrap();
-    let result = Builder::default().capture_output(false).build().run();
-    let mut wxs_handle = File::open(package.path().join(WIX).join("main.wxs")).unwrap();
-    let mut wxs_content = String::new();
-    wxs_handle.read_to_string(&mut wxs_content).unwrap();
-    println!("{}", wxs_content);
-    // let result = Execution::default().run();
+    // let result = Builder::default().capture_output(false).build().run();
+    // let mut wxs_handle = File::open(package.path().join(WIX).join("main.wxs")).unwrap();
+    // let mut wxs_content = String::new();
+    // wxs_handle.read_to_string(&mut wxs_content).unwrap();
+    // println!("{}", wxs_content);
+    let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());

@@ -70,6 +70,7 @@ extern crate uuid;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::env;
+use std::ffi::OsStr;
 use std::fmt;
 use std::fs::File;
 use std::io::{self, ErrorKind, Read};
@@ -117,13 +118,30 @@ static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf.mustache");
 /// The MIT Rich Text Format (RTF) license template.
 static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf.mustache");
 
-fn manifest(input: Option<&PathBuf>) -> Result<Value> {
-    let default_manifest = {
-        let mut cwd = env::current_dir()?;
-        cwd.push(CARGO_MANIFEST_FILE);
-        cwd
+fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
+    let i = match input {
+        Some(i) => i.to_owned(),
+        None => {
+            let mut cwd = env::current_dir()?;
+            cwd.push(CARGO_MANIFEST_FILE);
+            cwd
+        }
     };
-    let cargo_file_path = input.unwrap_or(&default_manifest);
+    if i.exists() && i.is_file() && i.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {
+        Ok(i)
+    } else {
+        Err(Error::not_found(&i))
+    }
+}
+
+fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
+    cargo_toml_file(input).and_then(|p| Ok(
+        p.parent().map(PathBuf::from).expect("The Cargo.toml file to NOT be root.")
+    ))
+}
+
+fn manifest(input: Option<&PathBuf>) -> Result<Value> {
+    let cargo_file_path = cargo_toml_file(input)?;
     debug!("cargo_file_path = {:?}", cargo_file_path);
     let mut cargo_file = File::open(cargo_file_path)?;
     let mut cargo_file_content = String::new();
@@ -276,6 +294,12 @@ impl From<toml::de::Error> for Error {
 impl From<semver::SemVerError> for Error {
     fn from(err: semver::SemVerError) -> Self {
         Error::Version(err)
+    }
+}
+
+impl From<std::path::StripPrefixError> for Error {
+    fn from(err: std::path::StripPrefixError) -> Self {
+        Error::Generic(err.to_string())
     }
 }
 

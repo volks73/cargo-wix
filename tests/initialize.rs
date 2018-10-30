@@ -24,7 +24,7 @@ mod common;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
-use cargo_wix::{LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
+use cargo_wix::{CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
 use cargo_wix::initialize::{Builder, Execution};
 use std::env;
 use std::fs::File;
@@ -50,6 +50,7 @@ fn default_works() {
     env::set_current_dir(package.path()).unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
+    println!("{:?}", result);
     assert!(result.is_ok());
     package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
     package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
@@ -295,7 +296,7 @@ fn apache2_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let package_manifest = package.child("Cargo.toml");
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
