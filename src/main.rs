@@ -204,12 +204,13 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
-    // The binary-name option for the `init` and `print` subcommands.
-    let binary_name = Arg::with_name("binary-name")
-        .help("Overrides the 'name' field of the 'bin' section of the package's \
-              manifest (Cargo.toml) as the name of the executable within the \
-              installer.")
-        .long("binary-name")
+    // The binary option for the `init` and `print` subcommands.
+    let binary = Arg::with_name("binary")
+        .help("Overrides the default binary included in the installer. The \
+              default binary is the 'target\\release\\<package name>.exe' file, where \
+              <package-name> is the value from the 'name' field in the '[package]' \
+              section of the package's manifest (Cargo.toml).")
+        .long("binary")
         .short("b")
         .takes_value(true);
     // The description option for the `init` and `print` subcommands.
@@ -340,7 +341,7 @@ fn main() {
                            Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
-                    .arg(binary_name.clone())
+                    .arg(binary.clone())
                     .arg(description.clone())
                     .arg(eula.clone())
                     .arg(Arg::with_name("force")
@@ -411,7 +412,7 @@ fn main() {
                            Source file (wxs), the output is in XML. New GUIDs are generated for the \
                            'UpgradeCode' and Path Component each time the 'WXS' template is \
                            printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
-                    .arg(binary_name)
+                    .arg(binary)
                     .arg(description)
                     .arg(eula)
                     .arg(holder)
@@ -559,7 +560,7 @@ fn main() {
         },
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
-            init.binary_name(m.value_of("binary-name"));
+            init.binary(m.value_of("binary-name"));
             init.copyright_holder(m.value_of("holder"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
@@ -578,7 +579,7 @@ fn main() {
             match template {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
-                    print.binary_name(m.value_of("binary-name"));
+                    print.binary(m.value_of("binary"));
                     print.description(m.value_of("description"));
                     print.eula(m.value_of("eula"));
                     print.help_url(m.value_of("url"));

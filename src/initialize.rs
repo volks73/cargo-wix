@@ -38,7 +38,7 @@ use RTF_FILE_EXTENSION;
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
-    binary_name: Option<&'a str>,
+    binary: Option<&'a str>,
     copyright_year: Option<&'a str>,
     copyright_holder: Option<&'a str>,
     description: Option<&'a str>,
@@ -56,7 +56,7 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
-            binary_name: None,
+            binary: None,
             copyright_year: None,
             copyright_holder: None,
             description: None,
@@ -71,25 +71,19 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the binary name.
+    /// Sets the path to the binary.
     ///
-    /// The default is to use the `name` field under the `bin` section of the
-    /// package's manifest (Cargo.toml) or the `name` field under the `package`
-    /// section if the `bin` section does _not_ exist. This overrides either of
-    /// these defaults.
+    /// The default is to build a path relative to the package's manifest
+    /// (Cargo.toml) based on the output structure of a cargo release build. The
+    /// `name` field under the `bin` section of the package's manifest or the
+    /// `name` field under the `package` section if the `bin` section does _not_
+    /// exist is used as the binary's file name and the `.exe` file extension is
+    /// added. Then, the `target\release\<binary-name>.exe` path used.
     ///
-    /// Generally, the binary name should _not_ have spaces or special
-    /// characters. The binary name is the name of the executable. This will
-    /// _not_ appear in the Add/Remove Programs control panel. Use the
-    /// [`product_name`]` method to change the name that appears in the Add/Remove
-    /// Programs control panel.
-    ///
-    /// The binary name should also match the executable that is created in the
-    /// `target\Release` folder as part of the build process for the package.
-    ///
-    /// [`product_name`]: #product_name
-    pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
-        self.binary_name = b;
+    /// This method can be used to specify a different binary to include in the
+    /// installer than one determined from the package's manifest.
+    pub fn binary(&mut self, b: Option<&'a str>) -> &mut Self {
+        self.binary = b;
         self
     }
 
@@ -257,15 +251,6 @@ impl<'a> Builder<'a> {
     /// and the name of the default installation destination. For example, a
     /// product anme of `Example` will have an installation destination of
     /// `C:\Program Files\Example` as the default during installation.
-    ///
-    /// This is different from the binary name in that it is the name that
-    /// appears in the Add/Remove Programs control panel, _not_ the name of the
-    /// executable. The [`binary_name`] method can be used to change the
-    /// executable name. This value can have spaces and special characters,
-    /// where the binary (executable) name should avoid spaces and special
-    /// characters.
-    ///
-    /// [`binary_name`]: #binary_name
     pub fn product_name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.product_name = p;
         self
@@ -274,9 +259,9 @@ impl<'a> Builder<'a> {
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
         let mut wxs_printer = print::wxs::Builder::new();
-        wxs_printer.binary_name(self.binary_name);
+        wxs_printer.binary(self.binary);
         Execution {
-            binary_name: self.binary_name.map(String::from),
+            binary: self.binary.map(PathBuf::from),
             copyright_year: self.copyright_year.map(String::from),
             copyright_holder: self.copyright_holder.map(String::from),
             description: self.description.map(String::from),
@@ -300,7 +285,7 @@ impl<'a> Default for Builder<'a> {
 
 #[derive(Debug)]
 pub struct Execution {
-    binary_name: Option<String>,
+    binary: Option<PathBuf>,
     copyright_holder: Option<String>,
     copyright_year: Option<String>,
     description: Option<String>,
@@ -316,7 +301,7 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
-        debug!("binary_name = {:?}", self.binary_name);
+        debug!("binary = {:?}", self.binary);
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
         debug!("description = {:?}", self.description);
@@ -370,7 +355,7 @@ impl Execution {
         } else {
             info!("Creating the '{}' file", destination.display());
             let mut wxs_printer = print::wxs::Builder::new();
-            wxs_printer.binary_name(self.binary_name.as_ref().map(String::as_ref));
+            wxs_printer.binary(self.binary.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
             wxs_printer.eula(eula_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
@@ -439,7 +424,7 @@ mod tests {
         #[test]
         fn defaults_are_correct() {
             let actual = Builder::new();
-            assert!(actual.binary_name.is_none());
+            assert!(actual.binary.is_none());
             assert!(actual.copyright_year.is_none());
             assert!(actual.copyright_holder.is_none());
             assert!(actual.description.is_none());
@@ -454,11 +439,11 @@ mod tests {
         }
 
         #[test]
-        fn binary_name_works() {
-            const EXPECTED: &str = "name";
+        fn binary_works() {
+            const EXPECTED: &str = "bin\\Example.exe";
             let mut actual = Builder::new();
-            actual.binary_name(Some(EXPECTED));
-            assert_eq!(actual.binary_name, Some(EXPECTED));
+            actual.binary(Some(EXPECTED));
+            assert_eq!(actual.binary, Some(EXPECTED));
         }
 
         #[test]
@@ -552,7 +537,7 @@ mod tests {
         fn build_with_defaults_works() {
             let mut b = Builder::new();
             let default_execution = b.build();
-            assert!(default_execution.binary_name.is_none());
+            assert!(default_execution.binary.is_none());
             assert!(default_execution.copyright_year.is_none());
             assert!(default_execution.copyright_holder.is_none());
             assert!(default_execution.description.is_none());
@@ -568,7 +553,7 @@ mod tests {
 
         #[test]
         fn build_with_all_works() {
-            const EXPECTED_BINARY_NAME: &str = "Binary Name";
+            const EXPECTED_BINARY: &str = "bin\\Example.exe";
             const EXPECTED_COPYRIGHT_HOLDER: &str = "Copyright Holder";
             const EXPECTED_COPYRIGHT_YEAR: &str = "Copyright Year";
             const EXPECTED_DESCRIPTION: &str = "Description";
@@ -580,7 +565,7 @@ mod tests {
             const EXPECTED_OUTPUT: &str = "C:\\tmp\\output";
             const EXPECTED_PRODUCT_NAME: &str = "Product Name";
             let mut b = Builder::new();
-            b.binary_name(Some(EXPECTED_BINARY_NAME));
+            b.binary(Some(EXPECTED_BINARY));
             b.copyright_holder(Some(EXPECTED_COPYRIGHT_HOLDER));
             b.copyright_year(Some(EXPECTED_COPYRIGHT_YEAR));
             b.description(Some(EXPECTED_DESCRIPTION));
@@ -593,7 +578,7 @@ mod tests {
             b.output(Some(EXPECTED_OUTPUT));
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
             let execution = b.build();
-            assert_eq!(execution.binary_name, Some(EXPECTED_BINARY_NAME).map(String::from));
+            assert_eq!(execution.binary, Some(EXPECTED_BINARY).map(PathBuf::from));
             assert_eq!(execution.copyright_year, Some(EXPECTED_COPYRIGHT_YEAR).map(String::from));
             assert_eq!(execution.copyright_holder, Some(EXPECTED_COPYRIGHT_HOLDER).map(String::from));
             assert_eq!(execution.description, Some(EXPECTED_DESCRIPTION).map(String::from));

@@ -107,6 +107,11 @@ fn init_with_all_options_works() {
         "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
     ));
     env::set_current_dir(package.path()).unwrap();
+    let bin_example_path = package.path().join("bin").join("Example.exe");
+    fs::create_dir(bin_example_path.parent().unwrap()).unwrap();
+    {
+        let _bin_example_handle = File::create(&bin_example_path).unwrap();
+    }
     let package_license = package.child(LICENSE_FILE);
     {
         let _license_handle = File::create(package_license.path()).unwrap();
@@ -116,7 +121,7 @@ fn init_with_all_options_works() {
         let _eula_handle = File::create(package_eula.path()).unwrap();
     }
     initialize::Builder::new()
-        .binary_name(Some("Example"))
+        .binary(bin_example_path.to_str())
         .description(Some("This is a description"))
         .eula(package_eula.path().to_str())
         .help_url(Some("http://www.example.com"))
@@ -134,15 +139,20 @@ fn init_with_all_options_works() {
 }
 
 #[test]
-fn init_with_binary_name_option_works() {
+fn init_with_binary_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
         "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
     ));
     env::set_current_dir(package.path()).unwrap();
+    let bin_example_path = package.path().join("bin").join("Example.exe");
+    fs::create_dir(bin_example_path.parent().unwrap()).unwrap();
+    {
+        let _bin_example_handle = File::create(&bin_example_path).unwrap();
+    }
     initialize::Builder::new()
-        .binary_name(Some("Example"))
+        .binary(bin_example_path.to_str())
         .build()
         .run()
         .unwrap();

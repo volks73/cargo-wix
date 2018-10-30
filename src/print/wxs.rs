@@ -15,12 +15,14 @@
 use description;
 use Error;
 use eula::Eula;
+use EXE_FILE_EXTENSION;
 use LICENSE_FILE_NAME;
 use manifest;
 use mustache::{self, MapBuilder};
 use product_name;
 use Result;
 use RTF_FILE_EXTENSION;
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use Template;
 use toml::Value;
@@ -29,7 +31,7 @@ use uuid::Uuid;
 /// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
-    binary_name: Option<&'a str>,
+    binary: Option<&'a str>,
     description: Option<&'a str>,
     eula: Option<&'a str>,
     help_url: Option<&'a str>,
@@ -44,7 +46,7 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
-            binary_name: None,
+            binary: None,
             description: None,
             eula: None,
             help_url: None,
@@ -56,7 +58,7 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the binary name.
+    /// Sets the binary.
     ///
     /// The default is to use the `name` field under the `bin` section of the
     /// package's manifest (Cargo.toml) or the `name` field under the `package`
@@ -68,15 +70,15 @@ impl<'a> Builder<'a> {
     /// will _not_ appear in the Add/Remove Programs control panel. Use the
     /// `product_name` method to change the name that appears in the Add/Remove
     /// Programs control panel.
-    pub fn binary_name(&mut self, b: Option<&'a str>) -> &mut Self {
-        self.binary_name = b;
+    pub fn binary(&mut self, b: Option<&'a str>) -> &mut Self {
+        self.binary = b;
         self
     }
 
     /// Sets the description.
     ///
     /// This overrides the description determined from the `description` field
-    /// in the package's manifest (Cargo.toml).
+    /// in the package'
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
         self
@@ -181,7 +183,7 @@ impl<'a> Builder<'a> {
     /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
-            binary_name: self.binary_name.map(String::from),
+            binary: self.binary.map(PathBuf::from),
             description: self.description.map(String::from),
             eula: self.eula.map(PathBuf::from),
             help_url: self.help_url.map(String::from),
@@ -203,7 +205,7 @@ impl<'a> Default for Builder<'a> {
 /// A context for printing a WiX Toolset source file (wxs).
 #[derive(Debug)]
 pub struct Execution {
-    binary_name: Option<String>,
+    binary: Option<PathBuf>,
     description: Option<String>,
     eula: Option<PathBuf>,
     help_url: Option<String>,
@@ -216,7 +218,7 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
-        debug!("binary_name = {:?}", self.binary_name);
+        debug!("binary = {:?}", self.binary);
         debug!("description = {:?}", self.description);
         debug!("eula = {:?}", self.eula);
         debug!("help_url = {:?}", self.help_url);
@@ -230,6 +232,7 @@ impl Execution {
         let template = mustache::compile_str(Template::Wxs.to_str())?;
         let mut map = MapBuilder::new()
             .insert_str("binary-name", self.binary_name(&manifest)?)
+            .insert_str("binary-source", self.binary_source(&manifest)?)
             .insert_str("product-name", product_name(self.product_name.as_ref(), &manifest)?)
             .insert_str("manufacturer", self.manufacturer(&manifest)?)
             .insert_str("upgrade-code-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
@@ -274,9 +277,10 @@ impl Execution {
         template.render_data(&mut destination, &data).map_err(Error::from)
     }
 
+
     fn binary_name(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref b) = self.binary_name {
-            Ok(b.to_owned())
+        if let Some(ref b) = self.binary {
+            Ok(b.file_stem().and_then(OsStr::to_str).map(String::from).expect("Binary path to have a file name"))
         } else {
             manifest.get("bin")
                 .and_then(|b| b.as_array())
@@ -288,6 +292,18 @@ impl Execution {
                     product_name(None, manifest),
                     |s| Ok(String::from(s))
                 )
+        }
+    }
+
+    fn binary_source(&self, manifest: &Value) -> Result<String> {
+        if let Some(ref path) = self.binary.clone().map(PathBuf::from) {
+            Ok(path.to_str().map(String::from).expect("Path to string conversion"))
+        } else {
+            self.binary_name(manifest).map(|name| {
+                let mut path = PathBuf::from("target").join("release").join(name);
+                path.set_extension(EXE_FILE_EXTENSION);
+                path.to_str().map(String::from).expect("Path to string conversion")
+            })
         }
     }
 
@@ -421,10 +437,10 @@ mod tests {
 
         #[test]
         fn binary_name_works() {
-            const EXPECTED: &str = "Example";
+            const EXPECTED: &str = "bin\\Example.exe";
             let mut actual = Builder::new();
-            actual.binary_name(Some(EXPECTED));
-            assert_eq!(actual.binary_name, Some(EXPECTED));
+            actual.binary(Some(EXPECTED));
+            assert_eq!(actual.binary, Some(EXPECTED));
         }
 
         #[test]
@@ -638,14 +654,42 @@ mod tests {
 
         #[test]
         fn binary_name_with_override_works() {
-            const EXPECTED: &str = "Override";
+            const EXPECTED: &str = "bin\\Example.exe";
             let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
             let actual = Builder::default()
-                .binary_name(Some(EXPECTED))
+                .binary(Some(EXPECTED))
                 .build()
                 .binary_name(&manifest)
                 .unwrap();
-            assert_eq!(actual, String::from(EXPECTED));
+            assert_eq!(actual, String::from("Example"));
+        }
+
+        #[test]
+        fn binary_source_with_defaults_works() {
+            const EXPECTED: &str = r#"target\release\Example.exe"#;
+            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().binary_source(&manifest).unwrap();
+            assert_eq!(actual, EXPECTED);
+        }
+
+        #[test]
+        fn binary_source_with_bin_name_works() {
+            const EXPECTED: &str = r#"target\release\Different.exe"#;
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().binary_source(&manifest).unwrap();
+            assert_eq!(actual, EXPECTED);
+        }
+
+        #[test]
+        fn binary_source_with_override_works() {
+            const EXPECTED: &str = "bin\\Example.exe";
+            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
+            let actual = Builder::default()
+                .binary(Some(EXPECTED))
+                .build()
+                .binary_source(&manifest)
+                .unwrap();
+            assert_eq!(actual, EXPECTED);
         }
 
         #[test]

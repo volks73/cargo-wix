@@ -129,22 +129,23 @@ fn product_name_works() {
 }
 
 #[test]
-fn binary_name_works() {
-    const EXPECTED: &str = "Example";
+fn binary_works() {
+    const BINARY_NAME: &str = "Example";
+    const EXPECTED: &str = "bin\\Example.exe";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let result = Builder::default().binary_name(Some(EXPECTED)).build().run();
+    let result = Builder::default().binary(Some(EXPECTED)).build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED)
-    ), EXPECTED.to_string() + ".exe");
+        &format!("//*/wix:File[@Id='{}EXE']/@Name", BINARY_NAME)
+    ), "Example.exe");
     assert_eq!(common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED)
-    ), format!("target\\release\\{}.exe", EXPECTED));
+        &format!("//*/wix:File[@Id='{}EXE']/@Source", BINARY_NAME)
+    ), EXPECTED);
 }
 
 #[test]
