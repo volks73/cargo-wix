@@ -344,7 +344,8 @@ fn main() {
                     .arg(Arg::with_name("banner")
                         .help("Sets the path to a bitmap (.bmp) image file that \
                               will be displayed across the top of each dialog in the \
-                              installer.")
+                              installer. The banner image dimensions should be \
+                              493 x 58 pixels.")
                         .long("banner")
                         .takes_value(true))
                     .arg(binary.clone())
@@ -352,7 +353,8 @@ fn main() {
                     .arg(Arg::with_name("dialog")
                         .help("Sets the path to a bitmap (.bmp) image file that \
                                will be displayed to the left on the first dialog of \
-                               the installer.")
+                               the installer. The dialog image dimensions should \
+                               be 493 x 312 pxiels.")
                         .long("dialog")
                         .takes_value(true))
                     .arg(eula.clone())
