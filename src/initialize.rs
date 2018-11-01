@@ -38,10 +38,12 @@ use RTF_FILE_EXTENSION;
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
+    banner: Option<&'a str>,
     binary: Option<&'a str>,
     copyright_year: Option<&'a str>,
     copyright_holder: Option<&'a str>,
     description: Option<&'a str>,
+    dialog: Option<&'a str>,
     eula: Option<&'a str>,
     force: bool,
     help_url: Option<&'a str>,
@@ -56,10 +58,12 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
+            banner: None,
             binary: None,
             copyright_year: None,
             copyright_holder: None,
             description: None,
+            dialog: None,
             eula: None,
             force: false,
             help_url: None,
@@ -69,6 +73,19 @@ impl<'a> Builder<'a> {
             output: None,
             product_name: None,
         }
+    }
+
+    /// Sets the path to a bitmap (BMP) file to be used as a banner image across
+    /// the top of each dialog in the installer.
+    ///
+    /// The banner image must be 493 x 58 pixels. See the [Wix Toolset
+    /// documentation] for details about [customization].
+    ///
+    /// [Wix Toolset documentation]: http://wixtoolset.org/documentation/
+    /// [customization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_customizations.html
+    pub fn banner(&mut self, b: Option<&'a str>) -> &mut Self {
+        self.banner = b;
+        self
     }
 
     /// Sets the path to the binary.
@@ -130,6 +147,19 @@ impl<'a> Builder<'a> {
     /// in the package's manifest (Cargo.toml).
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
+        self
+    }
+
+    /// Sets the path to a bitmap (`.bmp`) file that will be displayed on the
+    /// first dialog to the left.
+    ///
+    /// The image must be 493 x 312 pixels. See the [Wix Toolset
+    /// documentation] for details about [customization].
+    ///
+    /// [Wix Toolset documentation]: http://wixtoolset.org/documentation/
+    /// [customization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_customizations.html
+    pub fn dialog(&mut self, d: Option<&'a str>) -> &mut Self {
+        self.dialog = d;
         self
     }
 
@@ -261,10 +291,12 @@ impl<'a> Builder<'a> {
         let mut wxs_printer = print::wxs::Builder::new();
         wxs_printer.binary(self.binary);
         Execution {
+            banner: self.banner.map(PathBuf::from),
             binary: self.binary.map(PathBuf::from),
             copyright_year: self.copyright_year.map(String::from),
             copyright_holder: self.copyright_holder.map(String::from),
             description: self.description.map(String::from),
+            dialog: self.dialog.map(PathBuf::from),
             eula: self.eula.map(PathBuf::from),
             force: self.force,
             help_url: self.help_url.map(String::from),
@@ -285,10 +317,12 @@ impl<'a> Default for Builder<'a> {
 
 #[derive(Debug)]
 pub struct Execution {
+    banner: Option<PathBuf>,
     binary: Option<PathBuf>,
     copyright_holder: Option<String>,
     copyright_year: Option<String>,
     description: Option<String>,
+    dialog: Option<PathBuf>,
     eula: Option<PathBuf>,
     force: bool,
     help_url: Option<String>,
@@ -301,10 +335,12 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
+        debug!("banner = {:?}", self.banner);
         debug!("binary = {:?}", self.binary);
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
         debug!("description = {:?}", self.description);
+        debug!("dialog = {:?}", self.dialog);
         debug!("eula = {:?}", self.eula);
         debug!("force = {:?}", self.force);
         debug!("help_url = {:?}", self.help_url);
@@ -355,8 +391,10 @@ impl Execution {
         } else {
             info!("Creating the '{}' file", destination.display());
             let mut wxs_printer = print::wxs::Builder::new();
+            wxs_printer.banner(self.banner.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.binary(self.binary.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
+            wxs_printer.dialog(self.dialog.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.eula(eula_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
@@ -424,10 +462,12 @@ mod tests {
         #[test]
         fn defaults_are_correct() {
             let actual = Builder::new();
+            assert!(actual.banner.is_none());
             assert!(actual.binary.is_none());
             assert!(actual.copyright_year.is_none());
             assert!(actual.copyright_holder.is_none());
             assert!(actual.description.is_none());
+            assert!(actual.dialog.is_none());
             assert!(actual.eula.is_none());
             assert!(!actual.force);
             assert!(actual.help_url.is_none());
@@ -436,6 +476,14 @@ mod tests {
             assert!(actual.manufacturer.is_none());
             assert!(actual.output.is_none());
             assert!(actual.product_name.is_none());
+        }
+
+        #[test]
+        fn banner_works() {
+            const EXPECTED: &str = "img\\Banner.bmp";
+            let mut actual = Builder::new();
+            actual.banner(Some(EXPECTED));
+            assert_eq!(actual.banner, Some(EXPECTED));
         }
 
         #[test]
@@ -468,6 +516,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.description(Some(EXPECTED));
             assert_eq!(actual.description, Some(EXPECTED));
+        }
+
+        #[test]
+        fn dialog_works() {
+            const EXPECTED: &str = "img\\Dialog.bmp";
+            let mut actual = Builder::new();
+            actual.dialog(Some(EXPECTED));
+            assert_eq!(actual.dialog, Some(EXPECTED));
         }
 
         #[test]

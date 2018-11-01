@@ -31,8 +31,10 @@ use uuid::Uuid;
 /// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
+    banner: Option<&'a str>,
     binary: Option<&'a str>,
     description: Option<&'a str>,
+    dialog: Option<&'a str>,
     eula: Option<&'a str>,
     help_url: Option<&'a str>,
     input: Option<&'a str>,
@@ -46,8 +48,10 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
+            banner: None,
             binary: None,
             description: None,
+            dialog: None,
             eula: None,
             help_url: None,
             input: None,
@@ -56,6 +60,19 @@ impl<'a> Builder<'a> {
             output: None,
             product_name: None,
         }
+    }
+
+    /// Sets the path to a bitmap (BMP) file to be used as a banner image across
+    /// the top of each dialog in the installer.
+    ///
+    /// The banner image must be 493 x 58 pixels. See the [Wix Toolset
+    /// documentation] for details about [customization].
+    ///
+    /// [Wix Toolset documentation]: http://wixtoolset.org/documentation/
+    /// [customization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_customizations.html
+    pub fn banner(&mut self, b: Option<&'a str>) -> &mut Self {
+        self.banner = b;
+        self
     }
 
     /// Sets the binary.
@@ -81,6 +98,19 @@ impl<'a> Builder<'a> {
     /// in the package'
     pub fn description(&mut self, d: Option<&'a str>) -> &mut Self {
         self.description = d;
+        self
+    }
+
+    /// Sets the path to a bitmap (`.bmp`) file that will be displayed on the
+    /// first dialog to the left.
+    ///
+    /// The image must be 493 x 312 pixels. See the [Wix Toolset
+    /// documentation] for details about [customization].
+    ///
+    /// [Wix Toolset documentation]: http://wixtoolset.org/documentation/
+    /// [customization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_customizations.html
+    pub fn dialog(&mut self, d: Option<&'a str>) -> &mut Self {
+        self.dialog = d;
         self
     }
 
@@ -183,8 +213,10 @@ impl<'a> Builder<'a> {
     /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
+            banner: self.banner.map(PathBuf::from),
             binary: self.binary.map(PathBuf::from),
             description: self.description.map(String::from),
+            dialog: self.dialog.map(PathBuf::from),
             eula: self.eula.map(PathBuf::from),
             help_url: self.help_url.map(String::from),
             input: self.input.map(PathBuf::from),
@@ -205,8 +237,10 @@ impl<'a> Default for Builder<'a> {
 /// A context for printing a WiX Toolset source file (wxs).
 #[derive(Debug)]
 pub struct Execution {
+    banner: Option<PathBuf>,
     binary: Option<PathBuf>,
     description: Option<String>,
+    dialog: Option<PathBuf>,
     eula: Option<PathBuf>,
     help_url: Option<String>,
     input: Option<PathBuf>,
@@ -218,8 +252,10 @@ pub struct Execution {
 
 impl Execution {
     pub fn run(self) -> Result<()> {
+        debug!("banner = {:?}", self.banner);
         debug!("binary = {:?}", self.binary);
         debug!("description = {:?}", self.description);
+        debug!("dialog = {:?}", self.description);
         debug!("eula = {:?}", self.eula);
         debug!("help_url = {:?}", self.help_url);
         debug!("input = {:?}", self.input);
@@ -237,12 +273,18 @@ impl Execution {
             .insert_str("manufacturer", self.manufacturer(&manifest)?)
             .insert_str("upgrade-code-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
             .insert_str("path-component-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase());
+        if let Some(ref banner) = self.banner {
+            map = map.insert_str("banner", banner.display().to_string());
+        }
         if let Some(description) = description(self.description.clone(), &manifest) {
             map = map.insert_str("description", description);
         } else {
             warn!("A description was not specified at the command line or in the package's manifest \
                   (Cargo.toml). The description can be added manually to the generated WiX \
                   Source (wxs) file using a text editor.");
+        }
+        if let Some(ref dialog) = self.dialog {
+            map = map.insert_str("dialog", dialog.display().to_string());
         }
         match self.eula(&manifest)? {
             Eula::Disabled => {
@@ -276,7 +318,6 @@ impl Execution {
         let data = map.build();
         template.render_data(&mut destination, &data).map_err(Error::from)
     }
-
 
     fn binary_name(&self, manifest: &Value) -> Result<String> {
         if let Some(ref b) = self.binary {
@@ -418,6 +459,14 @@ mod tests {
         use super::*;
 
         #[test]
+        fn banner_works() {
+            const EXPECTED: &str = "img\\Banner.bmp";
+            let mut actual = Builder::new();
+            actual.banner(Some(EXPECTED));
+            assert_eq!(actual.banner, Some(EXPECTED));
+        }
+
+        #[test]
         fn binary_name_works() {
             const EXPECTED: &str = "bin\\Example.exe";
             let mut actual = Builder::new();
@@ -431,6 +480,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.description(Some(EXPECTED));
             assert_eq!(actual.description, Some(EXPECTED));
+        }
+
+        #[test]
+        fn dialog_work() {
+            const EXPECTED: &str = "img\\Dialog.bmp";
+            let mut actual = Builder::new();
+            actual.dialog(Some(EXPECTED));
+            assert_eq!(actual.dialog, Some(EXPECTED));
         }
 
         #[test]

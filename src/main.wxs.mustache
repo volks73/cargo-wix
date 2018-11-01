@@ -234,14 +234,39 @@
         <!-- <WixVariable Id='WixUILicenseRtf' Value='Relative\Path\to\Eula.rtf'/> -->
         {{/eula}}
 
+        {{#banner}}
         <!--
-          Uncomment the next two `WixVaraible` tags to customize the
-          installer's Graphical User Interface (GUI). See the WiX Toolset documentation
-          for details about customization. The banner BMP dimensions are 493 x 58 pixels.
-          The dialog BMP dimensions are 493 x 312 pixels.
+          Disabling the banner in the installer requires commenting out or
+          removing the following `WixVariable` tag.
+        -->
+        <WixVariable Id='WixUIBannderBmp' Value='{{banner}}'/>
+        {{/banner}}
+        {{^banner}}
+        <!--
+          Uncomment the next `WixVaraible` tag to customize the installer's
+          Graphical User Interface (GUI) and add a custom banner image across
+          the top of each screen. See the WiX Toolset documentation for details
+          about customization. The banner BMP dimensions are 493 x 58 pixels.
         -->
         <!--<WixVariable Id='WixUIBannerBmp' Value='wix\Banner.bmp'/>-->
+        {{/banner}}
+
+        {{#dialog}}
+        <!--
+          Disabling the dialog image in the installer requires commenting out or
+          removing the following `WixVariable` tag.
+        -->
+        <WixVariable Id='WixUIDialogBmp' Value='{{dialog}}'/>
+        {{/dialog}}
+        {{^dialog}}
+        <!--
+          Uncomment the next `WixVariable` tag to customize the installer's
+          Graphical User Interface (GUI) and add a custom image to the first
+          dialog, or screen. See the WiX Toolset documentation for details about
+          customization. The dialog BMP dimensions are 493 x 312 pixels.
+        -->
         <!--<WixVariable Id='WixUIDialogBmp' Value='wix\Dialog.bmp'/>-->
+        {{/dialog}}
 
     </Product>
 
