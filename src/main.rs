@@ -341,8 +341,18 @@ fn main() {
                            Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
+                    .arg(Arg::with_name("banner")
+                        .help("Sets the path to a bitmap (.bmp) image file that \
+                              will be displayed across the top of each dialog in the \
+                              installer.")
+                        .long("banner"))
                     .arg(binary.clone())
                     .arg(description.clone())
+                    .arg(Arg::with_name("dialog")
+                         .help("Sets the path to a bitmap (.bmp) image file that \
+                               will be displayed to the left on the first dialog of \
+                               the installer.")
+                         .long("dialog"))
                     .arg(eula.clone())
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
@@ -560,10 +570,12 @@ fn main() {
         },
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
+            init.banner(m.value_of("banner"));
             init.binary(m.value_of("binary-name"));
             init.copyright_holder(m.value_of("holder"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
+            init.dialog(m.value_of("dialog"));
             init.eula(m.value_of("eula"));
             init.force(m.is_present("force"));
             init.help_url(m.value_of("url"));
@@ -579,8 +591,10 @@ fn main() {
             match template {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
+                    print.banner(m.value_of("banner"));
                     print.binary(m.value_of("binary"));
                     print.description(m.value_of("description"));
+                    print.dialog(m.value_of("dialog"));
                     print.eula(m.value_of("eula"));
                     print.help_url(m.value_of("url"));
                     print.input(m.value_of("INPUT"));
@@ -643,7 +657,7 @@ fn main() {
                 //
                 // See:
                 //
-                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47) 
+                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47)
                 // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
                 stderr.reset().expect("Revert color settings after printing the tag");
                 stderr.set_color(ColorSpec::new().set_fg(Some(Color::White)).set_bold(false)).expect("Coloring stderr");
@@ -653,7 +667,7 @@ fn main() {
                 //
                 // See:
                 //
-                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47) 
+                // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47)
                 // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
                 stderr.reset().expect("Revert color settings after printing the message");
             }
