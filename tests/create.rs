@@ -112,6 +112,15 @@ fn init_with_all_options_works() {
     {
         let _bin_example_handle = File::create(&bin_example_path).unwrap();
     }
+    let banner_path = package.path().join("img").join("Banner.bmp");
+    fs::create_dir(banner_path.parent().unwrap()).unwrap();
+    {
+        let _banner_handle = File::create(&banner_path).unwrap();
+    }
+    let dialog_path = package.path().join("img").join("Dialog.bmp");
+    {
+        let _dialog_handle = File::create(&dialog_path).unwrap();
+    }
     let package_license = package.child(LICENSE_FILE);
     {
         let _license_handle = File::create(package_license.path()).unwrap();
@@ -121,13 +130,40 @@ fn init_with_all_options_works() {
         let _eula_handle = File::create(package_eula.path()).unwrap();
     }
     initialize::Builder::new()
+        .banner(banner_path.to_str())
         .binary(bin_example_path.to_str())
         .description(Some("This is a description"))
+        .dialog(dialog_path.to_str())
         .eula(package_eula.path().to_str())
         .help_url(Some("http://www.example.com"))
         .license(package_license.path().to_str())
         .manufacturer(Some("Example Manufacturer"))
         .product_name(Some("Example Product Name"))
+        .build()
+        .run()
+        .unwrap();
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
+}
+
+#[test]
+fn init_with_banner_option_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!(
+        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+    ));
+    env::set_current_dir(package.path()).unwrap();
+    let banner_path = package.path().join("img").join("Banner.bmp");
+    fs::create_dir(banner_path.parent().unwrap()).unwrap();
+    {
+        let _banner_handle = File::create(&banner_path).unwrap();
+    }
+    initialize::Builder::new()
+        .banner(banner_path.to_str())
         .build()
         .run()
         .unwrap();
@@ -173,6 +209,31 @@ fn init_with_description_option_works() {
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new()
         .description(Some("This is a description"))
+        .build()
+        .run()
+        .unwrap();
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
+}
+
+#[test]
+fn init_with_dialog_option_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!(
+        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+    ));
+    env::set_current_dir(package.path()).unwrap();
+    let dialog_path = package.path().join("img").join("Dialog.bmp");
+    fs::create_dir(dialog_path.parent().unwrap()).unwrap();
+    {
+        let _dialog_handle = File::create(&dialog_path).unwrap();
+    }
+    initialize::Builder::new()
+        .dialog(dialog_path.to_str())
         .build()
         .run()
         .unwrap();

@@ -505,3 +505,44 @@ fn license_file_field_with_txt_file_works() {
     ), package_license.path().to_str().unwrap());
 }
 
+#[test]
+fn banner_works() {
+    const EXPECTED: &str = "img\\Banner.bmp";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_banner = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    fs::create_dir("img").unwrap();
+    let _banner_handle = File::create(package_banner.path()).unwrap();
+    let result = Builder::default()
+        .banner(package_banner.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUIBannerBmp']/@Value"
+    ), package_banner.path().to_str().unwrap());
+}
+
+#[test]
+fn dialog_works() {
+    const EXPECTED: &str = "img\\Dialog.bmp";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_dialog = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    fs::create_dir("img").unwrap();
+    let _dialog_handle = File::create(package_dialog.path()).unwrap();
+    let result = Builder::default()
+        .dialog(package_dialog.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:WixVariable[@Id='WixUIDialogBmp']/@Value"
+    ), package_dialog.path().to_str().unwrap());
+}
