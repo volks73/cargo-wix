@@ -345,14 +345,16 @@ fn main() {
                         .help("Sets the path to a bitmap (.bmp) image file that \
                               will be displayed across the top of each dialog in the \
                               installer.")
-                        .long("banner"))
+                        .long("banner")
+                        .takes_value(true))
                     .arg(binary.clone())
                     .arg(description.clone())
                     .arg(Arg::with_name("dialog")
-                         .help("Sets the path to a bitmap (.bmp) image file that \
+                        .help("Sets the path to a bitmap (.bmp) image file that \
                                will be displayed to the left on the first dialog of \
                                the installer.")
-                         .long("dialog"))
+                        .long("dialog")
+                        .takes_value(true))
                     .arg(eula.clone())
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
