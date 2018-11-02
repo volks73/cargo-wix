@@ -19,7 +19,7 @@ use RTF_FILE_EXTENSION;
 use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
-use print::Template;
+use Template;
 use toml::Value;
 
 #[derive(Clone, Debug, PartialEq)]

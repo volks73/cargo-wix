@@ -78,6 +78,8 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use toml::Value;
 
+pub use template::Template;
+
 pub mod clean;
 pub mod create;
 mod eula;
@@ -85,6 +87,7 @@ pub mod initialize;
 pub mod print;
 pub mod purge;
 pub mod sign;
+mod template;
 
 pub const BINARY_FOLDER_NAME: &str = "bin";
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
