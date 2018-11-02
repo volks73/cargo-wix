@@ -204,6 +204,14 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    // The banner option for the `init` and `print` subcommands.
+    let banner = Arg::with_name("banner")
+        .help("Sets the path to a bitmap (.bmp) image file that \
+               will be displayed across the top of each dialog in the \
+               installer. The banner image dimensions should be \
+               493 x 58 pixels.")
+        .long("banner")
+        .takes_value(true);
     // The binary option for the `init` and `print` subcommands.
     let binary = Arg::with_name("binary")
         .help("Overrides the default binary included in the installer. The \
@@ -219,6 +227,14 @@ fn main() {
               as the description within the installer.")
         .long("description")
         .short("d")
+        .takes_value(true);
+    // The dialog option for the `init` and `print` subcommands.
+    let dialog = Arg::with_name("dialog")
+        .help("Sets the path to a bitmap (.bmp) image file that \
+               will be displayed to the left on the first dialog of \
+               the installer. The dialog image dimensions should \
+               be 493 x 312 pxiels.")
+        .long("dialog")
         .takes_value(true);
     // The eula option for the `init` and `print` subcommands.
     let eula = Arg::with_name("eula")
@@ -310,8 +326,8 @@ fn main() {
                         during the installation of the WiX Toolset. Failing the existence of the \
                         {1} system environment variable, the path specified in the PATH system \
                         environment variable is used. This is useful when working with multiple \
-                        versions of the WiX Toolset.", 
-                        BINARY_FOLDER_NAME, 
+                        versions of the WiX Toolset.",
+                        BINARY_FOLDER_NAME,
                         WIX_PATH_KEY
                     ))
                     .long("bin-path")
@@ -341,22 +357,10 @@ fn main() {
                            Text Format (RTF) if the 'license' field is specified with a supported \
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
-                    .arg(Arg::with_name("banner")
-                        .help("Sets the path to a bitmap (.bmp) image file that \
-                              will be displayed across the top of each dialog in the \
-                              installer. The banner image dimensions should be \
-                              493 x 58 pixels.")
-                        .long("banner")
-                        .takes_value(true))
+                    .arg(banner.clone())
                     .arg(binary.clone())
                     .arg(description.clone())
-                    .arg(Arg::with_name("dialog")
-                        .help("Sets the path to a bitmap (.bmp) image file that \
-                               will be displayed to the left on the first dialog of \
-                               the installer. The dialog image dimensions should \
-                               be 493 x 312 pxiels.")
-                        .long("dialog")
-                        .takes_value(true))
+                    .arg(dialog.clone())
                     .arg(eula.clone())
                     .arg(Arg::with_name("force")
                         .help("Overwrites any existing files that are generated during \
@@ -426,8 +430,10 @@ fn main() {
                            Source file (wxs), the output is in XML. New GUIDs are generated for the \
                            'UpgradeCode' and Path Component each time the 'WXS' template is \
                            printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                    .arg(banner)
                     .arg(binary)
                     .arg(description)
+                    .arg(dialog)
                     .arg(eula)
                     .arg(holder)
                     .arg(Arg::with_name("INPUT")
