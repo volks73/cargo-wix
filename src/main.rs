@@ -303,14 +303,6 @@ fn main() {
         .long("verbose")
         .short("v")
         .multiple(true);
-    let year = Arg::with_name("year")
-         .help("Sets the copyright year for the license during initialization. The \
-               default is to use the current year. This is only used if a license \
-               is generated from one of the supported licenses based on the value \
-               of the 'license' field in the package's manifest (Cargo.toml).")
-         .short("Y")
-         .long("year")
-         .takes_value(true);
     let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
@@ -384,7 +376,14 @@ fn main() {
                     .arg(product_name.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
-                    .arg(year.clone()))
+                    .arg(Arg::with_name("year")
+                        .help("Sets the copyright year for the license during initialization. The \
+                            default is to use the current year. This is only used if a license \
+                            is generated from one of the supported licenses based on the value \
+                            of the 'license' field in the package's manifest (Cargo.toml).")
+                        .short("Y")
+                        .long("year")
+                        .takes_value(true)))
                 .arg(Arg::with_name("install-version")
                     .help("Overrides the version from the package's manifest (Cargo.toml), which \
                           is used for the installer name and appears in the Add/Remove Programs \
