@@ -287,8 +287,8 @@ fn main() {
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
-        .help("Sets the path to an image file that will be displayed as an icon
-              in the Add/Remove Programs (ARP) control panel for the installed
+        .help("Sets the path to an image file that will be displayed as an icon \
+              in the Add/Remove Programs (ARP) control panel for the installed \
               application.")
         .long("product-icon")
         .short("P")
