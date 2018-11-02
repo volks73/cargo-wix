@@ -285,7 +285,15 @@ fn main() {
         .long("manufacturer")
         .short("m")
         .takes_value(true);
-    // The product name option for the `init` and `print` subcommands
+    // The product icon option for the `init` and `print` subcommands
+    let product_icon = Arg::with_name("product-icon")
+        .help("Sets the path to an image file that will be displayed as an icon
+              in the Add/Remove Programs (ARP) control panel for the installed
+              application.")
+        .long("product-icon")
+        .short("P")
+        .takes_value(true);
+    // The product name option for the `init`, `print`, and `sign` subcommands
     let product_name = Arg::with_name("product-name")
         .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as \
               the product name within the installer. The product name can be \
@@ -381,6 +389,7 @@ fn main() {
                         .long("output")
                         .short("o")
                         .takes_value(true))
+                    .arg(product_icon.clone())
                     .arg(product_name.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
@@ -450,7 +459,9 @@ fn main() {
                               a.k.a. file, does not exist, it will be created.")
                         .long("output")
                         .short("o")
-                        .takes_value(true))
+                         .takes_value(true))
+                    .arg(product_icon)
+                    .arg(product_name.clone())
                     .arg(Arg::with_name("TEMPLATE")
                         .help("The template to print. This is required and values are case \
                               insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
