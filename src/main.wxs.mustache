@@ -163,6 +163,17 @@
         </Feature>
 
         <SetProperty Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' After='CostFinalize'/>
+
+        {{#product-icon}}
+        <!--
+          Disabling the custom product icon for the application in the
+          Add/Remove Programs control panel requires commenting out or
+          removing the following `Icon` and `Property` tags.
+        -->
+        <Icon Id='ProductICO' SourceFile='{{product-icon}}'/>
+        <Property Id='ARPPRODUCTICON' Value='ProductICO' />
+        {{/product-icon}}
+        {{^product-icon}}
         <!--
           Uncomment the following `Icon` and `Property` tags to change the product icon.
 
@@ -171,6 +182,7 @@
         -->
         <!--<Icon Id='ProductICO' SourceFile='wix\Product.ico'/>-->
         <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
+        {{/product-icon}}
 
         {{#help-url}}
         <Property Id='ARPHELPLINK' Value='{{help-url}}'/>
