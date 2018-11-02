@@ -266,6 +266,7 @@ pub struct Execution {
 }
 
 impl Execution {
+    /// Prints a WiX Source (wxs) file based on the built context.
     pub fn run(self) -> Result<()> {
         debug!("banner = {:?}", self.banner);
         debug!("binary = {:?}", self.binary);

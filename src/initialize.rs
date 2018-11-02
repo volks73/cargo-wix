@@ -329,6 +329,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+// A context for creating the necessary files to eventually build an installer.
 #[derive(Debug)]
 pub struct Execution {
     banner: Option<PathBuf>,
@@ -349,6 +350,8 @@ pub struct Execution {
 }
 
 impl Execution {
+    /// Generates the necessary files to eventually create, or build, an
+    /// installer based on a built context.
     pub fn run(self) -> Result<()> {
         debug!("banner = {:?}", self.banner);
         debug!("binary = {:?}", self.binary);

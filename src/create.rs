@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// The `create` command is also the default command for the `cargo wix`
-/// subcommand. It creates a Windows installer from an existing WiX Source (wxs)
-/// file. By default, it looks for a `wix\main.wxs` file relative to the root of
-/// the Cargo project. A different WiX Source file can be set with the `input`
-/// method using the `Builder` struct.
+//! The implementation for the `create`, or default, command. The default
+//! command, `cargo wix`, is focused on creating, or building, the installer
+//! using the WiX Toolset. Generally, this involves locating the WiX Source file
+//! (wxs) and passing options and flags to the WiX Toolset's compiler
+//! (`candle.exe`) and linker (`light.exe`). By default, it looks for a
+//! `wix\main.wxs` file relative to the root of the package's manifest
+//! (Cargo.toml). A different WiX Source file can be set with the `input` method
+//! using the `Builder` struct.
 
 use BINARY_FOLDER_NAME;
 use CARGO;
@@ -38,7 +41,7 @@ use WIX_PATH_KEY;
 use WIX_SOURCE_FILE_EXTENSION;
 use WIX_SOURCE_FILE_NAME;
 
-/// A builder for running the subcommand.
+/// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
@@ -114,7 +117,7 @@ impl<'a> Builder<'a> {
     ///
     /// The default is to use the `name` field under the `package` section of the package's
     /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
-    /// not found in the manifest. 
+    /// not found in the manifest.
     ///
     /// The installer (msi) that is created will be named as "name-major.minor.patch-platform.msi" format,
     /// where name is the value specified with this method or the value from the `name` field under
@@ -182,6 +185,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+/// A context for creating, or building, an installer.
 #[derive(Debug)]
 pub struct Execution {
     bin_path: Option<PathBuf>,
@@ -196,6 +200,7 @@ pub struct Execution {
 }
 
 impl Execution {
+    /// Creates, or builds, an installer within a built context.
     pub fn run(self) -> Result<()> {
         debug!("bin_path = {:?}", self.bin_path);
         debug!("capture_output = {:?}", self.capture_output);
@@ -247,7 +252,7 @@ impl Execution {
             trace!("Capturing the '{}' output", WIX_COMPILER);
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
-        } 
+        }
         compiler.arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
             .arg("-o")
@@ -261,7 +266,7 @@ impl Execution {
                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
                     system environment variable, the {} system environment variable exists, or use \
-                    the '-B,--bin-path' command line argument.", 
+                    the '-b,--bin-path' command line argument.",
                     WIX_COMPILER,
                     BINARY_FOLDER_NAME,
                     WIX_PATH_KEY
@@ -275,7 +280,7 @@ impl Execution {
         }
         // Link the installer
         info!("Linking the installer");
-        let mut linker = self.linker()?; 
+        let mut linker = self.linker()?;
         debug!("linker = {:?}", linker);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
@@ -288,7 +293,7 @@ impl Execution {
         }
         linker.arg("-ext")
             .arg("WixUIExtension")
-            .arg(format!("-cultures:{}", self.culture)) 
+            .arg(format!("-cultures:{}", self.culture))
             .arg(&source_wixobj)
             .arg("-out")
             .arg(&destination_msi);
@@ -300,7 +305,7 @@ impl Execution {
                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
                     environment variable, the {} system environment variable exists, or use the \
-                    '-B,--bin-path' command line argument.", 
+                    '-B,--bin-path' command line argument.",
                     WIX_LINKER,
                     BINARY_FOLDER_NAME,
                     WIX_PATH_KEY
@@ -320,7 +325,7 @@ impl Execution {
         if let Some(mut path) = self.bin_path.as_ref().map(|s| {
             let mut p = PathBuf::from(s);
             trace!(
-                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler", 
+                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
                 p.display(),
                 BINARY_FOLDER_NAME
             );
@@ -334,7 +339,7 @@ impl Execution {
                     "The compiler application ('{}') does not exist at the '{}' path specified via \
                     the '-B, --bin-path' command line argument. Please check the path is correct and \
                     the compiler application exists at the path.",
-                    WIX_COMPILER, 
+                    WIX_COMPILER,
                     path.display()
                 )))
             } else {
@@ -344,8 +349,8 @@ impl Execution {
             if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
                 let mut p = PathBuf::from(s);
                 trace!(
-                    "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler", 
-                    p.display(), 
+                    "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
+                    p.display(),
                     BINARY_FOLDER_NAME
                 );
                 p.push(BINARY_FOLDER_NAME);
@@ -372,9 +377,6 @@ impl Execution {
         }
     }
 
-    /// Gets the WiX localization file and checks if it exists.
-    ///
-    /// Returns `None` if no localization file is specified.
     fn locale(&self) -> Result<Option<PathBuf>> {
         if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
             if locale.exists() {
@@ -391,12 +393,11 @@ impl Execution {
         }
     }
 
-    /// Gets the command for the linker application (`light.exe`).
     fn linker(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.as_ref().map(|s| {
             let mut p = PathBuf::from(s);
             trace!(
-                "Using the '{}' path to the WiX Toolset '{}' folder for the linker", 
+                "Using the '{}' path to the WiX Toolset '{}' folder for the linker",
                 p.display(),
                 BINARY_FOLDER_NAME
             );
@@ -420,7 +421,7 @@ impl Execution {
             if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
                 let mut p = PathBuf::from(s);
                 trace!(
-                    "Using the '{}' path to the WiX Toolset's '{}' folder for the linker", 
+                    "Using the '{}' path to the WiX Toolset's '{}' folder for the linker",
                     p.display(),
                     BINARY_FOLDER_NAME
                 );
@@ -448,7 +449,6 @@ impl Execution {
         }
     }
 
-    /// Gets the platform.
     fn platform(&self) -> Platform {
         if cfg!(target_arch = "x86_64") {
             Platform::X64
@@ -470,7 +470,6 @@ impl Execution {
         }
     }
 
-    /// Gets the destination for the linker.
     fn destination_msi(&self, name: &str, version: &Version, platform: &Platform) -> PathBuf {
         if let Some(ref o) = self.output {
             PathBuf::from(o)
@@ -486,7 +485,6 @@ impl Execution {
         }
     }
 
-    /// Gets the destination for the compiler output/linker input.
     fn source_wixobj(&self) -> PathBuf {
         let mut source_wixobj = PathBuf::from("target");
         source_wixobj.push(WIX);
@@ -495,7 +493,6 @@ impl Execution {
         source_wixobj
     }
 
-    /// Gets the WiX Source (wxs) file.
     fn wxs_source(&self) -> Result<PathBuf> {
         if let Some(p) = self.input.as_ref().map(|s| PathBuf::from(s)) {
             if p.exists() {
@@ -533,7 +530,6 @@ impl Execution {
         }
     }
 
-    /// Gets the package version.
     fn version(&self, manifest: &Value) -> Result<Version> {
         if let Some(ref v) = self.version {
             Version::parse(v).map_err(Error::from)
