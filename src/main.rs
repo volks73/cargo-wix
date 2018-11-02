@@ -75,10 +75,10 @@
 //! the installation folder that contains the `bin` folder. The `WIX` system
 //! environment variable is used by the `cargo wix` subcommand and library with
 //! the [`std::process::Command`] module to create the installer. The
-//! `-B,--bin-path` option can be used to specify a path (relative or absolute)
-//! to the WiX Toolset `bin` folder. The `-B,--bin-path` option is useful if a
+//! `-b,--bin-path` option can be used to specify a path (relative or absolute)
+//! to the WiX Toolset `bin` folder. The `-b,--bin-path` option is useful if a
 //! different version of the WiX Toolset needs to be used to create the
-//! installer. The descending order of precedence is: (1) `-B,--bin-path` option
+//! installer. The descending order of precedence is: (1) `-b,--bin-path` option
 //! then (2) `WIX` system environment variable. An error will be displayed if
 //! the compiler and/or linker cannot be found.
 //!
@@ -87,9 +87,9 @@
 //! SDK installation. The location of the `bin` folder varies depending on the
 //! version. It is recommended to use the Developer Prompt to ensure the
 //! `signtool` application is available; however, it is possible to specify the
-//! path to the Windows SDK `bin` folder using the `-B,--bin-path` option for
+//! path to the Windows SDK `bin` folder using the `-b,--bin-path` option for
 //! the `cargo wix sign` subcommand. The descending order of precedence for
-//! locating the signer application is: (1) `-B,--bin-path` option then (2) the
+//! locating the signer application is: (1) `-b,--bin-path` option then (2) the
 //! order used by the [`std::process::Command::status`] method. Signing an
 //! installer is optional.
 //!
@@ -154,11 +154,11 @@
 //! The `cargo wix` subcommand uses the package name for the product name. The
 //! default install location is at `C:\Program Files\<Product Name>`, where
 //! `<Product Name>` is replaced with the product name determined from the
-//! package name. This can be overridden with the `-N,--name` option for the
-//! `cargo wix` subcommand or the `-p,--product-name` option for the `cargo wix
+//! package name. This can be overridden with the `-n,--name` option for the
+//! `cargo wix` subcommand or the `-P,--product-name` option for the `cargo wix
 //! init` subcommand. The binary name, which is the `name` field for the
 //! `[[bin]]` section, is used for the executable file name, i.e. "name.exe".
-//! This can also be overridden using the `-b,--bin-name` option for the `cargo
+//! This can also be overridden using the `-B,--binary` option for the `cargo
 //! wix init` subcommand. The package description is used in multiple places for
 //! the installer, including the text that appears in the blue UAC dialog when
 //! using a signed installer. This can be overridden using the
@@ -341,7 +341,7 @@ fn main() {
                         WIX_PATH_KEY
                     ))
                     .long("bin-path")
-                    .short("B")
+                    .short("b")
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
@@ -352,11 +352,11 @@ fn main() {
                               optional and the default is to use the current working directory (cwd).")
                         .index(1)))
                 .arg(Arg::with_name("culture")
-                    .help("Sets the culture for localization. Use with the '-L,--locale' option. \
+                    .help("Sets the culture for localization. Use with the '-l,--locale' option. \
                           See the WixUI localization documentation for more information about \
                           acceptable culture codes. The codes are case insenstive.")
                     .long("culture")
-                    .short("C")
+                    .short("c")
                     .default_value(&default_culture)
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
@@ -401,13 +401,13 @@ fn main() {
                           is used for the installer name and appears in the Add/Remove Programs \
                           control panel.")
                     .long("install-version")
-                    .short("I")
+                    .short("i")
                     .takes_value(true))
                 .arg(Arg::with_name("locale")
                     .help("Sets the path to a WiX localization file, '.wxl', which contains \
                           localized strings.")
                     .long("locale")
-                    .short("L")
+                    .short("l")
                     .takes_value(true))
                 .arg(Arg::with_name("name")
                     .help("Overrides the package's 'name' field in the manifest (Cargo.toml), which \
@@ -415,7 +415,7 @@ fn main() {
                           the executable within the installer. The name of the executable can be \
                           changed by modifying the WiX Source (wxs) file with a text editor.")
                     .long("name")
-                    .short("N")
+                    .short("n")
                     .takes_value(true))
                 .arg(Arg::with_name("no-build")
                     .help("Skips building the release binary. The installer is created, but the \
@@ -499,7 +499,7 @@ fn main() {
                               The default is to use the PATH system environment variable to locate the \
                               application.")
                         .long("bin-path")
-                        .short("B")
+                        .short("b")
                         .takes_value(true))
                     .arg(Arg::with_name("description")
                          .help("The information for the extended text of the ACL dialog that \
