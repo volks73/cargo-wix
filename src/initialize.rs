@@ -51,6 +51,7 @@ pub struct Builder<'a> {
     license: Option<&'a str>,
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
+    product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
 }
 
@@ -71,6 +72,7 @@ impl<'a> Builder<'a> {
             license: None,
             manufacturer: None,
             output: None,
+            product_icon: None,
             product_name: None,
         }
     }
@@ -271,6 +273,17 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the path to an image file to be used for product icon.
+    ///
+    /// The product icon is the icon that appears for an installed application
+    /// in the Add/Remove Programs (ARP) control panel. If a product icon is
+    /// _not_ defined for an application within the installer, then the Windows
+    /// OS assigns a generic one.
+    pub fn product_icon(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.product_icon = p;
+        self
+    }
+
     /// Sets the product name.
     ///
     /// The default is to use the `name` field under the `package` section of
@@ -304,6 +317,7 @@ impl<'a> Builder<'a> {
             license: self.license.map(PathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
+            product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
         }
     }
@@ -330,6 +344,7 @@ pub struct Execution {
     license: Option<PathBuf>,
     manufacturer: Option<String>,
     output: Option<PathBuf>,
+    product_icon: Option<PathBuf>,
     product_name: Option<String>,
 }
 
@@ -348,6 +363,7 @@ impl Execution {
         debug!("license = {:?}", self.license);
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
+        debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
         let manifest = super::manifest(self.input.as_ref())?;
         let mut destination = self.destination()?;
@@ -401,6 +417,7 @@ impl Execution {
             wxs_printer.license(license_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
+            wxs_printer.product_icon(self.product_icon.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
         }
@@ -475,6 +492,7 @@ mod tests {
             assert!(actual.license.is_none());
             assert!(actual.manufacturer.is_none());
             assert!(actual.output.is_none());
+            assert!(actual.product_icon.is_none());
             assert!(actual.product_name.is_none());
         }
 
@@ -582,6 +600,14 @@ mod tests {
         }
 
         #[test]
+        fn product_icon_works() {
+            const EXPECTED: &str = "img\\Product.ico";
+            let mut actual = Builder::new();
+            actual.product_icon(Some(EXPECTED));
+            assert_eq!(actual.product_icon, Some(EXPECTED));
+        }
+
+        #[test]
         fn product_name_works() {
             const EXPECTED: &str = "product name";
             let mut actual = Builder::new();
@@ -604,6 +630,7 @@ mod tests {
             assert!(default_execution.license.is_none());
             assert!(default_execution.manufacturer.is_none());
             assert!(default_execution.output.is_none());
+            assert!(default_execution.product_icon.is_none());
             assert!(default_execution.product_name.is_none());
         }
 
@@ -619,6 +646,7 @@ mod tests {
             const EXPECTED_LICENSE: &str = "C:\\tmp\\hello_world\\License.rtf";
             const EXPECTED_MANUFACTURER: &str = "Manufacturer";
             const EXPECTED_OUTPUT: &str = "C:\\tmp\\output";
+            const EXPECTED_PRODUCT_ICON: &str = "img\\Product.ico";
             const EXPECTED_PRODUCT_NAME: &str = "Product Name";
             let mut b = Builder::new();
             b.binary(Some(EXPECTED_BINARY));
@@ -632,6 +660,7 @@ mod tests {
             b.license(Some(EXPECTED_LICENSE));
             b.manufacturer(Some(EXPECTED_MANUFACTURER));
             b.output(Some(EXPECTED_OUTPUT));
+            b.product_icon(Some(EXPECTED_PRODUCT_ICON));
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
             let execution = b.build();
             assert_eq!(execution.binary, Some(EXPECTED_BINARY).map(PathBuf::from));
@@ -645,6 +674,7 @@ mod tests {
             assert_eq!(execution.license, Some(EXPECTED_LICENSE).map(PathBuf::from));
             assert_eq!(execution.manufacturer, Some(EXPECTED_MANUFACTURER).map(String::from));
             assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.product_icon, Some(EXPECTED_PRODUCT_ICON).map(PathBuf::from));
             assert_eq!(execution.product_name, Some(EXPECTED_PRODUCT_NAME).map(String::from));
         }
     }

@@ -41,6 +41,7 @@ pub struct Builder<'a> {
     license: Option<&'a str>,
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
+    product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
 }
 
@@ -58,6 +59,7 @@ impl<'a> Builder<'a> {
             license: None,
             manufacturer: None,
             output: None,
+            product_icon: None,
             product_name: None,
         }
     }
@@ -192,6 +194,17 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the path to an image file to be used for product icon.
+    ///
+    /// The product icon is the icon that appears for an installed application
+    /// in the Add/Remove Programs (ARP) control panel. If a product icon is
+    /// _not_ defined for an application within the installer, then the Windows
+    /// OS assigns a generic one.
+    pub fn product_icon(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.product_icon = p;
+        self
+    }
+
     /// Sets the product name.
     ///
     /// The default is to use the `name` field under the `package` section of
@@ -223,6 +236,7 @@ impl<'a> Builder<'a> {
             license: self.license.map(PathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
+            product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
         }
     }
@@ -247,6 +261,7 @@ pub struct Execution {
     license: Option<PathBuf>,
     manufacturer: Option<String>,
     output: Option<PathBuf>,
+    product_icon: Option<PathBuf>,
     product_name: Option<String>,
 }
 
@@ -262,6 +277,7 @@ impl Execution {
         debug!("license = {:?}", self.license);
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
+        debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
         let manifest = manifest(self.input.as_ref())?;
         let mut destination = super::destination(self.output.as_ref())?;
@@ -314,6 +330,9 @@ impl Execution {
             warn!("A license file could not be found and it will be excluded from the \
                   installer. A license file can be added manually to the generated WiX Source \
                   (wxs) file using a text editor.");
+        }
+        if let Some(icon) = self.product_icon {
+            map = map.insert_str("product-icon", icon.display().to_string());
         }
         let data = map.build();
         template.render_data(&mut destination, &data).map_err(Error::from)
@@ -536,6 +555,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.output(Some(EXPECTED));
             assert_eq!(actual.output, Some(EXPECTED));
+        }
+
+        #[test]
+        fn product_icon_works() {
+            const EXPECTED: &str = "img\\Product.ico";
+            let mut actual = Builder::new();
+            actual.product_icon(Some(EXPECTED));
+            assert_eq!(actual.product_icon, Some(EXPECTED));
         }
 
         #[test]

@@ -605,6 +605,7 @@ fn main() {
             init.license(m.value_of("license"));
             init.manufacturer(m.value_of("manufacturer"));
             init.output(m.value_of("output"));
+            init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
             init.build().run()
         },
@@ -623,6 +624,7 @@ fn main() {
                     print.license(m.value_of("license"));
                     print.manufacturer(m.value_of("manufacturer"));
                     print.output(m.value_of("output"));
+                    print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
                     print.build().run()
                 },
