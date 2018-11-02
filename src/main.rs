@@ -211,6 +211,7 @@ fn main() {
                installer. The banner image dimensions should be \
                493 x 58 pixels.")
         .long("banner")
+        .short("b")
         .takes_value(true);
     // The binary option for the `init` and `print` subcommands.
     let binary = Arg::with_name("binary")
@@ -219,7 +220,7 @@ fn main() {
               <package-name> is the value from the 'name' field in the '[package]' \
               section of the package's manifest (Cargo.toml).")
         .long("binary")
-        .short("b")
+        .short("B")
         .takes_value(true);
     // The description option for the `init` and `print` subcommands.
     let description = Arg::with_name("description")
@@ -235,6 +236,7 @@ fn main() {
                the installer. The dialog image dimensions should \
                be 493 x 312 pxiels.")
         .long("dialog")
+        .short("D")
         .takes_value(true);
     // The eula option for the `init` and `print` subcommands.
     let eula = Arg::with_name("eula")
@@ -244,7 +246,7 @@ fn main() {
               the 'license' field in the package's manifest (Cargo.toml). An EULA can be enabled \
               later by directly modifying the WiX Source (wxs) file with a text editor.")
         .long("eula")
-        .short("E")
+        .short("e")
         .takes_value(true);
     // The license option for the `init` and `print` subcommands.
     let license = Arg::with_name("license")
@@ -265,7 +267,7 @@ fn main() {
               (Cargo.toml). The help URL can be enabled after initialization by \
               directly modifying the WiX Source (wxs) file with a text editor.")
         .long("url")
-        .short("U")
+        .short("u")
         .takes_value(true);
     // The holder option for the `init` and `print` subcommands
     let holder = Arg::with_name("holder")
@@ -274,7 +276,7 @@ fn main() {
               (Cargo.toml). This is only used when generate a license based on the \
               value of the 'license' field in the package's manifest.")
         .long("holder")
-        .short("H")
+        .short("h")
         .takes_value(true);
     // The manufacturer option for the `init` and `print` subcommands
     let manufacturer = Arg::with_name("manufacturer")
@@ -291,7 +293,7 @@ fn main() {
               in the Add/Remove Programs (ARP) control panel for the installed \
               application.")
         .long("product-icon")
-        .short("P")
+        .short("p")
         .takes_value(true);
     // The product name option for the `init`, `print`, and `sign` subcommands
     let product_name = Arg::with_name("product-name")
@@ -300,7 +302,7 @@ fn main() {
               changed after initialization by directly modifying the WiX Source \
               file (wxs) with a text editor.")
         .long("product-name")
-        .short("p")
+        .short("P")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
     let verbose = Arg::with_name("verbose")
@@ -312,13 +314,13 @@ fn main() {
         .short("v")
         .multiple(true);
     let year = Arg::with_name("year")
-         .help("Sets the copyright year for the license during initialization. The \
-               default is to use the current year. This is only used if a license \
-               is generated from one of the supported licenses based on the value \
-               of the 'license' field in the package's manifest (Cargo.toml).")
-         .short("Y")
-         .long("year")
-         .takes_value(true);
+        .help("Sets the copyright year for the license during initialization. The \
+              default is to use the current year. This is only used if a license \
+              is generated from one of the supported licenses based on the value \
+              of the 'license' field in the package's manifest (Cargo.toml).")
+        .long("year")
+        .short("y")
+        .takes_value(true);
     let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
