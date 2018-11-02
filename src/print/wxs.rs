@@ -24,7 +24,7 @@ use Result;
 use RTF_FILE_EXTENSION;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use Template;
+use super::Template;
 use toml::Value;
 use uuid::Uuid;
 

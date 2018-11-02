@@ -18,7 +18,7 @@ use manifest;
 use mustache::{self, MapBuilder};
 use Result;
 use std::path::PathBuf;
-use Template;
+use super::Template;
 use toml::Value;
 
 /// A builder for creating an execution context to print a license.

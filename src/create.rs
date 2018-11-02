@@ -331,7 +331,6 @@ impl Execution {
         Ok(())
     }
 
-    /// Gets the command for the compiler application (`candle.exe`).
     fn compiler(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.as_ref().map(|s| {
             let mut p = PathBuf::from(s);
