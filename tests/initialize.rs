@@ -546,3 +546,24 @@ fn dialog_works() {
         "//*/wix:WixVariable[@Id='WixUIDialogBmp']/@Value"
     ), package_dialog.path().to_str().unwrap());
 }
+
+#[test]
+fn product_icon_works() {
+    const EXPECTED: &str = "img\\Product.ico";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let package_product_icon = package.child(EXPECTED);
+    env::set_current_dir(package.path()).unwrap();
+    fs::create_dir("img").unwrap();
+    let _product_icon_handle = File::create(package_product_icon.path()).unwrap();
+    let result = Builder::default()
+        .product_icon(package_product_icon.path().to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        "//*/wix:Icon[@Id='ProductICO']/@SourceFile"
+    ), package_product_icon.path().to_str().unwrap());
+}

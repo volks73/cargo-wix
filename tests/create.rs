@@ -51,7 +51,7 @@ fn default_works() {
     initialize::Execution::default().run().unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -92,7 +92,7 @@ fn init_with_package_section_fields_works() {
     initialize::Execution::default().run().unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -129,6 +129,10 @@ fn init_with_all_options_works() {
     {
         let _eula_handle = File::create(package_eula.path()).unwrap();
     }
+    let product_icon_path = package.path().join("img").join("Product.ico");
+    {
+        let _product_icon_handle = File::create(&product_icon_path).unwrap();
+    }
     initialize::Builder::new()
         .banner(banner_path.to_str())
         .binary(bin_example_path.to_str())
@@ -138,13 +142,14 @@ fn init_with_all_options_works() {
         .help_url(Some("http://www.example.com"))
         .license(package_license.path().to_str())
         .manufacturer(Some("Example Manufacturer"))
+        .product_icon(product_icon_path.to_str())
         .product_name(Some("Example Product Name"))
         .build()
         .run()
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -169,7 +174,7 @@ fn init_with_banner_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -194,7 +199,7 @@ fn init_with_binary_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -214,7 +219,7 @@ fn init_with_description_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -239,7 +244,7 @@ fn init_with_dialog_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -264,7 +269,7 @@ fn init_with_eula_in_cwd_works() {
         .expect("Initialization");
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -291,7 +296,7 @@ fn init_with_eula_in_docs_works() {
         .expect("Initialization");
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -311,7 +316,7 @@ fn init_with_help_url_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -336,7 +341,7 @@ fn init_with_license_in_cwd_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -363,7 +368,7 @@ fn init_with_license_in_docs_works() {
         .expect("Initialization");
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -383,7 +388,32 @@ fn init_with_manufacturer_option_works() {
         .unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
+    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
+    package.child(expected_msi_file).assert(predicate::path::exists());
+}
+
+#[test]
+fn init_with_product_icon_option_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!(
+        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+    ));
+    env::set_current_dir(package.path()).unwrap();
+    let product_icon_path = package.path().join("img").join("Product.ico");
+    fs::create_dir(product_icon_path.parent().unwrap()).unwrap();
+    {
+        let _product_icon_handle = File::create(&product_icon_path).unwrap();
+    }
+    initialize::Builder::new()
+        .product_icon(product_icon_path.to_str())
+        .build()
+        .run()
+        .unwrap();
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
@@ -407,7 +437,7 @@ fn init_with_product_name_option_works() {
     println!("{}", wxs_content);
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    assert!(result.is_ok());
+    result.expect("OK result");
     package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
     package.child(expected_msi_file).assert(predicate::path::exists());
 }
