@@ -99,6 +99,7 @@ pub const TARGET_FOLDER_NAME: &str = "target";
 pub const WIX: &str = "wix";
 pub const WIX_COMPILER: &str = "candle";
 pub const WIX_LINKER: &str = "light";
+pub const WIX_OBJECT_FILE_EXTENSION: &str = "wixobj";
 pub const WIX_PATH_KEY: &str = "WIX";
 pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 pub const WIX_SOURCE_FILE_NAME: &str = "main";

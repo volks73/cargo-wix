@@ -26,6 +26,7 @@ use CARGO;
 use Cultures;
 use Error;
 use EXE_FILE_EXTENSION;
+use MSI_FILE_EXTENSION;
 use Platform;
 use Result;
 use semver::Version;
@@ -33,10 +34,12 @@ use std::env;
 use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use TARGET_FOLDER_NAME;
 use toml::Value;
 use WIX;
 use WIX_COMPILER;
 use WIX_LINKER;
+use WIX_OBJECT_FILE_EXTENSION;
 use WIX_PATH_KEY;
 use WIX_SOURCE_FILE_EXTENSION;
 use WIX_SOURCE_FILE_NAME;
@@ -73,60 +76,67 @@ impl<'a> Builder<'a> {
 
     /// Sets the path to the WiX Toolset's `bin` folder.
     ///
-    /// The WiX Toolset's `bin` folder should contain the needed `candle.exe` and `light.exe`
-    /// applications. The default is to use the PATH system environment variable. This will
-    /// override any value obtained from the environment.
+    /// The WiX Toolset's `bin` folder should contain the needed `candle.exe`
+    /// and `light.exe` applications. The default is to use the WIX system
+    /// environment variable that is created during installation of the WiX
+    /// Toolset. This will override any value obtained from the environment.
     pub fn bin_path(&mut self, b: Option<&'a str>) -> &mut Self {
         self.bin_path = b;
         self
     }
 
-    /// Enables or disables capturing of the output from the builder (`cargo`), compiler
-    /// (`candle`), linker (`light`), and signer (`signtool`).
+    /// Enables or disables capturing of the output from the builder (`cargo`),
+    /// compiler (`candle`), linker (`light`), and signer (`signtool`).
     ///
-    /// The default is to capture all output, i.e. display nothing in the console but the log
-    /// statements.
+    /// The default is to capture all output, i.e. display nothing in the
+    /// console but the log statements.
     pub fn capture_output(&mut self, c: bool) -> &mut Self {
         self.capture_output = c;
         self
     }
 
-    /// Sets the culture to use with the linker (light.exe) for building a localized installer.
+    /// Sets the culture to use with the linker (light.exe) for building a
+    /// localized installer.
     pub fn culture(&mut self, c: Cultures) -> &mut Self {
         self.culture = c;
         self
     }
 
-    /// Sets the path to a file to be used as the WiX Source (wxs) file instead of `wix\main.wxs`.
+    /// Sets the path to a file to be used as the WiX Source (wxs) file instead
+    /// of `wix\main.wxs`.
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
     }
 
-    /// Sets the path to a WiX localization file, `.wxl`, for the linker (light.exe).
+    /// Sets the path to a WiX localization file, `.wxl`, for the linker
+    /// (light.exe).
     ///
-    /// The [WiX localization
-    /// file](http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html)
-    /// is an XML file that contains localization strings.
-    pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
+    /// The [WiX localization file] is an XML file that contains localization
+    /// strings.
+    ///
+    /// [WiX localization file]: http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html
+     pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
         self.locale = l;
         self
     }
 
     /// Sets the name.
     ///
-    /// The default is to use the `name` field under the `package` section of the package's
-    /// manifest (Cargo.toml). This overrides that value. An error occurs if the `name` field is
-    /// not found in the manifest.
+    /// The default is to use the `name` field under the `[package]` section of
+    /// the package's manifest (Cargo.toml). This overrides that value.
     ///
-    /// The installer (msi) that is created will be named as "name-major.minor.patch-platform.msi" format,
-    /// where name is the value specified with this method or the value from the `name` field under
-    /// the `package` section, the major.minor.patch is the version number from the package's
-    /// manifest `version` field or the value specified at the command line, and the _platform_ is
-    /// either "i686" or "x86_64" depending on the build environment.
+    /// The installer (msi) that is created will be named in the following
+    /// format: "name-major.minor.patch-platform.msi", where _name_ is the value
+    /// specified with this method or the value from the `name` field under the
+    /// `[package]` section, the _major.minor.patch_ is the version number from
+    /// the package's manifest `version` field or the value specified at the
+    /// command line, and the _platform_ is either "i686" or "x86_64" depending
+    /// on the build environment.
     ///
-    /// This does __not__ change the name of the executable that is installed. The name of the
-    /// executable can be changed by modifying the WiX Source (wxs) file with a text editor.
+    /// This does __not__ change the name of the executable that is installed.
+    /// The name of the executable can be changed by modifying the WiX Source
+    /// (wxs) file with a text editor.
     pub fn name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.name = p;
         self
@@ -134,10 +144,11 @@ impl<'a> Builder<'a> {
 
     /// Skips the building of the project with the release profile.
     ///
-    /// If `true`, the project will _not_ be built using the release profile, i.e. the `cargo build
-    /// --release` command will not be executed. The default is to build the project before each
-    /// creation. This is useful if building the project is more involved or is handled in
-    /// a separate process.
+    /// If `true`, the project will _not_ be built using the release profile,
+    /// i.e. the `cargo build --release` command will not be executed. The
+    /// default is to build the project before each creation. This is useful if
+    /// building the project is more involved or is handled in a separate
+    /// process.
     pub fn no_build(&mut self, n: bool) -> &mut Self {
         self.no_build = n;
         self
@@ -145,9 +156,10 @@ impl<'a> Builder<'a> {
 
     /// Sets the output file.
     ///
-    /// The default is to create a MSI file with the `<product-name>-<version>-<arch>.msi` file
-    /// name and extension in the `target\wix` folder. Use this method to override the destination
-    /// and file name of the Windows installer.
+    /// The default is to create a MSI file with the
+    /// `<product-name>-<version>-<arch>.msi` file name and extension in the
+    /// `target\wix` folder. Use this method to override the destination and
+    /// file name of the Windows installer.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
@@ -155,15 +167,14 @@ impl<'a> Builder<'a> {
 
     /// Sets the version.
     ///
-    /// This overrides the default where the version is obtained from the `version` field of the
-    /// package's manifest (Cargo.toml). The version should be in the "Major.Minor.Patch" notation.
+    /// This overrides the `version` field of the package's manifest
+    /// (Cargo.toml). The version should be in the "Major.Minor.Patch" notation.
     pub fn version(&mut self, v: Option<&'a str>) -> &mut Self {
         self.version = v;
         self
     }
 
-    /// Builds the project using the release profile, creates the installer (msi), and optionally
-    /// signs the output. 
+    /// Builds a context for creating, or building, the installer.
     pub fn build(&mut self) -> Execution {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
@@ -305,7 +316,7 @@ impl Execution {
                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
                     environment variable, the {} system environment variable exists, or use the \
-                    '-B,--bin-path' command line argument.",
+                    '-b,--bin-path' command line argument.",
                     WIX_LINKER,
                     BINARY_FOLDER_NAME,
                     WIX_PATH_KEY
@@ -337,7 +348,7 @@ impl Execution {
                 path.pop(); // Remove the `candle` application from the path
                 Err(Error::Generic(format!(
                     "The compiler application ('{}') does not exist at the '{}' path specified via \
-                    the '-B, --bin-path' command line argument. Please check the path is correct and \
+                    the '-b,--bin-path' command line argument. Please check the path is correct and \
                     the compiler application exists at the path.",
                     WIX_COMPILER,
                     path.display()
@@ -409,7 +420,7 @@ impl Execution {
                 path.pop(); // Remove the 'light' application from the path
                 Err(Error::Generic(format!(
                     "The linker application ('{}') does not exist at the '{}' path specified via \
-                    the '-B,--bin-path' command line argument. Please check the path is correct \
+                    the '-b,--bin-path' command line argument. Please check the path is correct \
                     and the linker application exists at the path.",
                     WIX_LINKER,
                     path.display()
@@ -474,22 +485,28 @@ impl Execution {
         if let Some(ref o) = self.output {
             PathBuf::from(o)
         } else {
-            let mut destination_msi = PathBuf::from("target");
+            let mut destination_msi = PathBuf::from(TARGET_FOLDER_NAME);
             destination_msi.push(WIX);
             // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
             // format, the `set_extension` method will replace the Patch version number and
             // architecture/platform with `msi`. Instead, just include the extension in the formatted
             // name.
-            destination_msi.push(&format!("{}-{}-{}.msi", name, version, platform.arch()));
+            destination_msi.push(&format!(
+                "{}-{}-{}.{}",
+                name,
+                version,
+                platform.arch(),
+                MSI_FILE_EXTENSION
+            ));
             destination_msi
         }
     }
 
     fn source_wixobj(&self) -> PathBuf {
-        let mut source_wixobj = PathBuf::from("target");
+        let mut source_wixobj = PathBuf::from(TARGET_FOLDER_NAME);
         source_wixobj.push(WIX);
         source_wixobj.push(WIX_SOURCE_FILE_NAME);
-        source_wixobj.set_extension("wixobj");
+        source_wixobj.set_extension(WIX_OBJECT_FILE_EXTENSION);
         source_wixobj
     }
 
