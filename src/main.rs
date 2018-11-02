@@ -595,7 +595,7 @@ fn main() {
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
             init.banner(m.value_of("banner"));
-            init.binary(m.value_of("binary-name"));
+            init.binary(m.value_of("binary"));
             init.copyright_holder(m.value_of("holder"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
