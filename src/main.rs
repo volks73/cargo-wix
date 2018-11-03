@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # cargo-wix Binary and Subcommand
+//! # `cargo-wix` Binary and Subcommand
 //!
 //! The goal of the cargo-wix project and the `cargo wix` subcommand is to make
 //! it easy to create a Windows installer (msi) for any Rust project. The
-//! project is primarily implemented as a cargo subcommand, but the core
+//! project is primarily implemented as a [cargo subcommand], but the core
 //! functionality is provided in a library (crate). See the module-level
 //! comments for the [`lib.rs`] file for more information about usage and
-//! organization of the `cargo-wix` crate. The remainder of this documentation
+//! organization of the `wix` crate. The remainder of this documentation
 //! focuses on the usage and features of the `cargo wix` subcommand.
 //!
 //! ## Quick Start
@@ -41,7 +41,7 @@
 //! the `src` folder and the project's manifest (Cargo.toml). The `wix` folder
 //! will contain the WiX Source file (`main.wxs`) that was automatically
 //! generated for the project based the contents of its manifest. The WiX Source
-//! file can be customized using an text editor, and once the file exists, the
+//! file can be customized using a text editor, and once the file exists, the
 //! `cargo wix init` command does not need to be used again.
 //!
 //! The `cargo wix` command uses the `wix\main.wxs` file generated from the
@@ -50,14 +50,14 @@
 //! Windows installer (msi). A variety of artifact files will be created in the
 //! `target\wix` folder. These can be ignored and/or deleted.
 //!
-//! The installer that is created will install the executable file in a `bin`
-//! folder within the destination selected by the user during installation. It
-//! will add a license file to the same folder as the `bin` folder, and it will
-//! add the `bin` folder to the `PATH` system environment variable so that the
+//! The created installer will install the executable file in a `bin` folder
+//! within the destination selected by the user during installation. It will add
+//! a license file to the same folder as the `bin` folder, and it will add the
+//! `bin` folder to the `PATH` system environment variable so that the
 //! executable can be called from anywhere with a commmand prompt. Most of these
-//! behaviors can be adjusted during the installation process of the Windows
-//! installer. The default destination is `C:\Program Files\<project name>`,
-//! where `<project name>` is replaced with the name of the Rust project's name.
+//! behaviors can be adjusted during the installation process. The default
+//! installation destination is `C:\Program Files\<project name>`, where
+//! `<project name>` is replaced with the name of the project's name.
 //!
 //! ## Features
 //!
@@ -73,34 +73,23 @@
 //! location for the WiX Toolset. The value of the `WIX` system environment
 //! variable that is created during installation of the WiX Toolset is a path to
 //! the installation folder that contains the `bin` folder. The `WIX` system
-//! environment variable is used by the `cargo wix` subcommand and library with
-//! the [`std::process::Command`] module to create the installer. The
-//! `-b,--bin-path` option can be used to specify a path (relative or absolute)
-//! to the WiX Toolset `bin` folder. The `-b,--bin-path` option is useful if a
-//! different version of the WiX Toolset needs to be used to create the
-//! installer. The descending order of precedence is: (1) `-b,--bin-path` option
-//! then (2) `WIX` system environment variable. An error will be displayed if
-//! the compiler and/or linker cannot be found.
+//! environment variable is used by the `cargo wix` subcommand with
+//! the [`std::process::Command`] module to create the installer.
 //!
 //! The Windows SDK provides a signer (`signtool`) application for signing
 //! installers. The application is installed in the `bin` folder of the Windows
 //! SDK installation. The location of the `bin` folder varies depending on the
 //! version. It is recommended to use the Developer Prompt to ensure the
-//! `signtool` application is available; however, it is possible to specify the
-//! path to the Windows SDK `bin` folder using the `-b,--bin-path` option for
-//! the `cargo wix sign` subcommand. The descending order of precedence for
-//! locating the signer application is: (1) `-b,--bin-path` option then (2) the
-//! order used by the [`std::process::Command::status`] method. Signing an
-//! installer is optional.
+//! `signtool` application is available. Signing an installer is optional.
 //!
 //! The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A
-//! template is provided with this subcommand that attempts to meet the majority
-//! of use cases for developers, so extensive knowledge of the WiX Toolset and
-//! Windows installer technologies is not required (but always recommended).
-//! Modification of the template is encouraged, but please consult the WiX
-//! Toolset's extensive [documentation] and [tutorials] for information about
-//! writing, customizing, and using wxs files. The documentation here is only
-//! for this subcommand.
+//! template is provided with this binary that attempts to meet the majority
+//! of use cases for developers and avoid requiring extensive knowledge of the
+//! WiX Toolset and Windows installer technologies. Modification of the template
+//! is encouraged, but please consult the WiX Toolset's extensive
+//! [documentation] and [tutorials] for information about writing (authoring),
+//! customizing, and using wxs files. This documentation here is only for this
+//! binary and subcommand.
 //!
 //! The [WXS] template is embedded in the binary installation of the subcommand
 //! and it can be printed to stdout using the `cargo wix print wxs` command from
@@ -116,31 +105,39 @@
 //! a package's manifest (Cargo.toml), a license file in the Rich Text Format
 //! (RTF) is generated from a template and placed in the `wix` folder. This RTF
 //! file is then displayed in the license dialog of the installer. See the help
-//! information on the `print` command for information about supported licenses.
-//! If the `license` field is not used, or the license ID is not supported, then
-//! the EULA is _not_ automatically created during initialization and it will
-//! have to be created manually with a text editor or other authoring tool.
+//! information on the `carge wix print` subcommand:
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix print --help
+//! ```
+//!
+//! for information about supported licenses. If the `license` field is
+//! not used, or the license ID is not supported, then the EULA is _not_
+//! automatically created during initialization and it will have to be created
+//! manually with a text editor or some other authoring tool.
 //!
 //! The `cargo wix init` subcommand uses a combination of the [`license`] and
 //! [`license-file`] fields of the project's manifest (Cargo.toml) to determine
 //! if a [sidecar] license file should be included in the installation folder
-//! along side the `bin` folder. The `license` field appears to be the more
+//! alongside the `bin` folder. The `license` field appears to be the more
 //! commonly used field to describe the licensing for a Rust project and
 //! package, while the `license-file` field is used to specify a custom, or
-//! properitary, license for the project and package. The top three most common
-//! licenses for Rust projects are supported from the `license` field, i.e. MIT,
-//! Apache-2.0, and GPLv3. If any of these three supported open source licenses
-//! are used for the `license` field, then a `License.rtf` file is generated
-//! from an embedded template in the `wix` folder as part of the `cargo wix
-//! init` subcommand. This generated RTF file will be used as a sidecar file and
-//! the End User License Agreement (EULA) that is displayed in the license
-//! dialog of the installer. If the `license-file` field is used and it contains
-//! a path to a file with the `.rtf` extension, then this file will be used as a
-//! sidecar file and the End User License Agreement (EULA). If neither of these
-//! fields exist or contain valid values, then no sidecar file is included in
-//! the installation and no license dialog appears during installation. This
-//! default behavior can be overridden with the `-l,--license` and `-E,--eula`
-//! options for the `cargo wix init` subcommand.
+//! properitary, license. The top three most common licenses for Rust projects
+//! are supported from the `license` field, i.e. MIT, Apache-2.0, and GPLv3. If
+//! any of these three supported open source licenses are used for the `license`
+//! field, then a `License.rtf` file is generated from an embedded template in
+//! the `wix` folder as part of the `cargo wix init` subcommand. This generated
+//! RTF file will be used as a sidecar file and for the End User License
+//! Agreement (EULA) that is displayed in the license dialog of the installer.
+//! If the `license-file` field is used and it contains a path to a file with
+//! the `.rtf` extension, then this file will be used as a sidecar file and the
+//! End User License Agreement (EULA). If neither of these fields exist or
+//! contain valid values, then no sidecar file is included in the installation
+//! and no license dialog appears during installation. This default behavior can
+//! be overridden with the `-l,--license` and `-e,--eula` options for the `cargo
+//! wix init` subcommand.
+//!
+//! ## Flags and Options
 //!
 //! Generally, any value that is obtained from the package's manifest
 //! (Cargo.toml) can be overridden at the command line with an appropriate
@@ -148,24 +145,48 @@
 //! in the Add/Remove Programs (ARP) control panel is obtained from the first
 //! author listed in the `authors` field of a project's manifest, but it can be
 //! overridden using the `-m,--manufacturer` option with the `cargo wix init`
-//! subcommand. The default in most cases is to use a value from a field in the
-//! project's manifest.
+//! subcommand.
+//!
+//! ### `-b,--bin-path`
+//!
+//! The `-b,--bin-path` option can be used to specify a path (relative or
+//! absolute) to the WiX Toolset `bin` folder. The `-b,--bin-path` option is
+//! useful if a different version of the WiX Toolset needs to be used to create
+//! the installer. The descending order of precedence is: (1) `-b,--bin-path`
+//! option then (2) `WIX` system environment variable. An error will be
+//! displayed if the compiler and/or linker cannot be found.
+//!
+//! This option is also avaliable for the `cargo wix sign` subcommand and can be
+//! used to specify a path to the Windows SDK `bin` folder. This can be used to
+//! override default `signtool` application found using the
+//! [`std::process::Command::status`] method.
+//!
+//! ### `-n,--name` and `-P,--product-name`
 //!
 //! The `cargo wix` subcommand uses the package name for the product name. The
 //! default install location is at `C:\Program Files\<Product Name>`, where
 //! `<Product Name>` is replaced with the product name determined from the
 //! package name. This can be overridden with the `-n,--name` option for the
 //! `cargo wix` subcommand or the `-P,--product-name` option for the `cargo wix
-//! init` subcommand. The binary name, which is the `name` field for the
-//! `[[bin]]` section, is used for the executable file name, i.e. "name.exe".
-//! This can also be overridden using the `-B,--binary` option for the `cargo
-//! wix init` subcommand. The package description is used in multiple places for
-//! the installer, including the text that appears in the blue UAC dialog when
-//! using a signed installer. This can be overridden using the
-//! `-d,--description` option with the `cargo wix init` or `cargo wix sign`
-//! subcommands, respectively.
+//! init` subcommand.
 //!
-//! [`lib.rs`]: https://volks73.github.io/cargo-wix/cargo_wix/index.html
+//! ### `-B,--binary`
+//!
+//! The binary name, which is the `name` field for the `[[bin]]` section, is
+//! used for the executable file name, i.e. "name.exe". This can also be
+//! overridden using the `-B,--binary` option for the `cargo wix init`
+//! subcommand. This option takes a relative or absolute path to an executable
+//! file and uses the file name as the binary name.
+//!
+//! ### `-d,--description`
+//!
+//! The package description is used in multiple places for the installer,
+//! including the text that appears in the blue UAC dialog when using a signed
+//! installer. This can be overridden using the `-d,--description` option with
+//! the `cargo wix init` or `cargo wix sign` subcommands, respectively.
+//!
+//! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
+//! [`lib.rs`]: ../wix/index.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [SignTool]: https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
@@ -180,11 +201,11 @@
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
 
-extern crate cargo_wix;
 #[macro_use] extern crate clap;
 extern crate env_logger;
 extern crate log;
 extern crate termcolor;
+extern crate wix;
 
 use clap::{App, Arg, SubCommand};
 use env_logger::Builder;
@@ -192,14 +213,14 @@ use env_logger::fmt::Color as LogColor;
 use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
-use cargo_wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
-use cargo_wix::clean;
-use cargo_wix::create;
-use cargo_wix::initialize;
-use cargo_wix::print;
-use cargo_wix::purge;
-use cargo_wix::sign;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
+use wix::clean;
+use wix::create;
+use wix::initialize;
+use wix::print;
+use wix::purge;
+use wix::sign;
 
 const SUBCOMMAND_NAME: &str = "wix";
 
