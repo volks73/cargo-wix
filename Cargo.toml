@@ -13,10 +13,9 @@ readme = "README.md"
 
 [[bin]]
 name = "cargo-wix"
-doc = false
 
 [lib]
-name = "cargo_wix"
+name = "wix"
 
 [dependencies]
 chrono = "0.4"
