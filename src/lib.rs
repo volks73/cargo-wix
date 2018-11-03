@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! # cargo-wix Library
+//! # `wix` Library
 //!
-//! The goal of the cargo-wix project and the `cargo-wix` crate/library is to
-//! make it easy to create a Windows installer (msi) for any Rust project.
+//! The goal of the cargo-wix project and the `wix` library is to make it easy
+//! to create a Windows installer (msi) for any Rust project. The cargo-wix
+//! project is primarily implemented as a [cargo subcommand], but its core
+//! functionality has been organized into a separate library. Documentation for
+//! the binary and Command Line Interface (CLI) are provided in the module-level
+//! documentation for the [`main.rs`] file and the `cargo wix --help` command.
 //!
 //! ## Usage
 //!
@@ -23,38 +27,30 @@
 //!
 //! ```toml
 //! [dependencies]
-//! cargo-wix = "0.1"
+//! wix = "0.1"
 //! ```
 //!
 //! Next, add this to the `lib.rs` or `main.rs` file for your project:
 //!
 //! ```ignore
-//! extern crate cargo_wix;
+//! extern crate wix;
 //! ```
 //!
-//! Please note the underscore instead of the dash.
-//!
 //! ## Organization
-//!
-//! The cargo-wix project is primarily implemented as a cargo subcommand, but
-//! the core functionality is provided in a library (crate). Documentation for
-//! the binary and Command Line Interface (CLI) are provided with the `cargo wix
-//! --help` command and the module-level comments for the [`main.rs`] source
-//! file.
 //!
 //! Each subcommand is organized into a separate module. So, there is a
 //! `create`, `inititalize`, `print`, etc. module within the crate. Some of the
 //! modules are in a single Rust source file, while others are organized into
-//! sub-folders. Each module follows [Builder] design pattern, so there is a
+//! sub-folders. Each module follows the [Builder] design pattern, so there is a
 //! `Builder` and `Execution` struct for each module/subcommand. The `Builder`
 //! struct is used to customize the execution of the subcommand and builds an
 //! `Execution` struct. The `Execution` struct is responsible for actually
 //! executing the subcommand, which generally involves executing a process with
 //! the [`std::process::Command`] struct, but not always. Each method for the
 //! `Builder` struct generally corresponds to a CLI option or argument found in
-//! the binary [`cargo wix`] subcommand.
+//! the [`cargo wix`] subcommand and binary.
 //!
-//! [`main.rs`]: https://volks73.github.io/cargo-wix/main.html
+//! [`main.rs`]: ../cargo_wix/main.html
 //! [Builder]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 //! [`cargo wix`]: https://volks73.github.io/cargo-wix/main.html
@@ -89,22 +85,63 @@ pub mod purge;
 pub mod sign;
 mod templates;
 
+/// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
+
+/// The file name with extension for a package's manifest.
 pub const CARGO_MANIFEST_FILE: &str = "Cargo.toml";
+
+/// The name of the builder application for a Rust project.
 pub const CARGO: &str = "cargo";
+
+/// The file extension for an executable.
 pub const EXE_FILE_EXTENSION: &str = "exe";
+
+/// The file name without an extension when generating a license.
 pub const LICENSE_FILE_NAME: &str = "License";
+
+/// The file extension for a Windows installer.
 pub const MSI_FILE_EXTENSION: &str = "msi";
+
+/// The file extension for a Rich Text Format (RTF) file.
 pub const RTF_FILE_EXTENSION: &str = "rtf";
+
+/// The name of the signer application from the Windows SDK.
 pub const SIGNTOOL: &str = "signtool";
+
+/// The name of the environment variable to specify the path to the signer
+/// application.
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
+
+/// The name of the folder where output from the builder, compiler, linker, and
+/// signer.
 pub const TARGET_FOLDER_NAME: &str = "target";
+
+/// The default name of the folder for output from this subcommand.
 pub const WIX: &str = "wix";
+
+/// The application name without the file extension of the compiler for the
+/// Windows installer.
 pub const WIX_COMPILER: &str = "candle";
+
+/// The application name without the file extension of the linker for the
+/// Windows installer.
 pub const WIX_LINKER: &str = "light";
+
+/// The file extension for a WiX Toolset object file, which is the output from
+/// the WiX compiler.
 pub const WIX_OBJECT_FILE_EXTENSION: &str = "wixobj";
+
+/// The name of the environment variable installed by the WiX Toolset that
+/// points to the `bin` folder for the compiler and linker.
 pub const WIX_PATH_KEY: &str = "WIX";
+
+/// The file extension of the WiX Source file, which is the input to the WiX
+/// Toolset compiler.
 pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
+
+/// The default file name for the WiX Source file, which is the input to the WiX
+/// Toolset compiler.
 pub const WIX_SOURCE_FILE_NAME: &str = "main";
 
 /// A specialized `Result` type for cargo-wix operations.

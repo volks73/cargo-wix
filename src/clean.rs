@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! The implementation for the `clean` command. This command is focused on
+//! cleaning up build output, similar to the `cargo clean` subcommand.
+
 use CARGO_MANIFEST_FILE;
 use Error;
 use Result;

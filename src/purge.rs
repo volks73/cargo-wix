@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! The implementation for the `purge` command. This command is focused on
+//! removing all files associated with `cargo wix` subcommand.
+
 use CARGO_MANIFEST_FILE;
 use clean;
 use Error;

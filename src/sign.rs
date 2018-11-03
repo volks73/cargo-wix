@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! The implementation for the `sign` command. This command focuses on signing
+//! installers using the Windows SDK `signtool` application.
+
 use BINARY_FOLDER_NAME;
 use Error;
 use EXE_FILE_EXTENSION;

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! The implementation for the `print` command. This command is focused on
+//! printing various templates based on a package's manifest (Cargo.toml) or
+//! end-user input.
+
 pub mod license;
 pub mod wxs;
 
