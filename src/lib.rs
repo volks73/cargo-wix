@@ -144,7 +144,7 @@ pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 /// Toolset compiler.
 pub const WIX_SOURCE_FILE_NAME: &str = "main";
 
-/// A specialized `Result` type for cargo-wix operations.
+/// A specialized `Result` type for wix operations.
 pub type Result<T> = std::result::Result<T, Error>;
 
 fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
