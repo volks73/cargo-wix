@@ -200,7 +200,7 @@ fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<Strin
     }
 }
 
-/// The error type for cargo-wix-related operations and associated traits.
+/// The error type for wix-related operations and associated traits.
 ///
 /// Errors mostly originate from the dependencies, but custom instances of `Error` can be created
 /// with the `Generic` variant and a message.
@@ -276,7 +276,7 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Command(ref command, ref code) => 
+            Error::Command(ref command, ref code) =>
                 write!(f, "The '{}' application failed with exit code = {}. Consider using the \
                        '--nocapture' flag to obtain more information.", command, code),
             Error::Generic(ref msg) => msg.fmt(f),
@@ -293,7 +293,7 @@ impl fmt::Display for Error {
                 }
                 _ => err.fmt(f),
             },
-            Error::Manifest(ref var) => 
+            Error::Manifest(ref var) =>
                 write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
             Error::Mustache(ref err) => err.fmt(f),
             Error::Toml(ref err) => err.fmt(f),
@@ -352,7 +352,7 @@ impl Platform {
     ///
     /// ```rust
     /// extern crate cargo_wix;
-    /// 
+    ///
     /// use cargo_wix::Platform;
     ///
     /// fn main() {
@@ -408,7 +408,7 @@ impl TimestampServer {
         }
     }
 }
- 
+
 impl fmt::Display for TimestampServer {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.url())
