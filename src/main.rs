@@ -227,19 +227,21 @@ const SUBCOMMAND_NAME: &str = "wix";
 fn main() {
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
-        .help("Sets the path to a bitmap (.bmp) image file that \
-               will be displayed across the top of each dialog in the \
-               installer. The banner image dimensions should be \
-               493 x 58 pixels.")
+        .help("The image file for the banner in the installer.")
+        .long_help("Sets the path to a bitmap (.bmp) image file that will be \
+            displayed across the top of each dialog in the installer. The banner \
+            image dimensions should be 493 x 58 pixels.")
         .long("banner")
         .short("b")
         .takes_value(true);
     // The binary option for the `init` and `print` subcommands.
     let binary = Arg::with_name("binary")
-        .help("Overrides the default binary included in the installer. The \
-              default binary is the 'target\\release\\<package name>.exe' file, where \
-              <package-name> is the value from the 'name' field in the '[package]' \
-              section of the package's manifest (Cargo.toml).")
+        .help("Overrides the default binary included in the installer.")
+        .long_help("Sets the path to an executable file that will override the \
+            default binary included in the installer. The default binary is the \
+            'target\\release\\<package name>.exe' file, where <package-name> is the \
+            value from the 'name' field in the '[package]' section of the package's \
+            manifest (Cargo.toml).")
         .long("binary")
         .short("B")
         .takes_value(true);
@@ -290,15 +292,6 @@ fn main() {
         .long("url")
         .short("u")
         .takes_value(true);
-    // The holder option for the `init` and `print` subcommands
-    let holder = Arg::with_name("holder")
-        .help("Sets the copyright holder for the license during initialization. The \
-              default is to use the first author from the package's manifest \
-              (Cargo.toml). This is only used when generate a license based on the \
-              value of the 'license' field in the package's manifest.")
-        .long("holder")
-        .short("h")
-        .takes_value(true);
     // The manufacturer option for the `init` and `print` subcommands
     let manufacturer = Arg::with_name("manufacturer")
         .help("Overrides the first author in the 'authors' field of the package's \
@@ -307,6 +300,15 @@ fn main() {
               modifying the WiX Source file (wxs) with a text editor.")
         .long("manufacturer")
         .short("m")
+        .takes_value(true);
+    // The owner option for the `init` and `print` subcommands
+    let owner = Arg::with_name("owner")
+        .help("Sets the copyright owner for the license during initialization. The \
+               default is to use the first author from the package's manifest \
+               (Cargo.toml). This is only used when generating a license based on the \
+               value of the 'license' field in the package's manifest.")
+        .long("owner")
+        .short("O")
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
@@ -397,7 +399,6 @@ fn main() {
                         .help("Overwrites any existing files that are generated during \
                               initialization. Use with caution.")
                         .long("force"))
-                    .arg(holder.clone())
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
                               not used, then all output from initialization will be placed in \
@@ -412,6 +413,7 @@ fn main() {
                         .long("output")
                         .short("o")
                         .takes_value(true))
+                    .arg(owner.clone())
                     .arg(product_icon.clone())
                     .arg(product_name.clone())
                     .arg(url.clone())
@@ -467,7 +469,6 @@ fn main() {
                     .arg(description)
                     .arg(dialog)
                     .arg(eula)
-                    .arg(holder)
                     .arg(Arg::with_name("INPUT")
                         .help("A package's manifest (Cargo.toml). The selected template will be \
                               printed to stdout or a file based on the field values in this \
@@ -483,6 +484,7 @@ fn main() {
                         .long("output")
                         .short("o")
                          .takes_value(true))
+                    .arg(owner)
                     .arg(product_icon)
                     .arg(product_name.clone())
                     .arg(Arg::with_name("TEMPLATE")
@@ -617,7 +619,7 @@ fn main() {
             let mut init = initialize::Builder::new();
             init.banner(m.value_of("banner"));
             init.binary(m.value_of("binary"));
-            init.copyright_holder(m.value_of("holder"));
+            init.copyright_holder(m.value_of("owner"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
             init.dialog(m.value_of("dialog"));
@@ -653,7 +655,7 @@ fn main() {
                 },
                 t => {
                     let mut print = print::license::Builder::new();
-                    print.copyright_holder(m.value_of("holder"));
+                    print.copyright_holder(m.value_of("owner"));
                     print.copyright_year(m.value_of("year"));
                     print.input(m.value_of("INPUT"));
                     print.output(m.value_of("output"));
