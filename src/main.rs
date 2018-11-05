@@ -201,146 +201,166 @@
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
 
-#[macro_use] extern crate clap;
+#[macro_use]
+extern crate clap;
 extern crate env_logger;
 extern crate log;
 extern crate termcolor;
 extern crate wix;
 
 use clap::{App, Arg, SubCommand};
-use env_logger::Builder;
 use env_logger::fmt::Color as LogColor;
+use env_logger::Builder;
 use log::{Level, LevelFilter};
 use std::error::Error;
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-use wix::{BINARY_FOLDER_NAME, Cultures, Template, WIX_PATH_KEY};
 use wix::clean;
 use wix::create;
 use wix::initialize;
 use wix::print;
 use wix::purge;
 use wix::sign;
+use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
-        .help("The image file for the banner in the installer.")
+        .help("A path to an image file (.bmp) for the installer's banner")
         .long_help("Sets the path to a bitmap (.bmp) image file that will be \
-            displayed across the top of each dialog in the installer. The banner \
-            image dimensions should be 493 x 58 pixels.")
+             displayed across the top of each dialog in the installer. The banner \
+             image dimensions should be 493 x 58 pixels.")
         .long("banner")
         .short("b")
         .takes_value(true);
     // The binary option for the `init` and `print` subcommands.
     let binary = Arg::with_name("binary")
-        .help("Overrides the default binary included in the installer.")
+        .help("A path to an executable file (.exe) for the application")
         .long_help("Sets the path to an executable file that will override the \
-            default binary included in the installer. The default binary is the \
-            'target\\release\\<package name>.exe' file, where <package-name> is the \
-            value from the 'name' field in the '[package]' section of the package's \
-            manifest (Cargo.toml).")
+             default binary included in the installer. The default binary is the \
+             'target\\release\\<package name>.exe' file, where <package-name> is the \
+             value from the 'name' field in the '[package]' section of the package's \
+             manifest (Cargo.toml).")
         .long("binary")
         .short("B")
         .takes_value(true);
     // The description option for the `init` and `print` subcommands.
     let description = Arg::with_name("description")
-        .help("Overrides the 'description' field of the package's manifest (Cargo.toml) \
-              as the description within the installer.")
+        .help("A string describing the application in the installer")
+        .long_help("Overrides the 'description' field of the package's manifest \
+             (Cargo.toml) as the description within the installer. Text with spaces \
+             should be surrounded by double quotes.")
         .long("description")
         .short("d")
         .takes_value(true);
     // The dialog option for the `init` and `print` subcommands.
     let dialog = Arg::with_name("dialog")
-        .help("Sets the path to a bitmap (.bmp) image file that \
-               will be displayed to the left on the first dialog of \
-               the installer. The dialog image dimensions should \
-               be 493 x 312 pxiels.")
+        .help("A path to an image file (.bmp) for the installer's welcome dialog")
+        .long_help("Sets the path to a bitmap (.bmp) image file that will be \
+             displayed to the left on the first dialog of the installer. The dialog \
+             image dimensions should be 493 x 312 pxiels.")
         .long("dialog")
         .short("D")
         .takes_value(true);
     // The eula option for the `init` and `print` subcommands.
     let eula = Arg::with_name("eula")
-        .help("Specifies a RTF file to use as the EULA for the license agreement dialog of the \
-              installer. The default is to disable the license agreement dialog unless one of the \
-              supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the value of \
-              the 'license' field in the package's manifest (Cargo.toml). An EULA can be enabled \
-              later by directly modifying the WiX Source (wxs) file with a text editor.")
+        .help("A path to a RTF file (.rtf) for the installer's license agreement dialog")
+        .long_help("Specifies a Rich Text Format (RTF) file to use as the End \
+             User License Agreement (EULA) for the license agreement dialog of the \
+             installer. The default is to disable the license agreement dialog unless \
+             one of the supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated \
+             based on the value of the 'license' field in the package's manifest \
+             (Cargo.toml). An EULA can be enabled later by directly modifying the WiX \
+             Source (wxs) file with a text editor.")
         .long("eula")
         .short("e")
         .takes_value(true);
     // The license option for the `init` and `print` subcommands.
     let license = Arg::with_name("license")
-        .help("Overrides the 'license-file' field of the package's manifest (Cargo.toml). If an \
-              appropriate license file does not exist, cannot be found, or is not specified, then \
-              no license file is included in the installer. A file containing the license, such as \
-              a TXT, PDF, or RTF file, can be added later by directly editing the generated WiX \
-              Source file (wxs) in a text editor.")
+        .help("A path to any file (.txt, .pdf, .rtf, etc.) to be used as a license")
+        .long_help("Overrides the 'license-file' field or any license generated \
+             from the 'license' field of the package's manifest (Cargo.toml). If an \
+             appropriate license file does not exist, cannot be found, or is not \
+             specified, then no license file is included in the installer or the \
+             installation folder along side the binary. A file containing the \
+             license, such as a TXT, PDF, or RTF file, can be added later by directly \
+             editing the generated WiX Source file (wxs) in a text editor.")
         .long("license")
         .short("l")
         .takes_value(true);
     // The url option for the `init` and `print` subcommands
     let url = Arg::with_name("url")
-        .help("Adds a URL to the installer that will be displayed in the Add/Remove \
-              Programs control panel for the application. The default is to disable \
-              it unless a URL is specified for either the 'homepage', \
-              'documentation', or 'repository' fields in the package's manifest \
-              (Cargo.toml). The help URL can be enabled after initialization by \
-              directly modifying the WiX Source (wxs) file with a text editor.")
-        .long("url")
+        .help("A URL for the Add/Remove Programs control panel's Help Link")
+        .long_help(
+            "Adds a URL to the installer that will be displayed in the \
+             Add/Remove Programs control panel for the application. The default is to \
+             disable it unless a URL is specified for either the 'homepage', \
+             'documentation', or 'repository' fields in the package's manifest \
+             (Cargo.toml). The help URL can be enabled after initialization by \
+             directly modifying the WiX Source (wxs) file with a text editor.",
+        ).long("url")
         .short("u")
         .takes_value(true);
     // The manufacturer option for the `init` and `print` subcommands
     let manufacturer = Arg::with_name("manufacturer")
-        .help("Overrides the first author in the 'authors' field of the package's \
-              manifest (Cargo.toml) as the manufacturer within the installer. The \
-              manufacturer can be changed after initialization by directly \
-              modifying the WiX Source file (wxs) with a text editor.")
+        .help("A string for the Add/Remove Programs control panel's Manufacturer")
+        .long_help("Overrides the first author in the 'authors' field of the \
+             package's manifest (Cargo.toml) as the manufacturer within the \
+             installer. The manufacturer can be changed after initialization by \
+             directly modifying the WiX Source file (wxs) with a text editor.")
         .long("manufacturer")
         .short("m")
         .takes_value(true);
     // The owner option for the `init` and `print` subcommands
     let owner = Arg::with_name("owner")
-        .help("Sets the copyright owner for the license during initialization. The \
-               default is to use the first author from the package's manifest \
-               (Cargo.toml). This is only used when generating a license based on the \
-               value of the 'license' field in the package's manifest.")
+        .help("A string for a generated license's copyright holder")
+        .long_help("Sets the copyright owner for the license during \
+             initialization. The default is to use the first author from the \
+             package's manifest (Cargo.toml). This is only used when generating a \
+             license based on the value of the 'license' field in the package's \
+             manifest.")
         .long("owner")
         .short("O")
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
-        .help("Sets the path to an image file that will be displayed as an icon \
-              in the Add/Remove Programs (ARP) control panel for the installed \
-              application.")
+        .help("A path to an image file (.ico) for the Add/Remove Programs control panel")
+        .long_help("Sets the path to an image file that will be displayed as an \
+             icon in the Add/Remove Programs (ARP) control panel for the installed \
+             application.")
         .long("product-icon")
         .short("p")
         .takes_value(true);
     // The product name option for the `init`, `print`, and `sign` subcommands
     let product_name = Arg::with_name("product-name")
-        .help("Overrides the 'name' field of the package's manifest (Cargo.toml) as \
-              the product name within the installer. The product name can be \
-              changed after initialization by directly modifying the WiX Source \
-              file (wxs) with a text editor.")
+        .help("A string for the Add/Remove Programs control panel's Name")
+        .long_help("Overrides the 'name' field of the package's manifest \
+             (Cargo.toml) as the product name within the installer. The product name \
+             can be changed after initialization by directly modifying the WiX Source \
+             file (wxs) with a text editor.")
         .long("product-name")
         .short("P")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
     let verbose = Arg::with_name("verbose")
-        .help("Sets the level of verbosity. The higher the level of verbosity, the more \
-              information that is printed and logged when the application is executed. \
-              This flag can be specified multiple times, where each occurrance \
-              increases the level and/or details written for each statement.")
+        .help("The verbosity level for logging statements")
+        .long_help("Sets the level of verbosity. The higher the level of \
+             verbosity, the more information that is printed and logged when the \
+             application is executed. This flag can be specified multiple times, \
+             where each occurrance increases the level and/or details written for \
+             each statement.")
         .long("verbose")
         .short("v")
         .multiple(true);
     let year = Arg::with_name("year")
-        .help("Sets the copyright year for the license during initialization. The \
-              default is to use the current year. This is only used if a license \
-              is generated from one of the supported licenses based on the value \
-              of the 'license' field in the package's manifest (Cargo.toml).")
+        .help("A string for a generated license's copyright year")
+        .long_help("Sets the copyright year for the license during \
+             initialization. The default is to use the current year. This is only \
+             used if a license is generated from one of the supported licenses based \
+             on the value of the 'license' field in the package's manifest \
+             (Cargo.toml).")
         .long("year")
         .short("y")
         .takes_value(true);
@@ -352,32 +372,38 @@ fn main() {
                 .version(crate_version!())
                 .about(crate_description!())
                 .arg(Arg::with_name("bin-path")
-                    .help(&format!(
-                        "Specifies the path to the WiX Toolset's '{0}' folder, which should contain \
-                        the needed 'candle.exe' and 'light.exe' applications. The default is to use \
-                        the path specified with the {1} system environment variable that is created \
-                        during the installation of the WiX Toolset. Failing the existence of the \
-                        {1} system environment variable, the path specified in the PATH system \
-                        environment variable is used. This is useful when working with multiple \
-                        versions of the WiX Toolset.",
-                        BINARY_FOLDER_NAME,
-                        WIX_PATH_KEY
-                    ))
-                    .long("bin-path")
-                    .short("b")
-                    .takes_value(true))
+                     .help(&format!(
+                         "A path to the WiX Toolset's '{}' folder",
+                         BINARY_FOLDER_NAME))
+                     .long_help(&format!(
+                         "Specifies the path to the WiX Toolset's '{0}' folder, which should contain \
+                         the needed 'candle.exe' and 'light.exe' applications. The default is to use \
+                         the path specified with the {1} system environment variable that is created \
+                         during the installation of the WiX Toolset. Failing the existence of the \
+                         {1} system environment variable, the path specified in the PATH system \
+                         environment variable is used. This is useful when working with multiple \
+                         versions of the WiX Toolset.",
+                         BINARY_FOLDER_NAME,
+                         WIX_PATH_KEY))
+                     .long("bin-path")
+                     .short("b")
+                     .takes_value(true))
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' folder if it exists.")
                     .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). The 'target\\wix' folder that \
-                              exists alongside the package's manifest will be removed. This is \
-                              optional and the default is to use the current working directory (cwd).")
-                        .index(1)))
+                         .help("A path to a package's manifest (Cargo.toml)")
+                         .long_help("The 'target\\wix' folder that exists \
+                            alongside the package's manifest will be removed. This \
+                            is optional and the default is to use the current \
+                            working directory (cwd).")
+                         .index(1)))
                 .arg(Arg::with_name("culture")
-                    .help("Sets the culture for localization. Use with the '-l,--locale' option. \
-                          See the WixUI localization documentation for more information about \
-                          acceptable culture codes. The codes are case insenstive.")
+                    .help("The culture code for localization")
+                    .long_help("Sets the culture for localization. Use with the \
+                       '-l,--locale' option. See the WixUI localization \
+                       documentation for more information about acceptable culture \
+                       codes. The codes are case insenstive.")
                     .long("culture")
                     .short("c")
                     .default_value(&default_culture)
@@ -396,20 +422,24 @@ fn main() {
                     .arg(dialog.clone())
                     .arg(eula.clone())
                     .arg(Arg::with_name("force")
-                        .help("Overwrites any existing files that are generated during \
-                              initialization. Use with caution.")
+                        .help("Overwrite existing WiX-related files")
+                        .long_help("Overwrites any existing files that are \
+                            generated during initialization. Use with caution.")
                         .long("force"))
                     .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). If the '-o,--output' option is \
-                              not used, then all output from initialization will be placed in \
-                              a 'wix' folder created alongside this path.")
+                        .help("A path to a package's manifest (Cargo.toml)")
+                        .long_help("If the '-o,--output' option is not used, \
+                            then all output from initialization will be placed in a \
+                            'wix' folder created alongside this path.")
                         .index(1))
                     .arg(license.clone())
                     .arg(manufacturer.clone())
                     .arg(Arg::with_name("output")
-                        .help("Sets the destination for all files generated during initialization. \
-                              The default is to create a 'wix' folder within the project then \
-                              generate all files in the 'wix' sub-folder.")
+                        .help("A path to a folder for generated files")
+                        .long_help("Sets the destination for all files \
+                            generated during initialization. The default is to \
+                            create a 'wix' folder within the project then generate \
+                            all files in the 'wix' sub-folder.")
                         .long("output")
                         .short("o")
                         .takes_value(true))
@@ -420,76 +450,92 @@ fn main() {
                     .arg(verbose.clone())
                     .arg(year.clone()))
                 .arg(Arg::with_name("install-version")
-                    .help("Overrides the version from the package's manifest (Cargo.toml), which \
-                          is used for the installer name and appears in the Add/Remove Programs \
-                          control panel.")
+                    .help("A string for the Add/Remove Programs control panel's version number")
+                    .long_help("Overrides the version from the package's manifest \
+                        (Cargo.toml), which is used for the installer name and \
+                        appears in the Add/Remove Programs control panel.")
                     .long("install-version")
                     .short("i")
                     .takes_value(true))
                 .arg(Arg::with_name("locale")
-                    .help("Sets the path to a WiX localization file, '.wxl', which contains \
-                          localized strings.")
+                    .help("A path to a WiX localization file (.wxl)")
+                    .long_help("Sets the path to a WiX localization file, \
+                        '.wxl', which contains localized strings. Use in conjunction \
+                        with the '-C,--culture' option.")
                     .long("locale")
                     .short("l")
                     .takes_value(true))
                 .arg(Arg::with_name("name")
-                    .help("Overrides the package's 'name' field in the manifest (Cargo.toml), which \
-                          is used in the name for the installer. This does not change the name of \
-                          the executable within the installer. The name of the executable can be \
-                          changed by modifying the WiX Source (wxs) file with a text editor.")
+                    .help("A string for the installer's product name")
+                    .long_help("Overrides the package's 'name' field in the \
+                        manifest (Cargo.toml), which is used in the name for the \
+                        installer. This does not change the name of the executable \
+                        within the installer. The name of the executable can be \
+                        changed by modifying the WiX Source (wxs) file with a text \
+                        editor.")
                     .long("name")
                     .short("n")
                     .takes_value(true))
                 .arg(Arg::with_name("no-build")
-                    .help("Skips building the release binary. The installer is created, but the \
-                          'cargo build --release' is not executed.")
+                    .help("Skips building the release binary")
+                    .long_help("The installer is created, but the 'cargo build \
+                        --release' is not executed.")
                     .long("no-build"))
                 .arg(Arg::with_name("no-capture")
-                    .help("By default, this subcommand captures, or hides, all output from the \
-                          builder, compiler, linker, and signer for the binary and Windows \
-                          installer, respectively. Use this flag to show the output.")
+                    .help("Displays all outptu from the builder, compiler, linker, and signer")
+                    .long_help("By default, this subcommand captures, or hides, \
+                        all output from the builder, compiler, linker, and signer \
+                        for the binary and Windows installer, respectively. Use this \
+                        flag to show the output.")
                     .long("nocapture"))
                 .arg(Arg::with_name("output")
-                    .help("Sets the destination file name and path for the created installer. The \
-                          default is to create an installer with the \
-                          '<product-name>-<version>-<arch>.msi' file name in the 'target\\wix' \
-                          folder.")
+                    .help("A path to a folder for generated files")
+                    .long_help("Sets the destination file name and path for the \
+                        created installer. The default is to create an installer \
+                        with the '<product-name>-<version>-<arch>.msi' file name in \
+                        the 'target\\wix' folder.")
                     .long("output")
                     .short("o")
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("print")
                     .version(crate_version!())
-                    .about("Prints a template to stdout or a file. In the case of a license \
-                           template, the output is in the Rich Text Format (RTF) and for a WiX \
-                           Source file (wxs), the output is in XML. New GUIDs are generated for the \
-                           'UpgradeCode' and Path Component each time the 'WXS' template is \
-                           printed. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                    .about("Prints a template to stdout or a file. In the case \
+                        of a license template, the output is in the Rich Text Format \
+                        (RTF) and for a WiX Source file (wxs), the output is in XML. \
+                        New GUIDs are generated for the 'UpgradeCode' and Path \
+                        Component each time the 'WXS' template is printed. [values: \
+                        Apache-2.0, GPL-3.0, MIT, WXS]")
                     .arg(banner)
                     .arg(binary)
                     .arg(description)
                     .arg(dialog)
                     .arg(eula)
                     .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). The selected template will be \
-                              printed to stdout or a file based on the field values in this \
-                              manifest. The default is to use the manifest in the current working \
-                              directory (cwd). An error occurs if a manifest is not found.")
+                        .help("A path to a package's manifest (Cargo.toml)")
+                        .long_help("The selected template will be printed to \
+                            stdout or a file based on the field values in this \
+                            manifest. The default is to use the manifest in the \
+                            current working directory (cwd). An error occurs if a \
+                            manifest is not found.")
                         .index(2))
                     .arg(license)
                     .arg(manufacturer)
                     .arg(Arg::with_name("output")
-                        .help("Sets the destination for printing the template. The default is to \
-                              print/write the rendered template to stdout. If the destination, \
-                              a.k.a. file, does not exist, it will be created.")
+                        .help("A path to a folder for generated files")
+                        .long_help("Sets the destination for printing the \
+                            template. The default is to print/write the rendered \
+                            template to stdout. If the destination, a.k.a. file, \
+                            does not exist, it will be created.")
                         .long("output")
                         .short("o")
-                         .takes_value(true))
+                        .takes_value(true))
                     .arg(owner)
                     .arg(product_icon)
                     .arg(product_name.clone())
                     .arg(Arg::with_name("TEMPLATE")
-                        .help("The template to print. This is required and values are case \
-                              insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                        .help("A name of a template")
+                        .long_help("This is required and values are case \
+                            insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
                         .hide_possible_values(true)
                         .possible_values(&Template::possible_values()
                             .iter()
@@ -502,58 +548,64 @@ fn main() {
                     .arg(verbose.clone()))
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
-                    .about("Deletes the 'target\\wix' and 'wix' folders if they exist. Use with \
-                            caution!")
+                    .about("Deletes the 'target\\wix' and 'wix' folders if they \
+                        exist. Use with caution!")
                     .arg(Arg::with_name("INPUT")
-                        .help("A package's manifest (Cargo.toml). The 'target\\wix' and 'wix' \
-                              folders that exists alongside the package's manifest will be removed. \
-                              This is optional and the default is to use the current working \
-                              directory (cwd).")
+                        .help("A path to a package's manifest (Cargo.toml)")
+                        .long_help("The 'target\\wix' and 'wix' folders that \
+                            exists alongside the package's manifest will be removed. \
+                            This is optional and the default is to use the current \
+                            working directory (cwd).")
                         .index(1)))
                 .subcommand(SubCommand::with_name("sign")
                     .version(crate_version!())
-                    .about("The Windows installer (msi) will be signed using the SignTool \
-                          application available in the Windows 10 SDK. The signtool is invoked with \
-                          the '/a' flag to automatically obtain an appropriate certificate from the \
-                          Windows certificate manager. The default is to also use the Comodo \
-                          timestamp server with the '/t' flag.")
+                    .about("The Windows installer (msi) will be signed using the \
+                        SignTool application available in the Windows 10 SDK. The \
+                        signtool is invoked with the '/a' flag to automatically \
+                        obtain an appropriate certificate from the Windows \
+                        certificate manager. The default is to also use the Comodo \
+                        timestamp server with the '/t' flag.")
                     .arg(Arg::with_name("bin-path")
-                        .help("Specifies the path to the folder containg the 'signtool' application. \
-                              The default is to use the PATH system environment variable to locate the \
-                              application.")
+                        .help("A path to the folder containing the 'signtool' application")
+                        .long_help("The default is to use the PATH system environment \
+                             variable to locate the application.")
                         .long("bin-path")
                         .short("b")
                         .takes_value(true))
                     .arg(Arg::with_name("description")
-                         .help("The information for the extended text of the ACL dialog that \
-                               appears. This will be appended to the product name and delimited by \
-                               a dash, '-'. The default is to use the description from the \
-                               package's manifest (Cargo.toml). This option will override the \
-                               default.")
-                         .long("description")
-                         .short("s")
-                         .takes_value(true))
+                        .help("A string for the extended ACL dialog")
+                        .long_help("The information for the extended text of \
+                            the ACL dialog that appears. This will be appended to \
+                            the product name and delimited by a dash, '-'. The \
+                            default is to use the description from the package's \
+                            manifest (Cargo.toml). This option will override the \
+                            default.")
+                        .long("description")
+                        .short("s")
+                        .takes_value(true))
                     .arg(Arg::with_name("homepage")
-                         .help("The URL to the homepage for the product. This will be displayed in \
-                               the ACL dialog.")
-                         .long("homepage")
-                         .short("U")
-                         .takes_value(true))
+                        .help("A URL for the product's homepage")
+                        .long_help("This will be displayed in the ACL dialog.")
+                        .long("homepage")
+                        .short("U")
+                        .takes_value(true))
                     .arg(Arg::with_name("INPUT")
-                         .help("A package's manifest (Cargo.toml). The installer located in the \
-                               'target\\wix' folder alongside this manifest will be signed based on \
-                               the metadata within the manifest.")
-                         .index(1))
+                        .help("A path to a package's manifest (Cargo.toml)")
+                        .long_help("The installer located in the 'target\\wix' \
+                            folder alongside this manifest will be signed based on \
+                            the metadata within the manifest.")
+                        .index(1))
                     .arg(Arg::with_name("no-capture")
-                         .help("By default, this subcommand captures, or hides, all output from the \
-                               signer. Use this flag to show the output.")
-                         .long("nocapture"))
+                        .help("Display output from the signer")
+                        .long_help("By default, this subcommand captures, or \
+                            hides, all output from the signer. Use this flag to \
+                            show the output.")
+                        .long("nocapture"))
                     .arg(product_name)
                     .arg(Arg::with_name("timestamp")
-                        .help("The alias or URL for the timestamp server used with the 'signtool' to \
-                              sign the installer. This can only be used with the '-s,--sign' flag. \
-                              Either an alias can be used or a URL. Available case-insensitive aliases \
-                              include: Comodo and Verisign.")
+                        .help("An alias or URL to a timestamp server")
+                        .long_help("Either an alias or URL can be used. Aliases \
+                            are case-insenstive. [values: Comodo, Verisign]")
                         .short("t")
                         .long("timestamp")
                         .takes_value(true))
@@ -584,37 +636,41 @@ fn main() {
     // For now, implementing environment variable support is held off and only the verbosity is
     // used to set the log level.
     let mut builder = Builder::new();
-    builder.format(|buf, record| {
-        // This implmentation for a format is copied from the default format implemented for the
-        // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
-        // message and change the colors to match the previous colors used by the `loggerv` crate.
-        let mut level_style = buf.style();
-        let level = record.level();
-        match level {
-            // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
-            // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
-            // same white color.
-            Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
-            Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
-            Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
-            Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
-            Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
-        };
-        let write_level = write!(buf, "{:>5}: ", level_style.value(level));
-        let write_args = writeln!(buf, "{}", record.args());
-        write_level.and(write_args)
-    }).filter(Some("cargo_wix"), match verbosity {
-        0 => LevelFilter::Warn,
-        1 => LevelFilter::Info,
-        2 => LevelFilter::Debug,
-        _ => LevelFilter::Trace,
-    }).init();
+    builder
+        .format(|buf, record| {
+            // This implmentation for a format is copied from the default format implemented for the
+            // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
+            // message and change the colors to match the previous colors used by the `loggerv` crate.
+            let mut level_style = buf.style();
+            let level = record.level();
+            match level {
+                // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
+                // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
+                // same white color.
+                Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
+                Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
+                Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
+                Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
+                Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+            };
+            let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+            let write_args = writeln!(buf, "{}", record.args());
+            write_level.and(write_args)
+        }).filter(
+            Some("cargo_wix"),
+            match verbosity {
+                0 => LevelFilter::Warn,
+                1 => LevelFilter::Info,
+                2 => LevelFilter::Debug,
+                _ => LevelFilter::Trace,
+            },
+        ).init();
     let result = match matches.subcommand() {
         ("clean", Some(m)) => {
             let mut clean = clean::Builder::new();
             clean.input(m.value_of("INPUT"));
             clean.build().run()
-        },
+        }
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
             init.banner(m.value_of("banner"));
@@ -633,7 +689,7 @@ fn main() {
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
             init.build().run()
-        },
+        }
         ("print", Some(m)) => {
             let template = value_t!(m, "TEMPLATE", Template).unwrap();
             match template {
@@ -652,7 +708,7 @@ fn main() {
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
                     print.build().run()
-                },
+                }
                 t => {
                     let mut print = print::license::Builder::new();
                     print.copyright_holder(m.value_of("owner"));
@@ -660,14 +716,14 @@ fn main() {
                     print.input(m.value_of("INPUT"));
                     print.output(m.value_of("output"));
                     print.build().run(t)
-                },
+                }
             }
-        },
+        }
         ("purge", Some(m)) => {
             let mut purge = purge::Builder::new();
             purge.input(m.value_of("INPUT"));
             purge.build().run()
-        },
+        }
         ("sign", Some(m)) => {
             let mut sign = sign::Builder::new();
             sign.bin_path(m.value_of("bin-path"));
@@ -678,7 +734,7 @@ fn main() {
             sign.product_name(m.value_of("product-name"));
             sign.timestamp(m.value_of("timestamp"));
             sign.build().run()
-        },
+        }
         _ => {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
@@ -698,8 +754,11 @@ fn main() {
         Err(e) => {
             {
                 let mut stderr = StandardStream::stderr(ColorChoice::Auto);
-                stderr.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true)).expect("Coloring stderr");
-                write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.description()).expect("Write tag to stderr");
+                stderr
+                    .set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true))
+                    .expect("Coloring stderr");
+                write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.description())
+                    .expect("Write tag to stderr");
                 // This prevents "leaking" the color settings to the console after the
                 // sub-command/application has completed and ensures the message is not printed in
                 // Red.
@@ -708,8 +767,12 @@ fn main() {
                 //
                 // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47)
                 // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
-                stderr.reset().expect("Revert color settings after printing the tag");
-                stderr.set_color(ColorSpec::new().set_fg(Some(Color::White)).set_bold(false)).expect("Coloring stderr");
+                stderr
+                    .reset()
+                    .expect("Revert color settings after printing the tag");
+                stderr
+                    .set_color(ColorSpec::new().set_fg(Some(Color::White)).set_bold(false))
+                    .expect("Coloring stderr");
                 writeln!(&mut stderr, "{}", e).expect("Write message to stderr");
                 // This prevents "leaking" the color settings to the console after the
                 // sub-command/application has completed.
@@ -718,10 +781,11 @@ fn main() {
                 //
                 // - [Issue #47](https://github.com/volks73/cargo-wix/issues/47)
                 // - [Issue #48](https://github.com/volks73/cargo-wix/issues/48).
-                stderr.reset().expect("Revert color settings after printing the message");
+                stderr
+                    .reset()
+                    .expect("Revert color settings after printing the message");
             }
             std::process::exit(e.code());
         }
     }
 }
-
