@@ -390,7 +390,8 @@ fn main() {
                      .takes_value(true))
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
-                    .about("Deletes the 'target\\wix' folder if it exists.")
+                    .about("Deletes the 'target\\wix' folder")
+                    .long_about("Deletes the 'target\\wix' folder if it exists.")
                     .arg(Arg::with_name("INPUT")
                          .help("A path to a package's manifest (Cargo.toml)")
                          .long_help("The 'target\\wix' folder that exists \
@@ -410,7 +411,8 @@ fn main() {
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
                     .version(crate_version!())
-                    .about("Uses a package's manifest (Cargo.toml) to generate a WiX Source (wxs) \
+                    .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
+                    .long_about("Uses a package's manifest (Cargo.toml) to generate a WiX Source (wxs) \
                            file that can be used immediately without modification to create an \
                            installer for the package. This will also generate an EULA in the Rich \
                            Text Format (RTF) if the 'license' field is specified with a supported \
@@ -499,7 +501,8 @@ fn main() {
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("print")
                     .version(crate_version!())
-                    .about("Prints a template to stdout or a file. In the case \
+                    .about("Prints a template")
+                    .long_about("Prints a template to stdout or a file. In the case \
                         of a license template, the output is in the Rich Text Format \
                         (RTF) and for a WiX Source file (wxs), the output is in XML. \
                         New GUIDs are generated for the 'UpgradeCode' and Path \
@@ -548,7 +551,8 @@ fn main() {
                     .arg(verbose.clone()))
                 .subcommand(SubCommand::with_name("purge")
                     .version(crate_version!())
-                    .about("Deletes the 'target\\wix' and 'wix' folders if they \
+                    .about("Deletes the 'target\\wix' and 'wix' folders")
+                    .long_about("Deletes the 'target\\wix' and 'wix' folders if they \
                         exist. Use with caution!")
                     .arg(Arg::with_name("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
@@ -559,7 +563,8 @@ fn main() {
                         .index(1)))
                 .subcommand(SubCommand::with_name("sign")
                     .version(crate_version!())
-                    .about("The Windows installer (msi) will be signed using the \
+                    .about("Signs an installer")
+                    .long_about("The Windows installer (msi) will be signed using the \
                         SignTool application available in the Windows 10 SDK. The \
                         signtool is invoked with the '/a' flag to automatically \
                         obtain an appropriate certificate from the Windows \
