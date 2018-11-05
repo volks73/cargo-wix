@@ -22,6 +22,13 @@
 //! organization of the `wix` crate. The remainder of this documentation
 //! focuses on the usage and features of the `cargo wix` subcommand.
 //!
+//! ## Table of Contents
+//!
+//! - [Quick Start](#quick-start)
+//! - [Examples](#examples)
+//! - [Features](#features)
+//! - [Flags and Options](#flags-and-options)
+//!
 //! ## Quick Start
 //!
 //! Ensure the [WiX Toolset] is installed and a `WIX` system environment
@@ -58,6 +65,34 @@
 //! behaviors can be adjusted during the installation process. The default
 //! installation destination is `C:\Program Files\<project name>`, where
 //! `<project name>` is replaced with the name of the project's name.
+//!
+//! ## Examples
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix init
+//! ```
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix
+//! ```
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix Path\to\WiX\Source\File.wxs
+//! ```
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix print WXS > example.wxs
+//! C:\Path\to\Project> cargo wix example.wxs
+//! ```
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix sign
+//! ```
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix -h
+//! C:\Path\to\Project> cargo wix --help
+//! ```
 //!
 //! ## Features
 //!
