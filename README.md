@@ -13,7 +13,7 @@ Start a command prompt (cmd.exe) and then execute the following commands:
 ```dos
 C:\>cargo install cargo-wix
 C:\>cd Path\To\Project
-C:\Path\To\Project\>cargo wix init
+C:\Path\To\Project\>cargo wix --init
 C:\Path\To\Project\>cargo wix
 ```
 
@@ -39,7 +39,7 @@ C:\> cargo install cargo-wix
 Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
 
 ```dos
-C:\Path\to\Project> cargo wix init
+C:\Path\to\Project> cargo wix --init
 ```
 
 This will create the `wix` folder in the project's root (along side the `Cargo.toml` file) and then it will create the `wix\main.wxs` file from the WiX Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file can be used without modification with the following command to create an installer for the project:
