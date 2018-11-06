@@ -844,35 +844,34 @@ fn main() {
     // For now, implementing environment variable support is held off and only the verbosity is
     // used to set the log level.
     let mut builder = Builder::new();
-    builder
-        .format(|buf, record| {
-            // This implmentation for a format is copied from the default format implemented for the
-            // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
-            // message and change the colors to match the previous colors used by the `loggerv` crate.
-            let mut level_style = buf.style();
-            let level = record.level();
-            match level {
-                // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
-                // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
-                // same white color.
-                Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
-                Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
-                Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
-                Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
-                Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
-            };
-            let write_level = write!(buf, "{:>5}: ", level_style.value(level));
-            let write_args = writeln!(buf, "{}", record.args());
-            write_level.and(write_args)
-        }).filter(
-            Some("cargo_wix"),
-            match verbosity {
-                0 => LevelFilter::Warn,
-                1 => LevelFilter::Info,
-                2 => LevelFilter::Debug,
-                _ => LevelFilter::Trace,
-            },
-        ).init();
+    builder.format(|buf, record| {
+        // This implmentation for a format is copied from the default format implemented for the
+        // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
+        // message and change the colors to match the previous colors used by the `loggerv` crate.
+        let mut level_style = buf.style();
+        let level = record.level();
+        match level {
+            // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
+            // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
+            // same white color.
+            Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
+            Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
+            Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
+            Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
+            Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+        };
+        let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+        let write_args = writeln!(buf, "{}", record.args());
+        write_level.and(write_args)
+    }).filter(
+        Some("wix"),
+        match verbosity {
+            0 => LevelFilter::Warn,
+            1 => LevelFilter::Info,
+            2 => LevelFilter::Debug,
+            _ => LevelFilter::Trace,
+        },
+    ).init();
     let result = match matches.subcommand() {
         ("clean", Some(m)) => {
             let mut clean = clean::Builder::new();
