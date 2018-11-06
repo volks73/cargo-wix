@@ -36,7 +36,7 @@ C:\> cargo install cargo-wix
 
 ## Usage
 
-Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
+Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
 
 ```dos
 C:\Path\to\Project> cargo wix init

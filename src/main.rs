@@ -68,31 +68,181 @@
 //!
 //! ## Examples
 //!
+//! All of the following examples use the native Command Prompt (cmd.exe) for
+//! the Windows OS; however, the [Developer Prompt] installed with the [VC Build
+//! Tools] is recommended. The [git bash] terminal can also be used. Begin each
+//! example by staring the appropriate prompt and navigating to the root folder
+//! of the Rust project. The `cargo wix` subcommand and binary assumes the
+//! current working directory (cwd) is the project, a.k.a. package, root folder,
+//! i.e. the same folder as the package's manifest (Cargo.toml).
+//!
+//! Let's create a basic project with Cargo and then an installer.
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo init --bin --vcs none --name example
+//! ```
+//!
+//! This will create a simple binary package named "example" without any verison
+//! control. While the `cargo wix` subcommand and binary does work with
+//! libraries (crates) in addition to binaries (application), generally an
+//! installer is needed for a binary (application) not a library. Rust libraries
+//! are generally distributed to uses through Cargo and [crates.io] and do not
+//! need an installer. The package's manifest should look like the following,
+//! but with your name and email address for the `authors` field:
+//!
+//! ```toml
+//! [package]
+//! name = "example"
+//! version = "0.1.0"
+//! authors = ["First Last <first.last@example.com>"]
+//!
+//! [dependencies]
+//! ```
+//!
+//! The next step is to create the WiX Source (wxs) file, which is needed to
+//! create the installer for the project.
+//!
 //! ```dos
 //! C:\Path\to\Project> cargo wix init
 //! ```
+//!
+//! This will create a `wix` folder with the `main.wxs` file:
+//!
+//! ```dos
+//! C:\Path\to\Project> dir
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>        .
+//! mm/DD/YYYY HH:MM AM    <DIR>        ..
+//! mm/DD/YYYY HH:MM AM             122 Cargo.toml
+//! mm/DD/YYYY HH:MM AM    <DIR>        src
+//! mm/DD/YYYY HH:MM AM    <DIR>        wix
+//!               1 File(s)          122 bytes
+//!               4 Dir(s)  ############# bytes free
+//!
+//! C:\Path\to\Project> dir wix
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>        .
+//! mm/DD/YYYY HH:MM AM    <DIR>        ..
+//! mm/DD/YYYY HH:MM AM           8,849 main.wxs
+//!               1 File(s)        8,849 bytes
+//!               2 Dir(s)  ############# bytes free
+//!
+//! ```
+//!
+//! Do not be concerned if the dates, times, and bytes are different.
+//! Importantly, the `wix` folder and the `main.wxs` file exist. Now an
+//! installer can be created:
 //!
 //! ```dos
 //! C:\Path\to\Project> cargo wix
 //! ```
 //!
-//! ```dos
-//! C:\Path\to\Project> cargo wix Path\to\WiX\Source\File.wxs
-//! ```
+//! This may take a moment to complete as the `cargo wix` subcommand will build
+//! the application with the _Release_ target and then build the installer. The
+//! installer will be located in the `target\wix` folder.
 //!
 //! ```dos
-//! C:\Path\to\Project> cargo wix print WXS > example.wxs
-//! C:\Path\to\Project> cargo wix example.wxs
+//! C:\Path\to\Project> dir target\wix
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>          .
+//! mm/DD/YYYY HH:MM AM    <DIR>          ..
+//! mm/DD/YYYY HH:MM AM           327,680 example-0.1.0-x86_64.msi
+//! mm/DD/YYYY HH:MM AM           344,108 example-0.1.0-x86_64.wixpdb
+//! mm/DD/YYYY HH:MM AM            12,242 main.wixobj
+//!               3 File(s)        684,030 bytes
+//!               2 Dir(s)  ############### bytes free
+//!
 //! ```
 //!
-//! ```dos
-//! C:\Path\to\Project> cargo wix sign
+//! Again, do not be concerned if the dates, times, and numbers are different.
+//! Importantly, an installer (.msi) exists for the application. The
+//! `example-0.1.0-x86_54.wixpdb` and `main.wixobj` files are artifacts of the
+//! installer build process and can be ignored and/or deleted.
+//!
+//! The installer that is created with the above steps and commands will install
+//! the `example.exe` file to `C:\Program Files\example\bin\example.exe`. It
+//! will also add the `C:\Program Files\example\bin` path to the `PATH` system
+//! environment variable, unless this feature is disabled during the
+//! installation process from the Custom Setup dialog. The default welcome
+//! screen, banner, and icons from the WiX Toolset's default UI component will
+//! be used. A license dialog will _not_ appear for this installer.
+//!
+//! The installer that is created for the previous example is relatively simple,
+//! but so is the application and package. It would be nice to have a license
+//! dialog appear in the installer that allows the end-user to review and
+//! acknowledge the End User License Agreement (EULA). It would also be nice to
+//! have this same license appear in the installation folder for the application
+//! so end-users can review it even after installation.
+//!
+//! The license agreement dialog for a WiX Toolset created installer must be in
+//! the [Rich Text Format] (.rtf). The majority of Rust binaries and libraries
+//! are developed and distributed with an open source license. We will do the
+//! same for the example binary here and use the GPL-3.0 license. Creating a RTF
+//! version of the GPL-3.0 requires a third-party tool, such as [WordPad], which
+//! is freely available with any Windows distribution, [Microsoft Office],
+//! [LibreOffice], or any number of freely available text editors, word
+//! processors, or document conversion tools. Luckily, the `cargo wix`
+//! subcommand and binary has a RTF version of the GPL-3.0 license available and
+//! eliminates the need to install, pay, and learn another tool to create the
+//! EULA.
+//!
+//! First, open the package's manifest (Cargo.toml) in a text editor, like
+//! [Microsoft Notepad], and add the [`license`] field to the `package`
+//! section with the `GPL-3.0` value:
+//!
+//! ```toml
+//! [package]
+//! name = "example"
+//! version = "0.1.0"
+//! authors = ["First Last <first.last@example.com>"]
+//! license = "GPL-3.0"
+//!
+//! [dependencies]
 //! ```
 //!
+//! Save the package's manifest and exit the text editor. Now, we can create a
+//! `wix\main.wxs` file that will include the license dialog with a GPL-3.0
+//! EULA.
+//!
 //! ```dos
-//! C:\Path\to\Project> cargo wix -h
-//! C:\Path\to\Project> cargo wix --help
+//! C:\Path\to\Project> cargo wix init --force
+//! C:\Path\to\Project> dir wix
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>         .
+//! mm/DD/YYYY HH:MM AM    <DIR>         ..
+//! mm/DD/YYYY HH:MM AM    <DIR>  37,354 License.rtf
+//! mm/DD/YYYY HH:MM AM            8,849 main.wxs
+//!               2 File(s)        45,356 bytes
+//!               2 Dir(s)  ############## bytes free
+//!
+//! C:\Path\to\Project> cargo wix
 //! ```
+//!
+//! The `--force` flag is needed so that the existing `wix\main.wxs` is
+//! overwritten with the new EULA-enabled `wix\main.wxs` file. Notice there is
+//! now `License.rtf` file in the `wix` folder. This will be used as the EULA in
+//! the license agreement dialog for the installer and be included in the
+//! installation folder with the binary.
+//!
+//! A side note, while version control has been disabled for the examples, it is
+//! best practice to include installer-related files in version control; thus,
+//! the `wix\main.wxs` and `wix\License.rtf` should be added to version control.
 //!
 //! ## Features
 //!
@@ -184,6 +334,9 @@
 //!
 //! ### `-b,--bin-path`
 //!
+//! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
+//! subcommands.
+//!
 //! The `-b,--bin-path` option can be used to specify a path (relative or
 //! absolute) to the WiX Toolset `bin` folder. The `-b,--bin-path` option is
 //! useful if a different version of the WiX Toolset needs to be used to create
@@ -196,16 +349,10 @@
 //! override default `signtool` application found using the
 //! [`std::process::Command::status`] method.
 //!
-//! ### `-n,--name` and `-P,--product-name`
-//!
-//! The `cargo wix` subcommand uses the package name for the product name. The
-//! default install location is at `C:\Program Files\<Product Name>`, where
-//! `<Product Name>` is replaced with the product name determined from the
-//! package name. This can be overridden with the `-n,--name` option for the
-//! `cargo wix` subcommand or the `-P,--product-name` option for the `cargo wix
-//! init` subcommand.
-//!
 //! ### `-B,--binary`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
 //!
 //! The binary name, which is the `name` field for the `[[bin]]` section, is
 //! used for the executable file name, i.e. "name.exe". This can also be
@@ -215,26 +362,47 @@
 //!
 //! ### `-d,--description`
 //!
+//! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
+//! and _sign_ (`cargo wix sign`) subcommands.
+//!
 //! The package description is used in multiple places for the installer,
 //! including the text that appears in the blue UAC dialog when using a signed
 //! installer. This can be overridden using the `-d,--description` option with
 //! the `cargo wix init` or `cargo wix sign` subcommands, respectively.
 //!
-//! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
-//! [`lib.rs`]: ../wix/index.html
-//! [WiX Toolset]: http://wixtoolset.org
-//! [SignTool]: https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx
-//! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
-//! [Rust]: https://www.rust-lang.org
+//! ### `-n,--name`
+//!
+//! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! ### `-P,--product-name`
+//!
+//! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
+//! and _sign_ (`cargo wix sign`) subcommands.
+//!
 //! [Cargo]: https://crates.io
-//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-//! [`std::process::Command::status`]: https://doc.rust-lang.org/std/process/struct.Command.html#method.status
+//! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
+//! [crates.io]: https://crates.io
+//! [Developer Prompt]: https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx
 //! [documentation]: http://wixtoolset.org/documentation/
-//! [tutorials]: https://www.firegiant.com/wix/tutorial/
-//! [WXS]: https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache
+//! [git bash]: https://gitforwindows.org/
+//! [`lib.rs`]: ../wix/index.html
+//! [LibreOffice]: https://www.libreoffice.org/
 //! [`license`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
+//! [Microsoft Office]: https://products.office.com/en-us/home
+//! [Microsoft Notepad]: https://en.wikipedia.org/wiki/Microsoft_Notepad
+//! [Rich Text Format]: https://en.wikipedia.org/wiki/Rich_Text_Format
+//! [Rust]: https://www.rust-lang.org
 //! [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
+//! [SignTool]: https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx
+//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
+//! [`std::process::Command::status`]: https://doc.rust-lang.org/std/process/struct.Command.html#method.status
+//! [tutorials]: https://www.firegiant.com/wix/tutorial/
+//! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
+//! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+//! [WiX Toolset]: http://wixtoolset.org
+//! [WordPad]: https://en.wikipedia.org/wiki/WordPad
+//! [WXS]: https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache
 
 #[macro_use]
 extern crate clap;
@@ -621,13 +789,13 @@ fn main() {
                             manifest (Cargo.toml). This option will override the \
                             default.")
                         .long("description")
-                        .short("s")
+                        .short("d")
                         .takes_value(true))
                     .arg(Arg::with_name("homepage")
                         .help("A URL for the product's homepage")
                         .long_help("This will be displayed in the ACL dialog.")
                         .long("homepage")
-                        .short("U")
+                        .short("u")
                         .takes_value(true))
                     .arg(Arg::with_name("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
