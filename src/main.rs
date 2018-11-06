@@ -104,9 +104,15 @@
 //!
 //! ```dos
 //! C:\Path\to\Project> cargo wix init
+//!  WARN: A description was not specified at the command line or in the package's manifest (Cargo.toml). The description can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!  WARN: An EULA was not specified at the command line, a RTF license file was not specified in the package manifest's (Cargo.toml) 'license-file' field, or the license ID from the pacakge manifest's 'license' field is not recognized. The license agreement dialog will be excluded from the installer. An EULA can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!  WARN: A help URL could not be found and it will be excluded from the installer. A help URL can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!  WARN: A license file could not be found and it will be excluded from the installer. A license file can be added manually to the generated WiX Source (wxs) file using a text editor.
 //! ```
 //!
-//! This will create a `wix` folder with the `main.wxs` file:
+//! The warnings can be ignored for the time being and they will be addressed in
+//! subsequent examples. The above command will create a `wix` folder with the
+//! `main.wxs` file:
 //!
 //! ```dos
 //! C:\Path\to\Project> dir
@@ -218,6 +224,9 @@
 //!
 //! ```dos
 //! C:\Path\to\Project> cargo wix init --force
+//!  WARN: A description was not specified at the command line or in the package's manifest (Cargo.toml). The description can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!  WARN: A help URL could not be found and it will be excluded from the installer. A help URL can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!
 //! C:\Path\to\Project> dir wix
 //!  Volume in drive C is Files
 //!  Volume Serial number is ####-####
@@ -235,10 +244,11 @@
 //! ```
 //!
 //! The `--force` flag is needed so that the existing `wix\main.wxs` is
-//! overwritten with the new EULA-enabled `wix\main.wxs` file. Notice there is
-//! now `License.rtf` file in the `wix` folder. This will be used as the EULA in
-//! the license agreement dialog for the installer and be included in the
-//! installation folder with the binary.
+//! overwritten with the new EULA-enabled `wix\main.wxs` file. The majority of
+//! the warnings have also been addressed. Notice there is now `License.rtf`
+//! file in the `wix` folder. This will be used as the EULA in the license
+//! agreement dialog for the installer and be included in the installation
+//! folder with the binary.
 //!
 //! A side note, while version control has been disabled for the examples, it is
 //! best practice to include installer-related files in version control; thus,
