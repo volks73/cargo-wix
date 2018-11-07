@@ -254,6 +254,86 @@
 //! best practice to include installer-related files in version control; thus,
 //! the `wix\main.wxs` and `wix\License.rtf` should be added to version control.
 //!
+//! Let's fix the remaining warnings. Both of the remaining warnings can be
+//! resolved in multiple ways. The first is to use the options available for the
+//! `cargo wix init` subcommmand following the previous example project:
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix init --force -d "This is a description" -u http://www.example.com
+//!
+//! C:\Path\to\Project> dir wix
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>         .
+//! mm/DD/YYYY HH:MM AM    <DIR>         ..
+//! mm/DD/YYYY HH:MM AM    <DIR>  37,354 License.rtf
+//! mm/DD/YYYY HH:MM AM            7,670 main.wxs
+//!               2 File(s)        45,033 bytes
+//!               2 Dir(s)  ############## bytes free
+//!
+//! C:\Path\to\Project> cargo wix
+//! ```
+//!
+//! Again, do not worry if the dates, times, and numbers are different, but
+//! notice how the warnings for the description and help URL have disappeared.
+//! The `-d,--description` option for the `cargo wix init` command adds a
+//! description for the installer. Similarly, the `-u,--url` option adds help
+//! URL. The `--force` flag is still needed to overwrite the previous
+//! `wix\main.wxs` file.
+//!
+//! Another possibility is to add the `description` and `homepage` fields to the
+//! package's manifest (Cargo.toml), and then initialize and create the
+//! installer. The cargo-wix binary and subcommand will use these fields, among
+//! others, to automatically include the values into the installer. The
+//! `-d,--description` and `-u,--url` options can still be used to override the
+//! values from the package's manifest. This can be useful if the contents of
+//! the installer might need different or more description than the package.
+//!
+//! Following from the previous example, open the package's manifest
+//! (Cargo.toml) in a text editor, like [Microsoft Notepad], and add the
+//! [`description`] and [`homepage`] fields to the `package` section:
+//!
+//! ```toml
+//! [package]
+//! name = "example"
+//! version = "0.1.0"
+//! authors = ["First Last <first.last@example.com>"]
+//! license = "GPL-3.0"
+//! description = "This is a description"
+//! homepage = "http://www.example.com"
+//!
+//! [dependencies]
+//! ```
+//!
+//! Save the package's manifest and exit the text editor. Now, we can create a
+//! `wix\main.wxs` file witout any warnings and uses the description and
+//! homepage from the package's manifest:
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix init --force
+//!
+//! C:\Path\to\Project> dir wix
+//!  Volume in drive C is Files
+//!  Volume Serial number is ####-####
+//!
+//!  Directory of C:\Path\to\Project
+//!
+//! mm/DD/YYYY HH:MM AM    <DIR>         .
+//! mm/DD/YYYY HH:MM AM    <DIR>         ..
+//! mm/DD/YYYY HH:MM AM    <DIR>  37,354 License.rtf
+//! mm/DD/YYYY HH:MM AM            7,670 main.wxs
+//!               2 File(s)        45,033 bytes
+//!               2 Dir(s)  ############## bytes free
+//!
+//! C:\Path\to\Project> cargo wix
+//! ```
+//!
+//! The [`documentation`] and [`repository`] fields can be used instead of the
+//! [`homepage`] field for the help URL, too.
+//!
 //! ## Features
 //!
 //! The cargo-wix binary, and related `cargo wix` subcommand, use the WiX
@@ -342,6 +422,22 @@
 //! overridden using the `-m,--manufacturer` option with the `cargo wix init`
 //! subcommand.
 //!
+//! Use the `-h,--help` flag with each subcommand to get a full list of options
+//! and flags that are available. The short flag, `-h`, will print a condensed
+//! version of each flag and option for the subcommand, while the long flag,
+//! `--help`, will print a detailed help for each flag and option. The rest of
+//! this section is a list of all flags and options implemented for all
+//! subcommands.
+//!
+//! ### `-b,--banner`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! Sets the path to a bitmap (.bmp) image file that will be displayed across
+//! the top of each dialog in the installer. The banner image dimensions should
+//! be 493 x 58 pixels.
+//!
 //! ### `-b,--bin-path`
 //!
 //! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
@@ -370,6 +466,10 @@
 //! subcommand. This option takes a relative or absolute path to an executable
 //! file and uses the file name as the binary name.
 //!
+//! ### `-c,--culture`
+//!
+//! Available for the _default_ (`cargo wix`) subcommand.
+//!
 //! ### `-d,--description`
 //!
 //! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
@@ -380,27 +480,145 @@
 //! installer. This can be overridden using the `-d,--description` option with
 //! the `cargo wix init` or `cargo wix sign` subcommands, respectively.
 //!
+//! ### `-D,--dialog`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! Sets the path to a bitmap (.bmp) image file that will be displayed to the
+//! left on the first dialog of the installer. The dialog image dimensions
+//! should be 493 x 312 pixels. The first dialog is known as the "Welcome"
+//! dialog.
+//!
+//! ### `-e,--eula`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! ### `--force`
+//!
+//! Available for the _init_ (`cargo wix init`) subcommand.
+//!
+//! Forces overriding of generated files from the _init_ subcommand. Use with
+//! caution! This cannot be undone.
+//!
+//! ### -h,--help
+//!
+//! Available for all subcommands.
+//!
+//! The short flag, `-h`, will print a condensed version of the help text, while
+//! the long flag, `--help`, will print a more detailed version of the help
+//! text.
+//!
+//! ### -u,--homepage
+//!
+//! Available for the _sign_ (`cargo wix sign`) subcommand.
+//!
+//! ### `-i,--install-version`
+//!
+//! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! ### `-l,--license`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! ### `-l,--locale`
+//!
+//! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! ### `-m,--manufacturer`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
 //! ### `-n,--name`
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! ### --no-build
+//!
+//! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! This skips building the Rust package using Cargo for the Release target.
+//!
+//! ### --nocapture
+//!
+//! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
+//! subcommands.
+//!
+//! Displays all output from the builder (Cargo), compiler (candle.exe), linker
+//! (light.exe), and signer (signtool.exe) applications.
+//!
+//! ### `-o,--output`
+//!
+//! Available for the _default_ (`cargo wix`), _init_ (`cargo wix init`) and
+//! _print_ (`cargo wix print`) subcommands.
+//!
+//! ### `-O,--owner`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! ### `-p,--product-icon`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
 //!
 //! ### `-P,--product-name`
 //!
 //! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
 //! and _sign_ (`cargo wix sign`) subcommands.
 //!
+//! ### `-t,--timestamp`
+//!
+//! Available for the _sign_ (`cargo wix sign`) subcommand.
+//!
+//! An alias or URL to a timestamp server when signing an installer with a
+//! certificate. Valid aliases are: `Comodo` and `Versign`, which are case
+//! insenstive.
+//!
+//! ### `-u,--url`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! ### `-V,--version`
+//!
+//! Available for all subcommands.
+//!
+//! Prints the cargo-wix binary and subcommand version.
+//!
+//! ### `-v,--verbose`
+//!
+//! Available for all subcommands.
+//!
+//! Increases the level of logging statements based on occurance count of the
+//! flag. The more `-v,--verbose` flags used, the more logging statements that
+//! will be printed during execution of a subcommand. When combined with the
+//! `--nocapture` flag, this is useful for debugging and testing.
+//!
+//! ### `-y,--year`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
 //! [Cargo]: https://crates.io
 //! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
 //! [crates.io]: https://crates.io
 //! [Developer Prompt]: https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx
+//! [`description`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
+//! [`documentation`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [documentation]: http://wixtoolset.org/documentation/
 //! [git bash]: https://gitforwindows.org/
+//! [`homepage`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [`lib.rs`]: ../wix/index.html
 //! [LibreOffice]: https://www.libreoffice.org/
 //! [`license`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [Microsoft Office]: https://products.office.com/en-us/home
 //! [Microsoft Notepad]: https://en.wikipedia.org/wiki/Microsoft_Notepad
+//! [`repository`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [Rich Text Format]: https://en.wikipedia.org/wiki/Rich_Text_Format
 //! [Rust]: https://www.rust-lang.org
 //! [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
@@ -697,7 +915,7 @@ fn main() {
                         --release' is not executed.")
                     .long("no-build"))
                 .arg(Arg::with_name("no-capture")
-                    .help("Displays all outptu from the builder, compiler, linker, and signer")
+                    .help("Displays all output from the builder, compiler, linker, and signer")
                     .long_help("By default, this subcommand captures, or hides, \
                         all output from the builder, compiler, linker, and signer \
                         for the binary and Windows installer, respectively. Use this \
