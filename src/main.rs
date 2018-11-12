@@ -470,6 +470,10 @@
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
 //!
+//! Sets the culture for localization. Use with the [`-l,--locale`] option. See
+//! the [WixUI localization documentation] for more information about acceptable
+//! culture codes. The codes are case insensitive.
+//!
 //! ### `-d,--description`
 //!
 //! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
@@ -495,6 +499,14 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
+//! Specifies a Rich Text Format (RTF) file to use as the End User License
+//! Agreement (EULA) for the license agreement dialog of the installer. The
+//! default is to disable the license agreement dialog unless one of the
+//! supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the
+//! value of the `license` field in the package's manifest (Cargo.toml). An EULA
+//! can be enabled later by directly modifying the WiX Source (wxs) file with a
+//! text editor.
+//!
 //! ### `--force`
 //!
 //! Available for the _init_ (`cargo wix init`) subcommand.
@@ -514,27 +526,53 @@
 //!
 //! Available for the _sign_ (`cargo wix sign`) subcommand.
 //!
+//! This will be display in the ACL dialog.
+//!
 //! ### `-i,--install-version`
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! Overrides the version from the package's manifest (Cargo.toml), which is
+//! used for the installer name and appears in the Add/Remove Programs (ARP)
+//! control panel.
 //!
 //! ### `-l,--license`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
+//! Overrides the `license-file` field or any license generated from the
+//! `license` field of the package's manifest (Cargo.toml). If an appropriate
+//! license file does not exist, cannot be found, or is not specified, then no
+//! license file is included in the installer or in the installation folder
+//! along side the `bin` folder. A file containing the license, such as a TXT,
+//! PDF, or RTF file, can be added later by directly editing the generated WiX
+//! Source file (wxs) in a text editor.
+//!
 //! ### `-l,--locale`
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! Sets the path to a WiX localization file (wxl) which contains localized
+//! strings. Use in conjunction with the [`-c,--culture`] option.
 //!
 //! ### `-m,--manufacturer`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
+//! Overrides the first author in the `authors` field of the package's manifest
+//! (Cargo.toml) as the manufacturer within the installer. The manufacturer can
+//! be changed after initialization by directly modifying the WiX Source file
+//! (wxs) with a text editor.
+//!
 //! ### `-n,--name`
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
+//!
+//! Overrides the `name` field in the package's manifest (Cargo.toml), which is
+//! used in the file name of the installer (msi). This does not change the name
+//! of the executable _within_ the installer.
 //!
 //! ### --no-build
 //!
@@ -555,20 +593,37 @@
 //! Available for the _default_ (`cargo wix`), _init_ (`cargo wix init`) and
 //! _print_ (`cargo wix print`) subcommands.
 //!
+//! Sets the destination for _init_ subcommand files, such as the WiX Source
+//! file (wxs), an alternative to stdout for _print_ subcommand, and the created
+//! installer for the _default_ subcommand.
+//!
 //! ### `-O,--owner`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
+//!
+//! Sets the copyright owner of the license during initialization or printing.
+//! The default is to use the first author from the package's manifest
+//! (Cargo.toml). This is only used when generating a license based on the value
+//! of the `license` field in the package's manifest.
 //!
 //! ### `-p,--product-icon`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
+//! Sets the path to an image file that will be display as an icon in the
+//! Add/Remove Programs (ARP) control panel for the installed application.
+//!
 //! ### `-P,--product-name`
 //!
 //! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
 //! and _sign_ (`cargo wix sign`) subcommands.
+//!
+//! Overrides the `name` field of the package's manifest (Cargo.toml) as the
+//! product name within the installer. The product name can be changed after
+//! initialization or printing by directly modifying the WiX Source file (wxs)
+//! with a text editor.
 //!
 //! ### `-t,--timestamp`
 //!
@@ -582,6 +637,13 @@
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
+//!
+//! Adds a URL to the installer that will be displayed in the Add/Remove
+//! Programs (ARP) control panel for the application. The default is to disable
+//! it unless a URL is specified for either the `homepage`, `documentation`, or
+//! `repository` fields in the package's manifest (Cargo.toml). The help URL can
+//! be enabled after initialization by directly modifying the WiX Source (wxs)
+//! file with a text editor.
 //!
 //! ### `-V,--version`
 //!
@@ -602,6 +664,11 @@
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
+//!
+//! Sets the copyright year for the license during initialization. The default
+//! is to use the current year. This is only used if a license is generated from
+//! one of the supported licenses based on the value of the `license` field in
+//! the package's manifest (Cargo.toml).
 //!
 //! [Cargo]: https://crates.io
 //! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
@@ -628,6 +695,7 @@
 //! [tutorials]: https://www.firegiant.com/wix/tutorial/
 //! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+//! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
 //! [WXS]: https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache
@@ -835,7 +903,7 @@ fn main() {
                     .long_help("Sets the culture for localization. Use with the \
                        '-l,--locale' option. See the WixUI localization \
                        documentation for more information about acceptable culture \
-                       codes. The codes are case insenstive.")
+                       codes. The codes are case insensitive.")
                     .long("culture")
                     .short("c")
                     .default_value(&default_culture)
@@ -892,20 +960,18 @@ fn main() {
                     .takes_value(true))
                 .arg(Arg::with_name("locale")
                     .help("A path to a WiX localization file (.wxl)")
-                    .long_help("Sets the path to a WiX localization file, \
-                        '.wxl', which contains localized strings. Use in conjunction \
-                        with the '-C,--culture' option.")
+                    .long_help("Sets the path to a WiX localization file (wxl) \
+                        which contains localized strings. Use in conjunction with \
+                        the '-c,--culture' option.")
                     .long("locale")
                     .short("l")
                     .takes_value(true))
                 .arg(Arg::with_name("name")
                     .help("A string for the installer's product name")
-                    .long_help("Overrides the package's 'name' field in the \
-                        manifest (Cargo.toml), which is used in the name for the \
-                        installer. This does not change the name of the executable \
-                        within the installer. The name of the executable can be \
-                        changed by modifying the WiX Source (wxs) file with a text \
-                        editor.")
+                    .long_help("Overrides the 'name' field in the package's \
+                        manifest (Cargo.toml), which is used in the file name of the \
+                        installer (msi). This does not change the name of the \
+                        executable within the installer.")
                     .long("name")
                     .short("n")
                     .takes_value(true))
