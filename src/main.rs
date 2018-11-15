@@ -18,7 +18,7 @@
 //! it easy to create a Windows installer (msi) for any Rust project. The
 //! project is primarily implemented as a [cargo subcommand], but the core
 //! functionality is provided in a library (crate). See the module-level
-//! comments for the [`lib.rs`] file for more information about usage and
+//! comments for the [library] for more information about usage and
 //! organization of the `wix` crate. The remainder of this documentation
 //! focuses on the usage and features of the `cargo wix` subcommand.
 //!
@@ -679,7 +679,7 @@
 //! [documentation]: http://wixtoolset.org/documentation/
 //! [git bash]: https://gitforwindows.org/
 //! [`homepage`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
-//! [`lib.rs`]: ../wix/index.html
+//! [library]: ../wix/index.html
 //! [LibreOffice]: https://www.libreoffice.org/
 //! [`license`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata

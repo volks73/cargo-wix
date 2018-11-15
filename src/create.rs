@@ -14,12 +14,13 @@
 
 //! The implementation for the `create`, or default, command. The default
 //! command, `cargo wix`, is focused on creating, or building, the installer
-//! using the WiX Toolset. Generally, this involves locating the WiX Source file
-//! (wxs) and passing options and flags to the WiX Toolset's compiler
-//! (`candle.exe`) and linker (`light.exe`). By default, it looks for a
-//! `wix\main.wxs` file relative to the root of the package's manifest
-//! (Cargo.toml). A different WiX Source file can be set with the `input` method
-//! using the `Builder` struct.
+//! using the WiX Toolset.
+//!
+//! Generally, this involves locating the WiX Source file (wxs) and passing
+//! options and flags to the WiX Toolset's compiler (`candle.exe`) and linker
+//! (`light.exe`). By default, it looks for a `wix\main.wxs` file relative to
+//! the root of the package's manifest (Cargo.toml). A different WiX Source file
+//! can be set with the `input` method using the `Builder` struct.
 
 use BINARY_FOLDER_NAME;
 use CARGO;

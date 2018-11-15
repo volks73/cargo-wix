@@ -19,7 +19,12 @@
 //! project is primarily implemented as a [cargo subcommand], but its core
 //! functionality has been organized into a separate library. Documentation for
 //! the binary and Command Line Interface (CLI) are provided in the module-level
-//! documentation for the [`main.rs`] file and the `cargo wix --help` command.
+//! documentation for the [binary] and the `cargo wix --help` command.
+//!
+//! ## Table of Contents
+//!
+//! - [Usage](#usage)
+//! - [Organization](#organization)
 //!
 //! ## Usage
 //!
@@ -50,10 +55,11 @@
 //! `Builder` struct generally corresponds to a CLI option or argument found in
 //! the [`cargo wix`] subcommand and binary.
 //!
-//! [`main.rs`]: ../cargo_wix/main.html
+//! [binary]: ../cargo_wix/index.html
 //! [Builder]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
+//! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
+//! [`cargo wix`]: ../cargo_wix/index.html
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
-//! [`cargo wix`]: https://volks73.github.io/cargo-wix/main.html
 
 extern crate chrono;
 #[macro_use] extern crate log;
@@ -132,8 +138,9 @@ pub const WIX_LINKER: &str = "light";
 /// the WiX compiler.
 pub const WIX_OBJECT_FILE_EXTENSION: &str = "wixobj";
 
-/// The name of the environment variable installed by the WiX Toolset that
-/// points to the `bin` folder for the compiler and linker.
+/// The name of the environment variable created by the WiX Toolset installer
+/// that points to the `bin` folder for the WiX Toolet's compiler (candle.exe)
+/// and linker (light.exe).
 pub const WIX_PATH_KEY: &str = "WIX";
 
 /// The file extension of the WiX Source file, which is the input to the WiX
@@ -144,7 +151,9 @@ pub const WIX_SOURCE_FILE_EXTENSION: &str = "wxs";
 /// Toolset compiler.
 pub const WIX_SOURCE_FILE_NAME: &str = "main";
 
-/// A specialized `Result` type for wix operations.
+/// A specialized [`Result`] type for wix operations.
+///
+/// [`Result`]: https://doc.rust-lang.org/std/result/
 pub type Result<T> = std::result::Result<T, Error>;
 
 fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
@@ -429,49 +438,88 @@ impl FromStr for TimestampServer {
 
 /// The various culture codes for localization.
 ///
-/// These are taken from the table in the [WixUI
-/// localization](http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html)
-/// documentation.
+/// These are taken from the table in the [WixUI localization] documentation.
+///
+/// [WixUI localization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 #[derive(Clone, Debug, PartialEq)]
 pub enum Cultures {
+    /// Arabic, Saudi Arabia
     ArSa,
+    /// Bulgarian, Bulgaria
     BgBg,
+    /// Catalan, Spain
     CaEs,
+    /// Croatian, Croatia
     HrHr,
+    /// Czech, Czech Republic
     CsCz,
+    /// Danish, Denmark
     DaDk,
+    /// Dutch, Netherlands
     NlNl,
+    /// English, United States
     EnUs,
+    /// Estonian, Estonia
     EtEe,
+    /// Finnish, Finland
     FiFi,
+    /// French, France
     FrFr,
+    /// German, Germany
     DeDe,
+    /// Greek, Greece
     ElGr,
+    /// Hebrew, Israel
     HeIl,
+    /// Hindi, India
     HiIn,
+    /// Hungarian, Hungary
     HuHu,
+    /// Italian, Italy
     ItIt,
+    /// Japanese, Japan
     JaJp,
+    /// Kazakh, Kazakhstan
     KkKz,
+    /// Korean, Korea
     KoKr,
+    /// Latvian, Latvia
     LvLv,
+    /// Lithuanian, Lithuania
     LtLt,
+    /// Norwegian, Norway
     NbNo,
+    /// Polish, Poland
     PlPl,
+    /// Portuguese, Brazil
     PtBr,
+    /// Portuguese, Portugal
     PtPt,
+    /// Romanian, Romania
     RoRo,
+    /// Russian, Russian
     RuRu,
+    /// Serbian, Serbia and Montenegro
     SrLatnCs,
+    /// Simplified Chinese, China
     ZhCn,
+    /// Slovak, Slovak Republic
     SkSk,
+    /// Solvenian, Solvenia
     SlSi,
+    /// Spanish, Spain
     EsEs,
+    /// Swedish, Sweden
     SvSe,
+    /// Thai, Thailand
     ThTh,
+    /// Traditional Chinese, Hong Kong SAR
     ZhHk,
+    /// Traditional Chinese, Taiwan
     ZhTw,
+    /// Turkish, Turkey
     TrTr,
+    /// Ukranian, Ukraine
     UkUa,
 }
 
