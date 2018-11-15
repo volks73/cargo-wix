@@ -482,6 +482,24 @@ pub enum TimestampServer {
 
 impl TimestampServer {
     /// Gets the URL of the timestamp server for an alias.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use std::str::FromStr;
+    /// use wix::TimestampServer;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         TimestampServer::from_str("http://www.example.com").unwrap().url(),
+    ///         "http://www.example.com"
+    ///     );
+    ///     assert_eq!(TimestampServer::Comodo.url(), "http://timestamp.comodoca.com/");
+    ///     assert_eq!(TimestampServer::Verisign.url(), "http://timestamp.verisign.com/scripts/timstamp.dll");
+    /// }
+    /// ```
     pub fn url(&self) -> &str {
         match *self {
             TimestampServer::Custom(ref url) => url,
