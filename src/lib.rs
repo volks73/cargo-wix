@@ -234,6 +234,19 @@ pub enum Error {
 impl Error {
     /// Gets an error code related to the error.
     ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use wix::Error;
+    ///
+    /// fn main() {
+    ///     let err = Error::from("A generic error");
+    ///     assert!(err.code() != 0)
+    /// }
+    /// ```
+    ///
     /// This is useful as a return, or exit, code for a command line application, where a non-zero
     /// integer indicates a failure in the application. it can also be used for quickly and easily
     /// testing equality between two errors.
@@ -249,10 +262,58 @@ impl Error {
         }
     }
 
+    /// Creates a new `Error` from a [std::io::Error] with the
+    /// [std::io::ErrorKind::AlreadyExists] variant.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
+    /// fn main() {
+    ///     let path = Path::new("C:\\");
+    ///     let expected = Error::Io(io::Error::new(
+    ///         io::ErrorKind::AlreadyExists,
+    ///         path.display().to_string()
+    ///     ));
+    ///     assert_eq!(expected, Error::already_exists(path));
+    /// }
+    /// ```
+    ///
+    /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
+    /// [std::io::ErrorKind::AlreadyExists]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
     pub fn already_exists(p: &Path) -> Self {
         io::Error::new(ErrorKind::AlreadyExists, p.display().to_string()).into()
     }
 
+    /// Creates a new `Error` from a [std::io::Error] with the
+    /// [std::io::ErrorKind::NotFound] variant.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
+    /// fn main() {
+    ///     let path = Path::new("C:\\Cargo\\Wix\\file.txt");
+    ///     let expected = Error::Io(io::Error::new(
+    ///         io::ErrorKind::NotFound,
+    ///         path.display().to_string()
+    ///     ));
+    ///     assert_eq!(expected, Error::not_found(path));
+    /// }
+    /// ```
+    ///
+    /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
+    /// [std::io::ErrorKind::NotFound]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
     pub fn not_found(p: &Path) -> Self {
         io::Error::new(ErrorKind::NotFound, p.display().to_string()).into()
     }
@@ -311,6 +372,18 @@ impl fmt::Display for Error {
     }
 }
 
+impl PartialEq for Error {
+    fn eq(&self, other: &Error) -> bool {
+        self.code() == other.code()
+    }
+}
+
+impl<'a> From<&'a str> for Error {
+    fn from(s: &str) -> Self {
+        Error::Generic(s.to_string())
+    }
+}
+
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Self {
         Error::Io(err)
@@ -360,9 +433,9 @@ impl Platform {
     /// # Example
     ///
     /// ```rust
-    /// extern crate cargo_wix;
+    /// extern crate wix;
     ///
-    /// use cargo_wix::Platform;
+    /// use wix::Platform;
     ///
     /// fn main() {
     ///     assert_eq!(Platform::X86.arch(), "i686");
@@ -524,6 +597,7 @@ pub enum Cultures {
 }
 
 impl Cultures {
+    /// The language of the culture code.
     pub fn language(&self) -> &'static str {
         match *self {
             Cultures::ArSa => "Arabic",
@@ -568,6 +642,7 @@ impl Cultures {
         }
     }
 
+    /// The location of the culture component, typically the country that speaks the language.
     pub fn location(&self) -> &'static str {
         match *self {
             Cultures::ArSa => "Saudi Arabia",
