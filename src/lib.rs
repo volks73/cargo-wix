@@ -234,7 +234,7 @@ pub enum Error {
 impl Error {
     /// Gets an error code related to the error.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```rust
     /// extern crate wix;
@@ -265,7 +265,7 @@ impl Error {
     /// Creates a new `Error` from a [std::io::Error] with the
     /// [std::io::ErrorKind::AlreadyExists] variant.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```rust
     /// extern crate wix;
@@ -293,7 +293,7 @@ impl Error {
     /// Creates a new `Error` from a [std::io::Error] with the
     /// [std::io::ErrorKind::NotFound] variant.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```rust
     /// extern crate wix;
@@ -430,7 +430,7 @@ impl Platform {
     /// commonly used for the `target_arch` conditional compilation attribute. To get the string
     /// recognized in wxs files, use `format!("{}", Platform::X86)`.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```rust
     /// extern crate wix;
@@ -599,7 +599,7 @@ pub enum Cultures {
 impl Cultures {
     /// The language of the culture code.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```rust
     /// extern crate wix;

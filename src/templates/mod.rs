@@ -31,18 +31,47 @@ static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf.mustache");
 /// The different templates that can be printed or written to a file.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Template {
+    /// The [Apache-2.0] license.
+    ///
+    /// [Apache-2.0]: https://opensource.org/licenses/Apache-2.0
     Apache2,
+    /// The [GPL-3.0] license.
+    ///
+    /// [GPL-3.0]: https://opensource.org/licenses/gpl-3.0.html
     Gpl3,
+    /// The [MIT] license.
+    ///
+    /// [MIT]: https://opensource.org/licenses/MIT
     Mit,
+    /// A [WiX Source (wxs)] file.
+    ///
+    /// [Wix Source (wxs)]: http://wixtoolset.org/documentation/manual/v3/overview/files.html
     Wxs,
 }
 
 impl Template {
     /// Gets the ID for the template.
     ///
-    /// In the case of a license template, the ID is the SPDX ID which is also used for the
+    /// In the case of a license template, the ID is the [SPDX ID] which is also used for the
     /// `license` field in the package's manifest (Cargo.toml). This is also the same value used
-    /// with the `--print-template` option.
+    /// with the `cargo wix print` subcommand.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use wix::Template;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Template::Apache2.id(), "Apache-2.0");
+    ///     assert_eq!(Template::Gpl3.id(), "GPL-3.0");
+    ///     assert_eq!(Template::Mit.id(), "MIT");
+    ///     assert_eq!(Template::Wxs.id(), "WXS");
+    /// }
+    /// ```
+    ///
+    /// [SPDX ID]: https://spdx.org/licenses/
     pub fn id(&self) -> &str {
         match *self {
             Template::Apache2 => "Apache-2.0",
@@ -53,6 +82,33 @@ impl Template {
     }
 
     /// Gets the possible string representations of each variant.
+    ///
+    /// The possibilities are combination of case (upper and lower) for the
+    /// various templates that are available.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use wix::Template;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Template::possible_values(),
+    ///         vec![
+    ///             "Apache-2.0",
+    ///             "apache-2.0",
+    ///             "GPL-3.0",
+    ///             "gpl-3.0",
+    ///             "MIT",
+    ///             "mit",
+    ///             "WXS",
+    ///             "wxs"
+    ///         ]
+    ///     );
+    /// }
+    /// ```
     pub fn possible_values() -> Vec<String> {
         vec![
             Template::Apache2.id().to_owned(),
@@ -67,6 +123,25 @@ impl Template {
     }
 
     /// Gets the IDs of all supported licenses.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate wix;
+    ///
+    /// use wix::Template;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Template::license_ids(),
+    ///         vec![
+    ///             "Apache-2.0",
+    ///             "GPL-3.0",
+    ///             "MIT",
+    ///         ]
+    ///     );
+    /// }
+    /// ```
     pub fn license_ids() -> Vec<String> {
         vec![
             Template::Apache2.id().to_owned(),
