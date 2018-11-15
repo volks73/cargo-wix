@@ -13,24 +13,25 @@
 // limitations under the License.
 
 extern crate assert_fs;
-extern crate cargo_wix;
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 extern crate predicates;
 extern crate tempfile;
 extern crate toml;
+extern crate wix;
 
 mod common;
 
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
-use cargo_wix::{CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
-use cargo_wix::initialize::{Builder, Execution};
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use toml::Value;
+use wix::{CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
+use wix::initialize::{Builder, Execution};
 
 lazy_static!{
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;

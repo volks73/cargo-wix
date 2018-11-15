@@ -13,17 +13,15 @@
 // limitations under the License.
 
 extern crate assert_fs;
-extern crate cargo_wix;
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 extern crate predicates;
 extern crate toml;
+extern crate wix;
 
 mod common;
 
 use assert_fs::prelude::*;
-use cargo_wix::create::{Builder, Execution};
-use cargo_wix::initialize;
-use cargo_wix::{CARGO_MANIFEST_FILE, WIX};
 use common::TARGET_NAME;
 use predicates::prelude::*;
 use std::env;
@@ -31,6 +29,9 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use toml::Value;
+use wix::create::{Builder, Execution};
+use wix::initialize;
+use wix::{CARGO_MANIFEST_FILE, WIX};
 
 lazy_static!{
     static ref TARGET_WIX_DIR: PathBuf = {
