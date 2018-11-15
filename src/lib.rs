@@ -496,8 +496,14 @@ impl TimestampServer {
     ///         TimestampServer::from_str("http://www.example.com").unwrap().url(),
     ///         "http://www.example.com"
     ///     );
-    ///     assert_eq!(TimestampServer::Comodo.url(), "http://timestamp.comodoca.com/");
-    ///     assert_eq!(TimestampServer::Verisign.url(), "http://timestamp.verisign.com/scripts/timstamp.dll");
+    ///     assert_eq!(
+    ///         TimestampServer::Comodo.url(),
+    ///         "http://timestamp.comodoca.com/"
+    ///     );
+    ///     assert_eq!(
+    ///         TimestampServer::Verisign.url(),
+    ///         "http://timestamp.verisign.com/scripts/timstamp.dll"
+    ///     );
     /// }
     /// ```
     pub fn url(&self) -> &str {

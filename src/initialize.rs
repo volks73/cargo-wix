@@ -331,7 +331,7 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
-// A context for creating the necessary files to eventually build an installer.
+/// A context for creating the necessary files to eventually build an installer.
 #[derive(Debug)]
 pub struct Execution {
     banner: Option<PathBuf>,

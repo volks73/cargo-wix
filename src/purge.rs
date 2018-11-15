@@ -64,6 +64,8 @@ impl<'a> Default for Builder<'a> {
     }
 }
 
+/// A context for removing WiX Toolset-related source and output files from a
+/// package.
 #[derive(Debug)]
 pub struct Execution {
     input: Option<PathBuf>,

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! The implementation for printing a WiX Source (wxs) file.
+
 use description;
 use Error;
 use eula::Eula;
