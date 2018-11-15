@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["cargo_wix"] = ["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cargo_wix/enum.Platform.html\" title=\"enum cargo_wix::Platform\">Platform</a>","impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cargo_wix/enum.Template.html\" title=\"enum cargo_wix::Template\">Template</a>",];
+implementors["wix"] = [{text:"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"wix/enum.Template.html\" title=\"enum wix::Template\">Template</a>",synthetic:false,types:["wix::templates::Template"]},{text:"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"wix/enum.Platform.html\" title=\"enum wix::Platform\">Platform</a>",synthetic:false,types:["wix::Platform"]},];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

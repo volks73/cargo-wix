@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Builder","A builder for running the `cargo wix` subcommand."],["Execution","A context for creating, or building, an installer."]]});

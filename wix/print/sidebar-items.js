@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["license","The implementation for printing a license."],["wxs","The implementation for printing a WiX Source (wxs) file."]]});
