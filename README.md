@@ -65,7 +65,7 @@ C:\Path\to\Project> cargo wix example.wxs
 
 The WiX source file can be customized using a text editor, but modification of the XML preprocessor variables should be avoided to ensure the `cargo wix` command works properly. 
 
-To sign the installer (msi) as part of the build process, ensure the `signtool` command is available in the PATH system environment variable or use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the Windows 10 SDK, and use the `--sign` flag with the subcommand as follows: 
+To sign the installer (msi) as part of the build process, ensure the `signtool` command is available in the PATH system environment variable or use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the Windows 10 SDK, and use the `sign` sub-subcommand as follows: 
 
 ```dos
 C:\Path\to\Project> cargo wix sign
