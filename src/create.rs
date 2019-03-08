@@ -267,6 +267,8 @@ impl Execution {
         }
         compiler.arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
+            .arg("-ext")
+            .arg("WixUtilExtension")
             .arg("-o")
             .arg(&source_wixobj)
             .arg(&source_wxs);
@@ -305,6 +307,8 @@ impl Execution {
         }
         linker.arg("-ext")
             .arg("WixUIExtension")
+            .arg("-ext")
+            .arg("WixUtilExtension")
             .arg(format!("-cultures:{}", self.culture))
             .arg(&source_wixobj)
             .arg("-out")
