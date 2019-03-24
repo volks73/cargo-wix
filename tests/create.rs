@@ -22,8 +22,10 @@ extern crate wix;
 mod common;
 
 use assert_fs::prelude::*;
-use common::TARGET_NAME;
 use predicates::prelude::*;
+
+use common::TARGET_NAME;
+use predicates::path;
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -53,8 +55,8 @@ fn default_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
-    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
-    package.child(expected_msi_file).assert(predicate::path::exists());
+    package.child(TARGET_WIX_DIR.as_path()).assert(path::exists());
+    package.child(expected_msi_file).assert(path::exists());
 }
 
 #[test]
@@ -94,8 +96,8 @@ fn init_with_package_section_fields_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
-    package.child(TARGET_WIX_DIR.as_path()).assert(predicate::path::exists());
-    package.child(expected_msi_file).assert(predicate::path::exists());
+    package.child(TARGET_WIX_DIR.as_path()).assert(path::exists());
+    package.child(expected_msi_file).assert(path::exists());
 }
 
 #[test]
