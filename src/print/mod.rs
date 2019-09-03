@@ -27,7 +27,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 use toml::Value;
 
-fn destination(output: Option<&PathBuf>) -> Result<Box<Write>> {
+fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {
         trace!("An output path has been explicity specified");
         let f = File::create(output)?;

@@ -231,7 +231,7 @@ impl Execution {
     fn msi(&self) -> Result<PathBuf> {
         if let Some(ref i) = self.input {
             trace!("The path to an installer to sign has been explicitly set");
-            let mut msi = PathBuf::from(i);
+            let msi = PathBuf::from(i);
             if msi.exists() {
                 trace!("The installer exists");
                 Ok(msi)
