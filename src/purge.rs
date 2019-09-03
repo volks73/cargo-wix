@@ -107,14 +107,14 @@ impl Execution {
                     }).unwrap())
                 } else {
                     Err(Error::Generic(format!(
-                        "The '{}' path does not appear to be to a '{}' file", 
-                        input.display(), 
+                        "The '{}' path does not appear to be to a '{}' file",
+                        input.display(),
                         CARGO_MANIFEST_FILE
                     )))
                 }
             } else {
                 Err(Error::Generic(format!(
-                    "The '{}' path does not exist or it is not a file", 
+                    "The '{}' path does not exist or it is not a file",
                     input.display()
                 )))
             }
@@ -151,7 +151,7 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
+        extern crate assert_fs;
 
         use std::fs::File;
         use super::*;
@@ -174,7 +174,7 @@ mod tests {
 
         #[test]
         fn wix_with_existing_file_but_not_cargo_toml_fails() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let non_cargo_toml_path = temp_dir.path().join("Example.txt");
             let _non_cargo_toml_handle = File::create(&non_cargo_toml_path).expect("Create file");
             let result = Builder::new()
@@ -186,7 +186,7 @@ mod tests {
 
         #[test]
         fn wix_with_existing_cargo_toml_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let cargo_toml_path = temp_dir.path().join("Cargo.toml");
             let expected = temp_dir.path().join(WIX);
             let _non_cargo_toml_handle = File::create(&cargo_toml_path).expect("Create file");

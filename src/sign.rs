@@ -384,7 +384,7 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
+        extern crate assert_fs;
 
         use std::fs::File;
         use super::*;
@@ -435,7 +435,7 @@ mod tests {
 
         #[test]
         fn msi_with_existing_file_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let msi_path = temp_dir.path().join("Example.msi");
             let _msi_handle = File::create(&msi_path).expect("Create file");
             let actual = Builder::new()

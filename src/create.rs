@@ -710,8 +710,6 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
-
         use super::*;
 
         #[test]

@@ -685,7 +685,7 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
+        extern crate assert_fs;
 
         use std::fs::File;
         use std::io::ErrorKind;
@@ -694,7 +694,7 @@ mod tests {
         #[test]
         fn destination_is_correct_with_defaults() {
             let original = env::current_dir().unwrap();
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             env::set_current_dir(temp_dir.path()).unwrap();
             let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
             File::create(&temp_cargo_toml).unwrap();
@@ -718,7 +718,7 @@ mod tests {
 
         #[test]
         fn destination_is_correct_with_input() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
             File::create(&temp_cargo_toml).unwrap();
             let expected = temp_dir.path().join(WIX);
@@ -737,7 +737,7 @@ mod tests {
 
         #[test]
         fn destination_fails_with_directory_input() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let mut e = Execution::default();
             e.input = Some(temp_dir.path().into());
             assert!(e.destination().is_err());
@@ -745,7 +745,7 @@ mod tests {
 
         #[test]
         fn destination_fails_when_input_is_not_a_manifest() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
             File::create(&not_a_manifest).unwrap();
             let mut e = Execution::default();
@@ -755,7 +755,7 @@ mod tests {
 
         #[test]
         fn destination_fails_correctly_when_input_is_not_a_manifest() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
             File::create(&not_a_manifest).unwrap();
             let mut e = Execution::default();
@@ -770,7 +770,7 @@ mod tests {
         #[test]
         fn destination_fails_when_cwd_has_no_manifest() {
             let original = env::current_dir().unwrap();
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             env::set_current_dir(temp_dir.path()).unwrap();
             let e = Execution::default();
             let result = e.destination();
@@ -780,7 +780,7 @@ mod tests {
 
         #[test]
         fn destination_fails_correctly_when_cwd_has_no_manifest() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let original = env::current_dir().unwrap();
             env::set_current_dir(temp_dir.path()).unwrap();
             let e = Execution::default();

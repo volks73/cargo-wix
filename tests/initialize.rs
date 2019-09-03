@@ -16,7 +16,6 @@ extern crate assert_fs;
 #[macro_use]
 extern crate lazy_static;
 extern crate predicates;
-extern crate tempfile;
 extern crate toml;
 extern crate wix;
 

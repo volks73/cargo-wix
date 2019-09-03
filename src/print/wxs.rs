@@ -578,7 +578,7 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
+        extern crate assert_fs;
 
         use std::fs::File;
         use super::*;
@@ -849,7 +849,7 @@ mod tests {
 
         #[test]
         fn eula_with_override_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
             let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
@@ -863,7 +863,7 @@ mod tests {
 
         #[test]
         fn eula_with_license_file_field_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
             let manifest = format!("[package]
@@ -878,7 +878,7 @@ mod tests {
 
         #[test]
         fn eula_with_license_file_extension_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
             let manifest = format!("[package]
@@ -893,7 +893,7 @@ mod tests {
 
         #[test]
         fn eula_with_wrong_file_extension_override_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
             let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");

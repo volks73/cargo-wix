@@ -148,7 +148,7 @@ mod tests {
     }
 
     mod execution {
-        extern crate tempfile;
+        extern crate assert_fs;
 
         use std::fs::File;
         use super::*;
@@ -173,7 +173,7 @@ mod tests {
 
         #[test]
         fn target_wix_with_existing_file_but_not_cargo_toml_fails() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let non_cargo_toml_path = temp_dir.path().join("Example.txt");
             let _non_cargo_toml_handle = File::create(&non_cargo_toml_path).expect("Create file");
             let result = Builder::new()
@@ -185,7 +185,7 @@ mod tests {
 
         #[test]
         fn target_wix_with_existing_cargo_toml_works() {
-            let temp_dir = tempfile::tempdir().unwrap();
+            let temp_dir = assert_fs::TempDir::new().unwrap();
             let cargo_toml_path = temp_dir.path().join("Cargo.toml");
             let expected = temp_dir.path().join(TARGET_FOLDER_NAME).join(WIX);
             let _non_cargo_toml_handle = File::create(&cargo_toml_path).expect("Create file");
