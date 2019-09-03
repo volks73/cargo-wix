@@ -568,3 +568,44 @@ fn product_icon_works() {
         "//*/wix:Icon[@Id='ProductICO']/@SourceFile"
     ), package_product_icon.path().to_str().unwrap());
 }
+
+#[test]
+fn multiple_binaries_works() {
+    const EXPECTED_NAME_1: &str = "main1";
+    const EXPECTED_SOURCE_1: &str = "target\\release\\main1.exe";
+    const EXPECTED_NAME_2: &str = "main2";
+    const EXPECTED_SOURCE_2: &str = "target\\release\\main2.exe";
+    const EXPECTED_NAME_3: &str = "main3";
+    const EXPECTED_SOURCE_3: &str = "target\\release\\main3.exe";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default().build().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_1)
+    ), format!("{}.exe", EXPECTED_NAME_1));
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_1)
+    ), EXPECTED_SOURCE_1);
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_2)
+    ), format!("{}.exe", EXPECTED_NAME_2));
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_2)
+    ), EXPECTED_SOURCE_2);
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_3)
+    ), format!("{}.exe", EXPECTED_NAME_3));
+    assert_eq!(common::evaluate_xpath(
+        package.child(MAIN_WXS_PATH.as_path()).path(),
+        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_3)
+    ), EXPECTED_SOURCE_3);
+}
+
