@@ -1,7 +1,6 @@
 extern crate assert_fs;
 extern crate sxd_document;
 extern crate sxd_xpath;
-// extern crate tempfile;
 
 use assert_fs::prelude::*;
 
@@ -17,6 +16,8 @@ use self::sxd_xpath::{Context, Factory};
 #[allow(dead_code)]
 pub const TARGET_NAME: &str = "target";
 
+// Cannot use dashes. WiX Toolset only allows A-Z, a-z, digits, underscores (_), or periods (.)
+// for attribute IDs.
 #[allow(dead_code)]
 pub const PACKAGE_NAME: &str = "cargowixtest";
 
@@ -30,7 +31,7 @@ pub const PACKAGE_NAME: &str = "cargowixtest";
 /// create the cargo project in the temporary directory is:
 ///
 /// ```
-/// > cargo init --bin --quiet --vcs none "C:\Users\<username>\AppData\Local\Temp\cargo_wix_text_######"
+/// > cargo init --bin --quiet --vcs none --name cargowixtest "C:\Users\<username>\AppData\Local\Temp\cargo_wix_text_######"
 /// ```
 ///
 /// where `<username>` is replaced with the current logged in user for the
@@ -42,13 +43,7 @@ pub const PACKAGE_NAME: &str = "cargowixtest";
 /// This will panic if a temporary directory fails to be created or if cargo
 /// fails to create the project/package.
 #[allow(dead_code)]
-// pub fn create_test_package() -> tempfile::TempDir {
 pub fn create_test_package() -> TempDir {
-    // Use a prefix because the default `.tmp` is an invalid name for a Cargo package.
-    //
-    // Cannot use dashes. WiX Toolset only allows A-Z, a-z, digits, underscores (_), or periods (.)
-    // for attribute IDs.
-    // let temp_dir = tempfile::Builder::new().prefix("cargo_wix_test_").tempdir().unwrap();
     let temp_dir = TempDir::new().unwrap();
     let cargo_init_status = Command::new("cargo")
         .arg("init")
@@ -85,7 +80,7 @@ pub fn create_test_package() -> TempDir {
 /// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
 /// project layout for multiple binaries.
 #[allow(dead_code)]
-pub fn create_test_package_multiple_binaries() -> assert_fs::TempDir {
+pub fn create_test_package_multiple_binaries() -> TempDir {
     let package = create_test_package();
     let package_manifest = package.child("Cargo.toml");
     let package_src = package.child("src");
