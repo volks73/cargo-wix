@@ -570,6 +570,7 @@ fn product_icon_works() {
 }
 
 #[test]
+#[ignore]
 fn multiple_binaries_works() {
     const EXPECTED_NAME_1: &str = "main1";
     const EXPECTED_SOURCE_1: &str = "target\\release\\main1.exe";
