@@ -24,7 +24,7 @@ mod common;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
-use common::TARGET_NAME;
+use common::{PACKAGE_NAME, TARGET_NAME};
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -47,7 +47,7 @@ fn default_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
@@ -63,7 +63,7 @@ fn init_with_package_section_fields_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_manifest = package.child("Cargo.toml");
@@ -106,7 +106,7 @@ fn init_with_all_options_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let bin_example_path = package.path().join("bin").join("Example.exe");
@@ -161,7 +161,7 @@ fn init_with_banner_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let banner_path = package.path().join("img").join("Banner.bmp");
@@ -186,7 +186,7 @@ fn init_with_binary_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let bin_example_path = package.path().join("bin").join("Example.exe");
@@ -211,7 +211,7 @@ fn init_with_description_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new()
@@ -231,7 +231,7 @@ fn init_with_dialog_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let dialog_path = package.path().join("img").join("Dialog.bmp");
@@ -257,7 +257,7 @@ fn init_with_eula_in_cwd_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_eula = package.child(EULA_FILE);
@@ -282,7 +282,7 @@ fn init_with_eula_in_docs_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_docs = package.child("docs");
@@ -308,7 +308,7 @@ fn init_with_help_url_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new()
@@ -329,7 +329,7 @@ fn init_with_license_in_cwd_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_license = package.child(LICENSE_FILE);
@@ -354,7 +354,7 @@ fn init_with_license_in_docs_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let package_docs = package.child("docs");
@@ -380,7 +380,7 @@ fn init_with_manufacturer_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new()
@@ -400,7 +400,7 @@ fn init_with_product_icon_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     let product_icon_path = package.path().join("img").join("Product.ico");
@@ -425,7 +425,7 @@ fn init_with_product_name_option_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new()
@@ -453,7 +453,7 @@ fn input_works() {
     fs::create_dir(output.parent().unwrap()).unwrap();
     fs::create_dir(&output).unwrap();
     let expected_msi_file = TARGET_WIX_DIR.join(format!(
-        "{}-0.1.0-x86_64.msi", package.path().file_name().and_then(|o| o.to_str()).unwrap()
+        "{}-0.1.0-x86_64.msi", PACKAGE_NAME
     ));
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();

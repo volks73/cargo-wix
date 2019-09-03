@@ -29,9 +29,9 @@ toml = "0.4"
 uuid = { version = "0.7", features = ["v4"] }
 
 [dev-dependencies]
-assert_fs = "0.9"
+assert_fs = "0.11"
 lazy_static = "1"
-predicates = "0.9"
+predicates = "1.0"
 tempfile = "3"
 sxd-document = "0.3"
 sxd-xpath = "0.4"

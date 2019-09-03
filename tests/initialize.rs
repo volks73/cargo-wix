@@ -25,6 +25,7 @@ mod common;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
+use assert_fs::fixture::ChildPath;
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -166,7 +167,8 @@ fn input_works() {
 fn output_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
-    let output = tempfile::Builder::new().prefix("cargo_wix_test_output_").tempdir().unwrap();
+    let temp_dir = tempfile::Builder::new().prefix("cargo_wix_test_output_").tempdir().unwrap();
+    let output = ChildPath::new(temp_dir.path());
     env::set_current_dir(package.path()).unwrap();
     let result = Builder::default()
         .output(output.path().to_str())

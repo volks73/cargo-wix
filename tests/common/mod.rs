@@ -1,9 +1,14 @@
+extern crate assert_fs;
 extern crate sxd_document;
 extern crate sxd_xpath;
-extern crate tempfile;
+// extern crate tempfile;
 
-use std::fs::File;
-use std::io::Read;
+use assert_fs::prelude::*;
+
+use assert_fs::TempDir;
+use std::fs;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::Path;
 use std::process::Command;
 use self::sxd_document::parser;
@@ -11,6 +16,9 @@ use self::sxd_xpath::{Context, Factory};
 
 #[allow(dead_code)]
 pub const TARGET_NAME: &str = "target";
+
+#[allow(dead_code)]
+pub const PACKAGE_NAME: &str = "cargowixtest";
 
 /// Create a new cargo project/package for a binary project in a temporary
 /// directory.
@@ -34,23 +42,80 @@ pub const TARGET_NAME: &str = "target";
 /// This will panic if a temporary directory fails to be created or if cargo
 /// fails to create the project/package.
 #[allow(dead_code)]
-pub fn create_test_package() -> tempfile::TempDir {
+// pub fn create_test_package() -> tempfile::TempDir {
+pub fn create_test_package() -> TempDir {
     // Use a prefix because the default `.tmp` is an invalid name for a Cargo package.
     //
     // Cannot use dashes. WiX Toolset only allows A-Z, a-z, digits, underscores (_), or periods (.)
     // for attribute IDs.
-    let temp_dir = tempfile::Builder::new().prefix("cargo_wix_test_").tempdir().unwrap();
+    // let temp_dir = tempfile::Builder::new().prefix("cargo_wix_test_").tempdir().unwrap();
+    let temp_dir = TempDir::new().unwrap();
     let cargo_init_status = Command::new("cargo")
         .arg("init")
         .arg("--bin")
         .arg("--quiet")
         .arg("--vcs")
         .arg("none")
+        .arg("--name")
+        .arg(PACKAGE_NAME)
         .arg(temp_dir.path())
         .status()
         .expect("Creation of test Cargo package");
     assert!(cargo_init_status.success());
     temp_dir
+}
+
+/// Create a new cargo project/package for a project with multiple binaries in a
+/// temporary directory. See the [create_test_package] function for more
+/// information.
+///
+/// Following creation of the project, the manifest file (Cargo.toml) is
+/// modified to include multiple `[[bin]]` sections for multiple binaries. The
+/// original `main.rs` file that is created for the first binary is copied for
+/// each of the other binaries. A total of three (3) binaries will be created
+/// and added to the manifest file.
+///
+/// [create_test_package]: fn.create_test_package.html
+///
+/// # Panics
+///
+/// This will panic if a temporary directory fails to be created or if cargo
+/// fails to create the project/package.
+///
+/// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
+/// project layout for multiple binaries.
+#[allow(dead_code)]
+pub fn create_test_package_multiple_binaries() -> assert_fs::TempDir {
+    let package = create_test_package();
+    let package_manifest = package.child("Cargo.toml");
+    let package_src = package.child("src");
+    {
+        let mut cargo_toml_handle = OpenOptions::new()
+            .read(true)
+            .append(true)
+            .open(package_manifest.path())
+            .unwrap();
+        cargo_toml_handle.write_all(
+r#"[[bin]]
+name = "main1"
+path = "src/main1.rs"
+
+[[bin]]
+name = "main2"
+path = "src/main2.rs"
+
+[[bin]]
+name = "main3"
+path = "src/main3.rs"
+"#.as_bytes()
+        ).unwrap();
+    }
+    let package_original_main = package_src.child("main.rs");
+    fs::copy(package_original_main.path(), package_src.child("main1.rs").path()).unwrap();
+    fs::copy(package_original_main.path(), package_src.child("main2.rs").path()).unwrap();
+    fs::copy(package_original_main.path(), package_src.child("main3.rs").path()).unwrap();
+    fs::remove_file(package_original_main.path()).unwrap();
+    package
 }
 
 /// Evaluates an XPath expression for a WiX Source file.
