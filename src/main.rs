@@ -534,6 +534,12 @@
 //! file (wxs), an alternative to stdout for _print_ subcommand, and the created
 //! installer for the _default_ subcommand.
 //!
+//! When used with the _default_ subcommand to create an installer (MSI), if the
+//! path is to an existing directory or the path has a trailing `/` or `\`, then
+//! the MSI will be available after creation at the specified path, but the MSI
+//! file name will be the default file name based on the package name, version,
+//! and platform.
+//!
 //! ### `-O,--owner`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
@@ -950,11 +956,18 @@ fn main() {
                         flag to show the output.")
                     .long("nocapture"))
                 .arg(Arg::with_name("output")
-                    .help("A path to a folder for generated files")
+                    .help("A path to a destination file or an existing folder")
                     .long_help("Sets the destination file name and path for the \
-                        created installer. The default is to create an installer \
-                        with the '<product-name>-<version>-<arch>.msi' file name in \
-                        the 'target\\wix' folder.")
+                        created installer, or the destination folder for the \
+                        installer with the default file name. If the path is to \
+                        an existing folder or has a trailing slash (forward and \
+                        backward), then the default installer file name will be \
+                        used and the installer will be available in the folder \
+                        after creation. Otherwise, this value overwrites the \
+                        default file name and path for the installer. The \
+                        default is to create an installer with the \
+                        '<product-name>-<version>-<arch>.msi' file name in the \
+                        'target\\wix' folder.")
                     .long("output")
                     .short("o")
                     .takes_value(true))
