@@ -157,12 +157,18 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the output file.
+    /// Sets the output file and destination.
     ///
     /// The default is to create a MSI file with the
     /// `<product-name>-<version>-<arch>.msi` file name and extension in the
     /// `target\wix` folder. Use this method to override the destination and
     /// file name of the Windows installer.
+    ///
+    /// If the path is to an existing folder or contains a trailing slash
+    /// (forward or backward), then the default MSI file name is used, but the
+    /// installer will be available at the specified path. When specifying a
+    /// file name and path, the `.msi` file is not required. It will be added
+    /// automatically.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
