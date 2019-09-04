@@ -15,14 +15,14 @@
 //! The implementation for the `purge` command. This command is focused on
 //! removing all files associated with `cargo wix` subcommand.
 
-use CARGO_MANIFEST_FILE;
 use clean;
-use Error;
-use Result;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::PathBuf;
+use Error;
+use Result;
+use CARGO_MANIFEST_FILE;
 use WIX;
 
 /// A builder for creating an execution context to remove all files and folders
@@ -35,9 +35,7 @@ pub struct Builder<'a> {
 impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
-        Builder {
-            input: None,
-        }
+        Builder { input: None }
     }
 
     /// Sets the path to a package's manifest (Cargo.toml) to be purge.
@@ -101,10 +99,14 @@ impl Execution {
                 trace!("The input path exists and it is a file");
                 if input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {
                     trace!("The input file is a Cargo manifest file");
-                    Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
-                        p.push(WIX);
-                        Some(p)
-                    }).unwrap())
+                    Ok(input
+                        .parent()
+                        .map(|p| p.to_path_buf())
+                        .and_then(|mut p| {
+                            p.push(WIX);
+                            Some(p)
+                        })
+                        .unwrap())
                 } else {
                     Err(Error::Generic(format!(
                         "The '{}' path does not appear to be to a '{}' file",
@@ -119,8 +121,10 @@ impl Execution {
                 )))
             }
         } else {
-            trace!("An input path has NOT been explicitly specified, implicitly using the current \
-                   working directory");
+            trace!(
+                "An input path has NOT been explicitly specified, implicitly using the current \
+                 working directory"
+            );
             let mut cwd = env::current_dir()?;
             cwd.push(WIX);
             Ok(cwd)
@@ -153,22 +157,21 @@ mod tests {
     mod execution {
         extern crate assert_fs;
 
-        use std::fs::File;
         use super::*;
+        use std::fs::File;
 
         #[test]
         fn wix_works() {
             let actual = Execution::default().wix().unwrap();
-            let cwd = env::current_dir().expect("Current Working Directory").join(WIX);
+            let cwd = env::current_dir()
+                .expect("Current Working Directory")
+                .join(WIX);
             assert_eq!(actual, cwd);
         }
 
         #[test]
         fn wix_with_nonexistent_manifest_fails() {
-            let result = Builder::new()
-                .input(Some("C:\\Cargo.toml"))
-                .build()
-                .wix();
+            let result = Builder::new().input(Some("C:\\Cargo.toml")).build().wix();
             assert!(result.is_err());
         }
 
@@ -199,4 +202,3 @@ mod tests {
         }
     }
 }
-

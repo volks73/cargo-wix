@@ -665,64 +665,76 @@ fn main() {
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
-        .long_help("Sets the path to a bitmap (.bmp) image file that will be \
+        .long_help(
+            "Sets the path to a bitmap (.bmp) image file that will be \
              displayed across the top of each dialog in the installer. The banner \
-             image dimensions should be 493 x 58 pixels.")
+             image dimensions should be 493 x 58 pixels.",
+        )
         .long("banner")
         .short("b")
         .takes_value(true);
     // The binary option for the `init` and `print` subcommands.
     let binary = Arg::with_name("binary")
         .help("A path to an executable file (.exe) for the application")
-        .long_help("Sets the path to an executable file that will override the \
+        .long_help(
+            "Sets the path to an executable file that will override the \
              default binary included in the installer. The default binary is the \
              'target\\release\\<package name>.exe' file, where <package-name> is the \
              value from the 'name' field in the '[package]' section of the package's \
-             manifest (Cargo.toml).")
+             manifest (Cargo.toml).",
+        )
         .long("binary")
         .short("B")
         .takes_value(true);
     // The description option for the `init` and `print` subcommands.
     let description = Arg::with_name("description")
         .help("A string describing the application in the installer")
-        .long_help("Overrides the 'description' field of the package's manifest \
+        .long_help(
+            "Overrides the 'description' field of the package's manifest \
              (Cargo.toml) as the description within the installer. Text with spaces \
-             should be surrounded by double quotes.")
+             should be surrounded by double quotes.",
+        )
         .long("description")
         .short("d")
         .takes_value(true);
     // The dialog option for the `init` and `print` subcommands.
     let dialog = Arg::with_name("dialog")
         .help("A path to an image file (.bmp) for the installer's welcome dialog")
-        .long_help("Sets the path to a bitmap (.bmp) image file that will be \
+        .long_help(
+            "Sets the path to a bitmap (.bmp) image file that will be \
              displayed to the left on the first dialog of the installer. The dialog \
-             image dimensions should be 493 x 312 pxiels.")
+             image dimensions should be 493 x 312 pxiels.",
+        )
         .long("dialog")
         .short("D")
         .takes_value(true);
     // The eula option for the `init` and `print` subcommands.
     let eula = Arg::with_name("eula")
         .help("A path to a RTF file (.rtf) for the installer's license agreement dialog")
-        .long_help("Specifies a Rich Text Format (RTF) file to use as the End \
+        .long_help(
+            "Specifies a Rich Text Format (RTF) file to use as the End \
              User License Agreement (EULA) for the license agreement dialog of the \
              installer. The default is to disable the license agreement dialog unless \
              one of the supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated \
              based on the value of the 'license' field in the package's manifest \
              (Cargo.toml). An EULA can be enabled later by directly modifying the WiX \
-             Source (wxs) file with a text editor.")
+             Source (wxs) file with a text editor.",
+        )
         .long("eula")
         .short("e")
         .takes_value(true);
     // The license option for the `init` and `print` subcommands.
     let license = Arg::with_name("license")
         .help("A path to any file (.txt, .pdf, .rtf, etc.) to be used as a license")
-        .long_help("Overrides the 'license-file' field or any license generated \
+        .long_help(
+            "Overrides the 'license-file' field or any license generated \
              from the 'license' field of the package's manifest (Cargo.toml). If an \
              appropriate license file does not exist, cannot be found, or is not \
              specified, then no license file is included in the installer or the \
              installation folder along side the binary. A file containing the \
              license, such as a TXT, PDF, or RTF file, can be added later by directly \
-             editing the generated WiX Source file (wxs) in a text editor.")
+             editing the generated WiX Source file (wxs) in a text editor.",
+        )
         .long("license")
         .short("l")
         .takes_value(true);
@@ -736,67 +748,80 @@ fn main() {
              'documentation', or 'repository' fields in the package's manifest \
              (Cargo.toml). The help URL can be enabled after initialization by \
              directly modifying the WiX Source (wxs) file with a text editor.",
-        ).long("url")
+        )
+        .long("url")
         .short("u")
         .takes_value(true);
     // The manufacturer option for the `init` and `print` subcommands
     let manufacturer = Arg::with_name("manufacturer")
         .help("A string for the Add/Remove Programs control panel's Manufacturer")
-        .long_help("Overrides the first author in the 'authors' field of the \
+        .long_help(
+            "Overrides the first author in the 'authors' field of the \
              package's manifest (Cargo.toml) as the manufacturer within the \
              installer. The manufacturer can be changed after initialization by \
-             directly modifying the WiX Source file (wxs) with a text editor.")
+             directly modifying the WiX Source file (wxs) with a text editor.",
+        )
         .long("manufacturer")
         .short("m")
         .takes_value(true);
     // The owner option for the `init` and `print` subcommands
     let owner = Arg::with_name("owner")
         .help("A string for a generated license's copyright holder")
-        .long_help("Sets the copyright owner for the license during \
+        .long_help(
+            "Sets the copyright owner for the license during \
              initialization. The default is to use the first author from the \
              package's manifest (Cargo.toml). This is only used when generating a \
              license based on the value of the 'license' field in the package's \
-             manifest.")
+             manifest.",
+        )
         .long("owner")
         .short("O")
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
         .help("A path to an image file (.ico) for the Add/Remove Programs control panel")
-        .long_help("Sets the path to an image file that will be displayed as an \
+        .long_help(
+            "Sets the path to an image file that will be displayed as an \
              icon in the Add/Remove Programs (ARP) control panel for the installed \
-             application.")
+             application.",
+        )
         .long("product-icon")
         .short("p")
         .takes_value(true);
     // The product name option for the `init`, `print`, and `sign` subcommands
     let product_name = Arg::with_name("product-name")
         .help("A string for the Add/Remove Programs control panel's Name")
-        .long_help("Overrides the 'name' field of the package's manifest \
+        .long_help(
+            "Overrides the 'name' field of the package's manifest \
              (Cargo.toml) as the product name within the installer. The product name \
              can be changed after initialization by directly modifying the WiX Source \
-             file (wxs) with a text editor.")
+             file (wxs) with a text editor.",
+        )
         .long("product-name")
         .short("P")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
     let verbose = Arg::with_name("verbose")
         .help("The verbosity level for logging statements")
-        .long_help("Sets the level of verbosity. The higher the level of \
+        .long_help(
+            "Sets the level of verbosity. The higher the level of \
              verbosity, the more information that is printed and logged when the \
              application is executed. This flag can be specified multiple times, \
              where each occurrance increases the level and/or details written for \
-             each statement.")
+             each statement.",
+        )
         .long("verbose")
         .short("v")
         .multiple(true);
     let year = Arg::with_name("year")
         .help("A string for a generated license's copyright year")
-        .long_help("Sets the copyright year for the license during \
+        .long_help(
+            "Sets the copyright year for the license during \
              initialization. The default is to use the current year. This is only \
              used if a license is generated from one of the supported licenses based \
              on the value of the 'license' field in the package's manifest \
-             (Cargo.toml).")
+             (Cargo.toml).",
+        )
         .long("year")
         .short("y")
         .takes_value(true);
@@ -1058,7 +1083,8 @@ fn main() {
         ("print", Some(m)) => m,
         ("purge", Some(m)) => m,
         _ => matches,
-    }.occurrences_of("verbose");
+    }
+    .occurrences_of("verbose");
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
     // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
     // level is later configured with the verbosity using the `filter` method. There are many
@@ -1075,34 +1101,37 @@ fn main() {
     // For now, implementing environment variable support is held off and only the verbosity is
     // used to set the log level.
     let mut builder = Builder::new();
-    builder.format(|buf, record| {
-        // This implmentation for a format is copied from the default format implemented for the
-        // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
-        // message and change the colors to match the previous colors used by the `loggerv` crate.
-        let mut level_style = buf.style();
-        let level = record.level();
-        match level {
-            // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
-            // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
-            // same white color.
-            Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
-            Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
-            Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
-            Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
-            Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
-        };
-        let write_level = write!(buf, "{:>5}: ", level_style.value(level));
-        let write_args = writeln!(buf, "{}", record.args());
-        write_level.and(write_args)
-    }).filter(
-        Some("wix"),
-        match verbosity {
-            0 => LevelFilter::Warn,
-            1 => LevelFilter::Info,
-            2 => LevelFilter::Debug,
-            _ => LevelFilter::Trace,
-        },
-    ).init();
+    builder
+        .format(|buf, record| {
+            // This implmentation for a format is copied from the default format implemented for the
+            // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
+            // message and change the colors to match the previous colors used by the `loggerv` crate.
+            let mut level_style = buf.style();
+            let level = record.level();
+            match level {
+                // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
+                // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
+                // same white color.
+                Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
+                Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
+                Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
+                Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
+                Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+            };
+            let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+            let write_args = writeln!(buf, "{}", record.args());
+            write_level.and(write_args)
+        })
+        .filter(
+            Some("wix"),
+            match verbosity {
+                0 => LevelFilter::Warn,
+                1 => LevelFilter::Info,
+                2 => LevelFilter::Debug,
+                _ => LevelFilter::Trace,
+            },
+        )
+        .init();
     let result = match matches.subcommand() {
         ("clean", Some(m)) => {
             let mut clean = clean::Builder::new();

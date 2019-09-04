@@ -30,10 +30,13 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use toml::Value;
-use wix::{CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX_SOURCE_FILE_NAME, WIX_SOURCE_FILE_EXTENSION, WIX};
 use wix::initialize::{Builder, Execution};
+use wix::{
+    CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
+    WIX_SOURCE_FILE_NAME,
+};
 
-lazy_static!{
+lazy_static! {
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;
     static ref LICENSE_RTF: String = LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION;
     static ref WIX_PATH: PathBuf = PathBuf::from(WIX);
@@ -53,9 +56,15 @@ fn default_works() {
     env::set_current_dir(original_working_directory).unwrap();
     println!("{:?}", result);
     assert!(result.is_ok());
-    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
-    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
-    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::missing());
+    package
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::missing());
 }
 
 #[test]
@@ -69,7 +78,7 @@ fn description_works() {
     assert!(result.is_ok());
     let actual = common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
-        "/wix:Wix/wix:Product/wix:Package/@Description"
+        "/wix:Wix/wix:Product/wix:Package/@Description",
     );
     assert_eq!(actual, EXPECTED);
 }
@@ -85,7 +94,7 @@ fn help_url_works() {
     assert!(result.is_ok());
     let actual = common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
-        "/wix:Wix/wix:Product/wix:Property[@Id='ARPHELPLINK']/@Value"
+        "/wix:Wix/wix:Product/wix:Property[@Id='ARPHELPLINK']/@Value",
     );
     assert_eq!(actual, EXPECTED);
 }
@@ -96,12 +105,15 @@ fn manufacturer_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let result = Builder::default().manufacturer(Some(EXPECTED)).build().run();
+    let result = Builder::default()
+        .manufacturer(Some(EXPECTED))
+        .build()
+        .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
     let actual = common::evaluate_xpath(
         package.child(MAIN_WXS_PATH.as_path()).path(),
-        "/wix:Wix/wix:Product/wix:Package/@Manufacturer"
+        "/wix:Wix/wix:Product/wix:Package/@Manufacturer",
     );
     assert_eq!(actual, EXPECTED);
 }
@@ -112,21 +124,33 @@ fn product_name_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
-    let result = Builder::default().product_name(Some(EXPECTED)).build().run();
+    let result = Builder::default()
+        .product_name(Some(EXPECTED))
+        .build()
+        .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "/wix:Wix/wix:Product/@Name"
-    ), EXPECTED);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "/wix:Wix/wix:Product/wix:Property[@Id='DiskPrompt']/@Value"
-    ), EXPECTED.to_string() + " Installation");
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:Directory[@Id='APPLICATIONFOLDER']/@Name"
-    ), EXPECTED);
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "/wix:Wix/wix:Product/@Name"
+        ),
+        EXPECTED
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "/wix:Wix/wix:Product/wix:Property[@Id='DiskPrompt']/@Value"
+        ),
+        EXPECTED.to_string() + " Installation"
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:Directory[@Id='APPLICATIONFOLDER']/@Name"
+        ),
+        EXPECTED
+    );
 }
 
 #[test]
@@ -139,14 +163,20 @@ fn binary_works() {
     let result = Builder::default().binary(Some(EXPECTED)).build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Name", BINARY_NAME)
-    ), "Example.exe");
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Source", BINARY_NAME)
-    ), EXPECTED);
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Name", BINARY_NAME)
+        ),
+        "Example.exe"
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", BINARY_NAME)
+        ),
+        EXPECTED
+    );
 }
 
 #[test]
@@ -158,8 +188,12 @@ fn input_works() {
         .run()
         .expect("OK result");
     package.child(WIX).assert(predicate::path::exists());
-    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
-    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::missing());
+    package
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::missing());
 }
 
 #[test]
@@ -174,7 +208,9 @@ fn output_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    output.child(MAIN_WXS.as_str()).assert(predicate::path::exists());
+    output
+        .child(MAIN_WXS.as_str())
+        .assert(predicate::path::exists());
 }
 
 #[test]
@@ -187,17 +223,23 @@ fn input_with_output_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("MIT")),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => {
+                        t.insert(String::from("license"), Value::from("MIT"))
+                    }
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -226,14 +268,20 @@ fn license_with_txt_file_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), EXPECTED);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), package_license.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        EXPECTED
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        package_license.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -250,18 +298,27 @@ fn license_with_rtf_file_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), EXPECTED);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), package_license.path().to_str().unwrap());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), package_license.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        EXPECTED
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        package_license.path().to_str().unwrap()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        package_license.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -278,10 +335,13 @@ fn eula_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), package_eula.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        package_eula.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -293,17 +353,23 @@ fn mit_license_id_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("MIT")),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => {
+                        t.insert(String::from("license"), Value::from("MIT"))
+                    }
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -311,21 +377,36 @@ fn mit_license_id_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
-    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
-    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::exists());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_RTF.to_owned());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF_PATH.display().to_string());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF_PATH.display().to_string());
+    package
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::exists());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        LICENSE_RTF.to_owned()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
 }
 
 #[test]
@@ -337,17 +418,23 @@ fn apache2_license_id_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("Apache-2.0")),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => {
+                        t.insert(String::from("license"), Value::from("Apache-2.0"))
+                    }
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -355,21 +442,36 @@ fn apache2_license_id_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
-    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
-    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::exists());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_RTF.to_owned());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF_PATH.display().to_string());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF_PATH.display().to_string());
+    package
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::exists());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        LICENSE_RTF.to_owned()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
 }
 
 #[test]
@@ -381,17 +483,23 @@ fn gpl3_license_id_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(String::from("license"), Value::from("GPL-3.0")),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => {
+                        t.insert(String::from("license"), Value::from("GPL-3.0"))
+                    }
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -399,21 +507,36 @@ fn gpl3_license_id_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    package.child(WIX_PATH.as_path()).assert(predicate::path::exists());
-    package.child(MAIN_WXS_PATH.as_path()).assert(predicate::path::exists());
-    package.child(LICENSE_RTF_PATH.as_path()).assert(predicate::path::exists());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), LICENSE_RTF.to_owned());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), LICENSE_RTF_PATH.display().to_string());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), LICENSE_RTF_PATH.display().to_string());
+    package
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::exists());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        LICENSE_RTF.to_owned()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        LICENSE_RTF_PATH.display().to_string()
+    );
 }
 
 #[test]
@@ -428,20 +551,24 @@ fn license_file_field_with_rtf_file_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(
-                    String::from("license-file"),
-                    Value::from(package_license.path().to_str().unwrap())
-                ),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => t.insert(
+                        String::from("license-file"),
+                        Value::from(package_license.path().to_str().unwrap()),
+                    ),
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -449,18 +576,27 @@ fn license_file_field_with_rtf_file_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), EXPECTED);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), package_license.path().to_str().unwrap());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
-    ), package_license.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        EXPECTED
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        package_license.path().to_str().unwrap()
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
+        ),
+        package_license.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -475,20 +611,24 @@ fn license_file_field_with_txt_file_works() {
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
-        cargo_toml_handle.read_to_string(&mut cargo_toml_content).unwrap();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
         toml::from_str(&cargo_toml_content).unwrap()
     };
     {
-        toml.get_mut("package").and_then(|p| {
-            match p {
-                Value::Table(ref mut t) => t.insert(
-                    String::from("license-file"),
-                    Value::from(package_license.path().to_str().unwrap())
-                ),
-                _ => panic!("The 'package' section is not a table"),
-            };
-            Some(p)
-        }).expect("A package section for the Cargo.toml");
+        toml.get_mut("package")
+            .and_then(|p| {
+                match p {
+                    Value::Table(ref mut t) => t.insert(
+                        String::from("license-file"),
+                        Value::from(package_license.path().to_str().unwrap()),
+                    ),
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
         let toml_string = toml.to_string();
         let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
@@ -496,14 +636,20 @@ fn license_file_field_with_txt_file_works() {
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Name"
-    ), EXPECTED);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:File[@Id='LicenseFile']/@Source"
-    ), package_license.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Name"
+        ),
+        EXPECTED
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:File[@Id='LicenseFile']/@Source"
+        ),
+        package_license.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -521,10 +667,13 @@ fn banner_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUIBannerBmp']/@Value"
-    ), package_banner.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUIBannerBmp']/@Value"
+        ),
+        package_banner.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -542,10 +691,13 @@ fn dialog_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:WixVariable[@Id='WixUIDialogBmp']/@Value"
-    ), package_dialog.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:WixVariable[@Id='WixUIDialogBmp']/@Value"
+        ),
+        package_dialog.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -563,10 +715,13 @@ fn product_icon_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        "//*/wix:Icon[@Id='ProductICO']/@SourceFile"
-    ), package_product_icon.path().to_str().unwrap());
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            "//*/wix:Icon[@Id='ProductICO']/@SourceFile"
+        ),
+        package_product_icon.path().to_str().unwrap()
+    );
 }
 
 #[test]
@@ -584,29 +739,46 @@ fn multiple_binaries_works() {
     let result = Builder::default().build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_ok());
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_1)
-    ), format!("{}.exe", EXPECTED_NAME_1));
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_1)
-    ), EXPECTED_SOURCE_1);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_2)
-    ), format!("{}.exe", EXPECTED_NAME_2));
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_2)
-    ), EXPECTED_SOURCE_2);
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_3)
-    ), format!("{}.exe", EXPECTED_NAME_3));
-    assert_eq!(common::evaluate_xpath(
-        package.child(MAIN_WXS_PATH.as_path()).path(),
-        &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_3)
-    ), EXPECTED_SOURCE_3);
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_1)
+        ),
+        format!("{}.exe", EXPECTED_NAME_1)
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_1)
+        ),
+        EXPECTED_SOURCE_1
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_2)
+        ),
+        format!("{}.exe", EXPECTED_NAME_2)
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_2)
+        ),
+        EXPECTED_SOURCE_2
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_3)
+        ),
+        format!("{}.exe", EXPECTED_NAME_3)
+    );
+    assert_eq!(
+        common::evaluate_xpath(
+            package.child(MAIN_WXS_PATH.as_path()).path(),
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_3)
+        ),
+        EXPECTED_SOURCE_3
+    );
 }
-

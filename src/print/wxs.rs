@@ -15,20 +15,20 @@
 //! The implementation for printing a WiX Source (wxs) file.
 
 use description;
-use Error;
 use eula::Eula;
-use EXE_FILE_EXTENSION;
-use LICENSE_FILE_NAME;
 use manifest;
 use mustache::{self, MapBuilder};
 use product_name;
-use Result;
-use RTF_FILE_EXTENSION;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use Template;
 use toml::Value;
 use uuid::Uuid;
+use Error;
+use Result;
+use Template;
+use EXE_FILE_EXTENSION;
+use LICENSE_FILE_NAME;
+use RTF_FILE_EXTENSION;
 
 /// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]
@@ -288,41 +288,60 @@ impl Execution {
         let mut map = MapBuilder::new()
             .insert_str("binary-name", self.binary_name(&manifest)?)
             .insert_str("binary-source", self.binary_source(&manifest)?)
-            .insert_str("product-name", product_name(self.product_name.as_ref(), &manifest)?)
+            .insert_str(
+                "product-name",
+                product_name(self.product_name.as_ref(), &manifest)?,
+            )
             .insert_str("manufacturer", self.manufacturer(&manifest)?)
-            .insert_str("upgrade-code-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
-            .insert_str("path-component-guid", Uuid::new_v4().to_hyphenated().to_string().to_uppercase());
+            .insert_str(
+                "upgrade-code-guid",
+                Uuid::new_v4().to_hyphenated().to_string().to_uppercase(),
+            )
+            .insert_str(
+                "path-component-guid",
+                Uuid::new_v4().to_hyphenated().to_string().to_uppercase(),
+            );
         if let Some(ref banner) = self.banner {
             map = map.insert_str("banner", banner.display().to_string());
         }
         if let Some(description) = description(self.description.clone(), &manifest) {
             map = map.insert_str("description", description);
         } else {
-            warn!("A description was not specified at the command line or in the package's manifest \
-                  (Cargo.toml). The description can be added manually to the generated WiX \
-                  Source (wxs) file using a text editor.");
+            warn!(
+                "A description was not specified at the command line or in the package's manifest \
+                 (Cargo.toml). The description can be added manually to the generated WiX \
+                 Source (wxs) file using a text editor."
+            );
         }
         if let Some(ref dialog) = self.dialog {
             map = map.insert_str("dialog", dialog.display().to_string());
         }
         match self.eula(&manifest)? {
             Eula::Disabled => {
-                warn!("An EULA was not specified at the command line, a RTF \
-                      license file was not specified in the package manifest's \
-                      (Cargo.toml) 'license-file' field, or the license ID from the \
-                      package manifest's 'license' field is not recognized. The \
-                      license agreement dialog will be excluded from the installer. An \
-                      EULA can be added manually to the generated WiX Source (wxs) \
-                      file using a text editor.");
-            },
+                warn!(
+                    "An EULA was not specified at the command line, a RTF \
+                     license file was not specified in the package manifest's \
+                     (Cargo.toml) 'license-file' field, or the license ID from the \
+                     package manifest's 'license' field is not recognized. The \
+                     license agreement dialog will be excluded from the installer. An \
+                     EULA can be added manually to the generated WiX Source (wxs) \
+                     file using a text editor."
+                );
+            }
             e => map = map.insert_str("eula", e.to_string()),
         }
-        if let Some(url) = self.help_url.as_ref().or(Execution::help_url(&manifest).as_ref()) {
+        if let Some(url) = self
+            .help_url
+            .as_ref()
+            .or(Execution::help_url(&manifest).as_ref())
+        {
             map = map.insert_str("help-url", url.to_owned());
         } else {
-            warn!("A help URL could not be found and it will be excluded from the installer. \
-                  A help URL can be added manually to the generated WiX Source (wxs) file \
-                  using a text editor.");
+            warn!(
+                "A help URL could not be found and it will be excluded from the installer. \
+                 A help URL can be added manually to the generated WiX Source (wxs) file \
+                 using a text editor."
+            );
         }
         if let Some(name) = self.license_name(&manifest) {
             map = map.insert_str("license-name", name);
@@ -330,50 +349,65 @@ impl Execution {
         if let Some(source) = self.license_source(&manifest)? {
             map = map.insert_str("license-source", source);
         } else {
-            warn!("A license file could not be found and it will be excluded from the \
-                  installer. A license file can be added manually to the generated WiX Source \
-                  (wxs) file using a text editor.");
+            warn!(
+                "A license file could not be found and it will be excluded from the \
+                 installer. A license file can be added manually to the generated WiX Source \
+                 (wxs) file using a text editor."
+            );
         }
         if let Some(icon) = self.product_icon {
             map = map.insert_str("product-icon", icon.display().to_string());
         }
         let data = map.build();
-        template.render_data(&mut destination, &data).map_err(Error::from)
+        template
+            .render_data(&mut destination, &data)
+            .map_err(Error::from)
     }
 
     fn binary_name(&self, manifest: &Value) -> Result<String> {
         if let Some(ref b) = self.binary {
-            Ok(b.file_stem().and_then(OsStr::to_str).map(String::from).expect("Binary path to have a file name"))
+            Ok(b.file_stem()
+                .and_then(OsStr::to_str)
+                .map(String::from)
+                .expect("Binary path to have a file name"))
         } else {
-            manifest.get("bin")
+            manifest
+                .get("bin")
                 .and_then(|b| b.as_array())
                 .and_then(|a| a.get(0))
                 .and_then(|e| e.as_table())
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
-                .map_or(
-                    product_name(None, manifest),
-                    |s| Ok(String::from(s))
-                )
+                .map_or(product_name(None, manifest), |s| Ok(String::from(s)))
         }
     }
 
     fn binary_source(&self, manifest: &Value) -> Result<String> {
         if let Some(ref path) = self.binary.clone().map(PathBuf::from) {
-            Ok(path.to_str().map(String::from).expect("Path to string conversion"))
+            Ok(path
+                .to_str()
+                .map(String::from)
+                .expect("Path to string conversion"))
         } else {
             self.binary_name(manifest).map(|name| {
                 let mut path = PathBuf::from("target").join("release").join(name);
                 path.set_extension(EXE_FILE_EXTENSION);
-                path.to_str().map(String::from).expect("Path to string conversion")
+                path.to_str()
+                    .map(String::from)
+                    .expect("Path to string conversion")
             })
         }
     }
 
     fn help_url(manifest: &Value) -> Option<String> {
-        manifest.get("package")
+        manifest
+            .get("package")
             .and_then(|p| p.as_table())
-            .and_then(|t| t.get("documentation").or(t.get("homepage")).or(t.get("repository")))
+            .and_then(|t| {
+                t.get("documentation")
+                    .or(t.get("homepage"))
+                    .or(t.get("repository"))
+            })
             .and_then(|h| h.as_str())
             .map(|s| {
                 trace!("Using '{}' for the help URL", s);
@@ -385,11 +419,13 @@ impl Execution {
         if let Some(ref path) = self.eula.clone().map(PathBuf::from) {
             Eula::new(Some(path), manifest)
         } else {
-            Eula::new(self.license.clone()
-                .map(PathBuf::from)
-                .filter(|p| p.extension().and_then(|p| p.to_str()) == Some(RTF_FILE_EXTENSION))
-                .as_ref(),
-                manifest
+            Eula::new(
+                self.license
+                    .clone()
+                    .map(PathBuf::from)
+                    .filter(|p| p.extension().and_then(|p| p.to_str()) == Some(RTF_FILE_EXTENSION))
+                    .as_ref(),
+                manifest,
             )
         }
     }
@@ -398,7 +434,8 @@ impl Execution {
         if let Some(ref l) = self.license.clone().map(PathBuf::from) {
             l.file_name().and_then(|f| f.to_str()).map(String::from)
         } else {
-            manifest.get("package")
+            manifest
+                .get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| {
                     t.get("license")
@@ -412,12 +449,13 @@ impl Execution {
                         .map(|_| String::from(LICENSE_FILE_NAME))
                         .or_else(|| {
                             t.get("license-file")
-                            .and_then(|l| l.as_str())
-                            .and_then(|l| {
-                                Path::new(l).file_name()
-                                    .and_then(|f| f.to_str())
-                                    .map(String::from)
-                            })
+                                .and_then(|l| l.as_str())
+                                .and_then(|l| {
+                                    Path::new(l)
+                                        .file_name()
+                                        .and_then(|f| f.to_str())
+                                        .map(String::from)
+                                })
                         })
                 })
         }
@@ -580,8 +618,8 @@ mod tests {
     mod execution {
         extern crate assert_fs;
 
-        use std::fs::File;
         use super::*;
+        use std::fs::File;
 
         const MIN_MANIFEST: &str = r#"[package]
             name = "Example"
@@ -654,21 +692,27 @@ mod tests {
         #[test]
         fn license_name_with_mit_license_field_works() {
             let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_name(&manifest).expect("License name");
+            let actual = Execution::default()
+                .license_name(&manifest)
+                .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
         fn license_name_with_gpl3_license_field_works() {
             let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_name(&manifest).expect("License name");
+            let actual = Execution::default()
+                .license_name(&manifest)
+                .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
         fn license_name_with_apache2_license_field_works() {
             let manifest = APACHE2_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_name(&manifest).expect("License name");
+            let actual = Execution::default()
+                .license_name(&manifest)
+                .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
@@ -682,22 +726,41 @@ mod tests {
         #[test]
         fn license_source_with_mit_license_field_works() {
             let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_source(&manifest).expect("License source");
-            assert_eq!(actual, Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION));
+            let actual = Execution::default()
+                .license_source(&manifest)
+                .expect("License source");
+            assert_eq!(
+                actual,
+                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+            );
         }
 
         #[test]
         fn license_source_with_gpl3_license_field_works() {
             let manifest = GPL3_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_source(&manifest).expect("License source");
-            assert_eq!(actual, Some(String::from(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)));
+            let actual = Execution::default()
+                .license_source(&manifest)
+                .expect("License source");
+            assert_eq!(
+                actual,
+                Some(String::from(
+                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
+                ))
+            );
         }
 
         #[test]
         fn license_source_with_apache2_license_field_works() {
             let manifest = APACHE2_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().license_source(&manifest).expect("License source");
-            assert_eq!(actual, Some(String::from(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)));
+            let actual = Execution::default()
+                .license_source(&manifest)
+                .expect("License source");
+            assert_eq!(
+                actual,
+                Some(String::from(
+                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
+                ))
+            );
         }
 
         #[test]
@@ -791,7 +854,9 @@ mod tests {
         #[test]
         fn help_url_with_documentation_works() {
             const EXPECTED: &str = "http://www.example.com";
-            let manifest = DOCUMENTATION_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = DOCUMENTATION_MANIFEST
+                .parse::<Value>()
+                .expect("Parsing TOML");
             let actual = Execution::help_url(&manifest);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
@@ -866,12 +931,17 @@ mod tests {
             let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = format!("[package]
+            let manifest = format!(
+                "[package]
                 name = \"Example\"
                 version = \"0.1.0\"
                 authors = [\"First Last <first.last@example.com>\"]
                 license-file = {:?}
-                ", license_file_path).parse::<Value>().expect("Parsing TOML");
+                ",
+                license_file_path
+            )
+            .parse::<Value>()
+            .expect("Parsing TOML");
             let actual = Execution::default().eula(&manifest).unwrap();
             assert_eq!(actual, Eula::Manifest(license_file_path));
         }
@@ -881,12 +951,17 @@ mod tests {
             let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = format!("[package]
+            let manifest = format!(
+                "[package]
                 name = \"Example\"
                 version = \"0.1.0\"
                 authors = [\"First Last <first.last@example.com>\"]
                 license-file = {:?}
-                ", license_file_path).parse::<Value>().expect("Parsing TOML");
+                ",
+                license_file_path
+            )
+            .parse::<Value>()
+            .expect("Parsing TOML");
             let actual = Execution::default().eula(&manifest).unwrap();
             assert_eq!(actual, Eula::Disabled);
         }

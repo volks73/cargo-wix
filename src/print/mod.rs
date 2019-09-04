@@ -19,13 +19,13 @@
 pub mod license;
 pub mod wxs;
 
-use Error;
 use regex::Regex;
-use Result;
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use toml::Value;
+use Error;
+use Result;
 
 fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {
@@ -33,18 +33,21 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
         let f = File::create(output)?;
         Ok(Box::new(f))
     } else {
-        trace!("An output path has NOT been explicity specified. Implicitly \
-                determine output.");
+        trace!(
+            "An output path has NOT been explicity specified. Implicitly \
+             determine output."
+        );
         Ok(Box::new(io::stdout()))
     }
 }
 
 fn first_author(manifest: &Value) -> Result<String> {
-    manifest.get("package")
+    manifest
+        .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("authors"))
         .and_then(|a| a.as_array())
-        .and_then(|a| a.get(0)) 
+        .and_then(|a| a.get(0))
         .and_then(|f| f.as_str())
         .and_then(|s| {
             // Strip email if it exists.
@@ -73,17 +76,19 @@ mod tests {
 
     #[test]
     fn first_author_with_single_author_works() {
-        let manifest = SINGLE_AUTHOR_MANIFEST.parse::<Value>().expect("Parsing TOML");
+        let manifest = SINGLE_AUTHOR_MANIFEST
+            .parse::<Value>()
+            .expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("First Last"));
     }
 
     #[test]
     fn first_author_with_multiple_authors_works() {
-        let manifest = MULTIPLE_AUTHORS_MANIFEST.parse::<Value>().expect("Parsing TOML");
+        let manifest = MULTIPLE_AUTHORS_MANIFEST
+            .parse::<Value>()
+            .expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("1 Author"));
     }
 }
-
-

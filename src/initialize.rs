@@ -22,20 +22,20 @@
 //! exists for the project, the `init` command does not need to be executed
 //! again.
 
-use CARGO_MANIFEST_FILE;
-use Error;
 use eula::Eula;
-use LICENSE_FILE_NAME;
 use print;
-use Result;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
-use WIX_SOURCE_FILE_NAME;
-use WIX_SOURCE_FILE_EXTENSION;
-use WIX;
+use Error;
+use Result;
+use CARGO_MANIFEST_FILE;
+use LICENSE_FILE_NAME;
 use RTF_FILE_EXTENSION;
+use WIX;
+use WIX_SOURCE_FILE_EXTENSION;
+use WIX_SOURCE_FILE_NAME;
 
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]
@@ -388,20 +388,26 @@ impl Execution {
                 } else {
                     info!("Generating an EULA");
                     let mut eula_printer = print::license::Builder::new();
-                    eula_printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
+                    eula_printer
+                        .copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
                     eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
-                    eula_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+                    eula_printer.input(
+                        self.input
+                            .as_ref()
+                            .map(PathBuf::as_path)
+                            .and_then(Path::to_str),
+                    );
                     eula_printer.output(destination.as_path().to_str());
                     eula_printer.build().run(template)?;
                 }
                 destination.pop();
-                let mut relative = destination.strip_prefix(
-                    &super::package_root(self.input.as_ref())?
-                )?.to_owned();
+                let mut relative = destination
+                    .strip_prefix(&super::package_root(self.input.as_ref())?)?
+                    .to_owned();
                 relative.push(LICENSE_FILE_NAME);
                 relative.set_extension(RTF_FILE_EXTENSION);
                 (Some(relative.clone()), Some(relative))
-            },
+            }
             Eula::Disabled => (None, self.license),
         };
         debug!("eula_wxs_path = {:?}", eula_wxs_path);
@@ -412,17 +418,52 @@ impl Execution {
         } else {
             info!("Creating the '{}' file", destination.display());
             let mut wxs_printer = print::wxs::Builder::new();
-            wxs_printer.banner(self.banner.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
-            wxs_printer.binary(self.binary.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.banner(
+                self.banner
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
+            wxs_printer.binary(
+                self.binary
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
-            wxs_printer.dialog(self.dialog.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
-            wxs_printer.eula(eula_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.dialog(
+                self.dialog
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
+            wxs_printer.eula(
+                eula_wxs_path
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
-            wxs_printer.input(self.input.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
-            wxs_printer.license(license_wxs_path.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.input(
+                self.input
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
+            wxs_printer.license(
+                license_wxs_path
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
-            wxs_printer.product_icon(self.product_icon.as_ref().map(PathBuf::as_path).and_then(Path::to_str));
+            wxs_printer.product_icon(
+                self.product_icon
+                    .as_ref()
+                    .map(PathBuf::as_path)
+                    .and_then(Path::to_str),
+            );
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
         }
@@ -437,29 +478,45 @@ impl Execution {
             trace!("An output path has NOT been explicity specified. Implicitly determine output.");
             if let Some(ref input) = self.input {
                 trace!("An input path has been explicitly specified");
-                if input.exists() &&
-                   input.is_file() &&
-                   input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE))
+                if input.exists()
+                    && input.is_file()
+                    && input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE))
                 {
-                    trace!("The input path exists, it is a file, and it appears to be {}", CARGO_MANIFEST_FILE);
-                    Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
-                        p.push(WIX);
-                        Some(p)
-                    }).unwrap())
+                    trace!(
+                        "The input path exists, it is a file, and it appears to be {}",
+                        CARGO_MANIFEST_FILE
+                    );
+                    Ok(input
+                        .parent()
+                        .map(|p| p.to_path_buf())
+                        .and_then(|mut p| {
+                            p.push(WIX);
+                            Some(p)
+                        })
+                        .unwrap())
                 } else {
                     Err(Error::not_found(input))
                 }
             } else {
-                trace!("An input path has NOT been explicitly specified, implicitly using the \
-                       current working directory");
+                trace!(
+                    "An input path has NOT been explicitly specified, implicitly using the \
+                     current working directory"
+                );
                 let mut cwd = env::current_dir()?;
                 cwd.push(CARGO_MANIFEST_FILE);
                 if cwd.exists() && cwd.is_file() {
-                    trace!("The current working directory has a {} file", CARGO_MANIFEST_FILE);
-                    Ok(cwd.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
-                        p.push(WIX);
-                        Some(p)
-                    }).unwrap())
+                    trace!(
+                        "The current working directory has a {} file",
+                        CARGO_MANIFEST_FILE
+                    );
+                    Ok(cwd
+                        .parent()
+                        .map(|p| p.to_path_buf())
+                        .and_then(|mut p| {
+                            p.push(WIX);
+                            Some(p)
+                        })
+                        .unwrap())
                 } else {
                     Err(Error::not_found(&cwd))
                 }
@@ -669,27 +726,45 @@ mod tests {
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
             let execution = b.build();
             assert_eq!(execution.binary, Some(EXPECTED_BINARY).map(PathBuf::from));
-            assert_eq!(execution.copyright_year, Some(EXPECTED_COPYRIGHT_YEAR).map(String::from));
-            assert_eq!(execution.copyright_holder, Some(EXPECTED_COPYRIGHT_HOLDER).map(String::from));
-            assert_eq!(execution.description, Some(EXPECTED_DESCRIPTION).map(String::from));
+            assert_eq!(
+                execution.copyright_year,
+                Some(EXPECTED_COPYRIGHT_YEAR).map(String::from)
+            );
+            assert_eq!(
+                execution.copyright_holder,
+                Some(EXPECTED_COPYRIGHT_HOLDER).map(String::from)
+            );
+            assert_eq!(
+                execution.description,
+                Some(EXPECTED_DESCRIPTION).map(String::from)
+            );
             assert_eq!(execution.eula, Some(EXPECTED_EULA).map(PathBuf::from));
             assert!(execution.force);
             assert_eq!(execution.help_url, Some(EXPECTED_URL).map(String::from));
             assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
             assert_eq!(execution.license, Some(EXPECTED_LICENSE).map(PathBuf::from));
-            assert_eq!(execution.manufacturer, Some(EXPECTED_MANUFACTURER).map(String::from));
+            assert_eq!(
+                execution.manufacturer,
+                Some(EXPECTED_MANUFACTURER).map(String::from)
+            );
             assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
-            assert_eq!(execution.product_icon, Some(EXPECTED_PRODUCT_ICON).map(PathBuf::from));
-            assert_eq!(execution.product_name, Some(EXPECTED_PRODUCT_NAME).map(String::from));
+            assert_eq!(
+                execution.product_icon,
+                Some(EXPECTED_PRODUCT_ICON).map(PathBuf::from)
+            );
+            assert_eq!(
+                execution.product_name,
+                Some(EXPECTED_PRODUCT_NAME).map(String::from)
+            );
         }
     }
 
     mod execution {
         extern crate assert_fs;
 
+        use super::*;
         use std::fs::File;
         use std::io::ErrorKind;
-        use super::*;
 
         #[test]
         fn destination_is_correct_with_defaults() {
@@ -795,4 +870,3 @@ mod tests {
         }
     }
 }
-

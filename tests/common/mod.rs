@@ -4,14 +4,14 @@ extern crate sxd_xpath;
 
 use assert_fs::prelude::*;
 
+use self::sxd_document::parser;
+use self::sxd_xpath::{Context, Factory};
 use assert_fs::TempDir;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::Path;
 use std::process::Command;
-use self::sxd_document::parser;
-use self::sxd_xpath::{Context, Factory};
 
 #[allow(dead_code)]
 pub const TARGET_NAME: &str = "target";
@@ -90,8 +90,9 @@ pub fn create_test_package_multiple_binaries() -> TempDir {
             .append(true)
             .open(package_manifest.path())
             .unwrap();
-        cargo_toml_handle.write_all(
-r#"[[bin]]
+        cargo_toml_handle
+            .write_all(
+                r#"[[bin]]
 name = "main1"
 path = "src/main1.rs"
 
@@ -102,13 +103,27 @@ path = "src/main2.rs"
 [[bin]]
 name = "main3"
 path = "src/main3.rs"
-"#.as_bytes()
-        ).unwrap();
+"#
+                .as_bytes(),
+            )
+            .unwrap();
     }
     let package_original_main = package_src.child("main.rs");
-    fs::copy(package_original_main.path(), package_src.child("main1.rs").path()).unwrap();
-    fs::copy(package_original_main.path(), package_src.child("main2.rs").path()).unwrap();
-    fs::copy(package_original_main.path(), package_src.child("main3.rs").path()).unwrap();
+    fs::copy(
+        package_original_main.path(),
+        package_src.child("main1.rs").path(),
+    )
+    .unwrap();
+    fs::copy(
+        package_original_main.path(),
+        package_src.child("main2.rs").path(),
+    )
+    .unwrap();
+    fs::copy(
+        package_original_main.path(),
+        package_src.child("main3.rs").path(),
+    )
+    .unwrap();
     fs::remove_file(package_original_main.path()).unwrap();
     package
 }
@@ -125,11 +140,15 @@ path = "src/main3.rs"
 pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
     let mut wxs = File::open(wxs).expect("Open Wix Source file");
     let mut wxs_content = String::new();
-    wxs.read_to_string(&mut wxs_content).expect("Read WiX Source file");
+    wxs.read_to_string(&mut wxs_content)
+        .expect("Read WiX Source file");
     let wxs_package = parser::parse(&wxs_content).expect("Parsing WiX Source file");
     let wxs_document = wxs_package.as_document();
     let mut context = Context::new();
     context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/wi");
     let xpath = Factory::new().build(xpath).unwrap().unwrap();
-    xpath.evaluate(&context, wxs_document.root()).unwrap().string()
+    xpath
+        .evaluate(&context, wxs_document.root())
+        .unwrap()
+        .string()
 }
