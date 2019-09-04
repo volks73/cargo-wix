@@ -1,4 +1,6 @@
 var ALIASES = {};
+ALIASES["cargo_wix"] = {};
+ALIASES["wix"] = {};
 ALIASES['cargo_wix'] = {};
 ALIASES['cargo_wix'] = {};
 ALIASES['cargo_wix'] = {};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1227,7 +1227,49 @@
 <span id="1227">1227</span>
 <span id="1228">1228</span>
 <span id="1229">1229</span>
-</pre><pre class="rust ">
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
+<span id="1248">1248</span>
+<span id="1249">1249</span>
+<span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+</pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1764,6 +1806,12 @@
 <span class="doccomment">//! file (wxs), an alternative to stdout for _print_ subcommand, and the created</span>
 <span class="doccomment">//! installer for the _default_ subcommand.</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! When used with the _default_ subcommand to create an installer (MSI), if the</span>
+<span class="doccomment">//! path is to an existing directory or the path has a trailing `/` or `\`, then</span>
+<span class="doccomment">//! the MSI will be available after creation at the specified path, but the MSI</span>
+<span class="doccomment">//! file name will be the default file name based on the package name, version,</span>
+<span class="doccomment">//! and platform.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ### `-O,--owner`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)</span>
@@ -1895,64 +1943,76 @@
     <span class="comment">// The banner option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">banner</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;banner&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.bmp) for the installer&#39;s banner&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
              displayed across the top of each dialog in the installer. The banner \
-             image dimensions should be 493 x 58 pixels.&quot;</span>)
+             image dimensions should be 493 x 58 pixels.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;banner&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;b&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The binary option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;binary&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an executable file (.exe) for the application&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to an executable file that will override the \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the path to an executable file that will override the \
              default binary included in the installer. The default binary is the \
              &#39;target\\release\\&lt;package name&gt;.exe&#39; file, where &lt;package-name&gt; is the \
              value from the &#39;name&#39; field in the &#39;[package]&#39; section of the package&#39;s \
-             manifest (Cargo.toml).&quot;</span>)
+             manifest (Cargo.toml).&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;binary&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;B&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The description option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;description&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string describing the application in the installer&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the &#39;description&#39; field of the package&#39;s manifest \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the &#39;description&#39; field of the package&#39;s manifest \
              (Cargo.toml) as the description within the installer. Text with spaces \
-             should be surrounded by double quotes.&quot;</span>)
+             should be surrounded by double quotes.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;description&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;d&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The dialog option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">dialog</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;dialog&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.bmp) for the installer&#39;s welcome dialog&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
              displayed to the left on the first dialog of the installer. The dialog \
-             image dimensions should be 493 x 312 pxiels.&quot;</span>)
+             image dimensions should be 493 x 312 pxiels.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;dialog&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;D&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The eula option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">eula</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;eula&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to a RTF file (.rtf) for the installer&#39;s license agreement dialog&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Specifies a Rich Text Format (RTF) file to use as the End \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Specifies a Rich Text Format (RTF) file to use as the End \
              User License Agreement (EULA) for the license agreement dialog of the \
              installer. The default is to disable the license agreement dialog unless \
              one of the supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated \
              based on the value of the &#39;license&#39; field in the package&#39;s manifest \
              (Cargo.toml). An EULA can be enabled later by directly modifying the WiX \
-             Source (wxs) file with a text editor.&quot;</span>)
+             Source (wxs) file with a text editor.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;eula&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;e&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The license option for the `init` and `print` subcommands.</span>
     <span class="kw">let</span> <span class="ident">license</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;license&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to any file (.txt, .pdf, .rtf, etc.) to be used as a license&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the &#39;license-file&#39; field or any license generated \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the &#39;license-file&#39; field or any license generated \
              from the &#39;license&#39; field of the package&#39;s manifest (Cargo.toml). If an \
              appropriate license file does not exist, cannot be found, or is not \
              specified, then no license file is included in the installer or the \
              installation folder along side the binary. A file containing the \
              license, such as a TXT, PDF, or RTF file, can be added later by directly \
-             editing the generated WiX Source file (wxs) in a text editor.&quot;</span>)
+             editing the generated WiX Source file (wxs) in a text editor.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;license&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;l&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
@@ -1966,67 +2026,80 @@
              &#39;documentation&#39;, or &#39;repository&#39; fields in the package&#39;s manifest \
              (Cargo.toml). The help URL can be enabled after initialization by \
              directly modifying the WiX Source (wxs) file with a text editor.&quot;</span>,
-        ).<span class="ident">long</span>(<span class="string">&quot;url&quot;</span>)
+        )
+        .<span class="ident">long</span>(<span class="string">&quot;url&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;u&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The manufacturer option for the `init` and `print` subcommands</span>
     <span class="kw">let</span> <span class="ident">manufacturer</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;manufacturer&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s Manufacturer&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the first author in the &#39;authors&#39; field of the \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the first author in the &#39;authors&#39; field of the \
              package&#39;s manifest (Cargo.toml) as the manufacturer within the \
              installer. The manufacturer can be changed after initialization by \
-             directly modifying the WiX Source file (wxs) with a text editor.&quot;</span>)
+             directly modifying the WiX Source file (wxs) with a text editor.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;manufacturer&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;m&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The owner option for the `init` and `print` subcommands</span>
     <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;owner&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for a generated license&#39;s copyright holder&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the copyright owner for the license during \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the copyright owner for the license during \
              initialization. The default is to use the first author from the \
              package&#39;s manifest (Cargo.toml). This is only used when generating a \
              license based on the value of the &#39;license&#39; field in the package&#39;s \
-             manifest.&quot;</span>)
+             manifest.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;owner&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;O&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The product icon option for the `init` and `print` subcommands</span>
     <span class="kw">let</span> <span class="ident">product_icon</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-icon&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.ico) for the Add/Remove Programs control panel&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to an image file that will be displayed as an \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the path to an image file that will be displayed as an \
              icon in the Add/Remove Programs (ARP) control panel for the installed \
-             application.&quot;</span>)
+             application.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;product-icon&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;p&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The product name option for the `init`, `print`, and `sign` subcommands</span>
     <span class="kw">let</span> <span class="ident">product_name</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-name&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s Name&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the &#39;name&#39; field of the package&#39;s manifest \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the &#39;name&#39; field of the package&#39;s manifest \
              (Cargo.toml) as the product name within the installer. The product name \
              can be changed after initialization by directly modifying the WiX Source \
-             file (wxs) with a text editor.&quot;</span>)
+             file (wxs) with a text editor.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;product-name&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;P&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The &quot;global&quot; verbose flag for all subcommands.</span>
     <span class="kw">let</span> <span class="ident">verbose</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;verbose&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;The verbosity level for logging statements&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the level of verbosity. The higher the level of \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the level of verbosity. The higher the level of \
              verbosity, the more information that is printed and logged when the \
              application is executed. This flag can be specified multiple times, \
              where each occurrance increases the level and/or details written for \
-             each statement.&quot;</span>)
+             each statement.&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;verbose&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;v&quot;</span>)
         .<span class="ident">multiple</span>(<span class="bool-val">true</span>);
     <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;year&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for a generated license&#39;s copyright year&quot;</span>)
-        .<span class="ident">long_help</span>(<span class="string">&quot;Sets the copyright year for the license during \
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Sets the copyright year for the license during \
              initialization. The default is to use the current year. This is only \
              used if a license is generated from one of the supported licenses based \
              on the value of the &#39;license&#39; field in the package&#39;s manifest \
-             (Cargo.toml).&quot;</span>)
+             (Cargo.toml).&quot;</span>,
+        )
         .<span class="ident">long</span>(<span class="string">&quot;year&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;y&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
@@ -2155,11 +2228,18 @@
                         flag to show the output.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;nocapture&quot;</span>))
                 .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;output&quot;</span>)
-                    .<span class="ident">help</span>(<span class="string">&quot;A path to a folder for generated files&quot;</span>)
+                    .<span class="ident">help</span>(<span class="string">&quot;A path to a destination file or an existing folder&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Sets the destination file name and path for the \
-                        created installer. The default is to create an installer \
-                        with the &#39;&lt;product-name&gt;-&lt;version&gt;-&lt;arch&gt;.msi&#39; file name in \
-                        the &#39;target\\wix&#39; folder.&quot;</span>)
+                        created installer, or the destination folder for the \
+                        installer with the default file name. If the path is to \
+                        an existing folder or has a trailing slash (forward and \
+                        backward), then the default installer file name will be \
+                        used and the installer will be available in the folder \
+                        after creation. Otherwise, this value overwrites the \
+                        default file name and path for the installer. The \
+                        default is to create an installer with the \
+                        &#39;&lt;product-name&gt;-&lt;version&gt;-&lt;arch&gt;.msi&#39; file name in the \
+                        &#39;target\\wix&#39; folder.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;output&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;o&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
@@ -2288,7 +2368,8 @@
         (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
         (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
         <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">matches</span>,
-    }.<span class="ident">occurrences_of</span>(<span class="string">&quot;verbose&quot;</span>);
+    }
+    .<span class="ident">occurrences_of</span>(<span class="string">&quot;verbose&quot;</span>);
     <span class="comment">// Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`</span>
     <span class="comment">// skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log</span>
     <span class="comment">// level is later configured with the verbosity using the `filter` method. There are many</span>
@@ -2305,34 +2386,37 @@
     <span class="comment">// For now, implementing environment variable support is held off and only the verbosity is</span>
     <span class="comment">// used to set the log level.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
-    <span class="ident">builder</span>.<span class="ident">format</span>(<span class="op">|</span><span class="ident">buf</span>, <span class="ident">record</span><span class="op">|</span> {
-        <span class="comment">// This implmentation for a format is copied from the default format implemented for the</span>
-        <span class="comment">// `env_logger` crate but modified to use a colon, `:`, to separate the level from the</span>
-        <span class="comment">// message and change the colors to match the previous colors used by the `loggerv` crate.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">level_style</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">style</span>();
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">level</span>();
-        <span class="kw">match</span> <span class="ident">level</span> {
-            <span class="comment">// Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows</span>
-            <span class="comment">// consoles, so TRACE and DEBUG statements are differentiated by boldness but use the</span>
-            <span class="comment">// same white color.</span>
-            <span class="ident">Level</span>::<span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
-            <span class="ident">Level</span>::<span class="ident">Debug</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-            <span class="ident">Level</span>::<span class="ident">Info</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-            <span class="ident">Level</span>::<span class="ident">Warn</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-            <span class="ident">Level</span>::<span class="ident">Error</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-        };
-        <span class="kw">let</span> <span class="ident">write_level</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{:&gt;5}: &quot;</span>, <span class="ident">level_style</span>.<span class="ident">value</span>(<span class="ident">level</span>));
-        <span class="kw">let</span> <span class="ident">write_args</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">record</span>.<span class="ident">args</span>());
-        <span class="ident">write_level</span>.<span class="ident">and</span>(<span class="ident">write_args</span>)
-    }).<span class="ident">filter</span>(
-        <span class="prelude-val">Some</span>(<span class="string">&quot;wix&quot;</span>),
-        <span class="kw">match</span> <span class="ident">verbosity</span> {
-            <span class="number">0</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Warn</span>,
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Info</span>,
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Debug</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Trace</span>,
-        },
-    ).<span class="ident">init</span>();
+    <span class="ident">builder</span>
+        .<span class="ident">format</span>(<span class="op">|</span><span class="ident">buf</span>, <span class="ident">record</span><span class="op">|</span> {
+            <span class="comment">// This implmentation for a format is copied from the default format implemented for the</span>
+            <span class="comment">// `env_logger` crate but modified to use a colon, `:`, to separate the level from the</span>
+            <span class="comment">// message and change the colors to match the previous colors used by the `loggerv` crate.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">level_style</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">style</span>();
+            <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">level</span>();
+            <span class="kw">match</span> <span class="ident">level</span> {
+                <span class="comment">// Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows</span>
+                <span class="comment">// consoles, so TRACE and DEBUG statements are differentiated by boldness but use the</span>
+                <span class="comment">// same white color.</span>
+                <span class="ident">Level</span>::<span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
+                <span class="ident">Level</span>::<span class="ident">Debug</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Info</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Warn</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Error</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+            };
+            <span class="kw">let</span> <span class="ident">write_level</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{:&gt;5}: &quot;</span>, <span class="ident">level_style</span>.<span class="ident">value</span>(<span class="ident">level</span>));
+            <span class="kw">let</span> <span class="ident">write_args</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">record</span>.<span class="ident">args</span>());
+            <span class="ident">write_level</span>.<span class="ident">and</span>(<span class="ident">write_args</span>)
+        })
+        .<span class="ident">filter</span>(
+            <span class="prelude-val">Some</span>(<span class="string">&quot;wix&quot;</span>),
+            <span class="kw">match</span> <span class="ident">verbosity</span> {
+                <span class="number">0</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Warn</span>,
+                <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Info</span>,
+                <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Debug</span>,
+                <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Trace</span>,
+            },
+        )
+        .<span class="ident">init</span>();
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">matches</span>.<span class="ident">subcommand</span>() {
         (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clean</span> <span class="op">=</span> <span class="ident">clean</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
@@ -2457,5 +2541,5 @@
         }
     }
 }
-</pre>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

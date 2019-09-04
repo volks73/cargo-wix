@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, wix"><title>wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Crate wix</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/wix/lib.rs.html#15-914' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>wix</a></span></h1><div class='docblock'><h1 id="wix-library" class="section-header"><a href="#wix-library"><code>wix</code> Library</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, wix"><title>wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all wix's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/wix/lib.rs.html#15-929' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>wix</a></span></h1><div class='docblock'><h1 id="wix-library" class="section-header"><a href="#wix-library"><code>wix</code> Library</a></h1>
 <p>The goal of the cargo-wix project and the <code>wix</code> library is to make it easy
 to create a Windows installer (msi) for any Rust project. The cargo-wix
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but its core
@@ -17,8 +17,8 @@ wix = &quot;0.1&quot;
 </code></pre>
 <p>Next, add this to the <code>lib.rs</code> or <code>main.rs</code> file for your project:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><pre class="rust rust-example-rendered ignore">
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wix</span>;</pre>
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wix</span>;</pre></div>
 <h2 id="organization" class="section-header"><a href="#organization">Organization</a></h2>
 <p>Each subcommand is organized into a separate module. So, there is a
 <code>create</code>, <code>inititalize</code>, <code>print</code>, etc. module within the crate. Some of the
@@ -32,257 +32,54 @@ the <a href="https://doc.rust-lang.org/std/process/struct.Command.html"><code>st
 <code>Builder</code> struct generally corresponds to a CLI option or argument found in
 the <a href="../cargo_wix/index.html"><code>cargo wix</code></a> subcommand and binary.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="clean/index.html"
-                                  title='mod wix::clean'>clean</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>clean</code> command. This command is focused on
+<table><tr class='module-item'><td><a class="mod" href="clean/index.html" title='wix::clean mod'>clean</a></td><td class='docblock-short'><p>The implementation for the <code>clean</code> command. This command is focused on
 cleaning up build output, similar to the <code>cargo clean</code> subcommand.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="create/index.html"
-                                  title='mod wix::create'>create</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>create</code>, or default, command. The default
+</td></tr><tr class='module-item'><td><a class="mod" href="create/index.html" title='wix::create mod'>create</a></td><td class='docblock-short'><p>The implementation for the <code>create</code>, or default, command. The default
 command, <code>cargo wix</code>, is focused on creating, or building, the installer
 using the WiX Toolset.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="initialize/index.html"
-                                  title='mod wix::initialize'>initialize</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>init</code> command. The <code>init</code> command for the <code>cargo wix</code> subcommand is focused on creating a WiX Source file (wxs) based on the
+</td></tr><tr class='module-item'><td><a class="mod" href="initialize/index.html" title='wix::initialize mod'>initialize</a></td><td class='docblock-short'><p>The implementation for the <code>init</code> command. The <code>init</code> command for the <code>cargo wix</code> subcommand is focused on creating a WiX Source file (wxs) based on the
 contents of the Cargo manifest file (Cargo.toml) for the project and any
 run-time based settings.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="print/index.html"
-                                  title='mod wix::print'>print</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>print</code> command. This command is focused on
+</td></tr><tr class='module-item'><td><a class="mod" href="print/index.html" title='wix::print mod'>print</a></td><td class='docblock-short'><p>The implementation for the <code>print</code> command. This command is focused on
 printing various templates based on a package's manifest (Cargo.toml) or
 end-user input.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="purge/index.html"
-                                  title='mod wix::purge'>purge</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>purge</code> command. This command is focused on
+</td></tr><tr class='module-item'><td><a class="mod" href="purge/index.html" title='wix::purge mod'>purge</a></td><td class='docblock-short'><p>The implementation for the <code>purge</code> command. This command is focused on
 removing all files associated with <code>cargo wix</code> subcommand.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="mod" href="sign/index.html"
-                                  title='mod wix::sign'>sign</a></td>
-                           <td class='docblock-short'>
-                                <p>The implementation for the <code>sign</code> command. This command focuses on signing
+</td></tr><tr class='module-item'><td><a class="mod" href="sign/index.html" title='wix::sign mod'>sign</a></td><td class='docblock-short'><p>The implementation for the <code>sign</code> command. This command focuses on signing
 installers using the Windows SDK <code>signtool</code> application.</p>
-
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Cultures.html"
-                                  title='enum wix::Cultures'>Cultures</a></td>
-                           <td class='docblock-short'>
-                                <p>The various culture codes for localization.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Error.html"
-                                  title='enum wix::Error'>Error</a></td>
-                           <td class='docblock-short'>
-                                <p>The error type for wix-related operations and associated traits.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Platform.html"
-                                  title='enum wix::Platform'>Platform</a></td>
-                           <td class='docblock-short'>
-                                <p>The different values for the <code>Platform</code> attribute of the <code>Package</code> element.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Template.html"
-                                  title='enum wix::Template'>Template</a></td>
-                           <td class='docblock-short'>
-                                <p>The different templates that can be printed or written to a file.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.TimestampServer.html"
-                                  title='enum wix::TimestampServer'>TimestampServer</a></td>
-                           <td class='docblock-short'>
-                                <p>The aliases for the URLs to different Microsoft Authenticode timestamp servers.</p>
-
-                           </td>
-                       </tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.BINARY_FOLDER_NAME.html"
-                                  title='constant wix::BINARY_FOLDER_NAME'>BINARY_FOLDER_NAME</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the folder where binaries are typically stored.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.CARGO.html"
-                                  title='constant wix::CARGO'>CARGO</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the builder application for a Rust project.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.CARGO_MANIFEST_FILE.html"
-                                  title='constant wix::CARGO_MANIFEST_FILE'>CARGO_MANIFEST_FILE</a></td>
-                           <td class='docblock-short'>
-                                <p>The file name with extension for a package's manifest.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.EXE_FILE_EXTENSION.html"
-                                  title='constant wix::EXE_FILE_EXTENSION'>EXE_FILE_EXTENSION</a></td>
-                           <td class='docblock-short'>
-                                <p>The file extension for an executable.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.LICENSE_FILE_NAME.html"
-                                  title='constant wix::LICENSE_FILE_NAME'>LICENSE_FILE_NAME</a></td>
-                           <td class='docblock-short'>
-                                <p>The file name without an extension when generating a license.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.MSI_FILE_EXTENSION.html"
-                                  title='constant wix::MSI_FILE_EXTENSION'>MSI_FILE_EXTENSION</a></td>
-                           <td class='docblock-short'>
-                                <p>The file extension for a Windows installer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.RTF_FILE_EXTENSION.html"
-                                  title='constant wix::RTF_FILE_EXTENSION'>RTF_FILE_EXTENSION</a></td>
-                           <td class='docblock-short'>
-                                <p>The file extension for a Rich Text Format (RTF) file.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.SIGNTOOL.html"
-                                  title='constant wix::SIGNTOOL'>SIGNTOOL</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the signer application from the Windows SDK.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.SIGNTOOL_PATH_KEY.html"
-                                  title='constant wix::SIGNTOOL_PATH_KEY'>SIGNTOOL_PATH_KEY</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the environment variable to specify the path to the signer
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Cultures.html" title='wix::Cultures enum'>Cultures</a></td><td class='docblock-short'><p>The various culture codes for localization.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Error.html" title='wix::Error enum'>Error</a></td><td class='docblock-short'><p>The error type for wix-related operations and associated traits.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Platform.html" title='wix::Platform enum'>Platform</a></td><td class='docblock-short'><p>The different values for the <code>Platform</code> attribute of the <code>Package</code> element.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Template.html" title='wix::Template enum'>Template</a></td><td class='docblock-short'><p>The different templates that can be printed or written to a file.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.TimestampServer.html" title='wix::TimestampServer enum'>TimestampServer</a></td><td class='docblock-short'><p>The aliases for the URLs to different Microsoft Authenticode timestamp servers.</p>
+</td></tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table><tr class='module-item'><td><a class="constant" href="constant.BINARY_FOLDER_NAME.html" title='wix::BINARY_FOLDER_NAME constant'>BINARY_FOLDER_NAME</a></td><td class='docblock-short'><p>The name of the folder where binaries are typically stored.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.CARGO.html" title='wix::CARGO constant'>CARGO</a></td><td class='docblock-short'><p>The name of the builder application for a Rust project.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.CARGO_MANIFEST_FILE.html" title='wix::CARGO_MANIFEST_FILE constant'>CARGO_MANIFEST_FILE</a></td><td class='docblock-short'><p>The file name with extension for a package's manifest.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.EXE_FILE_EXTENSION.html" title='wix::EXE_FILE_EXTENSION constant'>EXE_FILE_EXTENSION</a></td><td class='docblock-short'><p>The file extension for an executable.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.LICENSE_FILE_NAME.html" title='wix::LICENSE_FILE_NAME constant'>LICENSE_FILE_NAME</a></td><td class='docblock-short'><p>The file name without an extension when generating a license.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.MSI_FILE_EXTENSION.html" title='wix::MSI_FILE_EXTENSION constant'>MSI_FILE_EXTENSION</a></td><td class='docblock-short'><p>The file extension for a Windows installer.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.RTF_FILE_EXTENSION.html" title='wix::RTF_FILE_EXTENSION constant'>RTF_FILE_EXTENSION</a></td><td class='docblock-short'><p>The file extension for a Rich Text Format (RTF) file.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.SIGNTOOL.html" title='wix::SIGNTOOL constant'>SIGNTOOL</a></td><td class='docblock-short'><p>The name of the signer application from the Windows SDK.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.SIGNTOOL_PATH_KEY.html" title='wix::SIGNTOOL_PATH_KEY constant'>SIGNTOOL_PATH_KEY</a></td><td class='docblock-short'><p>The name of the environment variable to specify the path to the signer
 application.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.TARGET_FOLDER_NAME.html"
-                                  title='constant wix::TARGET_FOLDER_NAME'>TARGET_FOLDER_NAME</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the folder where output from the builder, compiler, linker, and
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.TARGET_FOLDER_NAME.html" title='wix::TARGET_FOLDER_NAME constant'>TARGET_FOLDER_NAME</a></td><td class='docblock-short'><p>The name of the folder where output from the builder, compiler, linker, and
 signer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX.html"
-                                  title='constant wix::WIX'>WIX</a></td>
-                           <td class='docblock-short'>
-                                <p>The default name of the folder for output from this subcommand.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_COMPILER.html"
-                                  title='constant wix::WIX_COMPILER'>WIX_COMPILER</a></td>
-                           <td class='docblock-short'>
-                                <p>The application name without the file extension of the compiler for the
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX.html" title='wix::WIX constant'>WIX</a></td><td class='docblock-short'><p>The default name of the folder for output from this subcommand.</p>
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_COMPILER.html" title='wix::WIX_COMPILER constant'>WIX_COMPILER</a></td><td class='docblock-short'><p>The application name without the file extension of the compiler for the
 Windows installer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_LINKER.html"
-                                  title='constant wix::WIX_LINKER'>WIX_LINKER</a></td>
-                           <td class='docblock-short'>
-                                <p>The application name without the file extension of the linker for the
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_LINKER.html" title='wix::WIX_LINKER constant'>WIX_LINKER</a></td><td class='docblock-short'><p>The application name without the file extension of the linker for the
 Windows installer.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_OBJECT_FILE_EXTENSION.html"
-                                  title='constant wix::WIX_OBJECT_FILE_EXTENSION'>WIX_OBJECT_FILE_EXTENSION</a></td>
-                           <td class='docblock-short'>
-                                <p>The file extension for a WiX Toolset object file, which is the output from
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_OBJECT_FILE_EXTENSION.html" title='wix::WIX_OBJECT_FILE_EXTENSION constant'>WIX_OBJECT_FILE_EXTENSION</a></td><td class='docblock-short'><p>The file extension for a WiX Toolset object file, which is the output from
 the WiX compiler.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_PATH_KEY.html"
-                                  title='constant wix::WIX_PATH_KEY'>WIX_PATH_KEY</a></td>
-                           <td class='docblock-short'>
-                                <p>The name of the environment variable created by the WiX Toolset installer
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_PATH_KEY.html" title='wix::WIX_PATH_KEY constant'>WIX_PATH_KEY</a></td><td class='docblock-short'><p>The name of the environment variable created by the WiX Toolset installer
 that points to the <code>bin</code> folder for the WiX Toolet's compiler (candle.exe)
 and linker (light.exe).</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_SOURCE_FILE_EXTENSION.html"
-                                  title='constant wix::WIX_SOURCE_FILE_EXTENSION'>WIX_SOURCE_FILE_EXTENSION</a></td>
-                           <td class='docblock-short'>
-                                <p>The file extension of the WiX Source file, which is the input to the WiX
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_SOURCE_FILE_EXTENSION.html" title='wix::WIX_SOURCE_FILE_EXTENSION constant'>WIX_SOURCE_FILE_EXTENSION</a></td><td class='docblock-short'><p>The file extension of the WiX Source file, which is the input to the WiX
 Toolset compiler.</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="constant" href="constant.WIX_SOURCE_FILE_NAME.html"
-                                  title='constant wix::WIX_SOURCE_FILE_NAME'>WIX_SOURCE_FILE_NAME</a></td>
-                           <td class='docblock-short'>
-                                <p>The default file name for the WiX Source file, which is the input to the WiX
+</td></tr><tr class='module-item'><td><a class="constant" href="constant.WIX_SOURCE_FILE_NAME.html" title='wix::WIX_SOURCE_FILE_NAME constant'>WIX_SOURCE_FILE_NAME</a></td><td class='docblock-short'><p>The default file name for the WiX Source file, which is the input to the WiX
 Toolset compiler.</p>
-
-                           </td>
-                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="type" href="type.Result.html"
-                                  title='type wix::Result'>Result</a></td>
-                           <td class='docblock-short'>
-                                <p>A specialized <a href="https://doc.rust-lang.org/std/result/"><code>Result</code></a> type for wix operations.</p>
-
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "wix";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.Result.html" title='wix::Result type'>Result</a></td><td class='docblock-short'><p>A specialized <a href="https://doc.rust-lang.org/std/result/"><code>Result</code></a> type for wix operations.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "wix";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
