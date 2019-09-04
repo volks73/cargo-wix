@@ -276,7 +276,7 @@ impl Execution {
                     "The signer application ('{}') does not exist at the '{}' path specified via \
                     the '-S, --sign-path' command line argument. Please check the path is correct and \
                     the signer application exists at the path.",
-                    SIGNTOOL, 
+                    SIGNTOOL,
                     path.display()
                 )))
             } else {
