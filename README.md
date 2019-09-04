@@ -5,6 +5,7 @@ A subcommand for [Cargo](http://doc.crates.io/) that builds a Windows installer 
 [![Crates.io](https://img.shields.io/crates/v/cargo-wix.svg)](https://crates.io/crates/cargo-wix)
 [![GitHub release](https://img.shields.io/github/release/volks73/cargo-wix.svg)](https://github.com/volks73/cargo-wix/releases)
 [![Crates.io](https://img.shields.io/crates/l/cargo-wix.svg)](https://github.com/volks73/cargo-wix#license)
+[![Build Status](https://travis-ci.org/volks73/cargo-wix.svg?branch=master)](https://travis-ci.org/volks73/cargo-wix)
 
 ## Quick Start
 
