@@ -22,12 +22,14 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use semver::Version;
 use std::env;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+
+use semver::Version;
 use toml::Value;
+
 use Cultures;
 use Error;
 use Platform;
@@ -185,7 +187,7 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
-            output: self.output.map(PathBuf::from),
+            output: self.output.map(String::from),
             version: self.version.map(String::from),
         }
     }
@@ -207,7 +209,7 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
-    output: Option<PathBuf>,
+    output: Option<String>,
     version: Option<String>,
 }
 
@@ -487,23 +489,22 @@ impl Execution {
     }
 
     fn destination_msi(&self, name: &str, version: &Version, platform: &Platform) -> PathBuf {
-        if let Some(ref o) = self.output {
-            PathBuf::from(o)
+        let filename = &format!(
+            "{}-{}-{}.{}",
+            name,
+            version,
+            platform.arch(),
+            MSI_FILE_EXTENSION
+        );
+        if let Some(ref path_str) = self.output {
+            let path = Path::new(path_str);
+            if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
+                path.join(filename)
+            } else {
+                path.to_owned()
+            }
         } else {
-            let mut destination_msi = PathBuf::from(TARGET_FOLDER_NAME);
-            destination_msi.push(WIX);
-            // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
-            // format, the `set_extension` method will replace the Patch version number and
-            // architecture/platform with `msi`. Instead, just include the extension in the formatted
-            // name.
-            destination_msi.push(&format!(
-                "{}-{}-{}.{}",
-                name,
-                version,
-                platform.arch(),
-                MSI_FILE_EXTENSION
-            ));
-            destination_msi
+            PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename)
         }
     }
 
@@ -544,10 +545,10 @@ impl Execution {
                 Ok(main_wxs)
             } else {
                 Err(Error::Generic(format!(
-                   "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
+                    "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
                    create it.",
-                   main_wxs.display()
-               )))
+                    main_wxs.display()
+                )))
             }
         }
     }
@@ -709,7 +710,7 @@ mod tests {
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
             assert!(execution.no_build);
-            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(String::from));
             assert_eq!(execution.version, Some(EXPECTED_VERSION).map(String::from));
         }
     }
