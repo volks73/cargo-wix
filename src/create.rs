@@ -309,6 +309,7 @@ impl Execution {
             linker.arg("-loc").arg(l);
         }
         linker
+            .arg("-spdb")
             .arg("-ext")
             .arg("WixUIExtension")
             .arg("-ext")
