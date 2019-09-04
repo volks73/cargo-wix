@@ -61,7 +61,7 @@ fn default_works() {
 }
 
 #[test]
-fn output_dir_works() {
+fn output_trailing_forwardslash_works() {
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let output_dir_str = format!("{}/", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
@@ -71,6 +71,97 @@ fn output_dir_works() {
     initialize::Execution::default().run().unwrap();
     let result = Builder::new()
         .output(Some(output_dir_str.as_str()))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn output_trailing_backslash_works() {
+    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir_str = format!("{}\\", output_dir.to_str().unwrap());
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = output_dir.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = Builder::new()
+        .output(Some(output_dir_str.as_str()))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn output_existing_dir_works() {
+    let output_dir = PathBuf::from("output_dir");
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = output_dir.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    fs::create_dir(&output_dir).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = Builder::new()
+        .output(output_dir.to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn output_file_without_extension_works() {
+    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let output_file = output_dir.join(PACKAGE_NAME);
+    let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = Builder::new()
+        .output(output_file.to_str())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn output_file_with_extension_works() {
+    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = Builder::new()
+        .output(expected_msi_file.to_str())
         .build()
         .run();
     env::set_current_dir(original_working_directory).unwrap();
