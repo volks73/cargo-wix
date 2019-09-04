@@ -15,13 +15,13 @@
 //! The implementation for printing a license.
 
 use chrono::{Datelike, Utc};
-use Error;
 use manifest;
 use mustache::{self, MapBuilder};
-use Result;
 use std::path::PathBuf;
-use Template;
 use toml::Value;
+use Error;
+use Result;
+use Template;
 
 /// A builder for creating an execution context to print a license.
 #[derive(Debug, Clone)]
@@ -128,7 +128,9 @@ impl Execution {
             .insert_str("copyright-year", self.copyright_year())
             .insert_str("copyright-holder", self.copyright_holder(&manifest)?)
             .build();
-        template.render_data(&mut destination, &data).map_err(Error::from)
+        template
+            .render_data(&mut destination, &data)
+            .map_err(Error::from)
     }
 
     fn copyright_holder(&self, manifest: &Value) -> Result<String> {
@@ -140,7 +142,8 @@ impl Execution {
     }
 
     fn copyright_year(&self) -> String {
-        self.copyright_year.clone()
+        self.copyright_year
+            .clone()
             .map(String::from)
             .unwrap_or(Utc::now().year().to_string())
     }
@@ -153,7 +156,7 @@ impl Default for Execution {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
 
     mod builder {
@@ -237,4 +240,3 @@ mod tests{
         }
     }
 }
-

@@ -22,21 +22,23 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use BINARY_FOLDER_NAME;
-use CARGO;
-use Cultures;
-use Error;
-use EXE_FILE_EXTENSION;
-use MSI_FILE_EXTENSION;
-use Platform;
-use Result;
-use semver::Version;
 use std::env;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use TARGET_FOLDER_NAME;
+
+use semver::Version;
 use toml::Value;
+
+use Cultures;
+use Error;
+use Platform;
+use Result;
+use BINARY_FOLDER_NAME;
+use CARGO;
+use EXE_FILE_EXTENSION;
+use MSI_FILE_EXTENSION;
+use TARGET_FOLDER_NAME;
 use WIX;
 use WIX_COMPILER;
 use WIX_LINKER;
@@ -117,7 +119,7 @@ impl<'a> Builder<'a> {
     /// strings.
     ///
     /// [WiX localization file]: http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html
-     pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
+    pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
         self.locale = l;
         self
     }
@@ -185,7 +187,7 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
-            output: self.output.map(PathBuf::from),
+            output: self.output.map(String::from),
             version: self.version.map(String::from),
         }
     }
@@ -207,7 +209,7 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
-    output: Option<PathBuf>,
+    output: Option<String>,
     version: Option<String>,
 }
 
@@ -265,7 +267,8 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        compiler.arg(format!("-dVersion={}", version))
+        compiler
+            .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
             .arg("-ext")
             .arg("WixUtilExtension")
@@ -305,7 +308,8 @@ impl Execution {
             trace!("Using the a WiX localization file");
             linker.arg("-loc").arg(l);
         }
-        linker.arg("-ext")
+        linker
+            .arg("-ext")
             .arg("WixUIExtension")
             .arg("-ext")
             .arg("WixUtilExtension")
@@ -318,13 +322,11 @@ impl Execution {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
                     "The linker application ({}) could not be found in the PATH environment \
-                    variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                    installed and check the WiX Toolset's '{}' folder has been added to the PATH \
-                    environment variable, the {} system environment variable exists, or use the \
-                    '-b,--bin-path' command line argument.",
-                    WIX_LINKER,
-                    BINARY_FOLDER_NAME,
-                    WIX_PATH_KEY
+                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
+                     environment variable, the {} system environment variable exists, or use the \
+                     '-b,--bin-path' command line argument.",
+                    WIX_LINKER, BINARY_FOLDER_NAME, WIX_PATH_KEY
                 ))
             } else {
                 err.into()
@@ -399,7 +401,7 @@ impl Execution {
             } else {
                 Err(Error::Generic(format!(
                     "The '{}' WiX localization file could not be found, or it does not exist. \
-                    Please check the path is correct and the file exists.",
+                     Please check the path is correct and the file exists.",
                     locale.display()
                 )))
             }
@@ -424,8 +426,8 @@ impl Execution {
                 path.pop(); // Remove the 'light' application from the path
                 Err(Error::Generic(format!(
                     "The linker application ('{}') does not exist at the '{}' path specified via \
-                    the '-b,--bin-path' command line argument. Please check the path is correct \
-                    and the linker application exists at the path.",
+                     the '-b,--bin-path' command line argument. Please check the path is correct \
+                     and the linker application exists at the path.",
                     WIX_LINKER,
                     path.display()
                 )))
@@ -449,8 +451,8 @@ impl Execution {
                     path.pop(); // Remove the `candle` application from the path
                     Err(Error::Generic(format!(
                         "The linker application ('{}') does not exist at the '{}' path specified \
-                        via the {} environment variable. Please check the path is correct and the \
-                        linker application exists at the path.",
+                         via the {} environment variable. Please check the path is correct and the \
+                         linker application exists at the path.",
                         WIX_LINKER,
                         path.display(),
                         WIX_PATH_KEY
@@ -476,7 +478,8 @@ impl Execution {
         if let Some(ref p) = self.name {
             Ok(p.to_owned())
         } else {
-            manifest.get("package")
+            manifest
+                .get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("name"))
                 .and_then(|n| n.as_str())
@@ -486,23 +489,22 @@ impl Execution {
     }
 
     fn destination_msi(&self, name: &str, version: &Version, platform: &Platform) -> PathBuf {
-        if let Some(ref o) = self.output {
-            PathBuf::from(o)
+        let filename = &format!(
+            "{}-{}-{}.{}",
+            name,
+            version,
+            platform.arch(),
+            MSI_FILE_EXTENSION
+        );
+        if let Some(ref path_str) = self.output {
+            let path = Path::new(path_str);
+            if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
+                path.join(filename)
+            } else {
+                path.to_owned()
+            }
         } else {
-            let mut destination_msi = PathBuf::from(TARGET_FOLDER_NAME);
-            destination_msi.push(WIX);
-            // Do NOT use the `set_extension` method for the MSI path. Since the pkg_version is in X.X.X
-            // format, the `set_extension` method will replace the Patch version number and
-            // architecture/platform with `msi`. Instead, just include the extension in the formatted
-            // name.
-            destination_msi.push(&format!(
-                "{}-{}-{}.{}",
-                name,
-                version,
-                platform.arch(),
-                MSI_FILE_EXTENSION
-            ));
-            destination_msi
+            PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename)
         }
     }
 
@@ -520,7 +522,7 @@ impl Execution {
                 if p.is_dir() {
                     Err(Error::Generic(format!(
                         "The '{}' path is not a file. Please check the path and ensure it is to \
-                        a WiX Source (wxs) file.",
+                         a WiX Source (wxs) file.",
                         p.display()
                     )))
                 } else {
@@ -530,7 +532,7 @@ impl Execution {
             } else {
                 Err(Error::Generic(format!(
                     "The '{0}' file does not exist. Consider using the 'cargo \
-                    wix print WXS > {0}' command to create it.",
+                     wix print WXS > {0}' command to create it.",
                     p.display()
                 )))
             }
@@ -542,11 +544,11 @@ impl Execution {
             if main_wxs.exists() {
                 Ok(main_wxs)
             } else {
-               Err(Error::Generic(format!(
-                   "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
+                Err(Error::Generic(format!(
+                    "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
                    create it.",
-                   main_wxs.display()
-               )))
+                    main_wxs.display()
+                )))
             }
         }
     }
@@ -555,7 +557,8 @@ impl Execution {
         if let Some(ref v) = self.version {
             Version::parse(v).map_err(Error::from)
         } else {
-            manifest.get("package")
+            manifest
+                .get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("version"))
                 .and_then(|v| v.as_str())
@@ -697,14 +700,17 @@ mod tests {
             b.output(Some(EXPECTED_OUTPUT));
             b.version(Some(EXPECTED_VERSION));
             let execution = b.build();
-            assert_eq!(execution.bin_path, Some(EXPECTED_BIN_PATH).map(PathBuf::from));
+            assert_eq!(
+                execution.bin_path,
+                Some(EXPECTED_BIN_PATH).map(PathBuf::from)
+            );
             assert!(!execution.capture_output);
             assert_eq!(execution.culture, EXPECTED_CULTURE);
             assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
             assert!(execution.no_build);
-            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(String::from));
             assert_eq!(execution.version, Some(EXPECTED_VERSION).map(String::from));
         }
     }
@@ -714,17 +720,20 @@ mod tests {
 
         #[test]
         fn compiler_is_correct_with_defaults() {
-            let expected = Command::new(env::var_os(WIX_PATH_KEY).map(|s| {
-                let mut p = PathBuf::from(s);
-                p.push(BINARY_FOLDER_NAME);
-                p.push(WIX_COMPILER);
-                p.set_extension(EXE_FILE_EXTENSION);
-                p
-            }).unwrap());
+            let expected = Command::new(
+                env::var_os(WIX_PATH_KEY)
+                    .map(|s| {
+                        let mut p = PathBuf::from(s);
+                        p.push(BINARY_FOLDER_NAME);
+                        p.push(WIX_COMPILER);
+                        p.set_extension(EXE_FILE_EXTENSION);
+                        p
+                    })
+                    .unwrap(),
+            );
             let e = Execution::default();
             let actual = e.compiler().unwrap();
             assert_eq!(format!("{:?}", actual), format!("{:?}", expected));
         }
     }
 }
-

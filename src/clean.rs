@@ -15,13 +15,13 @@
 //! The implementation for the `clean` command. This command is focused on
 //! cleaning up build output, similar to the `cargo clean` subcommand.
 
-use CARGO_MANIFEST_FILE;
-use Error;
-use Result;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::PathBuf;
+use Error;
+use Result;
+use CARGO_MANIFEST_FILE;
 use TARGET_FOLDER_NAME;
 use WIX;
 
@@ -35,9 +35,7 @@ pub struct Builder<'a> {
 impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
-        Builder {
-            input: None,
-        }
+        Builder { input: None }
     }
 
     /// Sets the path to a package's manifest (Cargo.toml) to be cleaned.
@@ -96,11 +94,15 @@ impl Execution {
                 trace!("The input path exists and it is a file");
                 if input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {
                     trace!("The input file is a Cargo manifest file");
-                    Ok(input.parent().map(|p| p.to_path_buf()).and_then(|mut p| {
-                        p.push(TARGET_FOLDER_NAME);
-                        p.push(WIX);
-                        Some(p)
-                    }).unwrap())
+                    Ok(input
+                        .parent()
+                        .map(|p| p.to_path_buf())
+                        .and_then(|mut p| {
+                            p.push(TARGET_FOLDER_NAME);
+                            p.push(WIX);
+                            Some(p)
+                        })
+                        .unwrap())
                 } else {
                     Err(Error::Generic(format!(
                         "The '{}' path does not appear to be to a '{}' file",
@@ -115,8 +117,10 @@ impl Execution {
                 )))
             }
         } else {
-            trace!("An input path has NOT been explicitly specified, implicitly \
-                    using the current working directory");
+            trace!(
+                "An input path has NOT been explicitly specified, implicitly \
+                 using the current working directory"
+            );
             let mut cwd = env::current_dir()?;
             cwd.push(TARGET_FOLDER_NAME);
             cwd.push(WIX);
@@ -150,8 +154,8 @@ mod tests {
     mod execution {
         extern crate assert_fs;
 
-        use std::fs::File;
         use super::*;
+        use std::fs::File;
 
         #[test]
         fn target_wix_works() {
@@ -198,4 +202,3 @@ mod tests {
         }
     }
 }
-

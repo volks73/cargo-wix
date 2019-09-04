@@ -62,7 +62,8 @@
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 
 extern crate chrono;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 extern crate mustache;
 extern crate regex;
 extern crate semver;
@@ -70,8 +71,8 @@ extern crate toml;
 extern crate uuid;
 
 use std::default::Default;
-use std::error::Error as StdError;
 use std::env;
+use std::error::Error as StdError;
 use std::ffi::OsStr;
 use std::fmt;
 use std::fs::File;
@@ -173,9 +174,11 @@ fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
 }
 
 fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
-    cargo_toml_file(input).and_then(|p| Ok(
-        p.parent().map(PathBuf::from).expect("The Cargo.toml file to NOT be root.")
-    ))
+    cargo_toml_file(input).and_then(|p| {
+        Ok(p.parent()
+            .map(PathBuf::from)
+            .expect("The Cargo.toml file to NOT be root."))
+    })
 }
 
 fn manifest(input: Option<&PathBuf>) -> Result<Value> {
@@ -189,7 +192,8 @@ fn manifest(input: Option<&PathBuf>) -> Result<Value> {
 }
 
 fn description(description: Option<String>, manifest: &Value) -> Option<String> {
-    description.or(manifest.get("package")
+    description.or(manifest
+        .get("package")
         .and_then(|p| p.as_table())
         .and_then(|t| t.get("description"))
         .and_then(|d| d.as_str())
@@ -200,7 +204,8 @@ fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<Strin
     if let Some(p) = product_name {
         Ok(p.to_owned())
     } else {
-        manifest.get("package")
+        manifest
+            .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("name"))
             .and_then(|n| n.as_str())
@@ -251,7 +256,7 @@ impl Error {
     /// integer indicates a failure in the application. it can also be used for quickly and easily
     /// testing equality between two errors.
     pub fn code(&self) -> i32 {
-        match *self{
+        match *self {
             Error::Command(..) => 1,
             Error::Generic(..) => 2,
             Error::Io(..) => 3,
@@ -338,7 +343,7 @@ impl StdError for Error {
             Error::Mustache(ref err) => Some(err),
             Error::Toml(ref err) => Some(err),
             Error::Version(ref err) => Some(err),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -346,25 +351,35 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Command(ref command, ref code) =>
-                write!(f, "The '{}' application failed with exit code = {}. Consider using the \
-                       '--nocapture' flag to obtain more information.", command, code),
+            Error::Command(ref command, ref code) => write!(
+                f,
+                "The '{}' application failed with exit code = {}. Consider using the \
+                 '--nocapture' flag to obtain more information.",
+                command, code
+            ),
             Error::Generic(ref msg) => msg.fmt(f),
             Error::Io(ref err) => match err.kind() {
-                ErrorKind::AlreadyExists => if let Some(path) = err.get_ref() {
-                    write!(f, "The '{}' file already exists. Use the '--force' flag to overwrite the contents.", path)
-                } else {
-                    err.fmt(f)
-                },
-                ErrorKind::NotFound => if let Some(path) = err.get_ref() {
-                    write!(f, "The '{}' path does not exist", path)
-                } else {
-                    err.fmt(f)
+                ErrorKind::AlreadyExists => {
+                    if let Some(path) = err.get_ref() {
+                        write!(f, "The '{}' file already exists. Use the '--force' flag to overwrite the contents.", path)
+                    } else {
+                        err.fmt(f)
+                    }
+                }
+                ErrorKind::NotFound => {
+                    if let Some(path) = err.get_ref() {
+                        write!(f, "The '{}' path does not exist", path)
+                    } else {
+                        err.fmt(f)
+                    }
                 }
                 _ => err.fmt(f),
             },
-            Error::Manifest(ref var) =>
-                write!(f, "No '{}' field found in the package's manifest (Cargo.toml)", var),
+            Error::Manifest(ref var) => write!(
+                f,
+                "No '{}' field found in the package's manifest (Cargo.toml)",
+                var
+            ),
             Error::Mustache(ref err) => err.fmt(f),
             Error::Toml(ref err) => err.fmt(f),
             Error::Version(ref err) => err.fmt(f),
@@ -528,7 +543,7 @@ impl FromStr for TimestampServer {
         match s.to_lowercase().trim() {
             "comodo" => Ok(TimestampServer::Comodo),
             "verisign" => Ok(TimestampServer::Verisign),
-            u @ _ => Ok(TimestampServer::Custom(String::from(u)))
+            u @ _ => Ok(TimestampServer::Custom(String::from(u))),
         }
     }
 }
@@ -912,4 +927,3 @@ impl Default for Cultures {
         Cultures::EnUs
     }
 }
-

@@ -15,13 +15,6 @@
 //! The implementation for the `sign` command. This command focuses on signing
 //! installers using the Windows SDK `signtool` application.
 
-use BINARY_FOLDER_NAME;
-use Error;
-use EXE_FILE_EXTENSION;
-use MSI_FILE_EXTENSION;
-use Result;
-use SIGNTOOL;
-use SIGNTOOL_PATH_KEY;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
@@ -29,9 +22,16 @@ use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use TARGET_FOLDER_NAME;
-use TimestampServer;
 use toml::Value;
+use Error;
+use Result;
+use TimestampServer;
+use BINARY_FOLDER_NAME;
+use EXE_FILE_EXTENSION;
+use MSI_FILE_EXTENSION;
+use SIGNTOOL;
+use SIGNTOOL_PATH_KEY;
+use TARGET_FOLDER_NAME;
 use WIX;
 
 /// A builder for creating an execution context to sign an installer.
@@ -186,17 +186,17 @@ impl Execution {
             signer.stdout(Stdio::null());
             signer.stderr(Stdio::null());
         }
-        signer.arg("sign")
-            .arg("/a")
-            .arg("/d")
-            .arg(description);
+        signer.arg("sign").arg("/a").arg("/d").arg(description);
         if let Some(h) = self.homepage(&manifest) {
             trace!("Using the '{}' URL for the expanded description", h);
             signer.arg("/du").arg(h);
         }
         if let Some(t) = self.timestamp {
             let server = TimestampServer::from_str(&t)?;
-            trace!("Using the '{}' timestamp server to sign the installer", server);
+            trace!(
+                "Using the '{}' timestamp server to sign the installer",
+                server
+            );
             signer.arg("/t");
             signer.arg(server.url());
         }
@@ -204,9 +204,9 @@ impl Execution {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
                     "The {0} application could not be found. Please check the Windows 10 SDK \
-                    (https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) is \
-                    installed and you are using the x64 or x86 Native Build Tools prompt so the \
-                    {0} application is available.",
+                     (https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) is \
+                     installed and you are using the x64 or x86 Native Build Tools prompt so the \
+                     {0} application is available.",
                     SIGNTOOL
                 ))
             } else {
@@ -220,12 +220,12 @@ impl Execution {
     }
 
     fn homepage(&self, manifest: &Value) -> Option<String> {
-        self.homepage.clone().or(manifest.get("package")
+        self.homepage.clone().or(manifest
+            .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("homepage"))
             .and_then(|d| d.as_str())
-            .map(|s| String::from(s))
-        )
+            .map(|s| String::from(s)))
     }
 
     fn msi(&self) -> Result<PathBuf> {
@@ -237,7 +237,8 @@ impl Execution {
                 Ok(msi)
             } else {
                 Err(Error::Generic(format!(
-                    "The '{}' path does not exist for the installer", msi.display()
+                    "The '{}' path does not exist for the installer",
+                    msi.display()
                 )))
             }
         } else {
@@ -253,7 +254,8 @@ impl Execution {
                 }
             }
             Err(Error::Generic(format!(
-                "Could not find an installer ({}) to sign", MSI_FILE_EXTENSION
+                "Could not find an installer ({}) to sign",
+                MSI_FILE_EXTENSION
             )))
         }
     }
@@ -262,7 +264,7 @@ impl Execution {
         if let Some(mut path) = self.bin_path.as_ref().map(|s| {
             let mut p = PathBuf::from(s);
             trace!(
-                "Using the '{}' path to the Windows SDK '{}' folder for the signer", 
+                "Using the '{}' path to the Windows SDK '{}' folder for the signer",
                 p.display(),
                 BINARY_FOLDER_NAME
             );
@@ -276,7 +278,7 @@ impl Execution {
                     "The signer application ('{}') does not exist at the '{}' path specified via \
                     the '-S, --sign-path' command line argument. Please check the path is correct and \
                     the signer application exists at the path.",
-                    SIGNTOOL, 
+                    SIGNTOOL,
                     path.display()
                 )))
             } else {
@@ -298,8 +300,8 @@ impl Execution {
                     path.pop(); // Remove the `signtool` application from the path
                     Err(Error::Generic(format!(
                         "The signer application ('{}') does not exist at the '{}' path specified \
-                        via the {} environment variable. Please check the path is correct and the \
-                        signer application exists at the path.",
+                         via the {} environment variable. Please check the path is correct and the \
+                         signer application exists at the path.",
                         SIGNTOOL,
                         path.display(),
                         SIGNTOOL_PATH_KEY
@@ -386,8 +388,8 @@ mod tests {
     mod execution {
         extern crate assert_fs;
 
-        use std::fs::File;
         use super::*;
+        use std::fs::File;
 
         const MIN_MANIFEST: &str = r#"[package]
             name = "Example"

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use Error;
 use std::fmt;
 use std::str::FromStr;
+use Error;
 
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("main.wxs.mustache");
@@ -176,8 +176,10 @@ impl FromStr for Template {
             "gpl-3.0" => Ok(Template::Gpl3),
             "mit" => Ok(Template::Mit),
             "wxs" => Ok(Template::Wxs),
-            _ => Err(Error::Generic(format!("Cannot convert from '{}' to a Template variant", s))),
+            _ => Err(Error::Generic(format!(
+                "Cannot convert from '{}' to a Template variant",
+                s
+            ))),
         }
     }
 }
-
