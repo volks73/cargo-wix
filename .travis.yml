@@ -18,3 +18,7 @@ matrix:
     - name: Rustfmt
       install: rustup component add rustfmt
       script: cargo fmt --all -- --check
+
+    - name: Clippy
+      install: rustup component add clippy
+      script: cargo clippy --all-targets -- -D warnings

@@ -192,12 +192,14 @@ fn manifest(input: Option<&PathBuf>) -> Result<Value> {
 }
 
 fn description(description: Option<String>, manifest: &Value) -> Option<String> {
-    description.or(manifest
-        .get("package")
-        .and_then(|p| p.as_table())
-        .and_then(|t| t.get("description"))
-        .and_then(|d| d.as_str())
-        .map(String::from))
+    description.or_else(|| {
+        manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("description"))
+            .and_then(|d| d.as_str())
+            .map(String::from)
+    })
 }
 
 fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<String> {
@@ -248,7 +250,7 @@ impl Error {
     ///
     /// fn main() {
     ///     let err = Error::from("A generic error");
-    ///     assert!(err.code() != 0)
+    ///     assert_ne!(err.code(), 0)
     /// }
     /// ```
     ///
@@ -457,8 +459,8 @@ impl Platform {
     ///     assert_eq!(Platform::X64.arch(), "x86_64");
     /// }
     /// ```
-    pub fn arch(&self) -> &'static str {
-        match *self {
+    pub fn arch(self) -> &'static str {
+        match self {
             Platform::X86 => "i686",
             Platform::X64 => "x86_64",
         }
@@ -543,7 +545,7 @@ impl FromStr for TimestampServer {
         match s.to_lowercase().trim() {
             "comodo" => Ok(TimestampServer::Comodo),
             "verisign" => Ok(TimestampServer::Verisign),
-            u @ _ => Ok(TimestampServer::Custom(String::from(u))),
+            u => Ok(TimestampServer::Custom(String::from(u))),
         }
     }
 }
@@ -917,7 +919,7 @@ impl FromStr for Cultures {
             "zh-TW" => Ok(Cultures::ZhTw),
             "tr-TR" => Ok(Cultures::TrTr),
             "uk-UA" => Ok(Cultures::UkUa),
-            e @ _ => Err(Error::Generic(format!("Unknown '{}' culture", e))),
+            e => Err(Error::Generic(format!("Unknown '{}' culture", e))),
         }
     }
 }

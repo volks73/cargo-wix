@@ -15,7 +15,9 @@
 use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
+
 use toml::Value;
+
 use Error;
 use Result;
 use Template;
@@ -61,7 +63,7 @@ impl Eula {
                          manifest (Cargo.toml) exists and has a RTF file extension.",
                         license_file_path.exists()
                     );
-                    Ok(Eula::Manifest(license_file_path.into()))
+                    Ok(Eula::Manifest(license_file_path))
                 } else {
                     Err(Error::Generic(format!(
                         "The '{}' file to be used for the EULA specified in the package's \
@@ -78,36 +80,32 @@ impl Eula {
                 );
                 Ok(Eula::Disabled)
             }
-        } else {
-            if let Some(license_name) = manifest
-                .get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("license"))
-                .and_then(|n| n.as_str())
-            {
-                trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
-                debug!("license_name = {:?}", license_name);
-                if let Ok(template) = Template::from_str(license_name) {
-                    trace!(
-                        "An embedded template for the '{}' license from the package's \
-                         manifest (Cargo.toml) exists.",
-                        license_name
-                    );
-                    Ok(Eula::Generate(template))
-                } else {
-                    trace!(
-                        "The '{}' license from the package's manifest (Cargo.toml) is \
-                         unknown or an embedded template does not exist for it",
-                        license_name
-                    );
-                    Ok(Eula::Disabled)
-                }
+        } else if let Some(license_name) = manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("license"))
+            .and_then(|n| n.as_str())
+        {
+            trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
+            debug!("license_name = {:?}", license_name);
+            if let Ok(template) = Template::from_str(license_name) {
+                trace!(
+                    "An embedded template for the '{}' license from the package's \
+                     manifest (Cargo.toml) exists.",
+                    license_name
+                );
+                Ok(Eula::Generate(template))
             } else {
                 trace!(
-                    "The 'license' field is not specified in the package's manifest (Cargo.toml)"
+                    "The '{}' license from the package's manifest (Cargo.toml) is \
+                     unknown or an embedded template does not exist for it",
+                    license_name
                 );
                 Ok(Eula::Disabled)
             }
+        } else {
+            trace!("The 'license' field is not specified in the package's manifest (Cargo.toml)");
+            Ok(Eula::Disabled)
         }
     }
 }

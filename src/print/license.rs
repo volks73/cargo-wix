@@ -145,7 +145,7 @@ impl Execution {
         self.copyright_year
             .clone()
             .map(String::from)
-            .unwrap_or(Utc::now().year().to_string())
+            .unwrap_or_else(|| Utc::now().year().to_string())
     }
 }
 
