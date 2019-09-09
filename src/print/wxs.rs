@@ -332,10 +332,10 @@ impl Execution {
         }
         if let Some(url) = self
             .help_url
-            .as_ref()
-            .or(Execution::help_url(&manifest).as_ref())
+            .to_owned()
+            .or_else(|| Execution::help_url(&manifest))
         {
-            map = map.insert_str("help-url", url.to_owned());
+            map = map.insert_str("help-url", url);
         } else {
             warn!(
                 "A help URL could not be found and it will be excluded from the installer. \
@@ -405,8 +405,8 @@ impl Execution {
             .and_then(|p| p.as_table())
             .and_then(|t| {
                 t.get("documentation")
-                    .or(t.get("homepage"))
-                    .or(t.get("repository"))
+                    .or_else(|| t.get("homepage"))
+                    .or_else(|| t.get("repository"))
             })
             .and_then(|h| h.as_str())
             .map(|s| {
@@ -743,9 +743,7 @@ mod tests {
                 .expect("License source");
             assert_eq!(
                 actual,
-                Some(String::from(
-                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
-                ))
+                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
             );
         }
 
@@ -757,9 +755,7 @@ mod tests {
                 .expect("License source");
             assert_eq!(
                 actual,
-                Some(String::from(
-                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
-                ))
+                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
             );
         }
 

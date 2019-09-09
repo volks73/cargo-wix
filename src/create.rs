@@ -221,6 +221,7 @@ pub struct Execution {
 
 impl Execution {
     /// Creates, or builds, an installer within a built context.
+    #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
         debug!("bin_path = {:?}", self.bin_path);
         debug!("capture_output = {:?}", self.capture_output);
@@ -244,7 +245,7 @@ impl Execution {
         debug!("source_wxs = {:?}", source_wxs);
         let source_wixobj = self.source_wixobj();
         debug!("source_wixobj = {:?}", source_wixobj);
-        let destination_msi = self.destination_msi(&name, &version, &platform);
+        let destination_msi = self.destination_msi(&name, &version, platform);
         debug!("destination_msi = {:?}", destination_msi);
         if self.no_build {
             warn!("Skipped building the release binary");
@@ -369,35 +370,33 @@ impl Execution {
             } else {
                 Ok(Command::new(path))
             }
-        } else {
-            if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-                let mut p = PathBuf::from(s);
-                trace!(
-                    "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
-                    p.display(),
-                    BINARY_FOLDER_NAME
-                );
-                p.push(BINARY_FOLDER_NAME);
-                p.push(WIX_COMPILER);
-                p.set_extension(EXE_FILE_EXTENSION);
-                p
-            }) {
-                if !path.exists() {
-                    path.pop(); // Remove the `candle` application from the path
-                    Err(Error::Generic(format!(
-                        "The compiler application ('{}') does not exist at the '{}' path specified \
-                        via the {} environment variable. Please check the path is correct and the \
-                        compiler application exists at the path.",
-                        WIX_COMPILER,
-                        path.display(),
-                        WIX_PATH_KEY
-                    )))
-                } else {
-                    Ok(Command::new(path))
-                }
+        } else if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
+            let mut p = PathBuf::from(s);
+            trace!(
+                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
+                p.display(),
+                BINARY_FOLDER_NAME
+            );
+            p.push(BINARY_FOLDER_NAME);
+            p.push(WIX_COMPILER);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
+        }) {
+            if !path.exists() {
+                path.pop(); // Remove the `candle` application from the path
+                Err(Error::Generic(format!(
+                    "The compiler application ('{}') does not exist at the '{}' path specified \
+                     via the {} environment variable. Please check the path is correct and the \
+                     compiler application exists at the path.",
+                    WIX_COMPILER,
+                    path.display(),
+                    WIX_PATH_KEY
+                )))
             } else {
-                Ok(Command::new(WIX_COMPILER))
+                Ok(Command::new(path))
             }
+        } else {
+            Ok(Command::new(WIX_COMPILER))
         }
     }
 
@@ -441,35 +440,33 @@ impl Execution {
             } else {
                 Ok(Command::new(path))
             }
-        } else {
-            if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-                let mut p = PathBuf::from(s);
-                trace!(
-                    "Using the '{}' path to the WiX Toolset's '{}' folder for the linker",
-                    p.display(),
-                    BINARY_FOLDER_NAME
-                );
-                p.push(BINARY_FOLDER_NAME);
-                p.push(WIX_LINKER);
-                p.set_extension(EXE_FILE_EXTENSION);
-                p
-            }) {
-                if !path.exists() {
-                    path.pop(); // Remove the `candle` application from the path
-                    Err(Error::Generic(format!(
-                        "The linker application ('{}') does not exist at the '{}' path specified \
-                         via the {} environment variable. Please check the path is correct and the \
-                         linker application exists at the path.",
-                        WIX_LINKER,
-                        path.display(),
-                        WIX_PATH_KEY
-                    )))
-                } else {
-                    Ok(Command::new(path))
-                }
+        } else if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
+            let mut p = PathBuf::from(s);
+            trace!(
+                "Using the '{}' path to the WiX Toolset's '{}' folder for the linker",
+                p.display(),
+                BINARY_FOLDER_NAME
+            );
+            p.push(BINARY_FOLDER_NAME);
+            p.push(WIX_LINKER);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
+        }) {
+            if !path.exists() {
+                path.pop(); // Remove the `candle` application from the path
+                Err(Error::Generic(format!(
+                    "The linker application ('{}') does not exist at the '{}' path specified \
+                     via the {} environment variable. Please check the path is correct and the \
+                     linker application exists at the path.",
+                    WIX_LINKER,
+                    path.display(),
+                    WIX_PATH_KEY
+                )))
             } else {
-                Ok(Command::new(WIX_LINKER))
+                Ok(Command::new(path))
             }
+        } else {
+            Ok(Command::new(WIX_LINKER))
         }
     }
 
@@ -495,7 +492,7 @@ impl Execution {
         }
     }
 
-    fn destination_msi(&self, name: &str, version: &Version, platform: &Platform) -> PathBuf {
+    fn destination_msi(&self, name: &str, version: &Version, platform: Platform) -> PathBuf {
         let filename = &format!(
             "{}-{}-{}.{}",
             name,
@@ -524,7 +521,7 @@ impl Execution {
     }
 
     fn wxs_source(&self) -> Result<PathBuf> {
-        if let Some(p) = self.input.as_ref().map(|s| PathBuf::from(s)) {
+        if let Some(p) = self.input.as_ref().map(PathBuf::from) {
             if p.exists() {
                 if p.is_dir() {
                     Err(Error::Generic(format!(

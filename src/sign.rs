@@ -22,7 +22,9 @@ use std::io::ErrorKind;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+
 use toml::Value;
+
 use Error;
 use Result;
 use TimestampServer;
@@ -220,12 +222,14 @@ impl Execution {
     }
 
     fn homepage(&self, manifest: &Value) -> Option<String> {
-        self.homepage.clone().or(manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("homepage"))
-            .and_then(|d| d.as_str())
-            .map(|s| String::from(s)))
+        self.homepage.clone().or_else(|| {
+            manifest
+                .get("package")
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("homepage"))
+                .and_then(|d| d.as_str())
+                .map(String::from)
+        })
     }
 
     fn msi(&self) -> Result<PathBuf> {
@@ -284,34 +288,32 @@ impl Execution {
             } else {
                 Ok(Command::new(path))
             }
-        } else {
-            if let Some(mut path) = env::var_os(SIGNTOOL_PATH_KEY).map(|s| {
-                let mut p = PathBuf::from(s);
-                trace!(
-                    "Using the '{}' path to the Windows SDK '{}' folder for the signer",
-                    p.display(),
-                    BINARY_FOLDER_NAME
-                );
-                p.push(SIGNTOOL);
-                p.set_extension(EXE_FILE_EXTENSION);
-                p
-            }) {
-                if !path.exists() {
-                    path.pop(); // Remove the `signtool` application from the path
-                    Err(Error::Generic(format!(
-                        "The signer application ('{}') does not exist at the '{}' path specified \
-                         via the {} environment variable. Please check the path is correct and the \
-                         signer application exists at the path.",
-                        SIGNTOOL,
-                        path.display(),
-                        SIGNTOOL_PATH_KEY
-                    )))
-                } else {
-                    Ok(Command::new(path))
-                }
+        } else if let Some(mut path) = env::var_os(SIGNTOOL_PATH_KEY).map(|s| {
+            let mut p = PathBuf::from(s);
+            trace!(
+                "Using the '{}' path to the Windows SDK '{}' folder for the signer",
+                p.display(),
+                BINARY_FOLDER_NAME
+            );
+            p.push(SIGNTOOL);
+            p.set_extension(EXE_FILE_EXTENSION);
+            p
+        }) {
+            if !path.exists() {
+                path.pop(); // Remove the `signtool` application from the path
+                Err(Error::Generic(format!(
+                    "The signer application ('{}') does not exist at the '{}' path specified \
+                     via the {} environment variable. Please check the path is correct and the \
+                     signer application exists at the path.",
+                    SIGNTOOL,
+                    path.display(),
+                    SIGNTOOL_PATH_KEY
+                )))
             } else {
-                Ok(Command::new(SIGNTOOL))
+                Ok(Command::new(path))
             }
+        } else {
+            Ok(Command::new(SIGNTOOL))
         }
     }
 }
@@ -388,8 +390,9 @@ mod tests {
     mod execution {
         extern crate assert_fs;
 
-        use super::*;
         use std::fs::File;
+
+        use super::*;
 
         const MIN_MANIFEST: &str = r#"[package]
             name = "Example"
