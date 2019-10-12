@@ -80,7 +80,7 @@ C:\Path\to\Project> cargo wix -h
 
 ## Tests
 
-The tests can be run using the `cargo test -- --test-threads=1` command from the root folder of the project, i.e. the same location as the `Cargo.toml` file. The `--test-threads=1` option appears to be needed when running the integration tests because sometimes if the integration tests are run in parallel (default without the option) some of the tests will fail. I believe this is related to creating temporary test projects using Cargo. There appears to be some kind of race condition that causes Cargo to not create separate projects for each of the integration tests.
+The tests must be run using the `cargo test -- --test-threads=1` command from the root folder of the project, i.e. the same location as the `Cargo.toml` file. The `--test-threads=1` option is needed when running the integration tests because if the integration tests are run in parallel (default without the option) some of the tests will fail. This is because the many of the integration tests change the current working directory (CWD) to closely as possible mimic usage by a user from within a cargo-based project. The same environment is shared across each test even though each test is essentially a separate application.
 
 ## License
 
