@@ -19,7 +19,7 @@ use eula::Eula;
 use manifest;
 use mustache::{self, MapBuilder};
 use product_name;
-use std::ffi::OsStr;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use toml::Value;
 use uuid::Uuid;
@@ -285,9 +285,18 @@ impl Execution {
         let manifest = manifest(self.input.as_ref())?;
         let mut destination = super::destination(self.output.as_ref())?;
         let template = mustache::compile_str(Template::Wxs.to_str())?;
+        let binaries = self.binaries(&manifest)?;
         let mut map = MapBuilder::new()
-            .insert_str("binary-name", self.binary_name(&manifest)?)
-            .insert_str("binary-source", self.binary_source(&manifest)?)
+            .insert_vec("binaries", |mut builder| {
+                for binary in &binaries {
+                    builder = builder.push_map(|builder| {
+                        builder
+                            .insert_str("binary-name", binary.get("binary-name").unwrap())
+                            .insert_str("binary-source", binary.get("binary-source").unwrap())
+                    });
+                }
+                builder
+            })
             .insert_str(
                 "product-name",
                 product_name(self.product_name.as_ref(), &manifest)?,
@@ -364,39 +373,41 @@ impl Execution {
             .map_err(Error::from)
     }
 
-    fn binary_name(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref b) = self.binary {
-            Ok(b.file_stem()
-                .and_then(OsStr::to_str)
-                .map(String::from)
-                .expect("Binary path to have a file name"))
+    fn binaries(&self, manifest: &Value) -> Result<Vec<HashMap<&'static str, String>>> {
+        let mut binaries = Vec::new();
+        if let Some(array) = manifest.get("bin").and_then(|b| b.as_array()) {
+            for i in array {
+                let mut map = HashMap::with_capacity(2);
+                let table = i.as_table().expect("The [[bin]] section to be a table");
+                if let Some(name) = table.get("name").and_then(|n| n.as_str()) {
+                    map.insert("binary-name", name.to_owned());
+                } else {
+                    return Err(Error::Generic(String::from(
+                        "Missing the 'name' field for the binary in the project's manifest file (Cargo.toml)",
+                    )));
+                }
+                map.insert(
+                    "binary-source",
+                    Self::default_binary_path(table.get("name").and_then(|n| n.as_str()).unwrap()),
+                );
+                binaries.push(map);
+            }
         } else {
-            manifest
-                .get("bin")
-                .and_then(|b| b.as_array())
-                .and_then(|a| a.get(0))
-                .and_then(|e| e.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map_or(product_name(None, manifest), |s| Ok(String::from(s)))
+            let mut map = HashMap::with_capacity(2);
+            let name = product_name(None, manifest)?;
+            map.insert("binary-source", Self::default_binary_path(&name));
+            map.insert("binary-name", name);
+            binaries.push(map);
         }
+        Ok(binaries)
     }
 
-    fn binary_source(&self, manifest: &Value) -> Result<String> {
-        if let Some(ref path) = self.binary.clone().map(PathBuf::from) {
-            Ok(path
-                .to_str()
-                .map(String::from)
-                .expect("Path to string conversion"))
-        } else {
-            self.binary_name(manifest).map(|name| {
-                let mut path = PathBuf::from("target").join("release").join(name);
-                path.set_extension(EXE_FILE_EXTENSION);
-                path.to_str()
-                    .map(String::from)
-                    .expect("Path to string conversion")
-            })
-        }
+    fn default_binary_path(name: &str) -> String {
+        let mut path = PathBuf::from("target").join("release").join(name);
+        path.set_extension(EXE_FILE_EXTENSION);
+        path.to_str()
+            .map(String::from)
+            .expect("Path to string conversion")
     }
 
     fn help_url(manifest: &Value) -> Option<String> {
@@ -665,6 +676,25 @@ mod tests {
             name = "Different"
         "#;
 
+        const MULTIPLE_BIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [[bin]]
+            name = "binary0"
+            path = "src/binary0/main.rs"
+
+            [[bin]]
+            name = "binary1"
+            path = "src/binary1/main.rs"
+
+            [[bin]]
+            name = "binary2"
+            path = "src/binary2/main.rs"
+        "#;
+
         const DOCUMENTATION_MANIFEST: &str = r#"[package]
             name = "Example"
             version = "0.1.0"
@@ -767,57 +797,54 @@ mod tests {
         }
 
         #[test]
-        fn binary_name_with_defaults_works() {
-            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().binary_name(&manifest).unwrap();
-            assert_eq!(actual, "Example".to_owned());
+        fn binaries_with_no_bin_section_works() {
+            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let actual = Execution::default().binaries(&manifest).unwrap();
+            assert_eq!(
+                actual,
+                vec![hashmap! {
+                    "binary-name" => String::from("Example"),
+                    "binary-source" => String::from("target\\release\\Example.exe")
+                }]
+            )
         }
 
         #[test]
-        fn binary_name_with_bin_name_works() {
+        fn binaries_with_single_bin_section_works() {
             let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().binary_name(&manifest).unwrap();
-            assert_eq!(actual, "Different".to_owned());
+            let actual = Execution::default().binaries(&manifest).unwrap();
+            assert_eq!(
+                actual,
+                vec![hashmap! {
+                    "binary-name" => String::from("Different"),
+                    "binary-source" => String::from("target\\release\\Different.exe")
+                }]
+            )
         }
 
         #[test]
-        fn binary_name_with_override_works() {
-            const EXPECTED: &str = "bin\\Example.exe";
-            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
-            let actual = Builder::default()
-                .binary(Some(EXPECTED))
-                .build()
-                .binary_name(&manifest)
-                .unwrap();
-            assert_eq!(actual, String::from("Example"));
-        }
-
-        #[test]
-        fn binary_source_with_defaults_works() {
-            const EXPECTED: &str = r#"target\release\Example.exe"#;
-            let manifest = MIT_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().binary_source(&manifest).unwrap();
-            assert_eq!(actual, EXPECTED);
-        }
-
-        #[test]
-        fn binary_source_with_bin_name_works() {
-            const EXPECTED: &str = r#"target\release\Different.exe"#;
-            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().binary_source(&manifest).unwrap();
-            assert_eq!(actual, EXPECTED);
-        }
-
-        #[test]
-        fn binary_source_with_override_works() {
-            const EXPECTED: &str = "bin\\Example.exe";
-            let manifest = MIT_MANIFEST_BIN.parse::<Value>().expect("Parsing TOML");
-            let actual = Builder::default()
-                .binary(Some(EXPECTED))
-                .build()
-                .binary_source(&manifest)
-                .unwrap();
-            assert_eq!(actual, EXPECTED);
+        fn binaries_with_multiple_bin_sections_works() {
+            let manifest = MULTIPLE_BIN_MANIFEST
+                .parse::<Value>()
+                .expect("Parsing TOML");
+            let actual = Execution::default().binaries(&manifest).unwrap();
+            assert_eq!(
+                actual,
+                vec![
+                    hashmap! {
+                        "binary-name" => String::from("binary0"),
+                        "binary-source" => String::from("target\\release\\binary0.exe")
+                    },
+                    hashmap! {
+                        "binary-name" => String::from("binary1"),
+                        "binary-source" => String::from("target\\release\\binary1.exe")
+                    },
+                    hashmap! {
+                        "binary-name" => String::from("binary2"),
+                        "binary-source" => String::from("target\\release\\binary2.exe")
+                    }
+                ]
+            )
         }
 
         #[test]

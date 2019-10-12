@@ -725,7 +725,6 @@ fn product_icon_works() {
 }
 
 #[test]
-#[ignore]
 fn multiple_binaries_works() {
     const EXPECTED_NAME_1: &str = "main1";
     const EXPECTED_SOURCE_1: &str = "target\\release\\main1.exe";
@@ -734,7 +733,7 @@ fn multiple_binaries_works() {
     const EXPECTED_NAME_3: &str = "main3";
     const EXPECTED_SOURCE_3: &str = "target\\release\\main3.exe";
     let original_working_directory = env::current_dir().unwrap();
-    let package = common::create_test_package();
+    let package = common::create_test_package_multiple_binaries();
     env::set_current_dir(package.path()).unwrap();
     let result = Builder::default().build().run();
     env::set_current_dir(original_working_directory).unwrap();
@@ -749,7 +748,7 @@ fn multiple_binaries_works() {
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_1)
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_1)
         ),
         EXPECTED_SOURCE_1
     );
@@ -763,7 +762,7 @@ fn multiple_binaries_works() {
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_2)
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_2)
         ),
         EXPECTED_SOURCE_2
     );
@@ -777,7 +776,7 @@ fn multiple_binaries_works() {
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_SOURCE_3)
+            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_3)
         ),
         EXPECTED_SOURCE_3
     );

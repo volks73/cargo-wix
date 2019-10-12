@@ -64,6 +64,8 @@
 extern crate chrono;
 #[macro_use]
 extern crate log;
+#[cfg_attr(test, macro_use)]
+extern crate maplit;
 extern crate mustache;
 extern crate regex;
 extern crate semver;
