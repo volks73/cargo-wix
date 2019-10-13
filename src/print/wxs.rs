@@ -561,11 +561,11 @@ mod tests {
         }
 
         #[test]
-        fn binary_name_works() {
+        fn binaries_name_works() {
             const EXPECTED: &str = "bin\\Example.exe";
             let mut actual = Builder::new();
-            actual.binary(Some(EXPECTED));
-            assert_eq!(actual.binary, Some(EXPECTED));
+            actual.binaries(Some(vec![EXPECTED]));
+            assert_eq!(actual.binaries, Some(vec![EXPECTED]));
         }
 
         #[test]

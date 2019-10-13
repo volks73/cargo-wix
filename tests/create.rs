@@ -263,7 +263,7 @@ fn init_with_all_options_works() {
     }
     initialize::Builder::new()
         .banner(banner_path.to_str())
-        .binary(bin_example_path.to_str())
+        .binaries(bin_example_path.to_str().map(|b| vec![b]))
         .description(Some("This is a description"))
         .dialog(dialog_path.to_str())
         .eula(package_eula.path().to_str())
@@ -325,7 +325,7 @@ fn init_with_binary_option_works() {
         let _bin_example_handle = File::create(&bin_example_path).unwrap();
     }
     initialize::Builder::new()
-        .binary(bin_example_path.to_str())
+        .binaries(bin_example_path.to_str().map(|b| vec![b]))
         .build()
         .run()
         .unwrap();

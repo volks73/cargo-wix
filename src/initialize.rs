@@ -557,7 +557,7 @@ mod tests {
         fn defaults_are_correct() {
             let actual = Builder::new();
             assert!(actual.banner.is_none());
-            assert!(actual.binary.is_none());
+            assert!(actual.binaries.is_none());
             assert!(actual.copyright_year.is_none());
             assert!(actual.copyright_holder.is_none());
             assert!(actual.description.is_none());
@@ -582,11 +582,11 @@ mod tests {
         }
 
         #[test]
-        fn binary_works() {
+        fn binaries_works() {
             const EXPECTED: &str = "bin\\Example.exe";
             let mut actual = Builder::new();
-            actual.binary(Some(EXPECTED));
-            assert_eq!(actual.binary, Some(EXPECTED));
+            actual.binaries(Some(vec![EXPECTED]));
+            assert_eq!(actual.binaries, Some(vec![EXPECTED]));
         }
 
         #[test]
@@ -696,7 +696,7 @@ mod tests {
         fn build_with_defaults_works() {
             let mut b = Builder::new();
             let default_execution = b.build();
-            assert!(default_execution.binary.is_none());
+            assert!(default_execution.binaries.is_none());
             assert!(default_execution.copyright_year.is_none());
             assert!(default_execution.copyright_holder.is_none());
             assert!(default_execution.description.is_none());
@@ -726,7 +726,7 @@ mod tests {
             const EXPECTED_PRODUCT_ICON: &str = "img\\Product.ico";
             const EXPECTED_PRODUCT_NAME: &str = "Product Name";
             let mut b = Builder::new();
-            b.binary(Some(EXPECTED_BINARY));
+            b.binaries(Some(vec![EXPECTED_BINARY]));
             b.copyright_holder(Some(EXPECTED_COPYRIGHT_HOLDER));
             b.copyright_year(Some(EXPECTED_COPYRIGHT_YEAR));
             b.description(Some(EXPECTED_DESCRIPTION));
@@ -740,7 +740,10 @@ mod tests {
             b.product_icon(Some(EXPECTED_PRODUCT_ICON));
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
             let execution = b.build();
-            assert_eq!(execution.binary, Some(EXPECTED_BINARY).map(PathBuf::from));
+            assert_eq!(
+                execution.binaries,
+                Some(vec![EXPECTED_BINARY]).map(|s| s.iter().map(PathBuf::from).collect())
+            );
             assert_eq!(
                 execution.copyright_year,
                 Some(EXPECTED_COPYRIGHT_YEAR).map(String::from)
