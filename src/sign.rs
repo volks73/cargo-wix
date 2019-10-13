@@ -216,7 +216,11 @@ impl Execution {
             }
         })?;
         if !status.success() {
-            return Err(Error::Command(SIGNTOOL, status.code().unwrap_or(100)));
+            return Err(Error::Command(
+                SIGNTOOL,
+                status.code().unwrap_or(100),
+                self.capture_output,
+            ));
         }
         Ok(())
     }

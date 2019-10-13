@@ -225,7 +225,7 @@ fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<Strin
 #[derive(Debug)]
 pub enum Error {
     /// A command operation failed.
-    Command(&'static str, i32),
+    Command(&'static str, i32, bool),
     /// A generic or custom error occurred. The message should contain the detailed information.
     Generic(String),
     /// An I/O operation failed.
@@ -355,12 +355,22 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Command(ref command, ref code) => write!(
-                f,
-                "The '{}' application failed with exit code = {}. Consider using the \
-                 '--nocapture' flag to obtain more information.",
-                command, code
-            ),
+            Error::Command(ref command, ref code, captured_output) => {
+                if captured_output {
+                    write!(
+                        f,
+                        "The '{}' application failed with exit code = {}. Consider using the \
+                         '--nocapture' flag to obtain more information.",
+                        command, code
+                    )
+                } else {
+                    write!(
+                        f,
+                        "The '{}' application failed with exit code = {}",
+                        command, code
+                    )
+                }
+            }
             Error::Generic(ref msg) => msg.fmt(f),
             Error::Io(ref err) => match err.kind() {
                 ErrorKind::AlreadyExists => {

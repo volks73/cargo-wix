@@ -262,7 +262,11 @@ impl Execution {
             }
             let status = builder.arg("build").arg("--release").status()?;
             if !status.success() {
-                return Err(Error::Command(CARGO, status.code().unwrap_or(100)));
+                return Err(Error::Command(
+                    CARGO,
+                    status.code().unwrap_or(100),
+                    self.capture_output,
+                ));
             }
         }
         // Compile the installer
@@ -300,7 +304,11 @@ impl Execution {
             }
         })?;
         if !status.success() {
-            return Err(Error::Command(WIX_COMPILER, status.code().unwrap_or(100)));
+            return Err(Error::Command(
+                WIX_COMPILER,
+                status.code().unwrap_or(100),
+                self.capture_output,
+            ));
         }
         // Link the installer
         info!("Linking the installer");
@@ -341,7 +349,11 @@ impl Execution {
             }
         })?;
         if !status.success() {
-            return Err(Error::Command(WIX_LINKER, status.code().unwrap_or(100)));
+            return Err(Error::Command(
+                WIX_LINKER,
+                status.code().unwrap_or(100),
+                self.capture_output,
+            ));
         }
         Ok(())
     }
