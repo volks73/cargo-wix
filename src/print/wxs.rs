@@ -296,6 +296,7 @@ impl Execution {
                 for binary in &binaries {
                     builder = builder.push_map(|builder| {
                         builder
+                            .insert_str("binary-index", binary.get("binary-index").unwrap())
                             .insert_str("binary-name", binary.get("binary-name").unwrap())
                             .insert_str("binary-source", binary.get("binary-source").unwrap())
                     });
@@ -381,12 +382,13 @@ impl Execution {
     fn binaries(&self, manifest: &Value) -> Result<Vec<HashMap<&'static str, String>>> {
         let mut binaries = Vec::new();
         if let Some(binary_paths) = &self.binaries {
-            let mut map = HashMap::with_capacity(2);
-            for binary in binary_paths {
+            let mut map = HashMap::with_capacity(3);
+            for (index, binary) in binary_paths.iter().enumerate() {
                 let binary_file_stem = binary.file_stem().ok_or(Error::Generic(format!(
                     "The '{}' binary path does not have a file name",
                     binary.display()
                 )))?;
+                map.insert("binary-index", index.to_string());
                 map.insert(
                     "binary-name",
                     binary_file_stem.to_string_lossy().into_owned(),
@@ -394,33 +396,33 @@ impl Execution {
                 map.insert("binary-source", binary.to_string_lossy().into_owned());
             }
             binaries.push(map);
-        } else {
-            if let Some(array) = manifest.get("bin").and_then(|b| b.as_array()) {
-                for i in array {
-                    let mut map = HashMap::with_capacity(2);
-                    let table = i.as_table().expect("The [[bin]] section to be a table");
-                    if let Some(name) = table.get("name").and_then(|n| n.as_str()) {
-                        map.insert("binary-name", name.to_owned());
-                    } else {
-                        return Err(Error::Generic(String::from(
+        } else if let Some(array) = manifest.get("bin").and_then(|b| b.as_array()) {
+            for (index, binary) in array.iter().enumerate() {
+                let mut map = HashMap::with_capacity(3);
+                let table = binary
+                    .as_table()
+                    .expect("The [[bin]] section to be a table");
+                map.insert("binary-index", index.to_string());
+                if let Some(name) = table.get("name").and_then(|n| n.as_str()) {
+                    map.insert("binary-name", name.to_owned());
+                } else {
+                    return Err(Error::Generic(String::from(
                             "Missing the 'name' field for the binary in the project's manifest file (Cargo.toml)",
                         )));
-                    }
-                    map.insert(
-                        "binary-source",
-                        Self::default_binary_path(
-                            table.get("name").and_then(|n| n.as_str()).unwrap(),
-                        ),
-                    );
-                    binaries.push(map);
                 }
-            } else {
-                let mut map = HashMap::with_capacity(2);
-                let name = product_name(None, manifest)?;
-                map.insert("binary-source", Self::default_binary_path(&name));
-                map.insert("binary-name", name);
+                map.insert(
+                    "binary-source",
+                    Self::default_binary_path(table.get("name").and_then(|n| n.as_str()).unwrap()),
+                );
                 binaries.push(map);
             }
+        } else {
+            let mut map = HashMap::with_capacity(3);
+            let name = product_name(None, manifest)?;
+            map.insert("binary-index", 0.to_string());
+            map.insert("binary-source", Self::default_binary_path(&name));
+            map.insert("binary-name", name);
+            binaries.push(map);
         }
         Ok(binaries)
     }
@@ -826,6 +828,7 @@ mod tests {
             assert_eq!(
                 actual,
                 vec![hashmap! {
+                    "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Example"),
                     "binary-source" => String::from("target\\release\\Example.exe")
                 }]
@@ -839,6 +842,7 @@ mod tests {
             assert_eq!(
                 actual,
                 vec![hashmap! {
+                    "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Different"),
                     "binary-source" => String::from("target\\release\\Different.exe")
                 }]
@@ -855,14 +859,17 @@ mod tests {
                 actual,
                 vec![
                     hashmap! {
+                        "binary-index" => 0.to_string(),
                         "binary-name" => String::from("binary0"),
                         "binary-source" => String::from("target\\release\\binary0.exe")
                     },
                     hashmap! {
+                        "binary-index" => 1.to_string(),
                         "binary-name" => String::from("binary1"),
                         "binary-source" => String::from("target\\release\\binary1.exe")
                     },
                     hashmap! {
+                        "binary-index" => 2.to_string(),
                         "binary-name" => String::from("binary2"),
                         "binary-source" => String::from("target\\release\\binary2.exe")
                     }

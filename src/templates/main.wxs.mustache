@@ -115,9 +115,9 @@
                                 System='yes'/>
                         </Component>
                         {{#binaries}}
-                        <Component Id='{{binary-name}}Binary' Guid='*' Win64='$(var.Win64)'>
+                        <Component Id='binary{{binary-index}}' Guid='*' Win64='$(var.Win64)'>
                             <File
-                                Id='{{binary-name}}EXE'
+                                Id='exe{{binary-index}}'
                                 Name='{{binary-name}}.exe'
                                 DiskId='1'
                                 Source='{{binary-source}}'
@@ -154,7 +154,7 @@
             {{/license-source}}
 
             {{#binaries}}
-            <ComponentRef Id='{{binary-name}}Binary'/>
+            <ComponentRef Id='binary{{binary-index}}'/>
             {{/binaries}}
 
             <Feature

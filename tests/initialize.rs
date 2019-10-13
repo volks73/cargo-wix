@@ -155,7 +155,6 @@ fn product_name_works() {
 
 #[test]
 fn binaries_works() {
-    const BINARY_NAME: &str = "Example";
     const EXPECTED: &str = "bin\\Example.exe";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -169,14 +168,14 @@ fn binaries_works() {
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Name", BINARY_NAME)
+            "//*/wix:File[@Id='exe0']/@Name"
         ),
         "Example.exe"
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", BINARY_NAME)
+            "//*/wix:File[@Id='exe0']/@Source"
         ),
         EXPECTED
     );
@@ -744,42 +743,42 @@ fn multiple_binaries_works() {
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_1)
+            "//*/wix:File[@Id='exe0']/@Name"
         ),
         format!("{}.exe", EXPECTED_NAME_1)
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_1)
+            "//*/wix:File[@Id='exe0']/@Source"
         ),
         EXPECTED_SOURCE_1
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_2)
+            "//*/wix:File[@Id='exe1']/@Name"
         ),
         format!("{}.exe", EXPECTED_NAME_2)
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_2)
+            "//*/wix:File[@Id='exe1']/@Source"
         ),
         EXPECTED_SOURCE_2
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Name", EXPECTED_NAME_3)
+            "//*/wix:File[@Id='exe2']/@Name"
         ),
         format!("{}.exe", EXPECTED_NAME_3)
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
-            &format!("//*/wix:File[@Id='{}EXE']/@Source", EXPECTED_NAME_3)
+            "//*/wix:File[@Id='exe2']/@Source"
         ),
         EXPECTED_SOURCE_3
     );
