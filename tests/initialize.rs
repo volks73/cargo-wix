@@ -153,15 +153,8 @@ fn product_name_works() {
     );
 }
 
-// This test is ignored for now. I am not sure the best way to implement this
-// CLI option when multiple binaries are involved. The easiest behavior might be
-// to simply use it to override all [bin] sections and just indicate a single
-// binary is to be included in the installer. This is probably a rarely used
-// option as it is and with multiple binaries, I wonder by the ulitity of it.
-// Thus, should it be removed?
 #[test]
-#[ignore]
-fn binary_works() {
+fn binaries_works() {
     const BINARY_NAME: &str = "Example";
     const EXPECTED: &str = "bin\\Example.exe";
     let original_working_directory = env::current_dir().unwrap();
