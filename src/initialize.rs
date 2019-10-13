@@ -41,7 +41,7 @@ use WIX_SOURCE_FILE_NAME;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     banner: Option<&'a str>,
-    binary: Option<&'a str>,
+    binaries: Option<Vec<&'a str>>,
     copyright_year: Option<&'a str>,
     copyright_holder: Option<&'a str>,
     description: Option<&'a str>,
@@ -62,7 +62,7 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             banner: None,
-            binary: None,
+            binaries: None,
             copyright_year: None,
             copyright_holder: None,
             description: None,
@@ -92,19 +92,31 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to the binary.
+    /// Sets the path to the binaries.
     ///
-    /// The default is to build a path relative to the package's manifest
-    /// (Cargo.toml) based on the output structure of a cargo release build. The
-    /// `name` field under the `bin` section of the package's manifest or the
-    /// `name` field under the `package` section if the `bin` section does _not_
-    /// exist is used as the binary's file name and the `.exe` file extension is
-    /// added. Then, the `target\release\<binary-name>.exe` path used.
+    /// The default is to, first, collect all of the `bin` sections and use the
+    /// `name` field within each `bin` section of the package's manifest for
+    /// each binary's name and create the following source with the `.exe` file
+    /// extension: `target\release\<binary-name>.exe`, where `<binary-name>` is
+    /// replaced with the name obtained from each `bin` section. All binaries
+    /// are included in the installer. If no `bin` sections exist, then the
+    /// package's `name` field is used and only one binary is included in the
+    /// installer.
     ///
-    /// This method can be used to specify a different binary to include in the
-    /// installer than one determined from the package's manifest.
-    pub fn binary(&mut self, b: Option<&'a str>) -> &mut Self {
-        self.binary = b;
+    /// This method skips creating the binary names and sources from the
+    /// package's manifest (Cargo.toml) and uses the supplied paths, regardless
+    /// of the number of `bin` sections in the package's manifest. The binary
+    /// name is extracted from each supplied path as the file stem (file name
+    /// without extension).
+    ///
+    /// This method is useful for including binaries, a.k.a. executables, in the
+    /// installer that are necessary for the application to run but are not
+    /// necessarily Rust/Cargo built binaries. However, this method overrides
+    /// _all_ binaries in the Cargo-based project, so if the installer is to
+    /// include a mixture of external and internal binaries, the internal
+    /// binaries must be explicitly included in this method.
+    pub fn binaries(&mut self, b: Option<Vec<&'a str>>) -> &mut Self {
+        self.binaries = b;
         self
     }
 
@@ -303,11 +315,14 @@ impl<'a> Builder<'a> {
 
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
-        let mut wxs_printer = print::wxs::Builder::new();
-        wxs_printer.binary(self.binary);
+        // let mut wxs_printer = print::wxs::Builder::new();
+        // wxs_printer.binaries(self.binaries);
         Execution {
             banner: self.banner.map(PathBuf::from),
-            binary: self.binary.map(PathBuf::from),
+            binaries: self
+                .binaries
+                .as_ref()
+                .map(|b| b.iter().map(PathBuf::from).collect()),
             copyright_year: self.copyright_year.map(String::from),
             copyright_holder: self.copyright_holder.map(String::from),
             description: self.description.map(String::from),
@@ -335,7 +350,7 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     banner: Option<PathBuf>,
-    binary: Option<PathBuf>,
+    binaries: Option<Vec<PathBuf>>,
     copyright_holder: Option<String>,
     copyright_year: Option<String>,
     description: Option<String>,
@@ -356,7 +371,7 @@ impl Execution {
     /// installer based on a built context.
     pub fn run(self) -> Result<()> {
         debug!("banner = {:?}", self.banner);
-        debug!("binary = {:?}", self.binary);
+        debug!("binaries = {:?}", self.binaries);
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
         debug!("description = {:?}", self.description);
@@ -424,12 +439,12 @@ impl Execution {
                     .map(PathBuf::as_path)
                     .and_then(Path::to_str),
             );
-            wxs_printer.binary(
-                self.binary
-                    .as_ref()
+            wxs_printer.binaries(self.binaries.as_ref().map(|b| {
+                b.iter()
                     .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
+                    .map(|p| p.to_str().unwrap())
+                    .collect()
+            }));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
             wxs_printer.dialog(
                 self.dialog

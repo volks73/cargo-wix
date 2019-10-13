@@ -1154,7 +1154,7 @@ fn main() {
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
             init.banner(m.value_of("banner"));
-            init.binary(m.value_of("binary"));
+            // init.binary(m.value_of("binary"));
             init.copyright_holder(m.value_of("owner"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
@@ -1176,7 +1176,7 @@ fn main() {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
                     print.banner(m.value_of("banner"));
-                    print.binary(m.value_of("binary"));
+                    // print.binary(m.value_of("binary"));
                     print.description(m.value_of("description"));
                     print.dialog(m.value_of("dialog"));
                     print.eula(m.value_of("eula"));

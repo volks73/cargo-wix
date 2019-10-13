@@ -34,7 +34,7 @@ use RTF_FILE_EXTENSION;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     banner: Option<&'a str>,
-    binary: Option<&'a str>,
+    binaries: Option<Vec<&'a str>>,
     description: Option<&'a str>,
     dialog: Option<&'a str>,
     eula: Option<&'a str>,
@@ -52,7 +52,7 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             banner: None,
-            binary: None,
+            binaries: None,
             description: None,
             dialog: None,
             eula: None,
@@ -79,20 +79,22 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the binary.
+    /// Sets the path to one or more binaries to include in the installer.
     ///
-    /// The default is to use the `name` field under the `bin` section of the
-    /// package's manifest (Cargo.toml) or the `name` field under the `package`
-    /// section if the `bin` section does _not_ exist. This overrides either of
-    /// these defaults.
+    /// The default is to first find _all_ binaries defined in the `bin`
+    /// sections of the package's manifest (Cargo.toml) and include all of them
+    /// in the installer. If there are no `bin` sections, then the `name` field
+    /// uder the `package` section is used. This overrides either of these
+    /// cases, regardless of the existence and number of `bin` sections.
     ///
-    /// Generally, the binary name should _not_ have spaces, special characters,
-    /// or a file extension. The binary name is the name of the executable. This
-    /// will _not_ appear in the Add/Remove Programs control panel. Use the
-    /// `product_name` method to change the name that appears in the Add/Remove
-    /// Programs control panel.
-    pub fn binary(&mut self, b: Option<&'a str>) -> &mut Self {
-        self.binary = b;
+    /// A path to each binary should be used for the value. The file stem (file
+    /// name without the extension) will be used for each binary's name, while
+    /// the path will be used for the source. The binary names will _not_ appear
+    /// in the Add/Remove Programs control panel. Use the `product_name` method
+    /// to change the name that appears in the Add/Remove Programs control
+    /// panel.
+    pub fn binaries(&mut self, b: Option<Vec<&'a str>>) -> &mut Self {
+        self.binaries = b;
         self
     }
 
@@ -229,7 +231,10 @@ impl<'a> Builder<'a> {
     pub fn build(&self) -> Execution {
         Execution {
             banner: self.banner.map(PathBuf::from),
-            binary: self.binary.map(PathBuf::from),
+            binaries: self
+                .binaries
+                .as_ref()
+                .map(|b| b.iter().map(PathBuf::from).collect()),
             description: self.description.map(String::from),
             dialog: self.dialog.map(PathBuf::from),
             eula: self.eula.map(PathBuf::from),
@@ -254,7 +259,7 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     banner: Option<PathBuf>,
-    binary: Option<PathBuf>,
+    binaries: Option<Vec<PathBuf>>,
     description: Option<String>,
     dialog: Option<PathBuf>,
     eula: Option<PathBuf>,
@@ -271,7 +276,7 @@ impl Execution {
     /// Prints a WiX Source (wxs) file based on the built context.
     pub fn run(self) -> Result<()> {
         debug!("banner = {:?}", self.banner);
-        debug!("binary = {:?}", self.binary);
+        debug!("binaries = {:?}", self.binaries);
         debug!("description = {:?}", self.description);
         debug!("dialog = {:?}", self.description);
         debug!("eula = {:?}", self.eula);
@@ -375,29 +380,47 @@ impl Execution {
 
     fn binaries(&self, manifest: &Value) -> Result<Vec<HashMap<&'static str, String>>> {
         let mut binaries = Vec::new();
-        if let Some(array) = manifest.get("bin").and_then(|b| b.as_array()) {
-            for i in array {
-                let mut map = HashMap::with_capacity(2);
-                let table = i.as_table().expect("The [[bin]] section to be a table");
-                if let Some(name) = table.get("name").and_then(|n| n.as_str()) {
-                    map.insert("binary-name", name.to_owned());
-                } else {
-                    return Err(Error::Generic(String::from(
-                        "Missing the 'name' field for the binary in the project's manifest file (Cargo.toml)",
-                    )));
-                }
+        if let Some(binary_paths) = &self.binaries {
+            let mut map = HashMap::with_capacity(2);
+            for binary in binary_paths {
+                let binary_file_stem = binary.file_stem().ok_or(Error::Generic(format!(
+                    "The '{}' binary path does not have a file name",
+                    binary.display()
+                )))?;
                 map.insert(
-                    "binary-source",
-                    Self::default_binary_path(table.get("name").and_then(|n| n.as_str()).unwrap()),
+                    "binary-name",
+                    binary_file_stem.to_string_lossy().into_owned(),
                 );
+                map.insert("binary-source", binary.to_string_lossy().into_owned());
+            }
+            binaries.push(map);
+        } else {
+            if let Some(array) = manifest.get("bin").and_then(|b| b.as_array()) {
+                for i in array {
+                    let mut map = HashMap::with_capacity(2);
+                    let table = i.as_table().expect("The [[bin]] section to be a table");
+                    if let Some(name) = table.get("name").and_then(|n| n.as_str()) {
+                        map.insert("binary-name", name.to_owned());
+                    } else {
+                        return Err(Error::Generic(String::from(
+                            "Missing the 'name' field for the binary in the project's manifest file (Cargo.toml)",
+                        )));
+                    }
+                    map.insert(
+                        "binary-source",
+                        Self::default_binary_path(
+                            table.get("name").and_then(|n| n.as_str()).unwrap(),
+                        ),
+                    );
+                    binaries.push(map);
+                }
+            } else {
+                let mut map = HashMap::with_capacity(2);
+                let name = product_name(None, manifest)?;
+                map.insert("binary-source", Self::default_binary_path(&name));
+                map.insert("binary-name", name);
                 binaries.push(map);
             }
-        } else {
-            let mut map = HashMap::with_capacity(2);
-            let name = product_name(None, manifest)?;
-            map.insert("binary-source", Self::default_binary_path(&name));
-            map.insert("binary-name", name);
-            binaries.push(map);
         }
         Ok(binaries)
     }
