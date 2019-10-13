@@ -384,10 +384,12 @@ impl Execution {
         if let Some(binary_paths) = &self.binaries {
             let mut map = HashMap::with_capacity(3);
             for (index, binary) in binary_paths.iter().enumerate() {
-                let binary_file_stem = binary.file_stem().ok_or(Error::Generic(format!(
-                    "The '{}' binary path does not have a file name",
-                    binary.display()
-                )))?;
+                let binary_file_stem = binary.file_stem().ok_or_else(|| {
+                    Error::Generic(format!(
+                        "The '{}' binary path does not have a file name",
+                        binary.display()
+                    ))
+                })?;
                 map.insert("binary-index", index.to_string());
                 map.insert(
                     "binary-name",
