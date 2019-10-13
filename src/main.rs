@@ -397,11 +397,18 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
-//! The binary name, which is the `name` field for the `[[bin]]` section, is
-//! used for the executable file name, i.e. "name.exe". This can also be
-//! overridden using the `-B,--binary` option for the `cargo wix init`
-//! subcommand. This option takes a relative or absolute path to an executable
-//! file and uses the file name as the binary name.
+//! A path to a binary, a.k.a. executable, to include in the installer _instead_
+//! of any and all binaries defined in the package's manifest (Cargo.toml). By
+//! default, all binaries defined with the `[[bin]]` section in the package's
+//! manifest are included in the installer. If no `[[bin]]` section is defined,
+//! then the package's `name` field is used. This option can be used to
+//! override, i.e. _not_ append, the binaries that should be included in the
+//! installer.
+//!
+//! This option can be used multiple times to define multiple binaries to
+//! include in the installer. The value is a path to a binary file. The file
+//! stem (file name without extension) is used as the binary name within the WXS
+//! file. A relative or absolute path is acceptable.
 //!
 //! ### `-c,--culture`
 //!
@@ -451,7 +458,7 @@
 //! Forces overriding of generated files from the _init_ subcommand. Use with
 //! caution! This cannot be undone.
 //!
-//! ### -h,--help
+//! ### `-h,--help`
 //!
 //! Available for all subcommands.
 //!
@@ -459,7 +466,7 @@
 //! the long flag, `--help`, will print a more detailed version of the help
 //! text.
 //!
-//! ### -u,--homepage
+//! ### `-u,--homepage`
 //!
 //! Available for the _sign_ (`cargo wix sign`) subcommand.
 //!
@@ -511,13 +518,13 @@
 //! used in the file name of the installer (msi). This does not change the name
 //! of the executable _within_ the installer.
 //!
-//! ### --no-build
+//! ### `--no-build`
 //!
 //! Available for the _default_ (`cargo wix`) subcommand.
 //!
 //! This skips building the Rust package using Cargo for the Release target.
 //!
-//! ### --nocapture
+//! ### `--nocapture`
 //!
 //! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
 //! subcommands.
@@ -679,17 +686,23 @@ fn main() {
         .long("banner")
         .short("b")
         .takes_value(true);
-    // The binary option for the `init` and `print` subcommands.
-    let binary = Arg::with_name("binary")
+    // The binaries option for the `init` and `print` subcommands.
+    let binaries = Arg::with_name("binaries")
         .help("A path to an executable file (.exe) for the application")
         .long_help(
-            "Sets the path to an executable file that will override the \
-             default binary included in the installer. The default binary is the \
-             'target\\release\\<package name>.exe' file, where <package-name> is the \
-             value from the 'name' field in the '[package]' section of the package's \
-             manifest (Cargo.toml).",
+            "Sets the path to an executable file that will override the default \
+             binaries included in the installer. The default binaries are the \
+             'target\\release\\<package name>.exe' file, where <package-name> is \
+             the value from the 'name' field in the '[package]' section of the \
+             package's manifest (Cargo.toml) if no '[[bin]]' sections are \
+             defined; otherwise, all binaries defined in the package's manifest \
+             in each '[[bin]]' section are included. This option overrides any \
+             and all binaries defined in the package's manifest. Use this option \
+             repeatedly to include multiple binaries.",
         )
         .long("binary")
+        .multiple(true)
+        .number_of_values(1)
         .short("B")
         .takes_value(true);
     // The description option for the `init` and `print` subcommands.
@@ -886,7 +899,7 @@ fn main() {
                            license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                            the 'wix' sub-folder by default.")
                     .arg(banner.clone())
-                    .arg(binary.clone())
+                    .arg(binaries.clone())
                     .arg(description.clone())
                     .arg(dialog.clone())
                     .arg(eula.clone())
@@ -981,7 +994,7 @@ fn main() {
                         Component each time the 'WXS' template is printed. [values: \
                         Apache-2.0, GPL-3.0, MIT, WXS]")
                     .arg(banner)
-                    .arg(binary)
+                    .arg(binaries)
                     .arg(description)
                     .arg(dialog)
                     .arg(eula)
@@ -1154,7 +1167,7 @@ fn main() {
         ("init", Some(m)) => {
             let mut init = initialize::Builder::new();
             init.banner(m.value_of("banner"));
-            // init.binary(m.value_of("binary"));
+            init.binaries(m.values_of("binaries").map(|v| v.collect()));
             init.copyright_holder(m.value_of("owner"));
             init.copyright_year(m.value_of("year"));
             init.description(m.value_of("description"));
@@ -1176,7 +1189,7 @@ fn main() {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
                     print.banner(m.value_of("banner"));
-                    // print.binary(m.value_of("binary"));
+                    print.binaries(m.values_of("binaries").map(|v| v.collect()));
                     print.description(m.value_of("description"));
                     print.dialog(m.value_of("dialog"));
                     print.eula(m.value_of("eula"));
