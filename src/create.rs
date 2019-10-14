@@ -104,6 +104,10 @@ impl<'a> Builder<'a> {
 
     /// Sets the culture to use with the linker (light.exe) for building a
     /// localized installer.
+    ///
+    /// This value will override any defaults and skip looking for a value in
+    /// the `[package.metadata.wix]` section of the package's manifest
+    /// (Cargo.toml).
     pub fn culture(&mut self, c: Option<&'a str>) -> &mut Self {
         self.culture = c;
         self
@@ -111,6 +115,9 @@ impl<'a> Builder<'a> {
 
     /// Sets the path to a file to be used as the WiX Source (wxs) file instead
     /// of `wix\main.wxs`.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
         self
@@ -121,6 +128,9 @@ impl<'a> Builder<'a> {
     ///
     /// The [WiX localization file] is an XML file that contains localization
     /// strings.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     ///
     /// [WiX localization file]: http://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/make_installer_localizable.html
     pub fn locale(&mut self, l: Option<&'a str>) -> &mut Self {
@@ -144,6 +154,9 @@ impl<'a> Builder<'a> {
     /// This does __not__ change the name of the executable that is installed.
     /// The name of the executable can be changed by modifying the WiX Source
     /// (wxs) file with a text editor.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn name(&mut self, p: Option<&'a str>) -> &mut Self {
         self.name = p;
         self
@@ -156,6 +169,9 @@ impl<'a> Builder<'a> {
     /// default is to build the project before each creation. This is useful if
     /// building the project is more involved or is handled in a separate
     /// process.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn no_build(&mut self, n: bool) -> &mut Self {
         self.no_build = n;
         self
@@ -173,6 +189,9 @@ impl<'a> Builder<'a> {
     /// installer will be available at the specified path. When specifying a
     /// file name and path, the `.msi` file is not required. It will be added
     /// automatically.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
         self
@@ -182,6 +201,9 @@ impl<'a> Builder<'a> {
     ///
     /// This overrides the `version` field of the package's manifest
     /// (Cargo.toml). The version should be in the "Major.Minor.Patch" notation.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn version(&mut self, v: Option<&'a str>) -> &mut Self {
         self.version = v;
         self
