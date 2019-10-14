@@ -22,12 +22,14 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
+use semver::Version;
+
 use std::env;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::str::FromStr;
 
-use semver::Version;
 use toml::Value;
 
 use Cultures;
@@ -47,12 +49,14 @@ use WIX_PATH_KEY;
 use WIX_SOURCE_FILE_EXTENSION;
 use WIX_SOURCE_FILE_NAME;
 
+const PKG_META_WIX: &str = "package.metadata.wix";
+
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
     capture_output: bool,
-    culture: Cultures,
+    culture: Option<&'a str>,
     input: Option<&'a str>,
     locale: Option<&'a str>,
     name: Option<&'a str>,
@@ -67,7 +71,7 @@ impl<'a> Builder<'a> {
         Builder {
             bin_path: None,
             capture_output: true,
-            culture: Cultures::EnUs,
+            culture: None,
             input: None,
             locale: None,
             name: None,
@@ -100,7 +104,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the culture to use with the linker (light.exe) for building a
     /// localized installer.
-    pub fn culture(&mut self, c: Cultures) -> &mut Self {
+    pub fn culture(&mut self, c: Option<&'a str>) -> &mut Self {
         self.culture = c;
         self
     }
@@ -188,7 +192,7 @@ impl<'a> Builder<'a> {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
-            culture: self.culture.clone(),
+            culture: self.culture.map(String::from),
             input: self.input.map(PathBuf::from),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
@@ -210,7 +214,7 @@ impl<'a> Default for Builder<'a> {
 pub struct Execution {
     bin_path: Option<PathBuf>,
     capture_output: bool,
-    culture: Cultures,
+    culture: Option<String>,
     input: Option<PathBuf>,
     locale: Option<PathBuf>,
     name: Option<String>,
@@ -237,21 +241,23 @@ impl Execution {
         debug!("name = {:?}", name);
         let version = self.version(&manifest)?;
         debug!("version = {:?}", version);
-        let locale = self.locale()?;
+        let culture = self.culture(&manifest)?;
+        debug!("culture = {:?}", culture);
+        let locale = self.locale(&manifest)?;
         debug!("locale = {:?}", locale);
         let platform = self.platform();
         debug!("platform = {:?}", platform);
-        let source_wxs = self.wxs_source()?;
+        let source_wxs = self.wxs_source(&manifest)?;
         debug!("source_wxs = {:?}", source_wxs);
         let source_wixobj = self.source_wixobj();
         debug!("source_wixobj = {:?}", source_wixobj);
-        let destination_msi = self.destination_msi(&name, &version, platform);
+        let destination_msi = self.destination_msi(&name, &version, platform, &manifest);
         debug!("destination_msi = {:?}", destination_msi);
-        if self.no_build {
+        if self.no_build(&manifest) {
             warn!("Skipped building the release binary");
         } else {
-            // Build the binary with the release profile. If a release binary has already been built, then
-            // this will essentially do nothing.
+            // Build the binary with the release profile. If a release binary
+            // has already been built, then this will essentially do nothing.
             info!("Building the release binary");
             let mut builder = Command::new(CARGO);
             debug!("builder = {:?}", builder);
@@ -329,7 +335,7 @@ impl Execution {
             .arg("WixUIExtension")
             .arg("-ext")
             .arg("WixUtilExtension")
-            .arg(format!("-cultures:{}", self.culture))
+            .arg(format!("-cultures:{}", culture))
             .arg(&source_wixobj)
             .arg("-out")
             .arg(&destination_msi);
@@ -412,7 +418,37 @@ impl Execution {
         }
     }
 
-    fn locale(&self) -> Result<Option<PathBuf>> {
+    fn no_build(&self, manifest: &Value) -> bool {
+        if self.no_build {
+            true
+        } else if let Some(pkg_meta_wix_no_build) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("no-build"))
+            .and_then(|c| c.as_bool())
+        {
+            pkg_meta_wix_no_build
+        } else {
+            false
+        }
+    }
+
+    fn culture(&self, manifest: &Value) -> Result<Cultures> {
+        if let Some(culture) = &self.culture {
+            Cultures::from_str(culture)
+        } else if let Some(pkg_meta_wix_culture) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("culture"))
+            .and_then(|c| c.as_str())
+        {
+            Cultures::from_str(pkg_meta_wix_culture)
+        } else {
+            Ok(Cultures::EnUs)
+        }
+    }
+
+    fn locale(&self, manifest: &Value) -> Result<Option<PathBuf>> {
         if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
             if locale.exists() {
                 Ok(Some(locale))
@@ -423,6 +459,14 @@ impl Execution {
                     locale.display()
                 )))
             }
+        } else if let Some(pkg_meta_wix_locale) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("locale"))
+            .and_then(|v| v.as_str())
+            .map(PathBuf::from)
+        {
+            Ok(Some(pkg_meta_wix_locale))
         } else {
             Ok(None)
         }
@@ -493,6 +537,14 @@ impl Execution {
     fn name(&self, manifest: &Value) -> Result<String> {
         if let Some(ref p) = self.name {
             Ok(p.to_owned())
+        } else if let Some(pkg_meta_wix_name) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("name"))
+            .and_then(|n| n.as_str())
+            .map(String::from)
+        {
+            Ok(pkg_meta_wix_name)
         } else {
             manifest
                 .get("package")
@@ -504,7 +556,13 @@ impl Execution {
         }
     }
 
-    fn destination_msi(&self, name: &str, version: &Version, platform: Platform) -> PathBuf {
+    fn destination_msi(
+        &self,
+        name: &str,
+        version: &Version,
+        platform: Platform,
+        manifest: &Value,
+    ) -> PathBuf {
         let filename = &format!(
             "{}-{}-{}.{}",
             name,
@@ -515,6 +573,21 @@ impl Execution {
         if let Some(ref path_str) = self.output {
             let path = Path::new(path_str);
             if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
+                path.join(filename)
+            } else {
+                path.to_owned()
+            }
+        } else if let Some(pkg_meta_wix_output) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("output"))
+            .and_then(|p| p.as_str())
+        {
+            let path = Path::new(pkg_meta_wix_output);
+            if pkg_meta_wix_output.ends_with('/')
+                || pkg_meta_wix_output.ends_with('\\')
+                || path.is_dir()
+            {
                 path.join(filename)
             } else {
                 path.to_owned()
@@ -532,7 +605,7 @@ impl Execution {
         source_wixobj
     }
 
-    fn wxs_source(&self) -> Result<PathBuf> {
+    fn wxs_source(&self, manifest: &Value) -> Result<PathBuf> {
         if let Some(p) = self.input.as_ref().map(PathBuf::from) {
             if p.exists() {
                 if p.is_dir() {
@@ -550,6 +623,38 @@ impl Execution {
                     "The '{0}' file does not exist. Consider using the 'cargo \
                      wix print WXS > {0}' command to create it.",
                     p.display()
+                )))
+            }
+        } else if let Some(pkg_meta_wix_input) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("input"))
+            .and_then(|i| i.as_str())
+            .map(PathBuf::from)
+        {
+            if pkg_meta_wix_input.exists() {
+                if pkg_meta_wix_input.is_dir() {
+                    Err(Error::Generic(format!(
+                        "The '{}' path is not a file. Please check the path and \
+                         ensure it is to a WiX Source (wxs) file in the \
+                         'package.metadata.wix' section of the package's manifest \
+                         (Cargo.toml).",
+                        pkg_meta_wix_input.display()
+                    )))
+                } else {
+                    trace!(
+                        "Using the '{}' WiX source file from the \
+                         'package.metadata.wix' section in the package's manifest.",
+                        pkg_meta_wix_input.display()
+                    );
+                    Ok(pkg_meta_wix_input)
+                }
+            } else {
+                Err(Error::Generic(format!(
+                    "The '{0}' file does not exist. \
+                     Consider using the 'cargo wix print WXS > {0} command to create \
+                     it.",
+                    pkg_meta_wix_input.display()
                 )))
             }
         } else {
@@ -572,6 +677,13 @@ impl Execution {
     fn version(&self, manifest: &Value) -> Result<Version> {
         if let Some(ref v) = self.version {
             Version::parse(v).map_err(Error::from)
+        } else if let Some(pkg_meta_wix_version) = manifest
+            .get(PKG_META_WIX)
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("version"))
+            .and_then(|v| v.as_str())
+        {
+            Version::parse(pkg_meta_wix_version).map_err(Error::from)
         } else {
             manifest
                 .get("package")
@@ -602,7 +714,7 @@ mod tests {
             let actual = Builder::new();
             assert!(actual.bin_path.is_none());
             assert!(actual.capture_output);
-            assert_eq!(actual.culture, Cultures::EnUs);
+            assert!(actual.culture.is_none());
             assert!(actual.input.is_none());
             assert!(actual.locale.is_none());
             assert!(actual.name.is_none());
@@ -628,10 +740,10 @@ mod tests {
 
         #[test]
         fn culture_works() {
-            const EXPECTED: Cultures = Cultures::FrFr;
+            const EXPECTED: &str = "FrFr";
             let mut actual = Builder::new();
-            actual.culture(EXPECTED);
-            assert_eq!(actual.culture, EXPECTED);
+            actual.culture(Some(EXPECTED));
+            assert_eq!(actual.culture, Some(EXPECTED));
         }
 
         #[test]
@@ -687,7 +799,7 @@ mod tests {
             let default_execution = b.build();
             assert!(default_execution.bin_path.is_none());
             assert!(default_execution.capture_output);
-            assert_eq!(default_execution.culture, Cultures::EnUs);
+            assert!(default_execution.culture.is_none());
             assert!(default_execution.input.is_none());
             assert!(default_execution.locale.is_none());
             assert!(default_execution.name.is_none());
@@ -699,7 +811,7 @@ mod tests {
         #[test]
         fn build_with_all_works() {
             const EXPECTED_BIN_PATH: &str = "C:\\Wix Toolset\\bin";
-            const EXPECTED_CULTURE: Cultures = Cultures::FrFr;
+            const EXPECTED_CULTURE: &str = "FrFr";
             const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
             const EXPECTED_LOCALE: &str = "C:\\tmp\\hello_world\\wix\\main.wxl";
             const EXPECTED_NAME: &str = "Name";
@@ -708,7 +820,7 @@ mod tests {
             let mut b = Builder::new();
             b.bin_path(Some(EXPECTED_BIN_PATH));
             b.capture_output(false);
-            b.culture(EXPECTED_CULTURE);
+            b.culture(Some(EXPECTED_CULTURE));
             b.input(Some(EXPECTED_INPUT));
             b.locale(Some(EXPECTED_LOCALE));
             b.name(Some(EXPECTED_NAME));
@@ -721,7 +833,7 @@ mod tests {
                 Some(EXPECTED_BIN_PATH).map(PathBuf::from)
             );
             assert!(!execution.capture_output);
-            assert_eq!(execution.culture, EXPECTED_CULTURE);
+            assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
             assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
@@ -733,6 +845,33 @@ mod tests {
 
     mod execution {
         use super::*;
+
+        const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
+
+        #[test]
+        fn culture_works() {
+            let execution = Execution::default();
+            let culture = execution
+                .culture(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(culture, Cultures::EnUs);
+        }
+
+        #[test]
+        fn locale_works() {
+            let execution = Execution::default();
+            let locale = execution
+                .locale(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert!(locale.is_none());
+        }
+
+        #[test]
+        fn no_build_works() {
+            let execution = Execution::default();
+            let no_build = execution.no_build(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap());
+            assert!(!no_build);
+        }
 
         #[test]
         fn compiler_is_correct_with_defaults() {

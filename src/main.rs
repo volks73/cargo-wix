@@ -1232,7 +1232,7 @@ fn main() {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
             create.capture_output(!matches.is_present("no-capture"));
-            create.culture(value_t!(matches, "culture", Cultures).unwrap_or_else(|e| e.exit()));
+            create.culture(matches.value_of("culture"));
             create.input(matches.value_of("INPUT"));
             create.locale(matches.value_of("locale"));
             create.name(matches.value_of("name"));
