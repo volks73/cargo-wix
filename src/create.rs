@@ -49,8 +49,6 @@ use WIX_PATH_KEY;
 use WIX_SOURCE_FILE_EXTENSION;
 use WIX_SOURCE_FILE_NAME;
 
-const PKG_META_WIX: &str = "package.metadata.wix";
-
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
@@ -444,8 +442,12 @@ impl Execution {
         if self.no_build {
             true
         } else if let Some(pkg_meta_wix_no_build) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("no-build"))
             .and_then(|c| c.as_bool())
         {
@@ -459,8 +461,12 @@ impl Execution {
         if let Some(culture) = &self.culture {
             Cultures::from_str(culture)
         } else if let Some(pkg_meta_wix_culture) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("culture"))
             .and_then(|c| c.as_str())
         {
@@ -482,10 +488,14 @@ impl Execution {
                 )))
             }
         } else if let Some(pkg_meta_wix_locale) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("locale"))
-            .and_then(|v| v.as_str())
+            .and_then(|l| l.as_str())
             .map(PathBuf::from)
         {
             Ok(Some(pkg_meta_wix_locale))
@@ -560,8 +570,12 @@ impl Execution {
         if let Some(ref p) = self.name {
             Ok(p.to_owned())
         } else if let Some(pkg_meta_wix_name) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("name"))
             .and_then(|n| n.as_str())
             .map(String::from)
@@ -600,10 +614,14 @@ impl Execution {
                 path.to_owned()
             }
         } else if let Some(pkg_meta_wix_output) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("output"))
-            .and_then(|p| p.as_str())
+            .and_then(|o| o.as_str())
         {
             let path = Path::new(pkg_meta_wix_output);
             if pkg_meta_wix_output.ends_with('/')
@@ -648,8 +666,12 @@ impl Execution {
                 )))
             }
         } else if let Some(pkg_meta_wix_input) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("input"))
             .and_then(|i| i.as_str())
             .map(PathBuf::from)
@@ -700,8 +722,12 @@ impl Execution {
         if let Some(ref v) = self.version {
             Version::parse(v).map_err(Error::from)
         } else if let Some(pkg_meta_wix_version) = manifest
-            .get(PKG_META_WIX)
+            .get("package")
             .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
             .and_then(|t| t.get("version"))
             .and_then(|v| v.as_str())
         {
@@ -867,6 +893,40 @@ mod tests {
 
     mod execution {
         use super::*;
+
+        const VERSION_PKG_META_WIX: &str = r#"
+            [package]
+            version = "0.1.0"
+
+            [package.metadata.wix]
+            version = "2.1.0"
+        "#;
+
+        #[test]
+        fn version_metadata_works() {
+            let execution = Execution::default();
+            let version = execution
+                .version(&VERSION_PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(version, Version::parse("2.1.0").unwrap());
+        }
+
+        const NAME_PKG_META_WIX: &str = r#"
+            [package]
+            name = "example"
+
+            [package.metadata.wix]
+            name = "Metadata"
+        "#;
+
+        #[test]
+        fn name_metadata_works() {
+            let execution = Execution::default();
+            let name = execution
+                .name(&NAME_PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(name, "Metadata".to_owned());
+        }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
 

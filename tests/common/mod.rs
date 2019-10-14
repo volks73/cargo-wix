@@ -128,6 +128,40 @@ path = "src/main3.rs"
     package
 }
 
+/// Create a new cargo project/package for a project with a
+/// `[package.metadata.wix]` section.
+///
+/// Following creation of the project, the manifest file (Cargo.toml) is
+/// modified to include a `[package.metadata.wix]` section.
+///
+/// # Panics
+///
+/// This will panic if a temporary directory fails to be created or if cargo
+/// fails to create the project/package.
+///
+/// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
+/// project layout for multiple binaries.
+#[allow(dead_code)]
+pub fn create_test_package_metadata() -> TempDir {
+    let package = create_test_package();
+    let package_manifest = package.child("Cargo.toml");
+    let mut cargo_toml_handle = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .open(package_manifest.path())
+        .unwrap();
+    cargo_toml_handle
+        .write_all(
+            r#"[package.metadata.wix]
+name = "Metadata"
+version = "2.1.0"
+"#
+            .as_bytes(),
+        )
+        .unwrap();
+    package
+}
+
 /// Evaluates an XPath expression for a WiX Source file.
 ///
 /// This registers the WiX XML namespace with the `wix` prefix. So, XPath
@@ -151,39 +185,4 @@ pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
         .evaluate(&context, wxs_document.root())
         .unwrap()
         .string()
-}
-/// Create a new cargo project/package for a project with a
-/// `[package.metadata.wix]` section.
-///
-/// Following creation of the project, the manifest file (Cargo.toml) is
-/// modified to include a `[package.metadata.wix]` section.
-///
-/// # Panics
-///
-/// This will panic if a temporary directory fails to be created or if cargo
-/// fails to create the project/package.
-///
-/// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
-/// project layout for multiple binaries.
-#[allow(dead_code)]
-pub fn create_test_package_metadata() -> TempDir {
-    let package = create_test_package();
-    let package_manifest = package.child("Cargo.toml");
-    {
-        let mut cargo_toml_handle = OpenOptions::new()
-            .read(true)
-            .append(true)
-            .open(package_manifest.path())
-            .unwrap();
-        cargo_toml_handle
-            .write_all(
-                r#"[package.metadata.wix]
-name = "Metadata"
-verison = "2.1.0"
-"#
-                .as_bytes(),
-            )
-            .unwrap();
-    }
-    package
 }
