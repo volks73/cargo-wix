@@ -27,6 +27,7 @@
 //! - [Quick Start](#quick-start)
 //! - [Examples](#examples)
 //! - [Features](#features)
+//! - [Configuration](#configuration)
 //! - [Flags and Options](#flags-and-options)
 //!
 //! ## Quick Start
@@ -348,6 +349,40 @@
 //! license agreement dialog appears during installation. This default behavior
 //! can be overridden with the `-l,--license` and `-e,--eula` options for the
 //! `cargo wix init` subcommand.
+//!
+//! ## Configuration
+//!
+//! The default subcommand, `cargo wix`, which creates a MSI based on the
+//! contents of the package's manifest (Cargo.toml) can be configured by adding
+//! a `[package.metadata.wix]` section to the manifest. For each CLI option for
+//! the default _create_ subcommand, a field can be added to the
+//! `[package.metadata.wix]` section. If the corresponding CLI option is used
+//! with the default _create_ subcommand, then the CLI option value will
+//! override the value in the metadata section.
+//!
+//! Below is an example `[package.metadata.wix]` section from a package's
+//! manifest that configures the default _create_ subcommand:
+//!
+//! ```toml
+//! [package.metadata.wix]
+//! culture = "FrFr"
+//! input = "Path\to\WIX\Source\File.wxs"
+//! locale = "Path\to\WIX\Localization\File.wxl"
+//! name = "example"
+//! no-build = false
+//! output = "Path\and\file\name\for\installer.msi"
+//! version = "2.1.0"
+//! ```
+//!
+//! See the documentation for each CLI option for more information about each
+//! field and its purpose. Note, the `name` and `version` fields will be the
+//! name and version number of the application as it appears in the Add/Remove
+//! Programs control panel, and the version number does _not_ need to match the
+//! package's version number. In other words, the installed application can have
+//! a different version number from the package, which is useful with multiple
+//! binaries, workspaces, or distributing a "suite" of applications, where the
+//! version number would be for the suite and not necessarily the individual
+//! applications within the suite.
 //!
 //! ## Flags and Options
 //!
