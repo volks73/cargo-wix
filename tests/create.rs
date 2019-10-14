@@ -61,6 +61,24 @@ fn default_works() {
 }
 
 #[test]
+fn metadata_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package_metadata();
+    let expected_msi_file = TARGET_WIX_DIR.join("Metadata-2.1.0-x86_64.msi");
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = Execution::default().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
 fn output_trailing_forwardslash_works() {
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let output_dir_str = format!("{}/", output_dir.to_str().unwrap());
