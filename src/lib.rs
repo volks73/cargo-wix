@@ -72,17 +72,6 @@ extern crate semver;
 extern crate toml;
 extern crate uuid;
 
-use std::default::Default;
-use std::env;
-use std::error::Error as StdError;
-use std::ffi::OsStr;
-use std::fmt;
-use std::fs::File;
-use std::io::{self, ErrorKind, Read};
-use std::path::{Path, PathBuf};
-use std::str::FromStr;
-use toml::Value;
-
 pub use crate::templates::Template;
 
 pub mod clean;
@@ -93,6 +82,18 @@ pub mod print;
 pub mod purge;
 pub mod sign;
 mod templates;
+
+use std::default::Default;
+use std::env;
+use std::error::Error as StdError;
+use std::ffi::OsStr;
+use std::fmt;
+use std::fs::File;
+use std::io::{self, ErrorKind, Read};
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+
+use toml::Value;
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";

@@ -24,10 +24,6 @@
 
 use crate::eula::Eula;
 use crate::print;
-use std::env;
-use std::ffi::OsStr;
-use std::fs;
-use std::path::{Path, PathBuf};
 use crate::Error;
 use crate::Result;
 use crate::CARGO_MANIFEST_FILE;
@@ -36,6 +32,11 @@ use crate::RTF_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
+
+use std::env;
+use std::ffi::OsStr;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]

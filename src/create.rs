@@ -22,16 +22,6 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use semver::Version;
-
-use std::env;
-use std::io::ErrorKind;
-use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
-use std::str::FromStr;
-
-use toml::Value;
-
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -48,6 +38,16 @@ use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
+
+use semver::Version;
+
+use std::env;
+use std::io::ErrorKind;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::str::FromStr;
+
+use toml::Value;
 
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]

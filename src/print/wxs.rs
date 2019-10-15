@@ -17,18 +17,22 @@
 use crate::description;
 use crate::eula::Eula;
 use crate::manifest;
-use mustache::{self, MapBuilder};
 use crate::product_name;
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
-use toml::Value;
-use uuid::Uuid;
 use crate::Error;
 use crate::Result;
 use crate::Template;
 use crate::EXE_FILE_EXTENSION;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
+
+use mustache::{self, MapBuilder};
+
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+
+use toml::Value;
+
+use uuid::Uuid;
 
 /// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]

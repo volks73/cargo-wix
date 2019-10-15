@@ -19,13 +19,16 @@
 pub mod license;
 pub mod wxs;
 
+use crate::Error;
+use crate::Result;
+
 use regex::Regex;
+
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::PathBuf;
+
 use toml::Value;
-use crate::Error;
-use crate::Result;
 
 fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {

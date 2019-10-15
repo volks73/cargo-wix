@@ -693,12 +693,17 @@ extern crate termcolor;
 extern crate wix;
 
 use clap::{App, Arg, SubCommand};
+
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
+
 use log::{Level, LevelFilter};
+
 use std::error::Error;
 use std::io::Write;
+
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+
 use wix::clean;
 use wix::create;
 use wix::initialize;

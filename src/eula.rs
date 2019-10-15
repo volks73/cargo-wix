@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fmt;
-use std::path::PathBuf;
-use std::str::FromStr;
-
-use toml::Value;
-
 use crate::Error;
 use crate::Result;
 use crate::Template;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
+
+use std::fmt;
+use std::path::PathBuf;
+use std::str::FromStr;
+
+use toml::Value;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Eula {

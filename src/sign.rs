@@ -15,16 +15,6 @@
 //! The implementation for the `sign` command. This command focuses on signing
 //! installers using the Windows SDK `signtool` application.
 
-use std::env;
-use std::ffi::OsStr;
-use std::fs;
-use std::io::ErrorKind;
-use std::path::PathBuf;
-use std::process::{Command, Stdio};
-use std::str::FromStr;
-
-use toml::Value;
-
 use crate::Error;
 use crate::Result;
 use crate::TimestampServer;
@@ -35,6 +25,16 @@ use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
 use crate::TARGET_FOLDER_NAME;
 use crate::WIX;
+
+use std::env;
+use std::ffi::OsStr;
+use std::fs;
+use std::io::ErrorKind;
+use std::path::PathBuf;
+use std::process::{Command, Stdio};
+use std::str::FromStr;
+
+use toml::Value;
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
