@@ -971,6 +971,13 @@ fn main() {
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
+                .arg(Arg::with_name("INPUT")
+                     .help("A path to a WiX source (wxs) file.")
+                     .long_help("A WiX source (wxs) file for the project that is \
+                        not located in the default location. The default location \
+                        is 'wix\\main.wxs', as created with the 'cargo wix init' \
+                        sub-command.")
+                     .required(false))
                 .arg(Arg::with_name("install-version")
                     .help("A string for the Add/Remove Programs control panel's version number")
                     .long_help("Overrides the version from the package's manifest \
