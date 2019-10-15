@@ -15,15 +15,15 @@
 //! The implementation for the `purge` command. This command is focused on
 //! removing all files associated with `cargo wix` subcommand.
 
-use clean;
+use crate::clean;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::PathBuf;
-use Error;
-use Result;
-use CARGO_MANIFEST_FILE;
-use WIX;
+use crate::Error;
+use crate::Result;
+use crate::CARGO_MANIFEST_FILE;
+use crate::WIX;
 
 /// A builder for creating an execution context to remove all files and folders
 /// related to the `cargo wix` subcommand.

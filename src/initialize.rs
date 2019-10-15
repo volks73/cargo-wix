@@ -22,20 +22,20 @@
 //! exists for the project, the `init` command does not need to be executed
 //! again.
 
-use eula::Eula;
-use print;
+use crate::eula::Eula;
+use crate::print;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
-use Error;
-use Result;
-use CARGO_MANIFEST_FILE;
-use LICENSE_FILE_NAME;
-use RTF_FILE_EXTENSION;
-use WIX;
-use WIX_SOURCE_FILE_EXTENSION;
-use WIX_SOURCE_FILE_NAME;
+use crate::Error;
+use crate::Result;
+use crate::CARGO_MANIFEST_FILE;
+use crate::LICENSE_FILE_NAME;
+use crate::RTF_FILE_EXTENSION;
+use crate::WIX;
+use crate::WIX_SOURCE_FILE_EXTENSION;
+use crate::WIX_SOURCE_FILE_NAME;
 
 /// A builder for running the `cargo wix init` subcommand.
 #[derive(Debug, Clone)]

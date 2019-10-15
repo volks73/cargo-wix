@@ -24,7 +24,7 @@ mod common;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
-use common::{PACKAGE_NAME, TARGET_NAME};
+use crate::common::{PACKAGE_NAME, TARGET_NAME};
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};

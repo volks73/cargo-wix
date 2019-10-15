@@ -83,7 +83,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use toml::Value;
 
-pub use templates::Template;
+pub use crate::templates::Template;
 
 pub mod clean;
 pub mod create;

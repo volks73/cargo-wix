@@ -18,11 +18,11 @@ use std::str::FromStr;
 
 use toml::Value;
 
-use Error;
-use Result;
-use Template;
-use LICENSE_FILE_NAME;
-use RTF_FILE_EXTENSION;
+use crate::Error;
+use crate::Result;
+use crate::Template;
+use crate::LICENSE_FILE_NAME;
+use crate::RTF_FILE_EXTENSION;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Eula {

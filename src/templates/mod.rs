@@ -14,7 +14,7 @@
 
 use std::fmt;
 use std::str::FromStr;
-use Error;
+use crate::Error;
 
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("main.wxs.mustache");

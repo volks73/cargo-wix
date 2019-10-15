@@ -32,22 +32,22 @@ use std::str::FromStr;
 
 use toml::Value;
 
-use Cultures;
-use Error;
-use Platform;
-use Result;
-use BINARY_FOLDER_NAME;
-use CARGO;
-use EXE_FILE_EXTENSION;
-use MSI_FILE_EXTENSION;
-use TARGET_FOLDER_NAME;
-use WIX;
-use WIX_COMPILER;
-use WIX_LINKER;
-use WIX_OBJECT_FILE_EXTENSION;
-use WIX_PATH_KEY;
-use WIX_SOURCE_FILE_EXTENSION;
-use WIX_SOURCE_FILE_NAME;
+use crate::Cultures;
+use crate::Error;
+use crate::Platform;
+use crate::Result;
+use crate::BINARY_FOLDER_NAME;
+use crate::CARGO;
+use crate::EXE_FILE_EXTENSION;
+use crate::MSI_FILE_EXTENSION;
+use crate::TARGET_FOLDER_NAME;
+use crate::WIX;
+use crate::WIX_COMPILER;
+use crate::WIX_LINKER;
+use crate::WIX_OBJECT_FILE_EXTENSION;
+use crate::WIX_PATH_KEY;
+use crate::WIX_SOURCE_FILE_EXTENSION;
+use crate::WIX_SOURCE_FILE_NAME;
 
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]

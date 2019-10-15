@@ -15,13 +15,13 @@
 //! The implementation for printing a license.
 
 use chrono::{Datelike, Utc};
-use manifest;
+use crate::manifest;
 use mustache::{self, MapBuilder};
 use std::path::PathBuf;
 use toml::Value;
-use Error;
-use Result;
-use Template;
+use crate::Error;
+use crate::Result;
+use crate::Template;
 
 /// A builder for creating an execution context to print a license.
 #[derive(Debug, Clone)]

@@ -25,16 +25,16 @@ use std::str::FromStr;
 
 use toml::Value;
 
-use Error;
-use Result;
-use TimestampServer;
-use BINARY_FOLDER_NAME;
-use EXE_FILE_EXTENSION;
-use MSI_FILE_EXTENSION;
-use SIGNTOOL;
-use SIGNTOOL_PATH_KEY;
-use TARGET_FOLDER_NAME;
-use WIX;
+use crate::Error;
+use crate::Result;
+use crate::TimestampServer;
+use crate::BINARY_FOLDER_NAME;
+use crate::EXE_FILE_EXTENSION;
+use crate::MSI_FILE_EXTENSION;
+use crate::SIGNTOOL;
+use crate::SIGNTOOL_PATH_KEY;
+use crate::TARGET_FOLDER_NAME;
+use crate::WIX;
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]

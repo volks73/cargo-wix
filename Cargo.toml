@@ -10,6 +10,7 @@ categories = ["development-tools"]
 keywords = ["cargo-subcommand", "installer", "wix-toolset", "wix"]
 homepage = "https://github.com/volks73/cargo-wix"
 readme = "README.md"
+edition = "2018"
 
 [[bin]]
 name = "cargo-wix"
