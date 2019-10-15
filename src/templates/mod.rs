@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::Error;
 use std::fmt;
 use std::str::FromStr;
-use crate::Error;
 
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("main.wxs.mustache");
