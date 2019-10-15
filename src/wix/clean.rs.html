@@ -202,6 +202,7 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -220,15 +221,16 @@
 <span class="doccomment">//! The implementation for the `clean` command. This command is focused on</span>
 <span class="doccomment">//! cleaning up build output, similar to the `cargo clean` subcommand.</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="prelude-ty">Result</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CARGO_MANIFEST_FILE</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">TARGET_FOLDER_NAME</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX</span>;
+
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsStr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
-<span class="kw">use</span> <span class="ident">Error</span>;
-<span class="kw">use</span> <span class="prelude-ty">Result</span>;
-<span class="kw">use</span> <span class="ident">CARGO_MANIFEST_FILE</span>;
-<span class="kw">use</span> <span class="ident">TARGET_FOLDER_NAME</span>;
-<span class="kw">use</span> <span class="ident">WIX</span>;
 
 <span class="doccomment">/// A builder for creating an execution context to clean a package of WiX</span>
 <span class="doccomment">/// Toolset-related output.</span>

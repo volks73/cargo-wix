@@ -472,6 +472,13 @@
 <span id="472">472</span>
 <span id="473">473</span>
 <span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -490,6 +497,17 @@
 <span class="doccomment">//! The implementation for the `sign` command. This command focuses on signing</span>
 <span class="doccomment">//! installers using the Windows SDK `signtool` application.</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="prelude-ty">Result</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">TimestampServer</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">BINARY_FOLDER_NAME</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">EXE_FILE_EXTENSION</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">MSI_FILE_EXTENSION</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">SIGNTOOL</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">SIGNTOOL_PATH_KEY</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">TARGET_FOLDER_NAME</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX</span>;
+
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsStr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
@@ -497,17 +515,8 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::{<span class="ident">Command</span>, <span class="ident">Stdio</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+
 <span class="kw">use</span> <span class="ident">toml</span>::<span class="ident">Value</span>;
-<span class="kw">use</span> <span class="ident">Error</span>;
-<span class="kw">use</span> <span class="prelude-ty">Result</span>;
-<span class="kw">use</span> <span class="ident">TimestampServer</span>;
-<span class="kw">use</span> <span class="ident">BINARY_FOLDER_NAME</span>;
-<span class="kw">use</span> <span class="ident">EXE_FILE_EXTENSION</span>;
-<span class="kw">use</span> <span class="ident">MSI_FILE_EXTENSION</span>;
-<span class="kw">use</span> <span class="ident">SIGNTOOL</span>;
-<span class="kw">use</span> <span class="ident">SIGNTOOL_PATH_KEY</span>;
-<span class="kw">use</span> <span class="ident">TARGET_FOLDER_NAME</span>;
-<span class="kw">use</span> <span class="ident">WIX</span>;
 
 <span class="doccomment">/// A builder for creating an execution context to sign an installer.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -689,18 +698,24 @@
             }
         })<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Command</span>(<span class="ident">SIGNTOOL</span>, <span class="ident">status</span>.<span class="ident">code</span>().<span class="ident">unwrap_or</span>(<span class="number">100</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Command</span>(
+                <span class="ident">SIGNTOOL</span>,
+                <span class="ident">status</span>.<span class="ident">code</span>().<span class="ident">unwrap_or</span>(<span class="number">100</span>),
+                <span class="self">self</span>.<span class="ident">capture_output</span>,
+            ));
         }
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">homepage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">homepage</span>.<span class="ident">clone</span>().<span class="ident">or</span>(<span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;homepage&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_str</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">s</span>)))
+        <span class="self">self</span>.<span class="ident">homepage</span>.<span class="ident">clone</span>().<span class="ident">or_else</span>(<span class="op">||</span> {
+            <span class="ident">manifest</span>
+                .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;homepage&quot;</span>))
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_str</span>())
+                .<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>)
+        })
     }
 
     <span class="kw">fn</span> <span class="ident">msi</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
@@ -759,34 +774,32 @@
             } <span class="kw">else</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">path</span>))
             }
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">path</span>) <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var_os</span>(<span class="ident">SIGNTOOL_PATH_KEY</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">s</span>);
-                <span class="macro">trace</span><span class="macro">!</span>(
-                    <span class="string">&quot;Using the &#39;{}&#39; path to the Windows SDK &#39;{}&#39; folder for the signer&quot;</span>,
-                    <span class="ident">p</span>.<span class="ident">display</span>(),
-                    <span class="ident">BINARY_FOLDER_NAME</span>
-                );
-                <span class="ident">p</span>.<span class="ident">push</span>(<span class="ident">SIGNTOOL</span>);
-                <span class="ident">p</span>.<span class="ident">set_extension</span>(<span class="ident">EXE_FILE_EXTENSION</span>);
-                <span class="ident">p</span>
-            }) {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">exists</span>() {
-                    <span class="ident">path</span>.<span class="ident">pop</span>(); <span class="comment">// Remove the `signtool` application from the path</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
-                        <span class="string">&quot;The signer application (&#39;{}&#39;) does not exist at the &#39;{}&#39; path specified \
-                         via the {} environment variable. Please check the path is correct and the \
-                         signer application exists at the path.&quot;</span>,
-                        <span class="ident">SIGNTOOL</span>,
-                        <span class="ident">path</span>.<span class="ident">display</span>(),
-                        <span class="ident">SIGNTOOL_PATH_KEY</span>
-                    )))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">path</span>))
-                }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">path</span>) <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var_os</span>(<span class="ident">SIGNTOOL_PATH_KEY</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">s</span>);
+            <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="string">&quot;Using the &#39;{}&#39; path to the Windows SDK &#39;{}&#39; folder for the signer&quot;</span>,
+                <span class="ident">p</span>.<span class="ident">display</span>(),
+                <span class="ident">BINARY_FOLDER_NAME</span>
+            );
+            <span class="ident">p</span>.<span class="ident">push</span>(<span class="ident">SIGNTOOL</span>);
+            <span class="ident">p</span>.<span class="ident">set_extension</span>(<span class="ident">EXE_FILE_EXTENSION</span>);
+            <span class="ident">p</span>
+        }) {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">exists</span>() {
+                <span class="ident">path</span>.<span class="ident">pop</span>(); <span class="comment">// Remove the `signtool` application from the path</span>
+                <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
+                    <span class="string">&quot;The signer application (&#39;{}&#39;) does not exist at the &#39;{}&#39; path specified \
+                     via the {} environment variable. Please check the path is correct and the \
+                     signer application exists at the path.&quot;</span>,
+                    <span class="ident">SIGNTOOL</span>,
+                    <span class="ident">path</span>.<span class="ident">display</span>(),
+                    <span class="ident">SIGNTOOL_PATH_KEY</span>
+                )))
             } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">SIGNTOOL</span>))
+                <span class="prelude-val">Ok</span>(<span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">path</span>))
             }
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">SIGNTOOL</span>))
         }
     }
 }
@@ -863,8 +876,9 @@
     <span class="kw">mod</span> <span class="ident">execution</span> {
         <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">assert_fs</span>;
 
-        <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
         <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">File</span>;
+
+        <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
         <span class="kw">const</span> <span class="ident">MIN_MANIFEST</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;[package]
             name = &quot;Example&quot;

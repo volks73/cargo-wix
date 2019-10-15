@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1271' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1331' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
 <p>The goal of the cargo-wix project and the <code>cargo wix</code> subcommand is to make
 it easy to create a Windows installer (msi) for any Rust project. The
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but the core
@@ -11,6 +11,7 @@ focuses on the usage and features of the <code>cargo wix</code> subcommand.</p>
 <li><a href="#quick-start">Quick Start</a></li>
 <li><a href="#examples">Examples</a></li>
 <li><a href="#features">Features</a></li>
+<li><a href="#configuration">Configuration</a></li>
 <li><a href="#flags-and-options">Flags and Options</a></li>
 </ul>
 <h2 id="quick-start" class="section-header"><a href="#quick-start">Quick Start</a></h2>
@@ -269,6 +270,34 @@ valid values, then no sidecar file is included in the installation and no
 license agreement dialog appears during installation. This default behavior
 can be overridden with the <code>-l,--license</code> and <code>-e,--eula</code> options for the
 <code>cargo wix init</code> subcommand.</p>
+<h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
+<p>The default subcommand, <code>cargo wix</code>, which creates a MSI based on the
+contents of the package's manifest (Cargo.toml) can be configured by adding
+a <code>[package.metadata.wix]</code> section to the manifest. For each CLI option for
+the default <em>create</em> subcommand, a field can be added to the
+<code>[package.metadata.wix]</code> section. If the corresponding CLI option is used
+with the default <em>create</em> subcommand, then the CLI option value will
+override the value in the metadata section.</p>
+<p>Below is an example <code>[package.metadata.wix]</code> section from a package's
+manifest that configures the default <em>create</em> subcommand:</p>
+<pre><code class="language-toml">[package.metadata.wix]
+culture = &quot;Fr-Fr&quot;
+input = &quot;Path\to\WIX\Source\File.wxs&quot;
+locale = &quot;Path\to\WIX\Localization\File.wxl&quot;
+name = &quot;example&quot;
+no-build = false
+output = &quot;Path\and\file\name\for\installer.msi&quot;
+version = &quot;2.1.0&quot;
+</code></pre>
+<p>See the documentation for each CLI option for more information about each
+field and its purpose. Note, the <code>name</code> and <code>version</code> fields will be the
+name and version number of the application as it appears in the Add/Remove
+Programs control panel, and the version number does <em>not</em> need to match the
+package's version number. In other words, the installed application can have
+a different version number from the package, which is useful with multiple
+binaries, workspaces, or distributing a &quot;suite&quot; of applications, where the
+version number would be for the suite and not necessarily the individual
+applications within the suite.</p>
 <h2 id="flags-and-options" class="section-header"><a href="#flags-and-options">Flags and Options</a></h2>
 <p>Generally, any value that is obtained from the package's manifest
 (Cargo.toml) can be overridden at the command line with an appropriate
@@ -305,11 +334,17 @@ override default <code>signtool</code> application found using the
 <h3 id="-b--binary" class="section-header"><a href="#-b--binary"><code>-B,--binary</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
-<p>The binary name, which is the <code>name</code> field for the <code>[[bin]]</code> section, is
-used for the executable file name, i.e. &quot;name.exe&quot;. This can also be
-overridden using the <code>-B,--binary</code> option for the <code>cargo wix init</code>
-subcommand. This option takes a relative or absolute path to an executable
-file and uses the file name as the binary name.</p>
+<p>A path to a binary, a.k.a. executable, to include in the installer <em>instead</em>
+of any and all binaries defined in the package's manifest (Cargo.toml). By
+default, all binaries defined with the <code>[[bin]]</code> section in the package's
+manifest are included in the installer. If no <code>[[bin]]</code> section is defined,
+then the package's <code>name</code> field is used. This option can be used to
+override, i.e. <em>not</em> append, the binaries that should be included in the
+installer.</p>
+<p>This option can be used multiple times to define multiple binaries to
+include in the installer. The value is a path to a binary file. The file
+stem (file name without extension) is used as the binary name within the WXS
+file. A relative or absolute path is acceptable.</p>
 <h3 id="-c--culture" class="section-header"><a href="#-c--culture"><code>-c,--culture</code></a></h3>
 <p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Sets the culture for localization. Use with the [<code>-l,--locale</code>] option. See
@@ -343,12 +378,12 @@ text editor.</p>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) subcommand.</p>
 <p>Forces overriding of generated files from the <em>init</em> subcommand. Use with
 caution! This cannot be undone.</p>
-<h3 id="-h--help" class="section-header"><a href="#-h--help">-h,--help</a></h3>
+<h3 id="-h--help" class="section-header"><a href="#-h--help"><code>-h,--help</code></a></h3>
 <p>Available for all subcommands.</p>
 <p>The short flag, <code>-h</code>, will print a condensed version of the help text, while
 the long flag, <code>--help</code>, will print a more detailed version of the help
 text.</p>
-<h3 id="-u--homepage" class="section-header"><a href="#-u--homepage">-u,--homepage</a></h3>
+<h3 id="-u--homepage" class="section-header"><a href="#-u--homepage"><code>-u,--homepage</code></a></h3>
 <p>Available for the <em>sign</em> (<code>cargo wix sign</code>) subcommand.</p>
 <p>This will be display in the ACL dialog.</p>
 <h3 id="-i--install-version" class="section-header"><a href="#-i--install-version"><code>-i,--install-version</code></a></h3>
@@ -382,10 +417,10 @@ be changed after initialization by directly modifying the WiX Source file
 <p>Overrides the <code>name</code> field in the package's manifest (Cargo.toml), which is
 used in the file name of the installer (msi). This does not change the name
 of the executable <em>within</em> the installer.</p>
-<h3 id="--no-build" class="section-header"><a href="#--no-build">--no-build</a></h3>
+<h3 id="--no-build" class="section-header"><a href="#--no-build"><code>--no-build</code></a></h3>
 <p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
 <p>This skips building the Rust package using Cargo for the Release target.</p>
-<h3 id="--nocapture" class="section-header"><a href="#--nocapture">--nocapture</a></h3>
+<h3 id="--nocapture" class="section-header"><a href="#--nocapture"><code>--nocapture</code></a></h3>
 <p>Available for the <em>default</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>)
 subcommands.</p>
 <p>Displays all output from the builder (Cargo), compiler (candle.exe), linker
@@ -397,7 +432,7 @@ subcommands.</p>
 file (wxs), an alternative to stdout for <em>print</em> subcommand, and the created
 installer for the <em>default</em> subcommand.</p>
 <p>When used with the <em>default</em> subcommand to create an installer (MSI), if the
-path is to an existing directory or the path has a trailing <code>/</code> or <code></code>, then
+path is to an existing directory or the path has a trailing <code>/</code> or <code>\</code>, then
 the MSI will be available after creation at the specified path, but the MSI
 file name will be the default file name based on the package name, version,
 and platform.</p>
