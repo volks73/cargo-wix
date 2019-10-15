@@ -365,7 +365,7 @@
 //!
 //! ```toml
 //! [package.metadata.wix]
-//! culture = "FrFr"
+//! culture = "Fr-Fr"
 //! input = "Path\to\WIX\Source\File.wxs"
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"

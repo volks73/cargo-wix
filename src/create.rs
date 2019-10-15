@@ -894,38 +894,102 @@ mod tests {
     mod execution {
         use super::*;
 
-        const VERSION_PKG_META_WIX: &str = r#"
-            [package]
-            version = "0.1.0"
-
-            [package.metadata.wix]
-            version = "2.1.0"
-        "#;
-
         #[test]
         fn version_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package]
+                version = "0.1.0"
+
+                [package.metadata.wix]
+                version = "2.1.0"
+            "#;
             let execution = Execution::default();
             let version = execution
-                .version(&VERSION_PKG_META_WIX.parse::<Value>().unwrap())
+                .version(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
             assert_eq!(version, Version::parse("2.1.0").unwrap());
         }
 
-        const NAME_PKG_META_WIX: &str = r#"
-            [package]
-            name = "example"
-
-            [package.metadata.wix]
-            name = "Metadata"
-        "#;
-
         #[test]
         fn name_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package]
+                name = "example"
+
+                [package.metadata.wix]
+                name = "Metadata"
+            "#;
             let execution = Execution::default();
             let name = execution
-                .name(&NAME_PKG_META_WIX.parse::<Value>().unwrap())
+                .name(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
             assert_eq!(name, "Metadata".to_owned());
+        }
+
+        #[test]
+        fn no_build_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                no-build = true
+            "#;
+            let execution = Execution::default();
+            let no_build = execution.no_build(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert!(no_build);
+        }
+
+        #[test]
+        fn culture_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                culture = "Fr-Fr"
+            "#;
+            let execution = Execution::default();
+            let culture = execution
+                .culture(&PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(culture, Cultures::FrFr);
+        }
+
+        #[test]
+        fn locale_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                locale = "wix/French.wxl"
+            "#;
+            let execution = Execution::default();
+            let locale = execution
+                .locale(&PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(locale, Some(PathBuf::from("wix/French.wxl")));
+        }
+
+        #[test]
+        fn output_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                output = "target/wix/test.msi"
+            "#;
+            let execution = Execution::default();
+            let output = execution.destination_msi(
+                "Different",
+                &"2.1.0".parse::<Version>().unwrap(),
+                Platform::X64,
+                &PKG_META_WIX.parse::<Value>().unwrap(),
+            );
+            assert_eq!(output, PathBuf::from("target/wix/test.msi"));
+        }
+
+        #[test]
+        fn input_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                input = "Cargo.toml"
+            "#;
+            let execution = Execution::default();
+            let input = execution
+                .wxs_source(&PKG_META_WIX.parse::<Value>().unwrap())
+                .unwrap();
+            assert_eq!(input, PathBuf::from("Cargo.toml"));
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
