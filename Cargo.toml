@@ -20,14 +20,14 @@ name = "wix"
 
 [dependencies]
 chrono = "0.4"
-env_logger = "0.5"
+env_logger = "0.7"
 log = "0.4"
 maplit = "1"
 mustache = "0.9"
 regex = "1"
 semver = "0.9"
 termcolor = "1"
-toml = "0.4"
+toml = "0.5"
 uuid = { version = "0.7", features = ["v4"] }
 
 [dev-dependencies]
