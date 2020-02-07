@@ -703,3 +703,25 @@ fn inputs_works() {
         .child(expected_msi_file)
         .assert(predicate::path::exists());
 }
+
+#[test]
+fn multiple_inputs_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package_multiple_wxs_sources();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    let one_wxs = package.path().join("wix").join("one.wxs");
+    let two_wxs = package.path().join("wix").join("two.wxs");
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .inputs(Some(vec![one_wxs.to_str().unwrap(), two_wxs.to_str().unwrap()]))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}

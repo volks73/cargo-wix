@@ -272,8 +272,6 @@ impl Execution {
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination();
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
-        debug!("wixobj_sources = {:?}", wixobj_sources);
         let destination_msi = self.destination_msi(&name, &version, platform, &manifest);
         debug!("destination_msi = {:?}", destination_msi);
         if self.no_build(&manifest) {
@@ -341,6 +339,8 @@ impl Execution {
         info!("Linking the installer");
         let mut linker = self.linker()?;
         debug!("linker = {:?}", linker);
+        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
+        debug!("wixobj_sources = {:?}", wixobj_sources);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
             linker.stdout(Stdio::null());

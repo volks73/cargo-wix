@@ -163,6 +163,34 @@ inputs = ["wix\\main.wxs"]
     package
 }
 
+/// Create a new cargo project/package for a project with multiple WXS files.
+///
+/// # Panics
+///
+/// This will panic if a temporary directory fails to be created or if cargo
+/// fails to create the project/package.
+///
+/// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
+/// project layout for multiple binaries.
+///
+/// This function will panic if the `wix` sub-folder could not be created.
+#[allow(dead_code)]
+pub fn create_test_package_multiple_wxs_sources() -> TempDir {
+    let one_wxs = include_str!("one.wxs");
+    let two_wxs = include_str!("two.wxs");
+    let package = create_test_package();
+    let mut wix_dir = package.path().join("wix");
+    fs::create_dir(&wix_dir).unwrap();
+    wix_dir.push("one.wxs");
+    let mut one_wxs_handle = File::create(&wix_dir).unwrap();
+    one_wxs_handle.write_all(one_wxs.as_bytes()).unwrap();
+    wix_dir.pop();
+    wix_dir.push("two.wxs");
+    let mut two_wxs_handle = File::create(&wix_dir).unwrap();
+    two_wxs_handle.write_all(two_wxs.as_bytes()).unwrap();
+    package
+}
+
 /// Evaluates an XPath expression for a WiX Source file.
 ///
 /// This registers the WiX XML namespace with the `wix` prefix. So, XPath
