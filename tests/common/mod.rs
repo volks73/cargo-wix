@@ -155,6 +155,7 @@ pub fn create_test_package_metadata() -> TempDir {
             r#"[package.metadata.wix]
 name = "Metadata"
 version = "2.1.0"
+inputs = ["wix\\main.wxs"]
 "#
             .as_bytes(),
         )

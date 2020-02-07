@@ -636,7 +636,7 @@ fn init_with_product_name_option_works() {
 }
 
 #[test]
-fn input_works() {
+fn inputs_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
@@ -691,7 +691,7 @@ fn input_works() {
         .run()
         .unwrap();
     let result = Builder::default()
-        .input(output.join("main.wxs").to_str())
+        .inputs(output.join("main.wxs").to_str().and_then(|i| Some(vec![i])))
         .build()
         .run();
     env::set_current_dir(original_working_directory).unwrap();

@@ -37,7 +37,6 @@ use crate::WIX_LINKER;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
 use crate::WIX_SOURCE_FILE_EXTENSION;
-use crate::WIX_SOURCE_FILE_NAME;
 
 use semver::Version;
 
@@ -55,7 +54,7 @@ pub struct Builder<'a> {
     bin_path: Option<&'a str>,
     capture_output: bool,
     culture: Option<&'a str>,
-    input: Option<&'a str>,
+    inputs: Option<Vec<&'a str>>,
     locale: Option<&'a str>,
     name: Option<&'a str>,
     no_build: bool,
@@ -70,7 +69,7 @@ impl<'a> Builder<'a> {
             bin_path: None,
             capture_output: true,
             culture: None,
-            input: None,
+            inputs: None,
             locale: None,
             name: None,
             no_build: false,
@@ -116,8 +115,8 @@ impl<'a> Builder<'a> {
     ///
     /// This value will override any default and skip looking for a value in the
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
-    pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
-        self.input = i;
+    pub fn inputs(&mut self, i: Option<Vec<&'a str>>) -> &mut Self {
+        self.inputs = i;
         self
     }
 
@@ -213,7 +212,9 @@ impl<'a> Builder<'a> {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             culture: self.culture.map(String::from),
-            input: self.input.map(PathBuf::from),
+            inputs: self.inputs.as_ref().map(|v| {
+                v.iter().map(&PathBuf::from).collect()
+            }),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
@@ -235,7 +236,7 @@ pub struct Execution {
     bin_path: Option<PathBuf>,
     capture_output: bool,
     culture: Option<String>,
-    input: Option<PathBuf>,
+    inputs: Option<Vec<PathBuf>>,
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
@@ -250,7 +251,7 @@ impl Execution {
         debug!("bin_path = {:?}", self.bin_path);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("culture = {:?}", self.culture);
-        debug!("input = {:?}", self.input);
+        debug!("inputs = {:?}", self.inputs);
         debug!("locale = {:?}", self.locale);
         debug!("name = {:?}", self.name);
         debug!("no_build = {:?}", self.no_build);
@@ -267,10 +268,12 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let platform = self.platform();
         debug!("platform = {:?}", platform);
-        let source_wxs = self.wxs_source(&manifest)?;
-        debug!("source_wxs = {:?}", source_wxs);
-        let source_wixobj = self.source_wixobj();
-        debug!("source_wixobj = {:?}", source_wixobj);
+        let wxs_sources = self.wxs_sources(&manifest)?;
+        debug!("wxs_sources = {:?}", wxs_sources);
+        let wixobj_destination = self.wixobj_destination();
+        debug!("wixobj_destination = {:?}", wixobj_destination);
+        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
+        debug!("wixobj_sources = {:?}", wixobj_sources);
         let destination_msi = self.destination_msi(&name, &version, platform, &manifest);
         debug!("destination_msi = {:?}", destination_msi);
         if self.no_build(&manifest) {
@@ -310,8 +313,8 @@ impl Execution {
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg("-o")
-            .arg(&source_wixobj)
-            .arg(&source_wxs);
+            .arg(&wixobj_destination)
+            .args(&wxs_sources);
         debug!("command = {:?}", compiler);
         let status = compiler.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
@@ -354,9 +357,9 @@ impl Execution {
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg(format!("-cultures:{}", culture))
-            .arg(&source_wixobj)
             .arg("-out")
-            .arg(&destination_msi);
+            .arg(&destination_msi)
+            .args(&wixobj_sources);
         debug!("command = {:?}", linker);
         let status = linker.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
@@ -635,84 +638,114 @@ impl Execution {
         }
     }
 
-    fn source_wixobj(&self) -> PathBuf {
-        let mut source_wixobj = PathBuf::from(TARGET_FOLDER_NAME);
-        source_wixobj.push(WIX);
-        source_wixobj.push(WIX_SOURCE_FILE_NAME);
-        source_wixobj.set_extension(WIX_OBJECT_FILE_EXTENSION);
-        source_wixobj
+    fn wixobj_destination(&self) -> PathBuf {
+        let mut dst = PathBuf::from(TARGET_FOLDER_NAME);
+        dst.push(format!("{}\\", WIX));
+        dst
     }
 
-    fn wxs_source(&self, manifest: &Value) -> Result<PathBuf> {
-        if let Some(p) = self.input.as_ref().map(PathBuf::from) {
-            if p.exists() {
-                if p.is_dir() {
-                    Err(Error::Generic(format!(
-                        "The '{}' path is not a file. Please check the path and ensure it is to \
-                         a WiX Source (wxs) file.",
+    fn wixobj_sources(&self, wixobj_dst: &Path) -> Result<Vec<PathBuf>> {
+        let wixobj_sources: Vec<PathBuf> = std::fs::read_dir(wixobj_dst)?
+            .filter(|r| r.is_ok())
+            .map(|r| r.unwrap().path())
+            .filter(|p| {
+                p.extension().and_then(|s| s.to_str()) == Some(WIX_OBJECT_FILE_EXTENSION)
+            })
+            .collect();
+        if wixobj_sources.is_empty() {
+            Err(Error::Generic(String::from("No WiX object files found.")))
+        } else {
+            Ok(wixobj_sources)
+        }
+    }
+
+    fn wxs_sources(&self, manifest: &Value) -> Result<Vec<PathBuf>> {
+        if let Some(paths) = self.inputs.as_ref() {
+            for p in paths {
+                if p.exists() {
+                    if p.is_dir() {
+                        return Err(Error::Generic(format!(
+                            "The '{}' path is not a file. Please check the path and ensure it is to \
+                            a WiX Source (wxs) file.",
+                            p.display()
+                        )))
+                    } else {
+                        trace!("Using the '{}' WiX source file", p.display());
+                    }
+                } else {
+                    return Err(Error::Generic(format!(
+                        "The '{0}' file does not exist. Consider using the 'cargo \
+                        wix print WXS > {0}' command to create it.",
                         p.display()
                     )))
-                } else {
-                    trace!("Using the '{}' WiX source file", p.display());
-                    Ok(p)
                 }
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{0}' file does not exist. Consider using the 'cargo \
-                     wix print WXS > {0}' command to create it.",
-                    p.display()
-                )))
             }
-        } else if let Some(pkg_meta_wix_input) = manifest
+            Ok(paths.to_owned())
+        } else if let Some(pkg_meta_wix_inputs) = manifest
             .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("metadata"))
             .and_then(|m| m.as_table())
             .and_then(|t| t.get("wix"))
             .and_then(|w| w.as_table())
-            .and_then(|t| t.get("input"))
-            .and_then(|i| i.as_str())
-            .map(PathBuf::from)
+            .and_then(|t| t.get("inputs"))
+            .and_then(|i| i.as_array())
+            .and_then(|a| Some(a.iter().map(
+                |s| s.as_str().map(PathBuf::from).unwrap()
+            ).collect::<Vec<PathBuf>>()))
         {
-            if pkg_meta_wix_input.exists() {
-                if pkg_meta_wix_input.is_dir() {
-                    Err(Error::Generic(format!(
-                        "The '{}' path is not a file. Please check the path and \
-                         ensure it is to a WiX Source (wxs) file in the \
-                         'package.metadata.wix' section of the package's manifest \
-                         (Cargo.toml).",
+            for pkg_meta_wix_input in &pkg_meta_wix_inputs {
+                if pkg_meta_wix_input.exists() {
+                    if pkg_meta_wix_input.is_dir() {
+                        return Err(Error::Generic(format!(
+                            "The '{}' path is not a file. Please check the path and \
+                            ensure it is to a WiX Source (wxs) file in the \
+                            'package.metadata.wix' section of the package's manifest \
+                            (Cargo.toml).",
+                            pkg_meta_wix_input.display()
+                        )))
+                    } else {
+                        trace!(
+                            "Using the '{}' WiX source file from the \
+                            'package.metadata.wix' section in the package's manifest.",
+                            pkg_meta_wix_input.display()
+                        );
+                    }
+                } else {
+                    return Err(Error::Generic(format!(
+                        "The '{0}' file does not exist. \
+                        Consider using the 'cargo wix print WXS > {0} command to create \
+                        it.",
                         pkg_meta_wix_input.display()
                     )))
-                } else {
-                    trace!(
-                        "Using the '{}' WiX source file from the \
-                         'package.metadata.wix' section in the package's manifest.",
-                        pkg_meta_wix_input.display()
-                    );
-                    Ok(pkg_meta_wix_input)
                 }
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{0}' file does not exist. \
-                     Consider using the 'cargo wix print WXS > {0} command to create \
-                     it.",
-                    pkg_meta_wix_input.display()
-                )))
             }
+            Ok(pkg_meta_wix_inputs.to_owned())
         } else {
-            trace!("Using the default WiX source file");
-            let mut main_wxs = PathBuf::from(WIX);
-            main_wxs.push(WIX_SOURCE_FILE_NAME);
-            main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
-            if main_wxs.exists() {
-                Ok(main_wxs)
+            trace!("Using the default WiX source files location");
+            let default_wix_inputs: Vec<PathBuf> = std::fs::read_dir(PathBuf::from(WIX))?
+                .filter(|r| r.is_ok())
+                .map(|r| r.unwrap().path())
+                .filter(|p| {
+                    p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
+                }).collect();
+            if default_wix_inputs.is_empty() {
+                Err(Error::Generic(String::from("No WXS files found in the 'wix' default location.")))
             } else {
-                Err(Error::Generic(format!(
-                    "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
-                   create it.",
-                    main_wxs.display()
-                )))
+                Ok(default_wix_inputs)
             }
+            // let mut main_wxs = PathBuf::from(WIX);
+            // main_wxs.push(WIX_SOURCE_FILE_NAME);
+            // main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
+            // if main_wxs.exists() {
+            //     Ok(vec![main_wxs])
+            // } else {
+            //     Err(Error::Generic(format!(
+            //         "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
+            //        create it.",
+            //         main_wxs.display()
+            //     )))
+            // }
         }
     }
 
@@ -761,7 +794,7 @@ mod tests {
             assert!(actual.bin_path.is_none());
             assert!(actual.capture_output);
             assert!(actual.culture.is_none());
-            assert!(actual.input.is_none());
+            assert!(actual.inputs.is_none());
             assert!(actual.locale.is_none());
             assert!(actual.name.is_none());
             assert!(!actual.no_build);
@@ -796,8 +829,8 @@ mod tests {
         fn input_works() {
             const EXPECTED: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
             let mut actual = Builder::new();
-            actual.input(Some(EXPECTED));
-            assert_eq!(actual.input, Some(EXPECTED));
+            actual.inputs(Some(vec![EXPECTED]));
+            assert_eq!(actual.inputs, Some(vec![EXPECTED]));
         }
 
         #[test]
@@ -846,7 +879,7 @@ mod tests {
             assert!(default_execution.bin_path.is_none());
             assert!(default_execution.capture_output);
             assert!(default_execution.culture.is_none());
-            assert!(default_execution.input.is_none());
+            assert!(default_execution.inputs.is_none());
             assert!(default_execution.locale.is_none());
             assert!(default_execution.name.is_none());
             assert!(!default_execution.no_build);
@@ -867,7 +900,7 @@ mod tests {
             b.bin_path(Some(EXPECTED_BIN_PATH));
             b.capture_output(false);
             b.culture(Some(EXPECTED_CULTURE));
-            b.input(Some(EXPECTED_INPUT));
+            b.inputs(Some(vec![EXPECTED_INPUT]));
             b.locale(Some(EXPECTED_LOCALE));
             b.name(Some(EXPECTED_NAME));
             b.no_build(true);
@@ -880,7 +913,7 @@ mod tests {
             );
             assert!(!execution.capture_output);
             assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
-            assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
+            assert_eq!(execution.inputs, Some(vec![PathBuf::from(EXPECTED_INPUT)]));
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
             assert!(execution.no_build);
@@ -981,13 +1014,13 @@ mod tests {
         fn input_metadata_works() {
             const PKG_META_WIX: &str = r#"
                 [package.metadata.wix]
-                input = "Cargo.toml"
+                inputs = ["Cargo.toml"]
             "#;
             let execution = Execution::default();
-            let input = execution
-                .wxs_source(&PKG_META_WIX.parse::<Value>().unwrap())
+            let inputs = execution
+                .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
-            assert_eq!(input, PathBuf::from("Cargo.toml"));
+            assert_eq!(inputs, vec![PathBuf::from("Cargo.toml")]);
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
@@ -1033,6 +1066,12 @@ mod tests {
             let e = Execution::default();
             let actual = e.compiler().unwrap();
             assert_eq!(format!("{:?}", actual), format!("{:?}", expected));
+        }
+
+        #[test]
+        fn wixobj_destination_works() {
+            let execution = Execution::default();
+            assert_eq!(execution.wixobj_destination(), PathBuf::from("target\\wix\\"))
         }
     }
 }

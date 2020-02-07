@@ -984,13 +984,14 @@ fn main() {
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
-                .arg(Arg::with_name("INPUT")
-                     .help("A path to a WiX source (wxs) file.")
-                     .long_help("A WiX source (wxs) file for the project that is \
+                .arg(Arg::with_name("INPUTS")
+                     .help("Path to multiple WiX source (wxs) files.")
+                     .long_help("WiX source (wxs) files for the project that are \
                         not located in the default location. The default location \
-                        is 'wix\\main.wxs', as created with the 'cargo wix init' \
+                        is 'wix', as created with the 'cargo wix init' \
                         sub-command.")
-                     .required(false))
+                     .required(false)
+                     .multiple(true))
                 .arg(Arg::with_name("install-version")
                     .help("A string for the Add/Remove Programs control panel's version number")
                     .long_help("Overrides the version from the package's manifest \
@@ -1293,7 +1294,7 @@ fn main() {
             create.bin_path(matches.value_of("bin-path"));
             create.capture_output(!matches.is_present("no-capture"));
             create.culture(matches.value_of("culture"));
-            create.input(matches.value_of("INPUT"));
+            create.inputs(matches.values_of("INPUTS").map(|a| a.collect()));
             create.locale(matches.value_of("locale"));
             create.name(matches.value_of("name"));
             create.no_build(matches.is_present("no-build"));
