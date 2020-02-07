@@ -1,1 +1,1 @@
-initSidebarItems({});
+initSidebarItems({"constant":[["SUBCOMMAND_NAME",""]],"fn":[["main",""]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -895,53 +895,6 @@
 <span id="895">895</span>
 <span id="896">896</span>
 <span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
-<span id="922">922</span>
-<span id="923">923</span>
-<span id="924">924</span>
-<span id="925">925</span>
-<span id="926">926</span>
-<span id="927">927</span>
-<span id="928">928</span>
-<span id="929">929</span>
-<span id="930">930</span>
-<span id="931">931</span>
-<span id="932">932</span>
-<span id="933">933</span>
-<span id="934">934</span>
-<span id="935">935</span>
-<span id="936">936</span>
-<span id="937">937</span>
-<span id="938">938</span>
-<span id="939">939</span>
-<span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
-<span id="943">943</span>
-<span id="944">944</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -1105,23 +1058,23 @@
 <span class="doccomment">/// [`Result`]: https://doc.rust-lang.org/std/result/</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
-<span class="kw">fn</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="ident">i</span>.<span class="ident">to_owned</span>(),
-        <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">to_owned</span>(),
+        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cwd</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">current_dir</span>()<span class="question-mark">?</span>;
             <span class="ident">cwd</span>.<span class="ident">push</span>(<span class="ident">CARGO_MANIFEST_FILE</span>);
             <span class="ident">cwd</span>
         }
     };
-    <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">exists</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_file</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">file_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr</span>::<span class="ident">new</span>(<span class="ident">CARGO_MANIFEST_FILE</span>)) {
+    <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">exists</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">i</span>.<span class="ident">is_file</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">i</span>.<span class="ident">file_name</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr</span>::<span class="ident">new</span>(<span class="ident">CARGO_MANIFEST_FILE</span>)) {
         <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">not_found</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">package_root</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">package_root</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">parent</span>()
             .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>)
@@ -1129,7 +1082,7 @@
     })
 }
 
-<span class="kw">fn</span> <span class="ident">manifest</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">manifest</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">cargo_file_path</span> <span class="op">=</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;cargo_file_path = {:?}&quot;</span>, <span class="ident">cargo_file_path</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cargo_file</span> <span class="op">=</span> <span class="ident">File</span>::<span class="ident">open</span>(<span class="ident">cargo_file_path</span>)<span class="question-mark">?</span>;
@@ -1139,8 +1092,8 @@
     <span class="prelude-val">Ok</span>(<span class="ident">manifest</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">description</span>(<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="ident">description</span>.<span class="ident">or_else</span>(<span class="op">||</span> {
+<span class="kw">fn</span> <span class="ident">description</span>(<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="ident">description</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
         <span class="ident">manifest</span>
             .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
@@ -1150,7 +1103,7 @@
     })
 }
 
-<span class="kw">fn</span> <span class="ident">product_name</span>(<span class="ident">product_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">product_name</span>(<span class="ident">product_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">product_name</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">to_owned</span>())
     } <span class="kw">else</span> {
@@ -1192,28 +1145,22 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use wix::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     let err = Error::from(&quot;A generic error&quot;);</span>
-    <span class="doccomment">///     assert_ne!(err.code(), 0)</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let err = Error::from(&quot;A generic error&quot;);</span>
+    <span class="doccomment">/// assert_ne!(err.code(), 0)</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is useful as a return, or exit, code for a command line application, where a non-zero</span>
     <span class="doccomment">/// integer indicates a failure in the application. it can also be used for quickly and easily</span>
     <span class="doccomment">/// testing equality between two errors.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=&gt;</span> <span class="number">1</span>,
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=&gt;</span> <span class="number">2</span>,
-            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=&gt;</span> <span class="number">3</span>,
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=&gt;</span> <span class="number">4</span>,
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=&gt;</span> <span class="number">5</span>,
-            <span class="ident">Error</span>::<span class="ident">Toml</span>(..) <span class="op">=&gt;</span> <span class="number">6</span>,
-            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=&gt;</span> <span class="number">7</span>,
+            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
+            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
+            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
+            <span class="ident">Error</span>::<span class="ident">Toml</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
+            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">7</span>,
         }
     }
 
@@ -1223,25 +1170,17 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::io;</span>
-    <span class="doccomment">/// use std::path::Path;</span>
-    <span class="doccomment">/// use wix::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     let path = Path::new(&quot;C:\\&quot;);</span>
-    <span class="doccomment">///     let expected = Error::Io(io::Error::new(</span>
-    <span class="doccomment">///         io::ErrorKind::AlreadyExists,</span>
-    <span class="doccomment">///         path.display().to_string()</span>
-    <span class="doccomment">///     ));</span>
-    <span class="doccomment">///     assert_eq!(expected, Error::already_exists(path));</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let path = Path::new(&quot;C:\\&quot;);</span>
+    <span class="doccomment">/// let expected = Error::Io(io::Error::new(</span>
+    <span class="doccomment">///     io::ErrorKind::AlreadyExists,</span>
+    <span class="doccomment">///     path.display().to_string()</span>
+    <span class="doccomment">/// ));</span>
+    <span class="doccomment">/// assert_eq!(expected, Error::already_exists(path));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html</span>
     <span class="doccomment">/// [std::io::ErrorKind::AlreadyExists]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">already_exists</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">already_exists</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ErrorKind</span>::<span class="ident">AlreadyExists</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
     }
 
@@ -1251,57 +1190,49 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::io;</span>
-    <span class="doccomment">/// use std::path::Path;</span>
-    <span class="doccomment">/// use wix::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     let path = Path::new(&quot;C:\\Cargo\\Wix\\file.txt&quot;);</span>
-    <span class="doccomment">///     let expected = Error::Io(io::Error::new(</span>
-    <span class="doccomment">///         io::ErrorKind::NotFound,</span>
-    <span class="doccomment">///         path.display().to_string()</span>
-    <span class="doccomment">///     ));</span>
-    <span class="doccomment">///     assert_eq!(expected, Error::not_found(path));</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let path = Path::new(&quot;C:\\Cargo\\Wix\\file.txt&quot;);</span>
+    <span class="doccomment">/// let expected = Error::Io(io::Error::new(</span>
+    <span class="doccomment">///     io::ErrorKind::NotFound,</span>
+    <span class="doccomment">///     path.display().to_string()</span>
+    <span class="doccomment">/// ));</span>
+    <span class="doccomment">/// assert_eq!(expected, Error::not_found(path));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html</span>
     <span class="doccomment">/// [std::io::ErrorKind::NotFound]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_found</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_found</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ErrorKind</span>::<span class="ident">NotFound</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Command&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Generic&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Io&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Manifest&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Mustache&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Toml</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;TOML&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;Version&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Command&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Generic&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Io&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Manifest&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Mustache&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Toml</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TOML&quot;</span>,
+            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Version&quot;</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Toml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error</span>::<span class="ident">Toml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(<span class="kw-2">ref</span> <span class="ident">command</span>, <span class="kw-2">ref</span> <span class="ident">code</span>, <span class="ident">captured_output</span>) <span class="op">=&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">Command</span>(<span class="kw-2">ref</span> <span class="ident">command</span>, <span class="kw-2">ref</span> <span class="ident">code</span>, <span class="ident">captured_output</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">captured_output</span> {
                     <span class="macro">write</span><span class="macro">!</span>(
                         <span class="ident">f</span>,
@@ -1317,74 +1248,74 @@
                     )
                 }
             }
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-                <span class="ident">ErrorKind</span>::<span class="ident">AlreadyExists</span> <span class="op">=&gt;</span> {
+            <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
+                <span class="ident">ErrorKind</span>::<span class="ident">AlreadyExists</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">get_ref</span>() {
                         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; file already exists. Use the &#39;--force&#39; flag to overwrite the contents.&quot;</span>, <span class="ident">path</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
                     }
                 }
-                <span class="ident">ErrorKind</span>::<span class="ident">NotFound</span> <span class="op">=&gt;</span> {
+                <span class="ident">ErrorKind</span>::<span class="ident">NotFound</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">get_ref</span>() {
                         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; path does not exist&quot;</span>, <span class="ident">path</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
                     }
                 }
-                <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             },
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(<span class="kw-2">ref</span> <span class="ident">var</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
+            <span class="ident">Error</span>::<span class="ident">Manifest</span>(<span class="kw-2">ref</span> <span class="ident">var</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;No &#39;{}&#39; field found in the package&#39;s manifest (Cargo.toml)&quot;</span>,
                 <span class="ident">var</span>
             ),
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Toml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error</span>::<span class="ident">Toml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">code</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">code</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">s</span>.<span class="ident">to_string</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mustache</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mustache</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mustache</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">toml</span>::<span class="ident">de</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">toml</span>::<span class="ident">de</span>::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">toml</span>::<span class="ident">de</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Toml</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">semver</span>::<span class="ident">SemVerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">semver</span>::<span class="ident">SemVerError</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">semver</span>::<span class="ident">SemVerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">StripPrefixError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">StripPrefixError</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">StripPrefixError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
 }
@@ -1408,34 +1339,28 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use wix::Platform;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     assert_eq!(Platform::X86.arch(), &quot;i686&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Platform::X64.arch(), &quot;x86_64&quot;);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// assert_eq!(Platform::X86.arch(), &quot;i686&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Platform::X64.arch(), &quot;x86_64&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arch</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arch</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Platform</span>::<span class="ident">X86</span> <span class="op">=&gt;</span> <span class="string">&quot;i686&quot;</span>,
-            <span class="ident">Platform</span>::<span class="ident">X64</span> <span class="op">=&gt;</span> <span class="string">&quot;x86_64&quot;</span>,
+            <span class="ident">Platform</span>::<span class="ident">X86</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;i686&quot;</span>,
+            <span class="ident">Platform</span>::<span class="ident">X64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;x86_64&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Platform</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Platform</span>::<span class="ident">X86</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x86&quot;</span>),
-            <span class="ident">Platform</span>::<span class="ident">X64</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x64&quot;</span>),
+            <span class="ident">Platform</span>::<span class="ident">X86</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x86&quot;</span>),
+            <span class="ident">Platform</span>::<span class="ident">X64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x64&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Platform</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) {
             <span class="ident">Platform</span>::<span class="ident">X64</span>
         } <span class="kw">else</span> {
@@ -1461,37 +1386,30 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::str::FromStr;</span>
-    <span class="doccomment">/// use wix::TimestampServer;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     assert_eq!(</span>
-    <span class="doccomment">///         TimestampServer::from_str(&quot;http://www.example.com&quot;).unwrap().url(),</span>
-    <span class="doccomment">///         &quot;http://www.example.com&quot;</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">///     assert_eq!(</span>
-    <span class="doccomment">///         TimestampServer::Comodo.url(),</span>
-    <span class="doccomment">///         &quot;http://timestamp.comodoca.com/&quot;</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">///     assert_eq!(</span>
-    <span class="doccomment">///         TimestampServer::Verisign.url(),</span>
-    <span class="doccomment">///         &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     TimestampServer::from_str(&quot;http://www.example.com&quot;).unwrap().url(),</span>
+    <span class="doccomment">///     &quot;http://www.example.com&quot;</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     TimestampServer::Comodo.url(),</span>
+    <span class="doccomment">///     &quot;http://timestamp.comodoca.com/&quot;</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     TimestampServer::Verisign.url(),</span>
+    <span class="doccomment">///     &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) <span class="op">=&gt;</span> <span class="ident">url</span>,
-            <span class="ident">TimestampServer</span>::<span class="ident">Comodo</span> <span class="op">=&gt;</span> <span class="string">&quot;http://timestamp.comodoca.com/&quot;</span>,
-            <span class="ident">TimestampServer</span>::<span class="ident">Verisign</span> <span class="op">=&gt;</span> <span class="string">&quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>,
+            <span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">url</span>,
+            <span class="ident">TimestampServer</span>::<span class="ident">Comodo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;http://timestamp.comodoca.com/&quot;</span>,
+            <span class="ident">TimestampServer</span>::<span class="ident">Verisign</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TimestampServer</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">url</span>())
     }
 }
@@ -1499,11 +1417,11 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">TimestampServer</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">trim</span>() {
-            <span class="string">&quot;comodo&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Comodo</span>),
-            <span class="string">&quot;verisign&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Verisign</span>),
-            <span class="ident">u</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">u</span>))),
+            <span class="string">&quot;comodo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Comodo</span>),
+            <span class="string">&quot;verisign&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Verisign</span>),
+            <span class="ident">u</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">u</span>))),
         }
     }
 }
@@ -1601,93 +1519,87 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use wix::Cultures;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ArSa.language(), &quot;Arabic&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::BgBg.language(), &quot;Bulgarian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::CaEs.language(), &quot;Catalan&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HrHr.language(), &quot;Croatian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::CsCz.language(), &quot;Czech&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::DaDk.language(), &quot;Danish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::NlNl.language(), &quot;Dutch&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EnUs.language(), &quot;English&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EtEe.language(), &quot;Estonian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::FiFi.language(), &quot;Finnish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::FrFr.language(), &quot;French&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::DeDe.language(), &quot;German&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ElGr.language(), &quot;Greek&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HeIl.language(), &quot;Hebrew&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HiIn.language(), &quot;Hindi&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HuHu.language(), &quot;Hungarian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ItIt.language(), &quot;Italian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::JaJp.language(), &quot;Japanese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::KkKz.language(), &quot;Kazakh&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::KoKr.language(), &quot;Korean&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::LvLv.language(), &quot;Latvian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::LtLt.language(), &quot;Lithuanian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::NbNo.language(), &quot;Norwegian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PlPl.language(), &quot;Polish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PtBr.language(), &quot;Portuguese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PtPt.language(), &quot;Portuguese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::RoRo.language(), &quot;Romanian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::RuRu.language(), &quot;Russian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SrLatnCs.language(), &quot;Serbian (Latin)&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhCn.language(), &quot;Simplified Chinese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SkSk.language(), &quot;Slovak&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SlSi.language(), &quot;Slovenian&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EsEs.language(), &quot;Spanish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SvSe.language(), &quot;Swedish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ThTh.language(), &quot;Thai&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhHk.language(), &quot;Traditional Chinese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhTw.language(), &quot;Traditional Chinese&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::TrTr.language(), &quot;Turkish&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::UkUa.language(), &quot;Ukrainian&quot;);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ArSa.language(), &quot;Arabic&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::BgBg.language(), &quot;Bulgarian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::CaEs.language(), &quot;Catalan&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HrHr.language(), &quot;Croatian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::CsCz.language(), &quot;Czech&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::DaDk.language(), &quot;Danish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::NlNl.language(), &quot;Dutch&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EnUs.language(), &quot;English&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EtEe.language(), &quot;Estonian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::FiFi.language(), &quot;Finnish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::FrFr.language(), &quot;French&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::DeDe.language(), &quot;German&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ElGr.language(), &quot;Greek&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HeIl.language(), &quot;Hebrew&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HiIn.language(), &quot;Hindi&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HuHu.language(), &quot;Hungarian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ItIt.language(), &quot;Italian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::JaJp.language(), &quot;Japanese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::KkKz.language(), &quot;Kazakh&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::KoKr.language(), &quot;Korean&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::LvLv.language(), &quot;Latvian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::LtLt.language(), &quot;Lithuanian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::NbNo.language(), &quot;Norwegian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PlPl.language(), &quot;Polish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PtBr.language(), &quot;Portuguese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PtPt.language(), &quot;Portuguese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::RoRo.language(), &quot;Romanian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::RuRu.language(), &quot;Russian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SrLatnCs.language(), &quot;Serbian (Latin)&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhCn.language(), &quot;Simplified Chinese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SkSk.language(), &quot;Slovak&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SlSi.language(), &quot;Slovenian&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EsEs.language(), &quot;Spanish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SvSe.language(), &quot;Swedish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ThTh.language(), &quot;Thai&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhHk.language(), &quot;Traditional Chinese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhTw.language(), &quot;Traditional Chinese&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::TrTr.language(), &quot;Turkish&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::UkUa.language(), &quot;Ukrainian&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">language</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">language</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=&gt;</span> <span class="string">&quot;Arabic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=&gt;</span> <span class="string">&quot;Bulgarian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=&gt;</span> <span class="string">&quot;Catalan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=&gt;</span> <span class="string">&quot;Croatian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=&gt;</span> <span class="string">&quot;Czech&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=&gt;</span> <span class="string">&quot;Danish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=&gt;</span> <span class="string">&quot;Dutch&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=&gt;</span> <span class="string">&quot;English&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=&gt;</span> <span class="string">&quot;Estonian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=&gt;</span> <span class="string">&quot;Finnish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=&gt;</span> <span class="string">&quot;French&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=&gt;</span> <span class="string">&quot;German&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=&gt;</span> <span class="string">&quot;Greek&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=&gt;</span> <span class="string">&quot;Hebrew&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=&gt;</span> <span class="string">&quot;Hindi&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=&gt;</span> <span class="string">&quot;Hungarian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=&gt;</span> <span class="string">&quot;Italian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=&gt;</span> <span class="string">&quot;Japanese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=&gt;</span> <span class="string">&quot;Kazakh&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=&gt;</span> <span class="string">&quot;Korean&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=&gt;</span> <span class="string">&quot;Latvian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=&gt;</span> <span class="string">&quot;Lithuanian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=&gt;</span> <span class="string">&quot;Norwegian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=&gt;</span> <span class="string">&quot;Polish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=&gt;</span> <span class="string">&quot;Romanian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=&gt;</span> <span class="string">&quot;Russian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=&gt;</span> <span class="string">&quot;Serbian (Latin)&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=&gt;</span> <span class="string">&quot;Simplified Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=&gt;</span> <span class="string">&quot;Slovak&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=&gt;</span> <span class="string">&quot;Slovenian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=&gt;</span> <span class="string">&quot;Spanish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=&gt;</span> <span class="string">&quot;Swedish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=&gt;</span> <span class="string">&quot;Thai&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=&gt;</span> <span class="string">&quot;Turkish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=&gt;</span> <span class="string">&quot;Ukrainian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Arabic&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bulgarian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Catalan&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Croatian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Czech&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Danish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Dutch&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;English&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Estonian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Finnish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;French&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;German&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Greek&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hebrew&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hindi&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hungarian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Italian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Japanese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Kazakh&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Korean&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Latvian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Lithuanian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Norwegian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Polish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Romanian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Russian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Serbian (Latin)&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Simplified Chinese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovak&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovenian&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spanish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Swedish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Thai&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Turkish&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Ukrainian&quot;</span>,
         }
     }
 
@@ -1696,139 +1608,133 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// extern crate wix;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use wix::Cultures;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn main() {</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ArSa.location(), &quot;Saudi Arabia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::BgBg.location(), &quot;Bulgaria&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::CaEs.location(), &quot;Spain&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HrHr.location(), &quot;Croatia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::CsCz.location(), &quot;Czech Republic&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::DaDk.location(), &quot;Denmark&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::NlNl.location(), &quot;Netherlands&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EnUs.location(), &quot;United States&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EtEe.location(), &quot;Estonia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::FiFi.location(), &quot;Finland&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::FrFr.location(), &quot;France&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::DeDe.location(), &quot;Germany&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ElGr.location(), &quot;Greece&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HeIl.location(), &quot;Israel&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HiIn.location(), &quot;India&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::HuHu.location(), &quot;Hungary&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ItIt.location(), &quot;Italy&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::JaJp.location(), &quot;Japan&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::KkKz.location(), &quot;Kazakhstan&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::KoKr.location(), &quot;Korea&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::LvLv.location(), &quot;Latvia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::LtLt.location(), &quot;Lithuania&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::NbNo.location(), &quot;Norway&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PlPl.location(), &quot;Poland&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PtBr.location(), &quot;Brazil&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::PtPt.location(), &quot;Portugal&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::RoRo.location(), &quot;Romania&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::RuRu.location(), &quot;Russia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SrLatnCs.location(), &quot;Serbia and Montenegro&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhCn.location(), &quot;China&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SkSk.location(), &quot;Slovak Republic&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SlSi.location(), &quot;Solvenia&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::EsEs.location(), &quot;Spain&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::SvSe.location(), &quot;Sweden&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ThTh.location(), &quot;Thailand&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhHk.location(), &quot;Hong Kong SAR&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::ZhTw.location(), &quot;Taiwan&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::TrTr.location(), &quot;Turkey&quot;);</span>
-    <span class="doccomment">///     assert_eq!(Cultures::UkUa.location(), &quot;Ukraine&quot;);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ArSa.location(), &quot;Saudi Arabia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::BgBg.location(), &quot;Bulgaria&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::CaEs.location(), &quot;Spain&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HrHr.location(), &quot;Croatia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::CsCz.location(), &quot;Czech Republic&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::DaDk.location(), &quot;Denmark&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::NlNl.location(), &quot;Netherlands&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EnUs.location(), &quot;United States&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EtEe.location(), &quot;Estonia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::FiFi.location(), &quot;Finland&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::FrFr.location(), &quot;France&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::DeDe.location(), &quot;Germany&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ElGr.location(), &quot;Greece&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HeIl.location(), &quot;Israel&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HiIn.location(), &quot;India&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::HuHu.location(), &quot;Hungary&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ItIt.location(), &quot;Italy&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::JaJp.location(), &quot;Japan&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::KkKz.location(), &quot;Kazakhstan&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::KoKr.location(), &quot;Korea&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::LvLv.location(), &quot;Latvia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::LtLt.location(), &quot;Lithuania&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::NbNo.location(), &quot;Norway&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PlPl.location(), &quot;Poland&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PtBr.location(), &quot;Brazil&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::PtPt.location(), &quot;Portugal&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::RoRo.location(), &quot;Romania&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::RuRu.location(), &quot;Russia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SrLatnCs.location(), &quot;Serbia and Montenegro&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhCn.location(), &quot;China&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SkSk.location(), &quot;Slovak Republic&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SlSi.location(), &quot;Solvenia&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::EsEs.location(), &quot;Spain&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::SvSe.location(), &quot;Sweden&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ThTh.location(), &quot;Thailand&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhHk.location(), &quot;Hong Kong SAR&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::ZhTw.location(), &quot;Taiwan&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::TrTr.location(), &quot;Turkey&quot;);</span>
+    <span class="doccomment">/// assert_eq!(Cultures::UkUa.location(), &quot;Ukraine&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">location</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">location</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=&gt;</span> <span class="string">&quot;Saudi Arabia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=&gt;</span> <span class="string">&quot;Bulgaria&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=&gt;</span> <span class="string">&quot;Spain&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=&gt;</span> <span class="string">&quot;Croatia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=&gt;</span> <span class="string">&quot;Czech Republic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=&gt;</span> <span class="string">&quot;Denmark&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=&gt;</span> <span class="string">&quot;Netherlands&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=&gt;</span> <span class="string">&quot;United States&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=&gt;</span> <span class="string">&quot;Estonia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=&gt;</span> <span class="string">&quot;Finland&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=&gt;</span> <span class="string">&quot;France&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=&gt;</span> <span class="string">&quot;Germany&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=&gt;</span> <span class="string">&quot;Greece&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=&gt;</span> <span class="string">&quot;Israel&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=&gt;</span> <span class="string">&quot;India&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=&gt;</span> <span class="string">&quot;Hungary&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=&gt;</span> <span class="string">&quot;Italy&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=&gt;</span> <span class="string">&quot;Japan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=&gt;</span> <span class="string">&quot;Kazakhstan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=&gt;</span> <span class="string">&quot;Korea&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=&gt;</span> <span class="string">&quot;Latvia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=&gt;</span> <span class="string">&quot;Lithuania&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=&gt;</span> <span class="string">&quot;Norway&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=&gt;</span> <span class="string">&quot;Poland&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=&gt;</span> <span class="string">&quot;Brazil&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=&gt;</span> <span class="string">&quot;Portugal&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=&gt;</span> <span class="string">&quot;Romania&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=&gt;</span> <span class="string">&quot;Russia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=&gt;</span> <span class="string">&quot;Serbia and Montenegro&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=&gt;</span> <span class="string">&quot;China&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=&gt;</span> <span class="string">&quot;Slovak Republic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=&gt;</span> <span class="string">&quot;Solvenia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=&gt;</span> <span class="string">&quot;Spain&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=&gt;</span> <span class="string">&quot;Sweden&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=&gt;</span> <span class="string">&quot;Thailand&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=&gt;</span> <span class="string">&quot;Hong Kong SAR&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=&gt;</span> <span class="string">&quot;Taiwan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=&gt;</span> <span class="string">&quot;Turkey&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=&gt;</span> <span class="string">&quot;Ukraine&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Saudi Arabia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bulgaria&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spain&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Croatia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Czech Republic&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Denmark&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Netherlands&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;United States&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Estonia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Finland&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;France&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Germany&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Greece&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Israel&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;India&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hungary&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Italy&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Japan&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Kazakhstan&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Korea&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Latvia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Lithuania&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Norway&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Poland&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Brazil&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portugal&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Romania&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Russia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Serbia and Montenegro&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;China&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovak Republic&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Solvenia&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spain&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Sweden&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Thailand&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hong Kong SAR&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Taiwan&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Turkey&quot;</span>,
+            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Ukraine&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ar-SA&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;bg-BG&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ca-ES&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hr-HR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;cs-CZ&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;da-DK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nl-NL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;en-US&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;et-EE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fi-FI&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fr-FR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;de-DE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;el-GR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;he-IL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hi-IN&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hu-HU&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;it-IT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ja-JP&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;kk-KZ&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ko-KR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lv-LV&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lt-LT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nb-NO&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pl-PL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-BR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-PT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ro-RO&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ru_RU&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sr-Latn-CS&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-CN&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sk-SK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sl-SI&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;es-ES&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sv-SE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;th-TH&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-HK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-TW&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;tr-TR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;uk-UA&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ar-SA&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;bg-BG&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ca-ES&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hr-HR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;cs-CZ&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;da-DK&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nl-NL&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;en-US&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;et-EE&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fi-FI&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fr-FR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;de-DE&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;el-GR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;he-IL&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hi-IN&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hu-HU&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;it-IT&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ja-JP&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;kk-KZ&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ko-KR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lv-LV&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lt-LT&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nb-NO&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pl-PL&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-BR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-PT&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ro-RO&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ru_RU&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sr-Latn-CS&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-CN&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sk-SK&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sl-SI&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;es-ES&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sv-SE&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;th-TH&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-HK&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-TW&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;tr-TR&quot;</span>),
+            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;uk-UA&quot;</span>),
         }
     }
 }
@@ -1836,56 +1742,56 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">trim</span>() {
-            <span class="string">&quot;ar-sa&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ArSa</span>),
-            <span class="string">&quot;bg-bg&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">BgBg</span>),
-            <span class="string">&quot;ca-es&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CaEs</span>),
-            <span class="string">&quot;hr-hr&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HrHr</span>),
-            <span class="string">&quot;cs-cz&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CsCz</span>),
-            <span class="string">&quot;da-dk&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DaDk</span>),
-            <span class="string">&quot;nl-nl&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NlNl</span>),
-            <span class="string">&quot;en-us&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EnUs</span>),
-            <span class="string">&quot;et-ee&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EtEe</span>),
-            <span class="string">&quot;fi-fi&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FiFi</span>),
-            <span class="string">&quot;fr-fr&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FrFr</span>),
-            <span class="string">&quot;de-de&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DeDe</span>),
-            <span class="string">&quot;el-gr&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ElGr</span>),
-            <span class="string">&quot;he-il&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HeIl</span>),
-            <span class="string">&quot;hi-in&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HiIn</span>),
-            <span class="string">&quot;hu-hu&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HuHu</span>),
-            <span class="string">&quot;it-it&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ItIt</span>),
-            <span class="string">&quot;ja-jp&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">JaJp</span>),
-            <span class="string">&quot;kk-kz&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KkKz</span>),
-            <span class="string">&quot;ko-kr&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KoKr</span>),
-            <span class="string">&quot;lv-lv&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LvLv</span>),
-            <span class="string">&quot;lt-lt&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LtLt</span>),
-            <span class="string">&quot;nb-no&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NbNo</span>),
-            <span class="string">&quot;pl-pl&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PlPl</span>),
-            <span class="string">&quot;pt-br&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtBr</span>),
-            <span class="string">&quot;pt-pt&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtPt</span>),
-            <span class="string">&quot;ro-ro&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RoRo</span>),
-            <span class="string">&quot;ru_ru&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RuRu</span>),
-            <span class="string">&quot;sr-Latn-CS&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span>),
-            <span class="string">&quot;zh-CN&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhCn</span>),
-            <span class="string">&quot;sk-SK&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SkSk</span>),
-            <span class="string">&quot;sl-SI&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SlSi</span>),
-            <span class="string">&quot;es-ES&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EsEs</span>),
-            <span class="string">&quot;sv-SE&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SvSe</span>),
-            <span class="string">&quot;th-TH&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ThTh</span>),
-            <span class="string">&quot;zh-HK&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhHk</span>),
-            <span class="string">&quot;zh-TW&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhTw</span>),
-            <span class="string">&quot;tr-TR&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">TrTr</span>),
-            <span class="string">&quot;uk-UA&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">UkUa</span>),
-            <span class="ident">e</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Unknown &#39;{}&#39; culture&quot;</span>, <span class="ident">e</span>))),
+            <span class="string">&quot;ar-sa&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ArSa</span>),
+            <span class="string">&quot;bg-bg&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">BgBg</span>),
+            <span class="string">&quot;ca-es&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CaEs</span>),
+            <span class="string">&quot;hr-hr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HrHr</span>),
+            <span class="string">&quot;cs-cz&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CsCz</span>),
+            <span class="string">&quot;da-dk&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DaDk</span>),
+            <span class="string">&quot;nl-nl&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NlNl</span>),
+            <span class="string">&quot;en-us&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EnUs</span>),
+            <span class="string">&quot;et-ee&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EtEe</span>),
+            <span class="string">&quot;fi-fi&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FiFi</span>),
+            <span class="string">&quot;fr-fr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FrFr</span>),
+            <span class="string">&quot;de-de&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DeDe</span>),
+            <span class="string">&quot;el-gr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ElGr</span>),
+            <span class="string">&quot;he-il&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HeIl</span>),
+            <span class="string">&quot;hi-in&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HiIn</span>),
+            <span class="string">&quot;hu-hu&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HuHu</span>),
+            <span class="string">&quot;it-it&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ItIt</span>),
+            <span class="string">&quot;ja-jp&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">JaJp</span>),
+            <span class="string">&quot;kk-kz&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KkKz</span>),
+            <span class="string">&quot;ko-kr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KoKr</span>),
+            <span class="string">&quot;lv-lv&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LvLv</span>),
+            <span class="string">&quot;lt-lt&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LtLt</span>),
+            <span class="string">&quot;nb-no&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NbNo</span>),
+            <span class="string">&quot;pl-pl&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PlPl</span>),
+            <span class="string">&quot;pt-br&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtBr</span>),
+            <span class="string">&quot;pt-pt&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtPt</span>),
+            <span class="string">&quot;ro-ro&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RoRo</span>),
+            <span class="string">&quot;ru_ru&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RuRu</span>),
+            <span class="string">&quot;sr-Latn-CS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span>),
+            <span class="string">&quot;zh-CN&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhCn</span>),
+            <span class="string">&quot;sk-SK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SkSk</span>),
+            <span class="string">&quot;sl-SI&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SlSi</span>),
+            <span class="string">&quot;es-ES&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EsEs</span>),
+            <span class="string">&quot;sv-SE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SvSe</span>),
+            <span class="string">&quot;th-TH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ThTh</span>),
+            <span class="string">&quot;zh-HK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhHk</span>),
+            <span class="string">&quot;zh-TW&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhTw</span>),
+            <span class="string">&quot;tr-TR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">TrTr</span>),
+            <span class="string">&quot;uk-UA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">UkUa</span>),
+            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Unknown &#39;{}&#39; culture&quot;</span>, <span class="ident">e</span>))),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">Cultures</span>::<span class="ident">EnUs</span>
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

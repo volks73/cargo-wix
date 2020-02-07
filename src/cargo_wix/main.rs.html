@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1329,6 +1329,19 @@
 <span id="1329">1329</span>
 <span id="1330">1330</span>
 <span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
+<span id="1344">1344</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -1627,7 +1640,7 @@
 <span class="doccomment">//! version. It is recommended to use the Developer Prompt to ensure the</span>
 <span class="doccomment">//! `signtool` application is available. Signing an installer is optional.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A</span>
+<span class="doccomment">//! The WiX Toolset requires a WiX Source (wxs) file, which is an [XML] file. A</span>
 <span class="doccomment">//! template is provided with this binary that attempts to meet the majority</span>
 <span class="doccomment">//! of use cases for developers and avoid requiring extensive knowledge of the</span>
 <span class="doccomment">//! WiX Toolset and Windows installer technologies. Modification of the template</span>
@@ -1667,20 +1680,30 @@
 <span class="doccomment">//! alongside the `bin` folder. The `license` field appears to be the more</span>
 <span class="doccomment">//! commonly used field to describe the licensing for a Rust project and</span>
 <span class="doccomment">//! package, while the `license-file` field is used to specify a custom, or</span>
-<span class="doccomment">//! properitary, license. The top three most common licenses for Rust projects</span>
-<span class="doccomment">//! are supported from the `license` field, i.e. MIT, Apache-2.0, and GPLv3. If</span>
-<span class="doccomment">//! any of these three supported open source licenses are used for the `license`</span>
-<span class="doccomment">//! field, then a `License.rtf` file is generated from an embedded template and</span>
-<span class="doccomment">//! placed in the `wix` folder as part of the `cargo wix init` subcommand. This</span>
-<span class="doccomment">//! generated RTF file will be used as a sidecar file and for the End User</span>
-<span class="doccomment">//! License Agreement (EULA) that is displayed in the license agreement dialog</span>
-<span class="doccomment">//! of the installer. If the `license-file` field is used and it contains a path</span>
-<span class="doccomment">//! to a file with the `.rtf` extension, then this file will be used as a</span>
-<span class="doccomment">//! sidecar file and for the EULA. If neither of these fields exist or contain</span>
-<span class="doccomment">//! valid values, then no sidecar file is included in the installation and no</span>
-<span class="doccomment">//! license agreement dialog appears during installation. This default behavior</span>
-<span class="doccomment">//! can be overridden with the `-l,--license` and `-e,--eula` options for the</span>
-<span class="doccomment">//! `cargo wix init` subcommand.</span>
+<span class="doccomment">//! properitary, license.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The top three most common licenses for Rust projects are supported from the</span>
+<span class="doccomment">//! `license` field, i.e. MIT, Apache-2.0, and GPLv3. If any of these three</span>
+<span class="doccomment">//! supported open source licenses are used for the `license` field, then a</span>
+<span class="doccomment">//! `License.rtf` file is generated from an embedded template and placed in the</span>
+<span class="doccomment">//! `wix` folder as part of the `cargo wix init` subcommand. This generated RTF</span>
+<span class="doccomment">//! file will be used as a sidecar file and for the End User License Agreement</span>
+<span class="doccomment">//! (EULA) that is displayed in the license agreement dialog of the installer.</span>
+<span class="doccomment">//! If the `license-file` field is used and it contains a path to a file with</span>
+<span class="doccomment">//! the `.rtf` extension, then this file will be used as a sidecar file and for</span>
+<span class="doccomment">//! the EULA. If neither of these fields exist or contain valid values, then no</span>
+<span class="doccomment">//! sidecar file is included in the installation and no license agreement dialog</span>
+<span class="doccomment">//! appears during installation. This default behavior can be overridden with</span>
+<span class="doccomment">//! the `-l,--license` and `-e,--eula` options for the `cargo wix init`</span>
+<span class="doccomment">//! subcommand.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [WixUIExtension] and [WixUtilExtension] is included in every execution</span>
+<span class="doccomment">//! of the default create cargo-wix subcommand, i.e. `cargo wix`. This is the</span>
+<span class="doccomment">//! same as calling either the compiler (candle.exe) or the linker (light.exe)</span>
+<span class="doccomment">//! with the `-ext WixUIExtension -ext WixUtilExtension` options. These two</span>
+<span class="doccomment">//! extensions are commonly used to create installers when using the WiX</span>
+<span class="doccomment">//! Toolset, so these are included by default. Additionally, the WixUIExtension</span>
+<span class="doccomment">//! is used for the template WXS file.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Configuration</span>
 <span class="doccomment">//!</span>
@@ -2012,10 +2035,13 @@
 <span class="doccomment">//! [tutorials]: https://www.firegiant.com/wix/tutorial/</span>
 <span class="doccomment">//! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017</span>
 <span class="doccomment">//! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk</span>
+<span class="doccomment">//! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html</span>
+<span class="doccomment">//! [WixUtilExtension]: https://wixtoolset.org/documentation/manual/v3/xsd/util/</span>
 <span class="doccomment">//! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html</span>
 <span class="doccomment">//! [WiX Toolset]: http://wixtoolset.org</span>
 <span class="doccomment">//! [WordPad]: https://en.wikipedia.org/wiki/WordPad</span>
 <span class="doccomment">//! [WXS]: ../wix/enum.Template.html</span>
+<span class="doccomment">//! [XML]: https://en.wikipedia.org/wiki/XML</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">clap</span>;
@@ -2407,7 +2433,7 @@
                         .<span class="ident">possible_values</span>(<span class="kw-2">&amp;</span><span class="ident">Template</span>::<span class="ident">possible_values</span>()
                             .<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_ref</span>())
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>())
+                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>())
                         .<span class="ident">required</span>(<span class="bool-val">true</span>)
                         .<span class="ident">index</span>(<span class="number">1</span>))
                     .<span class="ident">arg</span>(<span class="ident">url</span>)
@@ -2483,11 +2509,11 @@
         ).<span class="ident">get_matches</span>();
     <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">subcommand_matches</span>(<span class="ident">SUBCOMMAND_NAME</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">verbosity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">matches</span>.<span class="ident">subcommand</span>() {
-        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> <span class="ident">m</span>,
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">matches</span>,
+        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">matches</span>,
     }
     .<span class="ident">occurrences_of</span>(<span class="string">&quot;verbose&quot;</span>);
     <span class="comment">// Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`</span>
@@ -2517,11 +2543,11 @@
                 <span class="comment">// Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows</span>
                 <span class="comment">// consoles, so TRACE and DEBUG statements are differentiated by boldness but use the</span>
                 <span class="comment">// same white color.</span>
-                <span class="ident">Level</span>::<span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
-                <span class="ident">Level</span>::<span class="ident">Debug</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Info</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Warn</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Error</span> <span class="op">=&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Trace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
+                <span class="ident">Level</span>::<span class="ident">Debug</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Warn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level</span>::<span class="ident">Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
             };
             <span class="kw">let</span> <span class="ident">write_level</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{:&gt;5}: &quot;</span>, <span class="ident">level_style</span>.<span class="ident">value</span>(<span class="ident">level</span>));
             <span class="kw">let</span> <span class="ident">write_args</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">record</span>.<span class="ident">args</span>());
@@ -2530,20 +2556,20 @@
         .<span class="ident">filter</span>(
             <span class="prelude-val">Some</span>(<span class="string">&quot;wix&quot;</span>),
             <span class="kw">match</span> <span class="ident">verbosity</span> {
-                <span class="number">0</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Warn</span>,
-                <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Info</span>,
-                <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Debug</span>,
-                <span class="kw">_</span> <span class="op">=&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Trace</span>,
+                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Warn</span>,
+                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Info</span>,
+                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Debug</span>,
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Trace</span>,
             },
         )
         .<span class="ident">init</span>();
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">matches</span>.<span class="ident">subcommand</span>() {
-        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
+        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clean</span> <span class="op">=</span> <span class="ident">clean</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">clean</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
             <span class="ident">clean</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
+        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">initialize</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">init</span>.<span class="ident">banner</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;banner&quot;</span>));
             <span class="ident">init</span>.<span class="ident">binaries</span>(<span class="ident">m</span>.<span class="ident">values_of</span>(<span class="string">&quot;binaries&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">collect</span>()));
@@ -2562,10 +2588,10 @@
             <span class="ident">init</span>.<span class="ident">product_name</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-name&quot;</span>));
             <span class="ident">init</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
+        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="macro">value_t</span><span class="macro">!</span>(<span class="ident">m</span>, <span class="string">&quot;TEMPLATE&quot;</span>, <span class="ident">Template</span>).<span class="ident">unwrap</span>();
             <span class="kw">match</span> <span class="ident">template</span> {
-                <span class="ident">Template</span>::<span class="ident">Wxs</span> <span class="op">=&gt;</span> {
+                <span class="ident">Template</span>::<span class="ident">Wxs</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print</span>::<span class="ident">wxs</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
                     <span class="ident">print</span>.<span class="ident">banner</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;banner&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">binaries</span>(<span class="ident">m</span>.<span class="ident">values_of</span>(<span class="string">&quot;binaries&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">collect</span>()));
@@ -2581,7 +2607,7 @@
                     <span class="ident">print</span>.<span class="ident">product_name</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-name&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">build</span>().<span class="ident">run</span>()
                 }
-                <span class="ident">t</span> <span class="op">=&gt;</span> {
+                <span class="ident">t</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print</span>::<span class="ident">license</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
                     <span class="ident">print</span>.<span class="ident">copyright_holder</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;owner&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">copyright_year</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;year&quot;</span>));
@@ -2591,12 +2617,12 @@
                 }
             }
         }
-        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
+        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">purge</span> <span class="op">=</span> <span class="ident">purge</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">purge</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
             <span class="ident">purge</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;sign&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=&gt;</span> {
+        (<span class="string">&quot;sign&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sign</span> <span class="op">=</span> <span class="ident">sign</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">sign</span>.<span class="ident">bin_path</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;bin-path&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">capture_output</span>(<span class="op">!</span><span class="ident">m</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-capture&quot;</span>));
@@ -2607,7 +2633,7 @@
             <span class="ident">sign</span>.<span class="ident">timestamp</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;timestamp&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        <span class="kw">_</span> <span class="op">=&gt;</span> {
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">create</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">create</span>.<span class="ident">bin_path</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;bin-path&quot;</span>));
             <span class="ident">create</span>.<span class="ident">capture_output</span>(<span class="op">!</span><span class="ident">matches</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-capture&quot;</span>));
@@ -2622,8 +2648,8 @@
         }
     };
     <span class="kw">match</span> <span class="ident">result</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">exit</span>(<span class="number">0</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">exit</span>(<span class="number">0</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
             {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">StandardStream</span>::<span class="ident">stderr</span>(<span class="ident">ColorChoice</span>::<span class="ident">Auto</span>);
                 <span class="ident">stderr</span>
@@ -2662,4 +2688,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

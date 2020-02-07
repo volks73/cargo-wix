@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1331' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><div class="block items"><ul><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1344' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
 <p>The goal of the cargo-wix project and the <code>cargo wix</code> subcommand is to make
 it easy to create a Windows installer (msi) for any Rust project. The
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but the core
@@ -223,7 +223,7 @@ installers. The application is installed in the <code>bin</code> folder of the W
 SDK installation. The location of the <code>bin</code> folder varies depending on the
 version. It is recommended to use the Developer Prompt to ensure the
 <code>signtool</code> application is available. Signing an installer is optional.</p>
-<p>The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A
+<p>The WiX Toolset requires a WiX Source (wxs) file, which is an <a href="https://en.wikipedia.org/wiki/XML">XML</a> file. A
 template is provided with this binary that attempts to meet the majority
 of use cases for developers and avoid requiring extensive knowledge of the
 WiX Toolset and Windows installer technologies. Modification of the template
@@ -256,20 +256,28 @@ if a <a href="https://en.wikipedia.org/wiki/Sidecar_file">sidecar</a> license fi
 alongside the <code>bin</code> folder. The <code>license</code> field appears to be the more
 commonly used field to describe the licensing for a Rust project and
 package, while the <code>license-file</code> field is used to specify a custom, or
-properitary, license. The top three most common licenses for Rust projects
-are supported from the <code>license</code> field, i.e. MIT, Apache-2.0, and GPLv3. If
-any of these three supported open source licenses are used for the <code>license</code>
-field, then a <code>License.rtf</code> file is generated from an embedded template and
-placed in the <code>wix</code> folder as part of the <code>cargo wix init</code> subcommand. This
-generated RTF file will be used as a sidecar file and for the End User
-License Agreement (EULA) that is displayed in the license agreement dialog
-of the installer. If the <code>license-file</code> field is used and it contains a path
-to a file with the <code>.rtf</code> extension, then this file will be used as a
-sidecar file and for the EULA. If neither of these fields exist or contain
-valid values, then no sidecar file is included in the installation and no
-license agreement dialog appears during installation. This default behavior
-can be overridden with the <code>-l,--license</code> and <code>-e,--eula</code> options for the
-<code>cargo wix init</code> subcommand.</p>
+properitary, license.</p>
+<p>The top three most common licenses for Rust projects are supported from the
+<code>license</code> field, i.e. MIT, Apache-2.0, and GPLv3. If any of these three
+supported open source licenses are used for the <code>license</code> field, then a
+<code>License.rtf</code> file is generated from an embedded template and placed in the
+<code>wix</code> folder as part of the <code>cargo wix init</code> subcommand. This generated RTF
+file will be used as a sidecar file and for the End User License Agreement
+(EULA) that is displayed in the license agreement dialog of the installer.
+If the <code>license-file</code> field is used and it contains a path to a file with
+the <code>.rtf</code> extension, then this file will be used as a sidecar file and for
+the EULA. If neither of these fields exist or contain valid values, then no
+sidecar file is included in the installation and no license agreement dialog
+appears during installation. This default behavior can be overridden with
+the <code>-l,--license</code> and <code>-e,--eula</code> options for the <code>cargo wix init</code>
+subcommand.</p>
+<p>The <a href="https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html">WixUIExtension</a> and <a href="https://wixtoolset.org/documentation/manual/v3/xsd/util/">WixUtilExtension</a> is included in every execution
+of the default create cargo-wix subcommand, i.e. <code>cargo wix</code>. This is the
+same as calling either the compiler (candle.exe) or the linker (light.exe)
+with the <code>-ext WixUIExtension -ext WixUtilExtension</code> options. These two
+extensions are commonly used to create installers when using the WiX
+Toolset, so these are included by default. Additionally, the WixUIExtension
+is used for the template WXS file.</p>
 <h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
 <p>The default subcommand, <code>cargo wix</code>, which creates a MSI based on the
 contents of the package's manifest (Cargo.toml) can be configured by adding
@@ -485,4 +493,6 @@ subcommands.</p>
 is to use the current year. This is only used if a license is generated from
 one of the supported licenses based on the value of the <code>license</code> field in
 the package's manifest (Cargo.toml).</p>
-</div></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "cargo_wix";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
+</div><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table><tr class='module-item'><td><a class="constant" href="constant.SUBCOMMAND_NAME.html" title='cargo_wix::SUBCOMMAND_NAME constant'>SUBCOMMAND_NAME</a></td><td class='docblock-short'></td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.main.html" title='cargo_wix::main fn'>main</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "cargo_wix";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
