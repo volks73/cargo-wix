@@ -352,6 +352,14 @@
 //! the `-l,--license` and `-e,--eula` options for the `cargo wix init`
 //! subcommand.
 //!
+//! The [WixUIExtension] and [WixUtilExtension] is included in every execution
+//! of the default create cargo-wix subcommand, i.e. `cargo wix`. This is the
+//! same as calling either the compiler (candle.exe) or the linker (light.exe)
+//! with the `-ext WixUIExtension -ext WixUtilExtension` options. These two
+//! extensions are commonly used to create installers when using the WiX
+//! Toolset, so these are included by default. Additionally, the WixUIExtension
+//! is used for the template WXS file.
+//!
 //! ## Configuration
 //!
 //! The default subcommand, `cargo wix`, which creates a MSI based on the
@@ -682,6 +690,8 @@
 //! [tutorials]: https://www.firegiant.com/wix/tutorial/
 //! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+//! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html
+//! [WixUtilExtenion]: https://wixtoolset.org/documentation/manual/v3/xsd/util/
 //! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
