@@ -321,9 +321,7 @@ impl Execution {
                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
                     system environment variable, the {} system environment variable exists, or use \
                     the '-b,--bin-path' command line argument.",
-                    WIX_COMPILER,
-                    BINARY_FOLDER_NAME,
-                    WIX_PATH_KEY
+                    WIX_COMPILER, BINARY_FOLDER_NAME, WIX_PATH_KEY
                 ))
             } else {
                 err.into()
