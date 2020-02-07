@@ -295,7 +295,7 @@
 //! version. It is recommended to use the Developer Prompt to ensure the
 //! `signtool` application is available. Signing an installer is optional.
 //!
-//! The WiX Toolset requires a WiX Source (wxs) file, which is an XML file. A
+//! The WiX Toolset requires a WiX Source (wxs) file, which is an [XML] file. A
 //! template is provided with this binary that attempts to meet the majority
 //! of use cases for developers and avoid requiring extensive knowledge of the
 //! WiX Toolset and Windows installer technologies. Modification of the template
@@ -335,20 +335,22 @@
 //! alongside the `bin` folder. The `license` field appears to be the more
 //! commonly used field to describe the licensing for a Rust project and
 //! package, while the `license-file` field is used to specify a custom, or
-//! properitary, license. The top three most common licenses for Rust projects
-//! are supported from the `license` field, i.e. MIT, Apache-2.0, and GPLv3. If
-//! any of these three supported open source licenses are used for the `license`
-//! field, then a `License.rtf` file is generated from an embedded template and
-//! placed in the `wix` folder as part of the `cargo wix init` subcommand. This
-//! generated RTF file will be used as a sidecar file and for the End User
-//! License Agreement (EULA) that is displayed in the license agreement dialog
-//! of the installer. If the `license-file` field is used and it contains a path
-//! to a file with the `.rtf` extension, then this file will be used as a
-//! sidecar file and for the EULA. If neither of these fields exist or contain
-//! valid values, then no sidecar file is included in the installation and no
-//! license agreement dialog appears during installation. This default behavior
-//! can be overridden with the `-l,--license` and `-e,--eula` options for the
-//! `cargo wix init` subcommand.
+//! properitary, license.
+//!
+//! The top three most common licenses for Rust projects are supported from the
+//! `license` field, i.e. MIT, Apache-2.0, and GPLv3. If any of these three
+//! supported open source licenses are used for the `license` field, then a
+//! `License.rtf` file is generated from an embedded template and placed in the
+//! `wix` folder as part of the `cargo wix init` subcommand. This generated RTF
+//! file will be used as a sidecar file and for the End User License Agreement
+//! (EULA) that is displayed in the license agreement dialog of the installer.
+//! If the `license-file` field is used and it contains a path to a file with
+//! the `.rtf` extension, then this file will be used as a sidecar file and for
+//! the EULA. If neither of these fields exist or contain valid values, then no
+//! sidecar file is included in the installation and no license agreement dialog
+//! appears during installation. This default behavior can be overridden with
+//! the `-l,--license` and `-e,--eula` options for the `cargo wix init`
+//! subcommand.
 //!
 //! ## Configuration
 //!
@@ -684,6 +686,7 @@
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
 //! [WXS]: ../wix/enum.Template.html
+//! [XML]: https://en.wikipedia.org/wiki/XML
 
 #[macro_use]
 extern crate clap;
