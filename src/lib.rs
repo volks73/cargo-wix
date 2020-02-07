@@ -247,14 +247,8 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Error;
-    ///
-    /// fn main() {
-    ///     let err = Error::from("A generic error");
-    ///     assert_ne!(err.code(), 0)
-    /// }
+    /// let err = Error::from("A generic error");
+    /// assert_ne!(err.code(), 0)
     /// ```
     ///
     /// This is useful as a return, or exit, code for a command line application, where a non-zero
@@ -278,20 +272,12 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use std::io;
-    /// use std::path::Path;
-    /// use wix::Error;
-    ///
-    /// fn main() {
-    ///     let path = Path::new("C:\\");
-    ///     let expected = Error::Io(io::Error::new(
-    ///         io::ErrorKind::AlreadyExists,
-    ///         path.display().to_string()
-    ///     ));
-    ///     assert_eq!(expected, Error::already_exists(path));
-    /// }
+    /// let path = Path::new("C:\\");
+    /// let expected = Error::Io(io::Error::new(
+    ///     io::ErrorKind::AlreadyExists,
+    ///     path.display().to_string()
+    /// ));
+    /// assert_eq!(expected, Error::already_exists(path));
     /// ```
     ///
     /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
@@ -306,20 +292,12 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use std::io;
-    /// use std::path::Path;
-    /// use wix::Error;
-    ///
-    /// fn main() {
-    ///     let path = Path::new("C:\\Cargo\\Wix\\file.txt");
-    ///     let expected = Error::Io(io::Error::new(
-    ///         io::ErrorKind::NotFound,
-    ///         path.display().to_string()
-    ///     ));
-    ///     assert_eq!(expected, Error::not_found(path));
-    /// }
+    /// let path = Path::new("C:\\Cargo\\Wix\\file.txt");
+    /// let expected = Error::Io(io::Error::new(
+    ///     io::ErrorKind::NotFound,
+    ///     path.display().to_string()
+    /// ));
+    /// assert_eq!(expected, Error::not_found(path));
     /// ```
     ///
     /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
@@ -463,14 +441,8 @@ impl Platform {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Platform;
-    ///
-    /// fn main() {
-    ///     assert_eq!(Platform::X86.arch(), "i686");
-    ///     assert_eq!(Platform::X64.arch(), "x86_64");
-    /// }
+    /// assert_eq!(Platform::X86.arch(), "i686");
+    /// assert_eq!(Platform::X64.arch(), "x86_64");
     /// ```
     pub fn arch(self) -> &'static str {
         match self {
@@ -516,25 +488,18 @@ impl TimestampServer {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use std::str::FromStr;
-    /// use wix::TimestampServer;
-    ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         TimestampServer::from_str("http://www.example.com").unwrap().url(),
-    ///         "http://www.example.com"
-    ///     );
-    ///     assert_eq!(
-    ///         TimestampServer::Comodo.url(),
-    ///         "http://timestamp.comodoca.com/"
-    ///     );
-    ///     assert_eq!(
-    ///         TimestampServer::Verisign.url(),
-    ///         "http://timestamp.verisign.com/scripts/timstamp.dll"
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     TimestampServer::from_str("http://www.example.com").unwrap().url(),
+    ///     "http://www.example.com"
+    /// );
+    /// assert_eq!(
+    ///     TimestampServer::Comodo.url(),
+    ///     "http://timestamp.comodoca.com/"
+    /// );
+    /// assert_eq!(
+    ///     TimestampServer::Verisign.url(),
+    ///     "http://timestamp.verisign.com/scripts/timstamp.dll"
+    /// );
     /// ```
     pub fn url(&self) -> &str {
         match *self {
@@ -656,51 +621,45 @@ impl Cultures {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Cultures;
-    ///
-    /// fn main() {
-    ///     assert_eq!(Cultures::ArSa.language(), "Arabic");
-    ///     assert_eq!(Cultures::BgBg.language(), "Bulgarian");
-    ///     assert_eq!(Cultures::CaEs.language(), "Catalan");
-    ///     assert_eq!(Cultures::HrHr.language(), "Croatian");
-    ///     assert_eq!(Cultures::CsCz.language(), "Czech");
-    ///     assert_eq!(Cultures::DaDk.language(), "Danish");
-    ///     assert_eq!(Cultures::NlNl.language(), "Dutch");
-    ///     assert_eq!(Cultures::EnUs.language(), "English");
-    ///     assert_eq!(Cultures::EtEe.language(), "Estonian");
-    ///     assert_eq!(Cultures::FiFi.language(), "Finnish");
-    ///     assert_eq!(Cultures::FrFr.language(), "French");
-    ///     assert_eq!(Cultures::DeDe.language(), "German");
-    ///     assert_eq!(Cultures::ElGr.language(), "Greek");
-    ///     assert_eq!(Cultures::HeIl.language(), "Hebrew");
-    ///     assert_eq!(Cultures::HiIn.language(), "Hindi");
-    ///     assert_eq!(Cultures::HuHu.language(), "Hungarian");
-    ///     assert_eq!(Cultures::ItIt.language(), "Italian");
-    ///     assert_eq!(Cultures::JaJp.language(), "Japanese");
-    ///     assert_eq!(Cultures::KkKz.language(), "Kazakh");
-    ///     assert_eq!(Cultures::KoKr.language(), "Korean");
-    ///     assert_eq!(Cultures::LvLv.language(), "Latvian");
-    ///     assert_eq!(Cultures::LtLt.language(), "Lithuanian");
-    ///     assert_eq!(Cultures::NbNo.language(), "Norwegian");
-    ///     assert_eq!(Cultures::PlPl.language(), "Polish");
-    ///     assert_eq!(Cultures::PtBr.language(), "Portuguese");
-    ///     assert_eq!(Cultures::PtPt.language(), "Portuguese");
-    ///     assert_eq!(Cultures::RoRo.language(), "Romanian");
-    ///     assert_eq!(Cultures::RuRu.language(), "Russian");
-    ///     assert_eq!(Cultures::SrLatnCs.language(), "Serbian (Latin)");
-    ///     assert_eq!(Cultures::ZhCn.language(), "Simplified Chinese");
-    ///     assert_eq!(Cultures::SkSk.language(), "Slovak");
-    ///     assert_eq!(Cultures::SlSi.language(), "Slovenian");
-    ///     assert_eq!(Cultures::EsEs.language(), "Spanish");
-    ///     assert_eq!(Cultures::SvSe.language(), "Swedish");
-    ///     assert_eq!(Cultures::ThTh.language(), "Thai");
-    ///     assert_eq!(Cultures::ZhHk.language(), "Traditional Chinese");
-    ///     assert_eq!(Cultures::ZhTw.language(), "Traditional Chinese");
-    ///     assert_eq!(Cultures::TrTr.language(), "Turkish");
-    ///     assert_eq!(Cultures::UkUa.language(), "Ukrainian");
-    /// }
+    /// assert_eq!(Cultures::ArSa.language(), "Arabic");
+    /// assert_eq!(Cultures::BgBg.language(), "Bulgarian");
+    /// assert_eq!(Cultures::CaEs.language(), "Catalan");
+    /// assert_eq!(Cultures::HrHr.language(), "Croatian");
+    /// assert_eq!(Cultures::CsCz.language(), "Czech");
+    /// assert_eq!(Cultures::DaDk.language(), "Danish");
+    /// assert_eq!(Cultures::NlNl.language(), "Dutch");
+    /// assert_eq!(Cultures::EnUs.language(), "English");
+    /// assert_eq!(Cultures::EtEe.language(), "Estonian");
+    /// assert_eq!(Cultures::FiFi.language(), "Finnish");
+    /// assert_eq!(Cultures::FrFr.language(), "French");
+    /// assert_eq!(Cultures::DeDe.language(), "German");
+    /// assert_eq!(Cultures::ElGr.language(), "Greek");
+    /// assert_eq!(Cultures::HeIl.language(), "Hebrew");
+    /// assert_eq!(Cultures::HiIn.language(), "Hindi");
+    /// assert_eq!(Cultures::HuHu.language(), "Hungarian");
+    /// assert_eq!(Cultures::ItIt.language(), "Italian");
+    /// assert_eq!(Cultures::JaJp.language(), "Japanese");
+    /// assert_eq!(Cultures::KkKz.language(), "Kazakh");
+    /// assert_eq!(Cultures::KoKr.language(), "Korean");
+    /// assert_eq!(Cultures::LvLv.language(), "Latvian");
+    /// assert_eq!(Cultures::LtLt.language(), "Lithuanian");
+    /// assert_eq!(Cultures::NbNo.language(), "Norwegian");
+    /// assert_eq!(Cultures::PlPl.language(), "Polish");
+    /// assert_eq!(Cultures::PtBr.language(), "Portuguese");
+    /// assert_eq!(Cultures::PtPt.language(), "Portuguese");
+    /// assert_eq!(Cultures::RoRo.language(), "Romanian");
+    /// assert_eq!(Cultures::RuRu.language(), "Russian");
+    /// assert_eq!(Cultures::SrLatnCs.language(), "Serbian (Latin)");
+    /// assert_eq!(Cultures::ZhCn.language(), "Simplified Chinese");
+    /// assert_eq!(Cultures::SkSk.language(), "Slovak");
+    /// assert_eq!(Cultures::SlSi.language(), "Slovenian");
+    /// assert_eq!(Cultures::EsEs.language(), "Spanish");
+    /// assert_eq!(Cultures::SvSe.language(), "Swedish");
+    /// assert_eq!(Cultures::ThTh.language(), "Thai");
+    /// assert_eq!(Cultures::ZhHk.language(), "Traditional Chinese");
+    /// assert_eq!(Cultures::ZhTw.language(), "Traditional Chinese");
+    /// assert_eq!(Cultures::TrTr.language(), "Turkish");
+    /// assert_eq!(Cultures::UkUa.language(), "Ukrainian");
     /// ```
     pub fn language(&self) -> &'static str {
         match *self {
@@ -751,51 +710,45 @@ impl Cultures {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Cultures;
-    ///
-    /// fn main() {
-    ///     assert_eq!(Cultures::ArSa.location(), "Saudi Arabia");
-    ///     assert_eq!(Cultures::BgBg.location(), "Bulgaria");
-    ///     assert_eq!(Cultures::CaEs.location(), "Spain");
-    ///     assert_eq!(Cultures::HrHr.location(), "Croatia");
-    ///     assert_eq!(Cultures::CsCz.location(), "Czech Republic");
-    ///     assert_eq!(Cultures::DaDk.location(), "Denmark");
-    ///     assert_eq!(Cultures::NlNl.location(), "Netherlands");
-    ///     assert_eq!(Cultures::EnUs.location(), "United States");
-    ///     assert_eq!(Cultures::EtEe.location(), "Estonia");
-    ///     assert_eq!(Cultures::FiFi.location(), "Finland");
-    ///     assert_eq!(Cultures::FrFr.location(), "France");
-    ///     assert_eq!(Cultures::DeDe.location(), "Germany");
-    ///     assert_eq!(Cultures::ElGr.location(), "Greece");
-    ///     assert_eq!(Cultures::HeIl.location(), "Israel");
-    ///     assert_eq!(Cultures::HiIn.location(), "India");
-    ///     assert_eq!(Cultures::HuHu.location(), "Hungary");
-    ///     assert_eq!(Cultures::ItIt.location(), "Italy");
-    ///     assert_eq!(Cultures::JaJp.location(), "Japan");
-    ///     assert_eq!(Cultures::KkKz.location(), "Kazakhstan");
-    ///     assert_eq!(Cultures::KoKr.location(), "Korea");
-    ///     assert_eq!(Cultures::LvLv.location(), "Latvia");
-    ///     assert_eq!(Cultures::LtLt.location(), "Lithuania");
-    ///     assert_eq!(Cultures::NbNo.location(), "Norway");
-    ///     assert_eq!(Cultures::PlPl.location(), "Poland");
-    ///     assert_eq!(Cultures::PtBr.location(), "Brazil");
-    ///     assert_eq!(Cultures::PtPt.location(), "Portugal");
-    ///     assert_eq!(Cultures::RoRo.location(), "Romania");
-    ///     assert_eq!(Cultures::RuRu.location(), "Russia");
-    ///     assert_eq!(Cultures::SrLatnCs.location(), "Serbia and Montenegro");
-    ///     assert_eq!(Cultures::ZhCn.location(), "China");
-    ///     assert_eq!(Cultures::SkSk.location(), "Slovak Republic");
-    ///     assert_eq!(Cultures::SlSi.location(), "Solvenia");
-    ///     assert_eq!(Cultures::EsEs.location(), "Spain");
-    ///     assert_eq!(Cultures::SvSe.location(), "Sweden");
-    ///     assert_eq!(Cultures::ThTh.location(), "Thailand");
-    ///     assert_eq!(Cultures::ZhHk.location(), "Hong Kong SAR");
-    ///     assert_eq!(Cultures::ZhTw.location(), "Taiwan");
-    ///     assert_eq!(Cultures::TrTr.location(), "Turkey");
-    ///     assert_eq!(Cultures::UkUa.location(), "Ukraine");
-    /// }
+    /// assert_eq!(Cultures::ArSa.location(), "Saudi Arabia");
+    /// assert_eq!(Cultures::BgBg.location(), "Bulgaria");
+    /// assert_eq!(Cultures::CaEs.location(), "Spain");
+    /// assert_eq!(Cultures::HrHr.location(), "Croatia");
+    /// assert_eq!(Cultures::CsCz.location(), "Czech Republic");
+    /// assert_eq!(Cultures::DaDk.location(), "Denmark");
+    /// assert_eq!(Cultures::NlNl.location(), "Netherlands");
+    /// assert_eq!(Cultures::EnUs.location(), "United States");
+    /// assert_eq!(Cultures::EtEe.location(), "Estonia");
+    /// assert_eq!(Cultures::FiFi.location(), "Finland");
+    /// assert_eq!(Cultures::FrFr.location(), "France");
+    /// assert_eq!(Cultures::DeDe.location(), "Germany");
+    /// assert_eq!(Cultures::ElGr.location(), "Greece");
+    /// assert_eq!(Cultures::HeIl.location(), "Israel");
+    /// assert_eq!(Cultures::HiIn.location(), "India");
+    /// assert_eq!(Cultures::HuHu.location(), "Hungary");
+    /// assert_eq!(Cultures::ItIt.location(), "Italy");
+    /// assert_eq!(Cultures::JaJp.location(), "Japan");
+    /// assert_eq!(Cultures::KkKz.location(), "Kazakhstan");
+    /// assert_eq!(Cultures::KoKr.location(), "Korea");
+    /// assert_eq!(Cultures::LvLv.location(), "Latvia");
+    /// assert_eq!(Cultures::LtLt.location(), "Lithuania");
+    /// assert_eq!(Cultures::NbNo.location(), "Norway");
+    /// assert_eq!(Cultures::PlPl.location(), "Poland");
+    /// assert_eq!(Cultures::PtBr.location(), "Brazil");
+    /// assert_eq!(Cultures::PtPt.location(), "Portugal");
+    /// assert_eq!(Cultures::RoRo.location(), "Romania");
+    /// assert_eq!(Cultures::RuRu.location(), "Russia");
+    /// assert_eq!(Cultures::SrLatnCs.location(), "Serbia and Montenegro");
+    /// assert_eq!(Cultures::ZhCn.location(), "China");
+    /// assert_eq!(Cultures::SkSk.location(), "Slovak Republic");
+    /// assert_eq!(Cultures::SlSi.location(), "Solvenia");
+    /// assert_eq!(Cultures::EsEs.location(), "Spain");
+    /// assert_eq!(Cultures::SvSe.location(), "Sweden");
+    /// assert_eq!(Cultures::ThTh.location(), "Thailand");
+    /// assert_eq!(Cultures::ZhHk.location(), "Hong Kong SAR");
+    /// assert_eq!(Cultures::ZhTw.location(), "Taiwan");
+    /// assert_eq!(Cultures::TrTr.location(), "Turkey");
+    /// assert_eq!(Cultures::UkUa.location(), "Ukraine");
     /// ```
     pub fn location(&self) -> &'static str {
         match *self {

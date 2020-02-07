@@ -59,16 +59,10 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Template;
-    ///
-    /// fn main() {
-    ///     assert_eq!(Template::Apache2.id(), "Apache-2.0");
-    ///     assert_eq!(Template::Gpl3.id(), "GPL-3.0");
-    ///     assert_eq!(Template::Mit.id(), "MIT");
-    ///     assert_eq!(Template::Wxs.id(), "WXS");
-    /// }
+    /// assert_eq!(Template::Apache2.id(), "Apache-2.0");
+    /// assert_eq!(Template::Gpl3.id(), "GPL-3.0");
+    /// assert_eq!(Template::Mit.id(), "MIT");
+    /// assert_eq!(Template::Wxs.id(), "WXS");
     /// ```
     ///
     /// [SPDX ID]: https://spdx.org/licenses/
@@ -89,25 +83,19 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Template;
-    ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         Template::possible_values(),
-    ///         vec![
-    ///             "Apache-2.0",
-    ///             "apache-2.0",
-    ///             "GPL-3.0",
-    ///             "gpl-3.0",
-    ///             "MIT",
-    ///             "mit",
-    ///             "WXS",
-    ///             "wxs"
-    ///         ]
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     Template::possible_values(),
+    ///     vec![
+    ///         "Apache-2.0",
+    ///         "apache-2.0",
+    ///         "GPL-3.0",
+    ///         "gpl-3.0",
+    ///         "MIT",
+    ///         "mit",
+    ///         "WXS",
+    ///         "wxs"
+    ///     ]
+    /// );
     /// ```
     pub fn possible_values() -> Vec<String> {
         vec![
@@ -127,20 +115,14 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate wix;
-    ///
-    /// use wix::Template;
-    ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         Template::license_ids(),
-    ///         vec![
-    ///             "Apache-2.0",
-    ///             "GPL-3.0",
-    ///             "MIT",
-    ///         ]
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     Template::license_ids(),
+    ///     vec![
+    ///         "Apache-2.0",
+    ///         "GPL-3.0",
+    ///         "MIT",
+    ///     ]
+    /// );
     /// ```
     pub fn license_ids() -> Vec<String> {
         vec![
