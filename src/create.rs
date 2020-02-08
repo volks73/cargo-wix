@@ -700,12 +700,10 @@ impl Execution {
             .and_then(|w| w.as_table())
             .and_then(|t| t.get("inputs"))
             .and_then(|i| i.as_array())
-            .and_then(|a| {
-                Some(
-                    a.iter()
-                        .map(|s| s.as_str().map(PathBuf::from).unwrap())
-                        .collect::<Vec<PathBuf>>(),
-                )
+            .map(|a| {
+                a.iter()
+                    .map(|s| s.as_str().map(PathBuf::from).unwrap())
+                    .collect::<Vec<PathBuf>>()
             })
         {
             for pkg_meta_wix_input in &pkg_meta_wix_inputs {
@@ -734,7 +732,7 @@ impl Execution {
                     )));
                 }
             }
-            Ok(pkg_meta_wix_inputs.to_owned())
+            Ok(pkg_meta_wix_inputs)
         } else {
             trace!("Using the default WiX source files location");
             let default_wix_inputs: Vec<PathBuf> = std::fs::read_dir(PathBuf::from(WIX))?

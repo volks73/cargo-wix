@@ -691,7 +691,7 @@ fn inputs_works() {
         .run()
         .unwrap();
     let result = Builder::default()
-        .inputs(output.join("main.wxs").to_str().and_then(|i| Some(vec![i])))
+        .inputs(output.join("main.wxs").to_str().map(|i| vec![i]))
         .build()
         .run();
     env::set_current_dir(original_working_directory).unwrap();
