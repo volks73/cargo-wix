@@ -640,6 +640,16 @@ impl Execution {
 
     fn wixobj_destination(&self) -> PathBuf {
         let mut dst = PathBuf::from(TARGET_FOLDER_NAME);
+        // A trailing slash is needed; otherwise, candle tries to dump the
+        // object files to a `target\wix` file instead of dumping the object
+        // files in the `target\wix\` folder for the `-out` option. The trailing
+        // slash must be done "manually" as a string instead of using the
+        // PathBuf API because the PathBuf `push` and/or `join` methods treat a
+        // single slash (forward or backward) without a prefix as the root `C:\`
+        // or `/` and deletes the full path. This is noted in the documentation
+        // for PathBuf, but it was unexpected and kind of annoying because I am
+        // not sure how to add a trailing slash in a cross-platform way with
+        // PathBuf, not that cargo-wix needs to be cross-platform.
         dst.push(format!("{}\\", WIX));
         dst
     }
