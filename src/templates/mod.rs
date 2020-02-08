@@ -59,6 +59,8 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Template;
+    ///
     /// assert_eq!(Template::Apache2.id(), "Apache-2.0");
     /// assert_eq!(Template::Gpl3.id(), "GPL-3.0");
     /// assert_eq!(Template::Mit.id(), "MIT");
@@ -83,6 +85,8 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Template;
+    ///
     /// assert_eq!(
     ///     Template::possible_values(),
     ///     vec![
@@ -115,6 +119,8 @@ impl Template {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Template;
+    ///
     /// assert_eq!(
     ///     Template::license_ids(),
     ///     vec![

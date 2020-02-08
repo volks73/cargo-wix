@@ -247,6 +247,8 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Error;
+    ///
     /// let err = Error::from("A generic error");
     /// assert_ne!(err.code(), 0)
     /// ```
@@ -272,6 +274,10 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
     /// let path = Path::new("C:\\");
     /// let expected = Error::Io(io::Error::new(
     ///     io::ErrorKind::AlreadyExists,
@@ -292,6 +298,10 @@ impl Error {
     /// # Examples
     ///
     /// ```rust
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
     /// let path = Path::new("C:\\Cargo\\Wix\\file.txt");
     /// let expected = Error::Io(io::Error::new(
     ///     io::ErrorKind::NotFound,
@@ -441,6 +451,8 @@ impl Platform {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Platform;
+    ///
     /// assert_eq!(Platform::X86.arch(), "i686");
     /// assert_eq!(Platform::X64.arch(), "x86_64");
     /// ```
@@ -488,6 +500,9 @@ impl TimestampServer {
     /// # Examples
     ///
     /// ```rust
+    /// use std::str::FromStr;
+    /// use wix::TimestampServer;
+    ///
     /// assert_eq!(
     ///     TimestampServer::from_str("http://www.example.com").unwrap().url(),
     ///     "http://www.example.com"
@@ -621,6 +636,8 @@ impl Cultures {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Cultures;
+    ///
     /// assert_eq!(Cultures::ArSa.language(), "Arabic");
     /// assert_eq!(Cultures::BgBg.language(), "Bulgarian");
     /// assert_eq!(Cultures::CaEs.language(), "Catalan");
@@ -710,6 +727,8 @@ impl Cultures {
     /// # Examples
     ///
     /// ```rust
+    /// use wix::Cultures;
+    ///
     /// assert_eq!(Cultures::ArSa.location(), "Saudi Arabia");
     /// assert_eq!(Cultures::BgBg.location(), "Bulgaria");
     /// assert_eq!(Cultures::CaEs.location(), "Spain");
