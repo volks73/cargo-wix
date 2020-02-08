@@ -110,8 +110,9 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to a file to be used as the WiX Source (wxs) file instead
-    /// of `wix\main.wxs`.
+    /// Sets the path to multiple files to be used as the WiX Source (wxs) files
+    /// instead of including any file with the `.wxs` extension in the default,
+    /// `wix`, project source location.
     ///
     /// This value will override any default and skip looking for a value in the
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
