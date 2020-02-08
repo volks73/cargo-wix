@@ -758,7 +758,6 @@ use env_logger::Builder;
 
 use log::{Level, LevelFilter};
 
-use std::error::Error;
 use std::io::Write;
 
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
@@ -1357,7 +1356,7 @@ fn main() {
                 stderr
                     .set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true))
                     .expect("Coloring stderr");
-                write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.description())
+                write!(&mut stderr, "Error[{}] ({}): ", e.code(), e.as_str())
                     .expect("Write tag to stderr");
                 // This prevents "leaking" the color settings to the console after the
                 // sub-command/application has completed and ensures the message is not printed in

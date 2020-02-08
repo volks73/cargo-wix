@@ -315,10 +315,17 @@ impl Error {
     pub fn not_found(p: &Path) -> Self {
         io::Error::new(ErrorKind::NotFound, p.display().to_string()).into()
     }
-}
 
-impl StdError for Error {
-    fn description(&self) -> &str {
+    /// Extracts a short, single word representation of the error.
+    ///
+    /// The `std::error::Error::description` method is "soft-deprecated"
+    /// according to the Rust stdlib documentation. It is recommended to use the
+    /// `std::fmt::Display` implementation for a "description" string. However,
+    /// there is already a `std::fmt::Display` implemenation for this error
+    /// type, and it is nice to have a short, single word representation for
+    /// nicely formatting errors to humans. This method maintains the error
+    /// message formatting.
+    pub fn as_str(&self) -> &str {
         match *self {
             Error::Command(..) => "Command",
             Error::Generic(..) => "Generic",
@@ -329,8 +336,14 @@ impl StdError for Error {
             Error::Version(..) => "Version",
         }
     }
+}
 
-    fn cause(&self) -> Option<&dyn StdError> {
+impl StdError for Error {
+    fn description(&self) -> &str {
+        self.as_str()
+    }
+
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match *self {
             Error::Io(ref err) => Some(err),
             Error::Mustache(ref err) => Some(err),
