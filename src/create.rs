@@ -1081,12 +1081,12 @@ mod tests {
                 output = "target/wix/test.msi"
             "#;
             let execution = Execution::default();
-            let output = execution.destination_msi(
+            let output = execution.msi_destination(
                 "Different",
                 &"2.1.0".parse::<Version>().unwrap(),
                 Platform::X64,
                 &PKG_META_WIX.parse::<Value>().unwrap(),
-            );
+            ).unwrap();
             assert_eq!(output, PathBuf::from("target/wix/test.msi"));
         }
 
@@ -1100,7 +1100,7 @@ mod tests {
             let sources = execution
                 .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
-            assert_eq!(sources, vec![PathBuf::from("Cargo.toml")]);
+            assert_eq!(sources, vec![PathBuf::from("wix\\main.wxs"), PathBuf::from("Cargo.toml")]);
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
@@ -1152,7 +1152,7 @@ mod tests {
         fn wixobj_destination_works() {
             let execution = Execution::default();
             assert_eq!(
-                execution.wixobj_destination(),
+                execution.wixobj_destination().unwrap(),
                 PathBuf::from("target\\wix\\")
             )
         }
