@@ -636,7 +636,7 @@ fn init_with_product_name_option_works() {
 }
 
 #[test]
-fn inputs_works() {
+fn input_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
@@ -691,7 +691,7 @@ fn inputs_works() {
         .run()
         .unwrap();
     let result = Builder::default()
-        .includes(output.join("main.wxs").to_str().map(|i| vec![i]))
+        .input(package_manifest.path().to_str())
         .build()
         .run();
     env::set_current_dir(original_working_directory).unwrap();
@@ -705,12 +705,12 @@ fn inputs_works() {
 }
 
 #[test]
-fn multiple_inputs_works() {
+fn includes_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_wxs_sources();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
-    let one_wxs = package.path().join("wix").join("one.wxs");
-    let two_wxs = package.path().join("wix").join("two.wxs");
+    let one_wxs = package.path().join("misc").join("one.wxs");
+    let two_wxs = package.path().join("misc").join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
     let result = Builder::default()
         .includes(Some(vec![

@@ -179,14 +179,14 @@ pub fn create_test_package_multiple_wxs_sources() -> TempDir {
     let one_wxs = include_str!("one.wxs");
     let two_wxs = include_str!("two.wxs");
     let package = create_test_package();
-    let mut wix_dir = package.path().join("wix");
-    fs::create_dir(&wix_dir).unwrap();
-    wix_dir.push("one.wxs");
-    let mut one_wxs_handle = File::create(&wix_dir).unwrap();
+    let mut misc_dir = package.path().join("misc");
+    fs::create_dir(&misc_dir).unwrap();
+    misc_dir.push("one.wxs");
+    let mut one_wxs_handle = File::create(&misc_dir).unwrap();
     one_wxs_handle.write_all(one_wxs.as_bytes()).unwrap();
-    wix_dir.pop();
-    wix_dir.push("two.wxs");
-    let mut two_wxs_handle = File::create(&wix_dir).unwrap();
+    misc_dir.pop();
+    misc_dir.push("two.wxs");
+    let mut two_wxs_handle = File::create(&misc_dir).unwrap();
     two_wxs_handle.write_all(two_wxs.as_bytes()).unwrap();
     package
 }
