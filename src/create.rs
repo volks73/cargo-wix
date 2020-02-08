@@ -213,9 +213,10 @@ impl<'a> Builder<'a> {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             culture: self.culture.map(String::from),
-            inputs: self.inputs.as_ref().map(|v| {
-                v.iter().map(&PathBuf::from).collect()
-            }),
+            inputs: self
+                .inputs
+                .as_ref()
+                .map(|v| v.iter().map(&PathBuf::from).collect()),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
@@ -659,9 +660,7 @@ impl Execution {
         let wixobj_sources: Vec<PathBuf> = std::fs::read_dir(wixobj_dst)?
             .filter(|r| r.is_ok())
             .map(|r| r.unwrap().path())
-            .filter(|p| {
-                p.extension().and_then(|s| s.to_str()) == Some(WIX_OBJECT_FILE_EXTENSION)
-            })
+            .filter(|p| p.extension().and_then(|s| s.to_str()) == Some(WIX_OBJECT_FILE_EXTENSION))
             .collect();
         if wixobj_sources.is_empty() {
             Err(Error::Generic(String::from("No WiX object files found.")))
@@ -679,7 +678,7 @@ impl Execution {
                             "The '{}' path is not a file. Please check the path and ensure it is to \
                             a WiX Source (wxs) file.",
                             p.display()
-                        )))
+                        )));
                     } else {
                         trace!("Using the '{}' WiX source file", p.display());
                     }
@@ -688,7 +687,7 @@ impl Execution {
                         "The '{0}' file does not exist. Consider using the 'cargo \
                         wix print WXS > {0}' command to create it.",
                         p.display()
-                    )))
+                    )));
                 }
             }
             Ok(paths.to_owned())
@@ -701,9 +700,13 @@ impl Execution {
             .and_then(|w| w.as_table())
             .and_then(|t| t.get("inputs"))
             .and_then(|i| i.as_array())
-            .and_then(|a| Some(a.iter().map(
-                |s| s.as_str().map(PathBuf::from).unwrap()
-            ).collect::<Vec<PathBuf>>()))
+            .and_then(|a| {
+                Some(
+                    a.iter()
+                        .map(|s| s.as_str().map(PathBuf::from).unwrap())
+                        .collect::<Vec<PathBuf>>(),
+                )
+            })
         {
             for pkg_meta_wix_input in &pkg_meta_wix_inputs {
                 if pkg_meta_wix_input.exists() {
@@ -714,7 +717,7 @@ impl Execution {
                             'package.metadata.wix' section of the package's manifest \
                             (Cargo.toml).",
                             pkg_meta_wix_input.display()
-                        )))
+                        )));
                     } else {
                         trace!(
                             "Using the '{}' WiX source file from the \
@@ -728,7 +731,7 @@ impl Execution {
                         Consider using the 'cargo wix print WXS > {0} command to create \
                         it.",
                         pkg_meta_wix_input.display()
-                    )))
+                    )));
                 }
             }
             Ok(pkg_meta_wix_inputs.to_owned())
@@ -739,9 +742,12 @@ impl Execution {
                 .map(|r| r.unwrap().path())
                 .filter(|p| {
                     p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
-                }).collect();
+                })
+                .collect();
             if default_wix_inputs.is_empty() {
-                Err(Error::Generic(String::from("No WXS files found in the 'wix' default location.")))
+                Err(Error::Generic(String::from(
+                    "No WXS files found in the 'wix' default location.",
+                )))
             } else {
                 Ok(default_wix_inputs)
             }
@@ -1082,7 +1088,10 @@ mod tests {
         #[test]
         fn wixobj_destination_works() {
             let execution = Execution::default();
-            assert_eq!(execution.wixobj_destination(), PathBuf::from("target\\wix\\"))
+            assert_eq!(
+                execution.wixobj_destination(),
+                PathBuf::from("target\\wix\\")
+            )
         }
     }
 }

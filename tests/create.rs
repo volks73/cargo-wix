@@ -713,7 +713,10 @@ fn multiple_inputs_works() {
     let two_wxs = package.path().join("wix").join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
     let result = Builder::default()
-        .inputs(Some(vec![one_wxs.to_str().unwrap(), two_wxs.to_str().unwrap()]))
+        .inputs(Some(vec![
+            one_wxs.to_str().unwrap(),
+            two_wxs.to_str().unwrap(),
+        ]))
         .build()
         .run();
     env::set_current_dir(original_working_directory).unwrap();
