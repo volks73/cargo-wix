@@ -54,7 +54,8 @@ pub struct Builder<'a> {
     bin_path: Option<&'a str>,
     capture_output: bool,
     culture: Option<&'a str>,
-    inputs: Option<Vec<&'a str>>,
+    includes: Option<Vec<&'a str>>,
+    input: Option<&'a str>,
     locale: Option<&'a str>,
     name: Option<&'a str>,
     no_build: bool,
@@ -69,7 +70,8 @@ impl<'a> Builder<'a> {
             bin_path: None,
             capture_output: true,
             culture: None,
-            inputs: None,
+            includes: None,
+            input: None,
             locale: None,
             name: None,
             no_build: false,
@@ -110,14 +112,31 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the path to multiple files to be used as the WiX Source (wxs) files
-    /// instead of including any file with the `.wxs` extension in the default,
-    /// `wix`, project source location.
+    /// Adds multiple WiX Source (wxs) files to the creation of an installer.
+    ///
+    /// By default, any `.wxs` file located in the project's `wix` folder will
+    /// be included in the creation of an installer for the project. This method
+    /// adds, or appends, to the list of `.wxs` files. The value is a relative
+    /// or absolute path.
     ///
     /// This value will override any default and skip looking for a value in the
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
-    pub fn inputs(&mut self, i: Option<Vec<&'a str>>) -> &mut Self {
-        self.inputs = i;
+    pub fn includes(&mut self, i: Option<Vec<&'a str>>) -> &mut Self {
+        self.includes = i;
+        self
+    }
+
+    /// Sets the path to a package's manifest (Cargo.toml) file.
+    ///
+    /// A package's manifest is used to create an installer. If no path is
+    /// specified, then the current working directory (CWD) is used. An error
+    /// will occur if there is no `Cargo.toml` file in the CWD or at the
+    /// specified path. Either an absolute or relative path is valid.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
+    pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
+        self.input = i;
         self
     }
 
@@ -213,10 +232,11 @@ impl<'a> Builder<'a> {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             culture: self.culture.map(String::from),
-            inputs: self
-                .inputs
+            includes: self
+                .includes
                 .as_ref()
                 .map(|v| v.iter().map(&PathBuf::from).collect()),
+            input: self.input.map(PathBuf::from),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
@@ -238,7 +258,8 @@ pub struct Execution {
     bin_path: Option<PathBuf>,
     capture_output: bool,
     culture: Option<String>,
-    inputs: Option<Vec<PathBuf>>,
+    includes: Option<Vec<PathBuf>>,
+    input: Option<PathBuf>,
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
@@ -253,13 +274,14 @@ impl Execution {
         debug!("bin_path = {:?}", self.bin_path);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("culture = {:?}", self.culture);
-        debug!("inputs = {:?}", self.inputs);
+        debug!("includes = {:?}", self.includes);
+        debug!("input = {:?}", self.input);
         debug!("locale = {:?}", self.locale);
         debug!("name = {:?}", self.name);
         debug!("no_build = {:?}", self.no_build);
         debug!("output = {:?}", self.output);
         debug!("version = {:?}", self.version);
-        let manifest = super::manifest(None)?;
+        let manifest = super::manifest(self.input.as_ref())?;
         let name = self.name(&manifest)?;
         debug!("name = {:?}", name);
         let version = self.version(&manifest)?;
@@ -272,10 +294,10 @@ impl Execution {
         debug!("platform = {:?}", platform);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
-        let wixobj_destination = self.wixobj_destination();
+        let wixobj_destination = self.wixobj_destination()?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let destination_msi = self.destination_msi(&name, &version, platform, &manifest);
-        debug!("destination_msi = {:?}", destination_msi);
+        let msi_destination = self.msi_destination(&name, &version, platform, &manifest)?;
+        debug!("msi_destination = {:?}", msi_destination);
         if self.no_build(&manifest) {
             warn!("Skipped building the release binary");
         } else {
@@ -360,7 +382,7 @@ impl Execution {
             .arg("WixUtilExtension")
             .arg(format!("-cultures:{}", culture))
             .arg("-out")
-            .arg(&destination_msi)
+            .arg(&msi_destination)
             .args(&wixobj_sources);
         debug!("command = {:?}", linker);
         let status = linker.status().map_err(|err| {
@@ -595,13 +617,13 @@ impl Execution {
         }
     }
 
-    fn destination_msi(
+    fn msi_destination(
         &self,
         name: &str,
         version: &Version,
         platform: Platform,
         manifest: &Value,
-    ) -> PathBuf {
+    ) -> Result<PathBuf> {
         let filename = &format!(
             "{}-{}-{}.{}",
             name,
@@ -610,11 +632,12 @@ impl Execution {
             MSI_FILE_EXTENSION
         );
         if let Some(ref path_str) = self.output {
+            trace!("Using the explicitly specified output path for the MSI destination");
             let path = Path::new(path_str);
             if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
-                path.join(filename)
+                Ok(path.join(filename))
             } else {
-                path.to_owned()
+                Ok(path.to_owned())
             }
         } else if let Some(pkg_meta_wix_output) = manifest
             .get("package")
@@ -626,22 +649,52 @@ impl Execution {
             .and_then(|t| t.get("output"))
             .and_then(|o| o.as_str())
         {
+            trace!("Using the output path in the package's metadata for the MSI destination");
             let path = Path::new(pkg_meta_wix_output);
             if pkg_meta_wix_output.ends_with('/')
                 || pkg_meta_wix_output.ends_with('\\')
                 || path.is_dir()
             {
-                path.join(filename)
+                Ok(path.join(filename))
             } else {
-                path.to_owned()
+                Ok(path.to_owned())
             }
         } else {
-            PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename)
+            trace!("Using the current working directory and default output path for the MSI destination");
+            if let Some(manifest_path) = &self.input {
+                trace!("Using the package's manifest (Cargo.toml) file path to specify \
+                        the MSI destination");
+                // Remove the `Cargo.toml` file from the path
+                manifest_path.parent().ok_or(Error::Generic(format!(
+                    "The '{}' path for the package's manifest file is invalid", manifest_path.display()
+                ))).map(|d| {
+                    let mut dst = PathBuf::from(d);
+                    dst.push(TARGET_FOLDER_NAME);
+                    dst
+                })
+            } else {
+                trace!("Using the current working directory (CWD) to build the WiX object files destination");
+                Ok(PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename))
+            }
         }
     }
 
-    fn wixobj_destination(&self) -> PathBuf {
-        let mut dst = PathBuf::from(TARGET_FOLDER_NAME);
+    fn wixobj_destination(&self) -> Result<PathBuf> {
+        let mut dst = if let Some(manifest_path) = &self.input {
+            trace!("Using the package's manifest (Cargo.toml) file path to build \
+                the Wix object files destination");
+            // Remove the `Cargo.toml` file from the path
+            manifest_path.parent().ok_or(Error::Generic(format!(
+                "The '{}' path for the package's manifest file is invalid", manifest_path.display()
+            ))).map(|d| {
+                let mut dst = PathBuf::from(d);
+                dst.push(TARGET_FOLDER_NAME);
+                dst
+            })
+        } else {
+            trace!("Using the current working directory (CWD) to build the WiX object files destination");
+            Ok(PathBuf::from(TARGET_FOLDER_NAME))
+        }?;
         // A trailing slash is needed; otherwise, candle tries to dump the
         // object files to a `target\wix` file instead of dumping the object
         // files in the `target\wix\` folder for the `-out` option. The trailing
@@ -653,7 +706,7 @@ impl Execution {
         // not sure how to add a trailing slash in a cross-platform way with
         // PathBuf, not that cargo-wix needs to be cross-platform.
         dst.push(format!("{}\\", WIX));
-        dst
+        Ok(dst)
     }
 
     fn wixobj_sources(&self, wixobj_dst: &Path) -> Result<Vec<PathBuf>> {
@@ -670,7 +723,27 @@ impl Execution {
     }
 
     fn wxs_sources(&self, manifest: &Value) -> Result<Vec<PathBuf>> {
-        if let Some(paths) = self.inputs.as_ref() {
+        let project_wix_dir = if let Some(manifest_path) = &self.input {
+            trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
+            manifest_path.parent().ok_or(Error::Generic(format!(
+                "The '{}' path for the package's manifest file is invalid", manifest_path.display()
+            ))).map(|d| {
+                let mut dst = PathBuf::from(d);
+                dst.push(WIX);
+                dst
+            })
+        } else {
+            trace!("Using the current working directory (CWD) to obtain all WXS files");
+            Ok(PathBuf::from(WIX))
+        }?;
+        let mut wix_sources: Vec<PathBuf> = std::fs::read_dir(project_wix_dir)?
+            .filter(|r| r.is_ok())
+            .map(|r| r.unwrap().path())
+            .filter(|p| {
+                p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
+            })
+            .collect();
+        if let Some(paths) = self.includes.as_ref() {
             for p in paths {
                 if p.exists() {
                     if p.is_dir() {
@@ -690,15 +763,15 @@ impl Execution {
                     )));
                 }
             }
-            Ok(paths.to_owned())
-        } else if let Some(pkg_meta_wix_inputs) = manifest
+            wix_sources.extend(paths.clone());
+        } else if let Some(pkg_meta_wix_sources) = manifest
             .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("metadata"))
             .and_then(|m| m.as_table())
             .and_then(|t| t.get("wix"))
             .and_then(|w| w.as_table())
-            .and_then(|t| t.get("inputs"))
+            .and_then(|t| t.get("include"))
             .and_then(|i| i.as_array())
             .map(|a| {
                 a.iter()
@@ -706,21 +779,21 @@ impl Execution {
                     .collect::<Vec<PathBuf>>()
             })
         {
-            for pkg_meta_wix_input in &pkg_meta_wix_inputs {
-                if pkg_meta_wix_input.exists() {
-                    if pkg_meta_wix_input.is_dir() {
+            for pkg_meta_wix_source in &pkg_meta_wix_sources {
+                if pkg_meta_wix_source.exists() {
+                    if pkg_meta_wix_source.is_dir() {
                         return Err(Error::Generic(format!(
                             "The '{}' path is not a file. Please check the path and \
                             ensure it is to a WiX Source (wxs) file in the \
                             'package.metadata.wix' section of the package's manifest \
                             (Cargo.toml).",
-                            pkg_meta_wix_input.display()
+                            pkg_meta_wix_source.display()
                         )));
                     } else {
                         trace!(
                             "Using the '{}' WiX source file from the \
                             'package.metadata.wix' section in the package's manifest.",
-                            pkg_meta_wix_input.display()
+                            pkg_meta_wix_source.display()
                         );
                     }
                 } else {
@@ -728,39 +801,18 @@ impl Execution {
                         "The '{0}' file does not exist. \
                         Consider using the 'cargo wix print WXS > {0} command to create \
                         it.",
-                        pkg_meta_wix_input.display()
+                        pkg_meta_wix_source.display()
                     )));
                 }
             }
-            Ok(pkg_meta_wix_inputs)
+            wix_sources.extend(pkg_meta_wix_sources);
+        }
+        if wix_sources.is_empty() {
+            Err(Error::Generic(String::from(
+                "There are no WXS files to create an installer",
+            )))
         } else {
-            trace!("Using the default WiX source files location");
-            let default_wix_inputs: Vec<PathBuf> = std::fs::read_dir(PathBuf::from(WIX))?
-                .filter(|r| r.is_ok())
-                .map(|r| r.unwrap().path())
-                .filter(|p| {
-                    p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
-                })
-                .collect();
-            if default_wix_inputs.is_empty() {
-                Err(Error::Generic(String::from(
-                    "No WXS files found in the 'wix' default location.",
-                )))
-            } else {
-                Ok(default_wix_inputs)
-            }
-            // let mut main_wxs = PathBuf::from(WIX);
-            // main_wxs.push(WIX_SOURCE_FILE_NAME);
-            // main_wxs.set_extension(WIX_SOURCE_FILE_EXTENSION);
-            // if main_wxs.exists() {
-            //     Ok(vec![main_wxs])
-            // } else {
-            //     Err(Error::Generic(format!(
-            //         "The '{0}' file does not exist. Consider using the 'cargo wix init' command to \
-            //        create it.",
-            //         main_wxs.display()
-            //     )))
-            // }
+            Ok(wix_sources)
         }
     }
 
@@ -809,7 +861,8 @@ mod tests {
             assert!(actual.bin_path.is_none());
             assert!(actual.capture_output);
             assert!(actual.culture.is_none());
-            assert!(actual.inputs.is_none());
+            assert!(actual.includes.is_none());
+            assert!(actual.input.is_none());
             assert!(actual.locale.is_none());
             assert!(actual.name.is_none());
             assert!(!actual.no_build);
@@ -841,11 +894,19 @@ mod tests {
         }
 
         #[test]
-        fn input_works() {
+        fn includes_works() {
             const EXPECTED: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
             let mut actual = Builder::new();
-            actual.inputs(Some(vec![EXPECTED]));
-            assert_eq!(actual.inputs, Some(vec![EXPECTED]));
+            actual.includes(Some(vec![EXPECTED]));
+            assert_eq!(actual.includes, Some(vec![EXPECTED]));
+        }
+
+        #[test]
+        fn input_works() {
+            const EXPECTED: &str = "C:\\tmp\\hello_world\\Cargo.toml";
+            let mut actual = Builder::new();
+            actual.input(Some(EXPECTED));
+            assert_eq!(actual.input, Some(EXPECTED));
         }
 
         #[test]
@@ -894,7 +955,8 @@ mod tests {
             assert!(default_execution.bin_path.is_none());
             assert!(default_execution.capture_output);
             assert!(default_execution.culture.is_none());
-            assert!(default_execution.inputs.is_none());
+            assert!(default_execution.includes.is_none());
+            assert!(default_execution.input.is_none());
             assert!(default_execution.locale.is_none());
             assert!(default_execution.name.is_none());
             assert!(!default_execution.no_build);
@@ -906,7 +968,8 @@ mod tests {
         fn build_with_all_works() {
             const EXPECTED_BIN_PATH: &str = "C:\\Wix Toolset\\bin";
             const EXPECTED_CULTURE: &str = "FrFr";
-            const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
+            const EXPECTED_INCLUDES: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
+            const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world\\Cargo.toml";
             const EXPECTED_LOCALE: &str = "C:\\tmp\\hello_world\\wix\\main.wxl";
             const EXPECTED_NAME: &str = "Name";
             const EXPECTED_OUTPUT: &str = "C:\\tmp\\hello_world\\output";
@@ -915,7 +978,8 @@ mod tests {
             b.bin_path(Some(EXPECTED_BIN_PATH));
             b.capture_output(false);
             b.culture(Some(EXPECTED_CULTURE));
-            b.inputs(Some(vec![EXPECTED_INPUT]));
+            b.includes(Some(vec![EXPECTED_INCLUDES]));
+            b.input(Some(EXPECTED_INPUT));
             b.locale(Some(EXPECTED_LOCALE));
             b.name(Some(EXPECTED_NAME));
             b.no_build(true);
@@ -928,7 +992,8 @@ mod tests {
             );
             assert!(!execution.capture_output);
             assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
-            assert_eq!(execution.inputs, Some(vec![PathBuf::from(EXPECTED_INPUT)]));
+            assert_eq!(execution.includes, Some(vec![PathBuf::from(EXPECTED_INCLUDES)]));
+            assert_eq!(execution.input, Some(PathBuf::from(EXPECTED_INPUT)));
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
             assert!(execution.no_build);
@@ -1026,16 +1091,16 @@ mod tests {
         }
 
         #[test]
-        fn input_metadata_works() {
+        fn include_metadata_works() {
             const PKG_META_WIX: &str = r#"
                 [package.metadata.wix]
-                inputs = ["Cargo.toml"]
+                include = ["Cargo.toml"]
             "#;
             let execution = Execution::default();
-            let inputs = execution
+            let sources = execution
                 .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
-            assert_eq!(inputs, vec![PathBuf::from("Cargo.toml")]);
+            assert_eq!(sources, vec![PathBuf::from("Cargo.toml")]);
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;

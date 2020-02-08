@@ -987,6 +987,16 @@ fn main() {
                     .short("c")
                     .default_value(&default_culture)
                     .takes_value(true))
+                .arg(Arg::with_name("include")
+                    .help("Include an additional WiX Source (wxs) file")
+                    .long_help("Includes a WiX source (wxs) file for a project, \
+                        where the wxs file is not located in the default location, \
+                        i.e. 'wix'. Use this option multiple times to include \
+                        multiple wxs files.")
+                    .long("include")
+                    .multiple(true)
+                    .short("I")
+                    .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
                     .version(crate_version!())
                     .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
@@ -1029,12 +1039,15 @@ fn main() {
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
-                .arg(Arg::with_name("INPUTS")
-                     .help("Path to multiple WiX source (wxs) files.")
-                     .long_help("WiX source (wxs) files for the project that are \
-                        not located in the default location. The default location \
-                        is 'wix', as created with the 'cargo wix init' \
-                        sub-command.")
+                .arg(Arg::with_name("INPUT")
+                     .help("Path to a package's manifest (Cargo.toml) file.")
+                     .long_help("If not value is provided, then the current \
+                        working directory (CWD) will be used to locate a package's \
+                        manifest. An error will occur if a manifest cannot be \
+                        found. A relative or absolute path to a package's manifest \
+                        (Cargo.toml) file can be used. Only one manifest is \
+                        allowed. The creation of an installer will be relative to \
+                        the specified manifest.")
                      .required(false)
                      .multiple(true))
                 .arg(Arg::with_name("install-version")
@@ -1339,7 +1352,8 @@ fn main() {
             create.bin_path(matches.value_of("bin-path"));
             create.capture_output(!matches.is_present("no-capture"));
             create.culture(matches.value_of("culture"));
-            create.inputs(matches.values_of("INPUTS").map(|a| a.collect()));
+            create.includes(matches.values_of("include").map(|a| a.collect()));
+            create.input(matches.value_of("INPUT"));
             create.locale(matches.value_of("locale"));
             create.name(matches.value_of("name"));
             create.no_build(matches.is_present("no-build"));
