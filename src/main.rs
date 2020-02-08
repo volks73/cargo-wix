@@ -73,7 +73,7 @@
 //! the Windows OS; however, the [Developer Prompt] installed with the [VC Build
 //! Tools] is recommended. The [git bash] terminal can also be used.
 //!
-//! Begin each example by staring the appropriate prompt and navigating to the
+//! Begin each example by starting the appropriate prompt and navigating to the
 //! root folder of the Rust project. The `cargo wix` subcommand and binary
 //! assumes the current working directory (cwd) is the project, a.k.a. package,
 //! root folder, i.e. the same folder as the package's manifest (Cargo.toml).
@@ -139,13 +139,12 @@
 //! ```dos
 //! C:\Path\to\Project> dir target\wix /B
 //! example-0.1.0-x86_64.msi
-//! example-0.1.0-x86_64.wixpdb
 //! main.wixobj
 //! ```
 //!
-//! Great! An installer (msi) exists for the application. The
-//! `example-0.1.0-x86_64.wixpdb` and `main.wixobj` files are artifacts of the
-//! installer build process and can be ignored and/or deleted.
+//! Great! An installer (msi) exists for the application. The `main.wixobj` file
+//! is an artifact of the installer build process and can be ignored and/or
+//! deleted.
 //!
 //! The installer that is created with the above steps and commands will install
 //! the `example.exe` file to: `C:\Program Files\example\bin\example.exe`. It
@@ -295,13 +294,13 @@
 //! version. It is recommended to use the Developer Prompt to ensure the
 //! `signtool` application is available. Signing an installer is optional.
 //!
-//! The WiX Toolset requires a WiX Source (wxs) file, which is an [XML] file. A
+//! The WiX Toolset requires a WiX Source (WXS) file, which is an [XML] file. A
 //! template is provided with this binary that attempts to meet the majority
 //! of use cases for developers and avoid requiring extensive knowledge of the
 //! WiX Toolset and Windows installer technologies. Modification of the template
 //! is encouraged, but please consult the WiX Toolset's extensive
 //! [documentation] and [tutorials] for information about writing (authoring),
-//! customizing, and using wxs files. This documentation here is only for this
+//! customizing, and using WXS files. This documentation here is only for this
 //! binary and subcommand.
 //!
 //! The [WXS] template is embedded in the binary installation of the subcommand
@@ -352,21 +351,21 @@
 //! the `-l,--license` and `-e,--eula` options for the `cargo wix init`
 //! subcommand.
 //!
-//! The [WixUIExtension] and [WixUtilExtension] is included in every execution
-//! of the default create cargo-wix subcommand, i.e. `cargo wix`. This is the
+//! The [WixUIExtension] and [WixUtilExtension] are included in every execution
+//! of the default _create_ cargo-wix subcommand, i.e. `cargo wix`. This is the
 //! same as calling either the compiler (candle.exe) or the linker (light.exe)
 //! with the `-ext WixUIExtension -ext WixUtilExtension` options. These two
 //! extensions are commonly used to create installers when using the WiX
 //! Toolset, so these are included by default. Additionally, the WixUIExtension
 //! is used for the template WXS file.
 //!
-//! The cargo-wix subcommand supports including multiple WXS source files when
-//! creating an installer. A lot of customization is possible through the WXS
-//! file and sometimes the installer's source code becomes its own project where
+//! The cargo-wix subcommand supports including multiple WXS files when creating
+//! an installer. A lot of customization is possible through the WXS file and
+//! sometimes the installer's source code becomes its own project where
 //! organization and formatting are important. Breaking up a single, large WXS
 //! file into multiple WXS files can be useful for code readability and project
-//! navigation. Thus, cargo-wix by default will include any file with the `.wxs`
-//! file extension found in the default source folder, `wix`, when creating an
+//! navigation. Thus, cargo-wix will include any file with the `.wxs` file
+//! extension found in the default source folder, `wix`, when creating an
 //! installer. For example, say you have the following project with three WXS
 //! files in the `wix` sub-folder:
 //!
@@ -381,7 +380,7 @@
 //! third.wxs
 //! ```
 //!
-//! When the `cargo wix` default/create command is executed, all three WXS files
+//! When the `cargo wix` default _create_ command is executed, all three WXS files
 //! will be included and used to create the installer. Generally, this
 //! translates to the following set of commands:
 //!
@@ -436,7 +435,7 @@
 //!
 //! Please note that unlike most of the configuration keys, the `inputs`
 //! configuration key is an [TOML array] instead of a string value. This is the
-//! same as passing multiple paths as arguments to the default create subcommand
+//! same as passing multiple paths as arguments to the default _create_ subcommand
 //! or including multiple WXS files in the default, `wix`, project source
 //! location.
 //!
@@ -468,8 +467,8 @@
 //!
 //! ### `-b,--bin-path`
 //!
-//! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
-//! subcommands.
+//! Available for the default _create_ (`cargo wix`) and _sign_ (`cargo wix
+//! sign`) subcommands.
 //!
 //! The `-b,--bin-path` option can be used to specify a path (relative or
 //! absolute) to the WiX Toolset `bin` folder. The `-b,--bin-path` option is
@@ -503,7 +502,7 @@
 //!
 //! ### `-c,--culture`
 //!
-//! Available for the _default_ (`cargo wix`) subcommand.
+//! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Sets the culture for localization. Use with the [`-l,--locale`] option. See
 //! the [WixUI localization documentation] for more information about acceptable
@@ -539,14 +538,14 @@
 //! default is to disable the license agreement dialog unless one of the
 //! supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the
 //! value of the `license` field in the package's manifest (Cargo.toml). An EULA
-//! can be enabled later by directly modifying the WiX Source (wxs) file with a
+//! can be enabled later by directly modifying the WiX Source (WXS) file with a
 //! text editor.
 //!
 //! ### `--force`
 //!
 //! Available for the _init_ (`cargo wix init`) subcommand.
 //!
-//! Forces overriding of generated files from the _init_ subcommand. Use with
+//! Forces overwriting of generated files from the _init_ subcommand. Use with
 //! caution! This cannot be undone.
 //!
 //! ### `-h,--help`
@@ -561,7 +560,7 @@
 //!
 //! Available for the _sign_ (`cargo wix sign`) subcommand.
 //!
-//! This will be display in the ACL dialog.
+//! This will be displayed in the ACL dialog.
 //!
 //! ### `-i,--install-version`
 //!
@@ -582,11 +581,11 @@
 //! license file is included in the installer or in the installation folder
 //! along side the `bin` folder. A file containing the license, such as a TXT,
 //! PDF, or RTF file, can be added later by directly editing the generated WiX
-//! Source file (wxs) in a text editor.
+//! Source file (WXS) in a text editor.
 //!
 //! ### `-l,--locale`
 //!
-//! Available for the _default_ (`cargo wix`) subcommand.
+//! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Sets the path to a WiX localization file (wxl) which contains localized
 //! strings. Use in conjunction with the [`-c,--culture`] option.
@@ -599,11 +598,11 @@
 //! Overrides the first author in the `authors` field of the package's manifest
 //! (Cargo.toml) as the manufacturer within the installer. The manufacturer can
 //! be changed after initialization by directly modifying the WiX Source file
-//! (wxs) with a text editor.
+//! (WXS) with a text editor.
 //!
 //! ### `-n,--name`
 //!
-//! Available for the _default_ (`cargo wix`) subcommand.
+//! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Overrides the `name` field in the package's manifest (Cargo.toml), which is
 //! used in the file name of the installer (msi). This does not change the name
@@ -611,13 +610,13 @@
 //!
 //! ### `--no-build`
 //!
-//! Available for the _default_ (`cargo wix`) subcommand.
+//! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! This skips building the Rust package using Cargo for the Release target.
 //!
 //! ### `--nocapture`
 //!
-//! Available for the _default_ (`cargo wix`) and _sign_ (`cargo wix sign`)
+//! Available for the default _create_ (`cargo wix`) and _sign_ (`cargo wix sign`)
 //! subcommands.
 //!
 //! Displays all output from the builder (Cargo), compiler (candle.exe), linker
@@ -625,18 +624,18 @@
 //!
 //! ### `-o,--output`
 //!
-//! Available for the _default_ (`cargo wix`), _init_ (`cargo wix init`) and
+//! Available for the default _create_ (`cargo wix`), _init_ (`cargo wix init`) and
 //! _print_ (`cargo wix print`) subcommands.
 //!
 //! Sets the destination for _init_ subcommand files, such as the WiX Source
-//! file (wxs), an alternative to stdout for _print_ subcommand, and the created
-//! installer for the _default_ subcommand.
+//! file (WXS), an alternative to stdout for _print_ subcommand, and the created
+//! installer for the default _create_ subcommand.
 //!
-//! When used with the _default_ subcommand to create an installer (MSI), if the
-//! path is to an existing directory or the path has a trailing `/` or `\`, then
-//! the MSI will be available after creation at the specified path, but the MSI
-//! file name will be the default file name based on the package name, version,
-//! and platform.
+//! When used with the default _create_ subcommand to create an installer (MSI),
+//! if the path is to an existing directory or the path has a trailing `/` or
+//! `\`, then the MSI will be available after creation at the specified path,
+//! but the MSI file name will be the default file name based on the package
+//! name, version, and platform.
 //!
 //! ### `-O,--owner`
 //!
