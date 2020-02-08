@@ -144,7 +144,7 @@
 //! ```
 //!
 //! Great! An installer (msi) exists for the application. The
-//! `example-0.1.0-x86_54.wixpdb` and `main.wixobj` files are artifacts of the
+//! `example-0.1.0-x86_64.wixpdb` and `main.wixobj` files are artifacts of the
 //! installer build process and can be ignored and/or deleted.
 //!
 //! The installer that is created with the above steps and commands will install
@@ -360,6 +360,46 @@
 //! Toolset, so these are included by default. Additionally, the WixUIExtension
 //! is used for the template WXS file.
 //!
+//! The cargo-wix subcommand supports including multiple WXS source files when
+//! creating an installer. A lot of customization is possible through the WXS
+//! file and sometimes the installer's source code becomes its own project where
+//! organization and formatting are important. Breaking up a single, large WXS
+//! file into multiple WXS files can be useful for code readability and project
+//! navigation. Thus, cargo-wix by default will include any file with the `.wxs`
+//! file extension found in the default source folder, `wix`, when creating an
+//! installer. For example, say you have the following project with three WXS
+//! files in the `wix` sub-folder:
+//!
+//! ```dos
+//! C:\Path\to\Project> dir /B
+//! Cargo.toml
+//! src
+//! wix
+//! C:\Path\to\Project> dir wix /B
+//! first.wxs
+//! second.wxs
+//! third.wxs
+//! ```
+//!
+//! When the `cargo wix` default/create command is executed, all three WXS files
+//! will be included and used to create the installer. Generally, this
+//! translates to the following set of commands:
+//!
+//! ```dos
+//! C:\Path\to\Project> candle -out target\wix\ wix\first.wxs wix\second.wxs wix\third.wxs
+//! C:\Path\to\Project> light -out target\wix\example-0.1.0-x86_64.msi target\wix\first.wixobj target\wix\second.wixobj target\wix\third.wixobj
+//! ```
+//!
+//! Alternatively, multiple WXS files can also be included when creating an
+//! installer by including the relative or absolute paths to the WXS files as
+//! arguments to the subcommand, but any WXS files in the default, `wix`,
+//! sub-folder are ignored and would have to be explicitly included. For
+//! example,
+//!
+//! ```dos
+//! C:\Path\To\Project> cargo wix path\to\first\wxs\file\one.wxs path\to\second\wxs\file\two.wxs
+//! ```
+//!
 //! ## Configuration
 //!
 //! The default subcommand, `cargo wix`, which creates a MSI based on the
@@ -376,7 +416,7 @@
 //! ```toml
 //! [package.metadata.wix]
 //! culture = "Fr-Fr"
-//! input = "Path\to\WIX\Source\File.wxs"
+//! inputs = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"
 //! no-build = false
@@ -393,6 +433,12 @@
 //! binaries, workspaces, or distributing a "suite" of applications, where the
 //! version number would be for the suite and not necessarily the individual
 //! applications within the suite.
+//!
+//! Please note that unlike most of the configuration keys, the `inputs`
+//! configuration key is an [TOML array] instead of a string value. This is the
+//! same as passing multiple paths as arguments to the default create subcommand
+//! or including multiple WXS files in the default, `wix`, project source
+//! location.
 //!
 //! ## Flags and Options
 //!
@@ -687,6 +733,7 @@
 //! [SignTool]: https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 //! [`std::process::Command::status`]: https://doc.rust-lang.org/std/process/struct.Command.html#method.status
+//! [TOML array]: https://github.com/toml-lang/toml#user-content-array
 //! [tutorials]: https://www.firegiant.com/wix/tutorial/
 //! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
