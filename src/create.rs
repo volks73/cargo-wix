@@ -307,18 +307,18 @@ impl Execution {
     /// Creates, or builds, an installer within a built context.
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
-        debug!("bin_path = {:?}", self.bin_path);
-        debug!("capture_output = {:?}", self.capture_output);
-        debug!("culture = {:?}", self.culture);
-        debug!("debug_build = {:?}", self.debug_build);
-        debug!("debug_name = {:?}", self.debug_name);
-        debug!("includes = {:?}", self.includes);
-        debug!("input = {:?}", self.input);
-        debug!("locale = {:?}", self.locale);
-        debug!("name = {:?}", self.name);
-        debug!("no_build = {:?}", self.no_build);
-        debug!("output = {:?}", self.output);
-        debug!("version = {:?}", self.version);
+        debug!("self.bin_path = {:?}", self.bin_path);
+        debug!("self.capture_output = {:?}", self.capture_output);
+        debug!("self.culture = {:?}", self.culture);
+        debug!("self.debug_build = {:?}", self.debug_build);
+        debug!("self.debug_name = {:?}", self.debug_name);
+        debug!("self.includes = {:?}", self.includes);
+        debug!("self.input = {:?}", self.input);
+        debug!("self.locale = {:?}", self.locale);
+        debug!("self.name = {:?}", self.name);
+        debug!("self.no_build = {:?}", self.no_build);
+        debug!("self.output = {:?}", self.output);
+        debug!("self.version = {:?}", self.version);
         let manifest_path = super::cargo_toml_file(self.input.as_ref())?;
         debug!("manifest_path = {:?}", manifest_path);
         let manifest = super::manifest(self.input.as_ref())?;
@@ -332,13 +332,19 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let platform = self.platform();
         debug!("platform = {:?}", platform);
+        let debug_build = self.debug_build(&manifest);
+        debug!("debug_build = {:?}", debug_build);
+        let debug_name = self.debug_name(&manifest);
+        debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let msi_destination = self.msi_destination(&name, &version, platform, &manifest)?;
+        let msi_destination = self.msi_destination(&name, &version, platform, debug_name, &manifest)?;
         debug!("msi_destination = {:?}", msi_destination);
-        if self.no_build(&manifest) {
+        let no_build = self.no_build(&manifest);
+        debug!("no_build = {:?}", no_build);
+        if no_build {
             warn!("Skipped building the release binary");
         } else {
             // Build the binary with the release profile. If a release binary
@@ -352,7 +358,7 @@ impl Execution {
                 builder.stderr(Stdio::null());
             }
             builder.arg("build");
-            if !self.debug_build {
+            if !debug_build {
                 builder.arg("--release");
             }
             builder.arg("--manifest-path").arg(&manifest_path);
@@ -515,6 +521,44 @@ impl Execution {
         }
     }
 
+    fn debug_build(&self, manifest: &Value) -> bool {
+        if self.debug_build {
+            true
+        } else if let Some(pkg_meta_wix_debug_build) = manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
+            .and_then(|t| t.get("dbg-build"))
+            .and_then(|c| c.as_bool())
+        {
+            pkg_meta_wix_debug_build
+        } else {
+            false
+        }
+    }
+
+    fn debug_name(&self, manifest: &Value) -> bool {
+        if self.debug_name {
+            true
+        } else if let Some(pkg_meta_wix_debug_name) = manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
+            .and_then(|t| t.get("dbg-name"))
+            .and_then(|c| c.as_bool())
+        {
+            pkg_meta_wix_debug_name
+        } else {
+            false
+        }
+    }
+
     fn no_build(&self, manifest: &Value) -> bool {
         if self.no_build {
             true
@@ -674,9 +718,10 @@ impl Execution {
         name: &str,
         version: &Version,
         platform: Platform,
+        debug_name: bool,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let filename = if self.debug_name {
+        let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
                 name,
@@ -938,6 +983,8 @@ mod tests {
             assert!(actual.bin_path.is_none());
             assert!(actual.capture_output);
             assert!(actual.culture.is_none());
+            assert!(!actual.debug_build);
+            assert!(!actual.debug_name);
             assert!(actual.includes.is_none());
             assert!(actual.input.is_none());
             assert!(actual.locale.is_none());
@@ -968,6 +1015,20 @@ mod tests {
             let mut actual = Builder::new();
             actual.culture(Some(EXPECTED));
             assert_eq!(actual.culture, Some(EXPECTED));
+        }
+
+        #[test]
+        fn debug_build_works() {
+            let mut actual = Builder::new();
+            actual.debug_build(true);
+            assert!(actual.debug_build);
+        }
+
+        #[test]
+        fn debug_name_works() {
+            let mut actual = Builder::new();
+            actual.debug_name(true);
+            assert!(actual.debug_name);
         }
 
         #[test]
@@ -1032,6 +1093,8 @@ mod tests {
             assert!(default_execution.bin_path.is_none());
             assert!(default_execution.capture_output);
             assert!(default_execution.culture.is_none());
+            assert!(!default_execution.debug_build);
+            assert!(!default_execution.debug_name);
             assert!(default_execution.includes.is_none());
             assert!(default_execution.input.is_none());
             assert!(default_execution.locale.is_none());
@@ -1055,6 +1118,8 @@ mod tests {
             b.bin_path(Some(EXPECTED_BIN_PATH));
             b.capture_output(false);
             b.culture(Some(EXPECTED_CULTURE));
+            b.debug_build(true);
+            b.debug_name(true);
             b.includes(Some(vec![EXPECTED_INCLUDES]));
             b.input(Some(EXPECTED_INPUT));
             b.locale(Some(EXPECTED_LOCALE));
@@ -1069,6 +1134,8 @@ mod tests {
             );
             assert!(!execution.capture_output);
             assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
+            assert!(execution.debug_build);
+            assert!(execution.debug_name);
             assert_eq!(
                 execution.includes,
                 Some(vec![PathBuf::from(EXPECTED_INCLUDES)])
@@ -1084,6 +1151,28 @@ mod tests {
 
     mod execution {
         use super::*;
+
+        #[test]
+        fn debug_build_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                dbg-build = true
+            "#;
+            let execution = Execution::default();
+            let debug_build = execution.debug_build(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert!(debug_build);
+        }
+
+        #[test]
+        fn debug_name_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                dbg-name = true
+            "#;
+            let execution = Execution::default();
+            let debug_name = execution.debug_name(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert!(debug_name);
+        }
 
         #[test]
         fn version_metadata_works() {
@@ -1166,6 +1255,7 @@ mod tests {
                     "Different",
                     &"2.1.0".parse::<Version>().unwrap(),
                     Platform::X64,
+                    false,
                     &PKG_META_WIX.parse::<Value>().unwrap(),
                 )
                 .unwrap();
