@@ -47,6 +47,8 @@ lazy_static! {
     };
 }
 
+/// Run the _create_ subcommand with the output capture toggled by the
+/// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
     b.capture_output(!env::var(NO_CAPTURE_VAR_NAME).is_ok()).build().run()
 }
@@ -658,52 +660,12 @@ fn init_with_product_name_option_works() {
 }
 
 #[test]
-fn input_works() {
+fn input_works_inside_cwd() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
-    let mut toml: Value = {
-        let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
-        let mut cargo_toml_content = String::new();
-        cargo_toml_handle
-            .read_to_string(&mut cargo_toml_content)
-            .unwrap();
-        toml::from_str(&cargo_toml_content).unwrap()
-    };
-    {
-        toml.get_mut("package")
-            .and_then(|p| {
-                match p {
-                    Value::Table(ref mut t) => {
-                        t.insert(
-                            String::from("description"),
-                            Value::from("This is a description"),
-                        );
-                        t.insert(
-                            String::from("documentation"),
-                            Value::from("https://www.example.com/docs"),
-                        );
-                        t.insert(
-                            String::from("homepage"),
-                            Value::from("https://www.example.com"),
-                        );
-                        t.insert(String::from("license"), Value::from("MIT"));
-                        t.insert(
-                            String::from("repository"),
-                            Value::from("https://www.example.com/repo"),
-                        );
-                    }
-                    _ => panic!("The 'package' section is not a table"),
-                };
-                Some(p)
-            })
-            .expect("A package section for the Cargo.toml");
-        let toml_string = toml.to_string();
-        let mut cargo_toml_handle = File::create(package_manifest.path()).unwrap();
-        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
-    }
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::default()
         .build()
@@ -717,6 +679,27 @@ fn input_works() {
         .assert(predicate::path::exists());
     package
         .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn input_works_outside_cwd() {
+    init_logging();
+    let package = common::create_test_package();
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
+    let expected_msi_file = package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
+    initialize::Builder::default()
+        .input(package_manifest.path().to_str())
+        .build()
+        .run()
+        .unwrap();
+    let result = run(Builder::default().input(package_manifest.path().to_str()));
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file.path())
         .assert(predicate::path::exists());
 }
 

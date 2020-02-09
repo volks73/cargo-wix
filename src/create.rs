@@ -281,6 +281,8 @@ impl Execution {
         debug!("no_build = {:?}", self.no_build);
         debug!("output = {:?}", self.output);
         debug!("version = {:?}", self.version);
+        let manifest_path = super::cargo_toml_file(self.input.as_ref())?;
+        debug!("manifest_path = {:?}", manifest_path);
         let manifest = super::manifest(self.input.as_ref())?;
         let name = self.name(&manifest)?;
         debug!("name = {:?}", name);
@@ -311,7 +313,11 @@ impl Execution {
                 builder.stdout(Stdio::null());
                 builder.stderr(Stdio::null());
             }
-            let status = builder.arg("build").arg("--release").status()?;
+            let status = builder.arg("build")
+                .arg("--release")
+                .arg("--manifest-path")
+                .arg(&manifest_path)
+                .status()?;
             if !status.success() {
                 return Err(Error::Command(
                     CARGO,
@@ -365,6 +371,12 @@ impl Execution {
         debug!("linker = {:?}", linker);
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
+        let base_path = manifest_path
+            .parent()
+            .ok_or(Error::Generic(String::from(
+                "The base path for the linker is invalid"
+            )))?;
+        debug!("base_path = {:?}", base_path);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
             linker.stdout(Stdio::null());
@@ -383,6 +395,8 @@ impl Execution {
             .arg(format!("-cultures:{}", culture))
             .arg("-out")
             .arg(&msi_destination)
+            .arg("-b")
+            .arg(&base_path)
             .args(&wixobj_sources);
         debug!("command = {:?}", linker);
         let status = linker.status().map_err(|err| {
@@ -660,7 +674,6 @@ impl Execution {
                 Ok(path.to_owned())
             }
         } else {
-            trace!("Using the current working directory and default output path for the MSI destination");
             if let Some(manifest_path) = &self.input {
                 trace!("Using the package's manifest (Cargo.toml) file path to specify \
                         the MSI destination");
