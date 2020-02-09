@@ -313,11 +313,12 @@ impl Execution {
                 builder.stdout(Stdio::null());
                 builder.stderr(Stdio::null());
             }
-            let status = builder.arg("build")
+            builder.arg("build")
                 .arg("--release")
                 .arg("--manifest-path")
-                .arg(&manifest_path)
-                .status()?;
+                .arg(&manifest_path);
+            debug!("command = {:?}", builder);
+            let status = builder.status()?;
             if !status.success() {
                 return Err(Error::Command(
                     CARGO,

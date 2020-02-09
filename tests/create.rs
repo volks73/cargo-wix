@@ -754,3 +754,33 @@ fn includes_works_without_wix_dir() {
         .child(expected_msi_file)
         .assert(predicate::path::exists());
 }
+
+#[test]
+fn includes_works_with_input_outside_cwd() {
+    init_logging();
+    let package = common::create_test_package_multiple_wxs_sources();
+    let package_manifest = package.child(CARGO_MANIFEST_FILE);
+    let expected_msi_file = package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
+    let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
+    let three_wxs = package.path().join(MISC_NAME).join("three.wxs");
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Builder::default()
+        .input(package_manifest.path().to_str())
+        .build()
+        .run()
+        .unwrap();
+    let result = run(Builder::default()
+        .input(package_manifest.path().to_str())
+        .includes(Some(vec![
+            two_wxs.to_str().unwrap(),
+            three_wxs.to_str().unwrap(),
+        ])));
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file.path())
+        .assert(predicate::path::exists());
+}
+
