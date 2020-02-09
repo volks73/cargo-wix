@@ -1059,7 +1059,7 @@ fn main() {
                     .arg(year.clone()))
                 .arg(Arg::with_name("INPUT")
                      .help("Path to a package's manifest (Cargo.toml) file.")
-                     .long_help("If not value is provided, then the current \
+                     .long_help("If no value is provided, then the current \
                         working directory (CWD) will be used to locate a package's \
                         manifest. An error will occur if a manifest cannot be \
                         found. A relative or absolute path to a package's manifest \
@@ -1067,7 +1067,7 @@ fn main() {
                         allowed. The creation of an installer will be relative to \
                         the specified manifest.")
                      .required(false)
-                     .multiple(true))
+                     .index(1))
                 .arg(Arg::with_name("install-version")
                     .help("A string for the Add/Remove Programs control panel's version number")
                     .long_help("Overrides the version from the package's manifest \
