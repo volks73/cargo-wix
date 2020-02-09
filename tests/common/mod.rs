@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 extern crate assert_fs;
 extern crate env_logger;
 extern crate log;
@@ -23,19 +25,17 @@ use std::io::{Read, Write};
 use std::path::Path;
 use std::process::Command;
 
-#[allow(dead_code)]
 pub const TARGET_NAME: &str = "target";
 
 // Cannot use dashes. WiX Toolset only allows A-Z, a-z, digits, underscores (_), or periods (.)
 // for attribute IDs.
-#[allow(dead_code)]
 pub const PACKAGE_NAME: &str = "cargowixtest";
 
-#[allow(dead_code)]
 pub const NO_CAPTURE_VAR_NAME: &str = "CARGO_WIX_TEST_NO_CAPTURE";
 
-#[allow(dead_code)]
 pub const PERSIST_VAR_NAME: &str = "CARGO_WIX_TEST_PERSIST";
+
+pub const MISC_NAME: &str = "misc";
 
 /// Create a new cargo project/package for a binary project in a temporary
 /// directory.
@@ -194,8 +194,9 @@ inputs = ["wix\\main.wxs"]
 pub fn create_test_package_multiple_wxs_sources() -> TempDir {
     let one_wxs = include_str!("one.wxs");
     let two_wxs = include_str!("two.wxs");
+    let three_wxs = include_str!("three.wxs");
     let package = create_test_package();
-    let mut misc_dir = package.path().join("misc");
+    let mut misc_dir = package.path().join(MISC_NAME);
     fs::create_dir(&misc_dir).unwrap();
     misc_dir.push("one.wxs");
     let mut one_wxs_handle = File::create(&misc_dir).unwrap();
@@ -204,6 +205,10 @@ pub fn create_test_package_multiple_wxs_sources() -> TempDir {
     misc_dir.push("two.wxs");
     let mut two_wxs_handle = File::create(&misc_dir).unwrap();
     two_wxs_handle.write_all(two_wxs.as_bytes()).unwrap();
+    misc_dir.pop();
+    misc_dir.push("three.wxs");
+    let mut three_wxs_handle = File::create(&misc_dir).unwrap();
+    three_wxs_handle.write_all(three_wxs.as_bytes()).unwrap();
     package
 }
 

@@ -737,13 +737,19 @@ impl Execution {
             trace!("Using the current working directory (CWD) to obtain all WXS files");
             Ok(PathBuf::from(WIX))
         }?;
-        let mut wix_sources: Vec<PathBuf> = std::fs::read_dir(project_wix_dir)?
-            .filter(|r| r.is_ok())
-            .map(|r| r.unwrap().path())
-            .filter(|p| {
-                p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
-            })
-            .collect();
+        let mut wix_sources = {
+            if project_wix_dir.exists() {
+                std::fs::read_dir(project_wix_dir)?
+                    .filter(|r| r.is_ok())
+                    .map(|r| r.unwrap().path())
+                    .filter(|p| {
+                        p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
+                    })
+                    .collect()
+            } else {
+                Vec::new()
+            }
+        };
         if let Some(paths) = self.includes.as_ref() {
             for p in paths {
                 if p.exists() {

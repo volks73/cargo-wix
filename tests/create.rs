@@ -25,7 +25,7 @@ use assert_fs::prelude::*;
 
 use predicates::prelude::*;
 
-use crate::common::{NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
+use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
 use crate::common::init_logging;
 
 use std::env;
@@ -704,13 +704,41 @@ fn input_works_outside_cwd() {
 }
 
 #[test]
-fn includes_works() {
+fn includes_works_with_wix_dir() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_wxs_sources();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
-    let one_wxs = package.path().join("misc").join("one.wxs");
-    let two_wxs = package.path().join("misc").join("two.wxs");
+    let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
+    let three_wxs = package.path().join(MISC_NAME).join("three.wxs");
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Builder::default()
+        .build()
+        .run()
+        .unwrap();
+    let result = run(Builder::default()
+        .includes(Some(vec![
+            two_wxs.to_str().unwrap(),
+            three_wxs.to_str().unwrap(),
+        ])));
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn includes_works_without_wix_dir() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package_multiple_wxs_sources();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    let one_wxs = package.path().join(MISC_NAME).join("one.wxs");
+    let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
     let result = run(Builder::default()
         .includes(Some(vec![
