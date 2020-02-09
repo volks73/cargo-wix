@@ -54,6 +54,8 @@ pub struct Builder<'a> {
     bin_path: Option<&'a str>,
     capture_output: bool,
     culture: Option<&'a str>,
+    debug_build: bool,
+    debug_name: bool,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
     locale: Option<&'a str>,
@@ -70,6 +72,8 @@ impl<'a> Builder<'a> {
             bin_path: None,
             capture_output: true,
             culture: None,
+            debug_build: false,
+            debug_name: false,
             includes: None,
             input: None,
             locale: None,
@@ -109,6 +113,34 @@ impl<'a> Builder<'a> {
     /// (Cargo.toml).
     pub fn culture(&mut self, c: Option<&'a str>) -> &mut Self {
         self.culture = c;
+        self
+    }
+
+    /// Builds the package with the Debug profile instead of the Release profile.
+    ///
+    /// See the [Cargo book] for more information about release profiles. The
+    /// default is to use the Release profile when creating the installer. This
+    /// value is ignored if the `no_build` method is set to `true`.
+    ///
+    /// [Cargo book]: https://doc.rust-lang.org/book/ch14-01-release-profiles.html
+    pub fn debug_build(&mut self, d: bool) -> &mut Self {
+        self.debug_build = d;
+        self
+    }
+
+    /// Appends `-debug` to the file stem for the installer (msi).
+    ///
+    /// If `true`, then `-debug` is added as suffix to the file stem (string
+    /// before the dot and file extension) for the installer's file name. For
+    /// example, if `true`, then file name would be
+    /// `example-0.1.0-x86_64-debug.msi`. The default is to _not_ append the
+    /// `-debug` because the Release profile is the default.
+    ///
+    /// Generally, this should be used in combination with the `debug_build`
+    /// method to indicate the installer is for a debugging variant of the
+    /// installed binary.
+    pub fn debug_name(&mut self, d: bool) -> &mut Self {
+        self.debug_name = d;
         self
     }
 
@@ -232,6 +264,8 @@ impl<'a> Builder<'a> {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             culture: self.culture.map(String::from),
+            debug_build: self.debug_build,
+            debug_name: self.debug_name,
             includes: self
                 .includes
                 .as_ref()
@@ -258,6 +292,8 @@ pub struct Execution {
     bin_path: Option<PathBuf>,
     capture_output: bool,
     culture: Option<String>,
+    debug_build: bool,
+    debug_name: bool,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
     locale: Option<PathBuf>,
@@ -274,6 +310,8 @@ impl Execution {
         debug!("bin_path = {:?}", self.bin_path);
         debug!("capture_output = {:?}", self.capture_output);
         debug!("culture = {:?}", self.culture);
+        debug!("debug_build = {:?}", self.debug_build);
+        debug!("debug_name = {:?}", self.debug_name);
         debug!("includes = {:?}", self.includes);
         debug!("input = {:?}", self.input);
         debug!("locale = {:?}", self.locale);
@@ -313,11 +351,11 @@ impl Execution {
                 builder.stdout(Stdio::null());
                 builder.stderr(Stdio::null());
             }
-            builder
-                .arg("build")
-                .arg("--release")
-                .arg("--manifest-path")
-                .arg(&manifest_path);
+            builder.arg("build");
+            if !self.debug_build {
+                builder.arg("--release");
+            }
+            builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
             let status = builder.status()?;
             if !status.success() {
@@ -638,13 +676,23 @@ impl Execution {
         platform: Platform,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let filename = &format!(
-            "{}-{}-{}.{}",
-            name,
-            version,
-            platform.arch(),
-            MSI_FILE_EXTENSION
-        );
+        let filename = if self.debug_name {
+            format!(
+                "{}-{}-{}-debug.{}",
+                name,
+                version,
+                platform.arch(),
+                MSI_FILE_EXTENSION
+            )
+        } else {
+            format!(
+                "{}-{}-{}.{}",
+                name,
+                version,
+                platform.arch(),
+                MSI_FILE_EXTENSION
+            )
+        };
         if let Some(ref path_str) = self.output {
             trace!("Using the explicitly specified output path for the MSI destination");
             let path = Path::new(path_str);
@@ -674,10 +722,7 @@ impl Execution {
                 Ok(path.to_owned())
             }
         } else if let Some(manifest_path) = &self.input {
-            trace!(
-                "Using the package's manifest (Cargo.toml) file path to specify \
-                        the MSI destination"
-            );
+            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
             // Remove the `Cargo.toml` file from the path
             manifest_path
                 .parent()

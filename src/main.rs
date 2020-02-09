@@ -998,13 +998,31 @@ fn main() {
                 .arg(Arg::with_name("culture")
                     .help("The culture code for localization")
                     .long_help("Sets the culture for localization. Use with the \
-                       '-l,--locale' option. See the WixUI localization \
-                       documentation for more information about acceptable culture \
-                       codes. The codes are case insensitive.")
+                        '-l,--locale' option. See the WixUI localization \
+                        documentation for more information about acceptable culture \
+                        codes. The codes are case insensitive.")
                     .long("culture")
                     .short("c")
                     .default_value(&default_culture)
                     .takes_value(true))
+                .arg(Arg::with_name("debug-build")
+                    .help("Builds the package using the Debug profile")
+                    .long_help("Uses the Debug profile when building the package \
+                        using Cargo. The default is to build the package using the \
+                        Release profile.")
+                    .long("dbg-build")
+                    .short("d"))
+                .arg(Arg::with_name("debug-name")
+                    .help("Appends '-debug' to the file stem of installer's file name")
+                    .long_help("Adds the '-debug' suffix to the file stem \
+                        (content before the file extension) for the installer's file \
+                        name. This should be used to indicate the binary distributed \
+                        within the installer was built using debugging information \
+                        and optimizations. Generally, this should be used in \
+                        combination with the '-d,--dbg-build' flag to build the \
+                        binary with the Debug profile.")
+                    .long("dbg-name")
+                    .short("D"))
                 .arg(Arg::with_name("include")
                     .help("Include an additional WiX Source (wxs) file")
                     .long_help("Includes a WiX source (wxs) file for a project, \
@@ -1019,11 +1037,11 @@ fn main() {
                     .version(crate_version!())
                     .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
                     .long_about("Uses a package's manifest (Cargo.toml) to generate a WiX Source (wxs) \
-                           file that can be used immediately without modification to create an \
-                           installer for the package. This will also generate an EULA in the Rich \
-                           Text Format (RTF) if the 'license' field is specified with a supported \
-                           license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
-                           the 'wix' sub-folder by default.")
+                        file that can be used immediately without modification to create an \
+                        installer for the package. This will also generate an EULA in the Rich \
+                        Text Format (RTF) if the 'license' field is specified with a supported \
+                        license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
+                        the 'wix' sub-folder by default.")
                     .arg(banner.clone())
                     .arg(binaries.clone())
                     .arg(description.clone())
@@ -1370,6 +1388,8 @@ fn main() {
             create.bin_path(matches.value_of("bin-path"));
             create.capture_output(!matches.is_present("no-capture"));
             create.culture(matches.value_of("culture"));
+            create.debug_build(matches.is_present("debug-build"));
+            create.debug_name(matches.is_present("debug-name"));
             create.includes(matches.values_of("include").map(|a| a.collect()));
             create.input(matches.value_of("INPUT"));
             create.locale(matches.value_of("locale"));
