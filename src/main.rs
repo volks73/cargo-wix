@@ -415,7 +415,7 @@
 //! ```toml
 //! [package.metadata.wix]
 //! culture = "Fr-Fr"
-//! inputs = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
+//! include = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"
 //! no-build = false
@@ -433,11 +433,17 @@
 //! version number would be for the suite and not necessarily the individual
 //! applications within the suite.
 //!
-//! Please note that unlike most of the configuration keys, the `inputs`
-//! configuration key is an [TOML array] instead of a string value. This is the
-//! same as passing multiple paths as arguments to the default _create_ subcommand
-//! or including multiple WXS files in the default, `wix`, project source
-//! location.
+//! Please note that unlike most of the fields, the `include` field is an [TOML
+//! array] instead of a string value. This is the same as passing multiple paths
+//! to the default _create_ subcommand using multiple `-I,--include` options or
+//! including multiple WXS files in the default, `wix`, project source location.
+//!
+//! The only CLI option, or argument, that is not supported in the
+//! `[package.metadata.wix]` section is the `<INPUT>` argument for the default
+//! _create_ command, which specifies a relative or absolute path to a package's
+//! manifest file. The assumption is that the package manifest (Cargo.toml) to
+//! be used for the cdefault _create_ subcommand is the same manifest that
+//! contains the `[package.metadata.wix]` section.
 //!
 //! ## Flags and Options
 //!
@@ -564,11 +570,23 @@
 //!
 //! ### `-i,--install-version`
 //!
-//! Available for the _default_ (`cargo wix`) subcommand.
+//! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Overrides the version from the package's manifest (Cargo.toml), which is
 //! used for the installer name and appears in the Add/Remove Programs (ARP)
 //! control panel.
+//!
+//! ### `-I,--include`
+//!
+//! Available only for the default _create_ (`cargo wix`) subcommand.
+//!
+//! This option can be used multiple times to include multiple WiX Source (WXS)
+//! files in the creation of an installer. The option takes a path to a single
+//! WXS file as its value. Any WXS files located in the default `wix` folder
+//! located within the package's root folder, i.e. same location as the
+//! package's manifest (Cargo.toml) are automatically included and used in the
+//! creation of the installer. This option allows the inclusion of other WXS
+//! files outside of the default `wix` location.
 //!
 //! ### `-l,--license`
 //!

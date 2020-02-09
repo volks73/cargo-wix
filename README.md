@@ -100,7 +100,7 @@ where `<TEST NAME>` is replaced with the name of an integration tests. The last 
 PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_PERSIST=1; $env:CARGO_WIX_TEST_LOG=5; $env:CARGO_WIX_TEST_NO_CAPTURE=1; 
 PS C:\Path\to\Cargo\Wix> cargo test <TEST NAME>
 PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item Env:\CARGO_WIX_TEST_LOG; Remove-Item Env:\CARGO_WIX_TEST_NO_CAPTURE
-``)`
+```
 
 ## License
 
