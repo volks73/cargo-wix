@@ -729,11 +729,11 @@ fn product_icon_works() {
 #[test]
 fn multiple_binaries_works() {
     const EXPECTED_NAME_1: &str = "main1";
-    const EXPECTED_SOURCE_1: &str = "target\\release\\main1.exe";
+    const EXPECTED_SOURCE_1: &str = "target\\$(var.Profile)\\main1.exe";
     const EXPECTED_NAME_2: &str = "main2";
-    const EXPECTED_SOURCE_2: &str = "target\\release\\main2.exe";
+    const EXPECTED_SOURCE_2: &str = "target\\$(var.Profile)\\main2.exe";
     const EXPECTED_NAME_3: &str = "main3";
-    const EXPECTED_SOURCE_3: &str = "target\\release\\main3.exe";
+    const EXPECTED_SOURCE_3: &str = "target\\$(var.Profile)\\main3.exe";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_binaries();
     env::set_current_dir(package.path()).unwrap();

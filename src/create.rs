@@ -381,6 +381,11 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
+        if debug_build {
+            compiler.arg("-dProfile=debug");
+        } else {
+            compiler.arg("-dProfile=release");
+        }
         compiler
             .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
@@ -1274,7 +1279,7 @@ mod tests {
                 .unwrap();
             assert_eq!(
                 sources,
-                vec![PathBuf::from("wix\\main.wxs"), PathBuf::from("Cargo.toml")]
+                vec![PathBuf::from("Cargo.toml")]
             );
         }
 

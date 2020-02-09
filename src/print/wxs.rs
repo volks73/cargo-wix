@@ -434,7 +434,7 @@ impl Execution {
     }
 
     fn default_binary_path(name: &str) -> String {
-        let mut path = PathBuf::from("target").join("release").join(name);
+        let mut path = PathBuf::from("target").join("$(var.Profile)").join(name);
         path.set_extension(EXE_FILE_EXTENSION);
         path.to_str()
             .map(String::from)
@@ -836,7 +836,7 @@ mod tests {
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Example"),
-                    "binary-source" => String::from("target\\release\\Example.exe")
+                    "binary-source" => String::from("target\\$(var.Profile)\\Example.exe")
                 }]
             )
         }
@@ -850,7 +850,7 @@ mod tests {
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Different"),
-                    "binary-source" => String::from("target\\release\\Different.exe")
+                    "binary-source" => String::from("target\\$(var.Profile)\\Different.exe")
                 }]
             )
         }
@@ -867,17 +867,17 @@ mod tests {
                     hashmap! {
                         "binary-index" => 0.to_string(),
                         "binary-name" => String::from("binary0"),
-                        "binary-source" => String::from("target\\release\\binary0.exe")
+                        "binary-source" => String::from("target\\$(var.Profile)\\binary0.exe")
                     },
                     hashmap! {
                         "binary-index" => 1.to_string(),
                         "binary-name" => String::from("binary1"),
-                        "binary-source" => String::from("target\\release\\binary1.exe")
+                        "binary-source" => String::from("target\\$(var.Profile)\\binary1.exe")
                     },
                     hashmap! {
                         "binary-index" => 2.to_string(),
                         "binary-name" => String::from("binary2"),
-                        "binary-source" => String::from("target\\release\\binary2.exe")
+                        "binary-source" => String::from("target\\$(var.Profile)\\binary2.exe")
                     }
                 ]
             )
