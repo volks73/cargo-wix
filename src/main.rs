@@ -1233,7 +1233,7 @@ fn main() {
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
     // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
     // level is later configured with the verbosity using the `filter` method. There are many
-    // questions related to implementing  support for environment variables:
+    // questions related to implementing support for environment variables:
     //
     // 1. What should the environment variable be called, WIX_LOG, CARGO_WIX_LOG, CARGO_LOG, etc.?
     //    WIX_LOG might conflict with a system variable that is used for the WiX Toolset. CARGO_LOG

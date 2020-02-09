@@ -82,6 +82,18 @@ C:\Path\to\Project> cargo wix -h
 
 The tests must be run using the `cargo test --all-targets -- --test-threads=1` command from the root folder of the project, i.e. the same location as the `Cargo.toml` file. The `--test-threads=1` option is needed because integration tests ran in parallel will cause many tests to fail. This is because many of the integration tests change the current working directory (CWD) to as closely as possible mimic usage by a user from within a cargo-based project. The same environment is shared across each test even though each test is essentially a separate application.
 
+There are set environment variables that can be used to help debug a failing test. The `CARGO_WIX_TEST_PERSIST` environment variable can be set to persist the temporary directories that are created during integration tests. This allows the developer to inspect the contents of the temporary directory to better understand what the test was doing. The `CARGO_WIX_TEST_PERSIST` environment variable accepts any value. Unsetting the environment variable will delete the temporary directories after each test. The `CARGO_WIX_TEST_LOG` environment variable is sets the log level while running an integration test. It accepts an integer value between 0 and 5, with 0 turning off logging, and 5 displaying all log statements (ERROR, WARN, INFO, DEBUG, and TRACE). Log statements are __not__ captured during tests, so this environment variable should be used only when running an integration test in isolation to prevent "swampping" the terminal/console with statements. Finally, the `CARGO_WIX_TEST_NO_CAPTURE` environment variable accepts any value and will display the output from the WiX Toolset compiler (candle.exe) and linker (light.exe) when running an integration test. Similar to the `CARGO_WIX_TEST_LOG` environment variable, this variable should only be used in isolation to prevent "swamping" the terminal/console with the output from the WiX Toolset commands. By default, the output is captured by the _test_ not cargo's test framework; thus, the `cargo test -- --nocapture` command has no affect. Below is a [Powershell] example of debugging a failed integration test:
+
+```powershell
+PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_PERSIST=1; $env:CARGO_WIX_TEST_LOG=5; $env:CARGO_WIX_TEST_NO_CAPTURE=1; 
+PS C:\Path\to\Cargo\Wix> cargo test <TEST NAME>
+PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item Env:\CARGO_WIX_TEST_LOG; Remove-Item Env:\CARGO_WIX_TEST_NO_CAPTURE
+```
+
+where `<TEST NAME>` is replaced with the name of an integration tests. The third line is optional and unsets the three environment variables to avoid additional tests from also persisting, logging, and dumping output to the terminal/console. Note, the `-- --nocapture` option is _not_ needed to display the logging statements or the output from the WiX Toolset compiler (candle.exe) and linker (light.exe).
+
+[Powershell]: https://docs.microsoft.com/en-us/powershell/
+
 ## License
 
 The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/master/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/master/LICENSE-APACHE) files for more information about licensing and copyright.

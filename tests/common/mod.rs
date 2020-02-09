@@ -1,4 +1,6 @@
 extern crate assert_fs;
+extern crate env_logger;
+extern crate log;
 extern crate sxd_document;
 extern crate sxd_xpath;
 
@@ -6,7 +8,15 @@ use assert_fs::prelude::*;
 
 use self::sxd_document::parser;
 use self::sxd_xpath::{Context, Factory};
+
 use assert_fs::TempDir;
+
+use env_logger::fmt::Color as LogColor;
+use env_logger::Builder;
+
+use log::{Level, LevelFilter};
+
+use std::env;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
@@ -20,6 +30,12 @@ pub const TARGET_NAME: &str = "target";
 // for attribute IDs.
 #[allow(dead_code)]
 pub const PACKAGE_NAME: &str = "cargowixtest";
+
+#[allow(dead_code)]
+pub const NO_CAPTURE_VAR_NAME: &str = "CARGO_WIX_TEST_NO_CAPTURE";
+
+#[allow(dead_code)]
+pub const PERSIST_VAR_NAME: &str = "CARGO_WIX_TEST_PERSIST";
 
 /// Create a new cargo project/package for a binary project in a temporary
 /// directory.
@@ -57,7 +73,7 @@ pub fn create_test_package() -> TempDir {
         .status()
         .expect("Creation of test Cargo package");
     assert!(cargo_init_status.success());
-    temp_dir
+    temp_dir.persist_if(env::var(PERSIST_VAR_NAME).is_ok())
 }
 
 /// Create a new cargo project/package for a project with multiple binaries in a
@@ -215,3 +231,91 @@ pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
         .unwrap()
         .string()
 }
+
+/// Initializes the logging for the integration tests.
+///
+/// When a test fails, it is useful to re-run the tests with logging statements
+/// enabled to debug the failed test. This initializes the logging based on the
+/// `CARGO_WIX_TEST_LOG` environment variable, which takes an integer as a
+/// value. A `0` value, or not setting the environment variable, turns off
+/// logging. Each increment of the integer value will increase the number of
+/// statements that are logged up to 5 (Trace).
+///
+/// If the `CARGO_WIX_TEST_LOG` value is greater than zero (0), then log
+/// statements will be emitted to the terminal/console regardless of the
+/// `--nocapture` option for cargo tests. In other words, log statements are
+/// *not* captured by cargo's testing framework with this implementation. Thus,
+/// it is recommended to *not* activate logging if running all of the tests.
+/// Logging should be done for isolated tests. Not capturing the log statements
+/// by cargo's test framework keeps the formatting and coloring. There might be
+/// a decrease in performance as well.
+///
+/// Log statements are formated the same as the verbosity format for the CLI.
+///
+/// # Examples
+///
+/// Enabling logging for tests in Powershell requires two commands and an
+/// optional third command to undo:
+///
+/// ```powershell
+/// PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_LOG=5
+/// PS C:\Path\to\Cargo\Wix> cargo test
+/// PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_LOG
+/// ```
+///
+/// This can be collapsed into a single line as:
+///
+/// ```powershell
+/// PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_LOG=5; cargo test; Remove-Item Env:\CARGO_WIX_TEST_LOG
+/// ```
+///
+/// But again, logging should only be activated for isolated tests to avoid
+/// relatively large number of statements being written:
+///
+/// ```powershell
+/// PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_LOG=5; cargo test <TEST_NAME>; Remove-Item Env:\CARGO_WIX_TEST_LOG
+/// ```
+///
+/// where `<TEST_NAME>` is the name of a test, a.k.a. function name with the `#[test]` attribute.
+#[allow(dead_code)]
+pub fn init_logging() {
+    let log_level = match std::env::var("CARGO_WIX_TEST_LOG") {
+        Ok(level) => level.parse::<i32>().expect("Integer for CARGO_WIX_TEST_LOG value"),
+        Err(_) => 0
+    };
+    let mut builder = Builder::new();
+    builder
+        .format(|buf, record| {
+            // This implmentation for a format is copied from the default format implemented for the
+            // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
+            // message and change the colors to match the previous colors used by the `loggerv` crate.
+            let mut level_style = buf.style();
+            let level = record.level();
+            match level {
+                // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
+                // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
+                // same white color.
+                Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
+                Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
+                Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
+                Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
+                Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+            };
+            let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+            let write_args = writeln!(buf, "{}", record.args());
+            write_level.and(write_args)
+        })
+        .filter(
+            Some("wix"),
+            match log_level {
+                0 => LevelFilter::Off,
+                1 => LevelFilter::Error,
+                2 => LevelFilter::Warn,
+                3 => LevelFilter::Info,
+                4 => LevelFilter::Debug,
+                _ => LevelFilter::Trace,
+            },
+        )
+        .init();
+}
+

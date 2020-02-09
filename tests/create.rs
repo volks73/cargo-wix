@@ -22,17 +22,22 @@ extern crate wix;
 mod common;
 
 use assert_fs::prelude::*;
+
 use predicates::prelude::*;
 
-use crate::common::{PACKAGE_NAME, TARGET_NAME};
+use crate::common::{NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
+use crate::common::init_logging;
+
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
+
 use toml::Value;
-use wix::create::{Builder, Execution};
+
+use wix::create::Builder;
 use wix::initialize;
-use wix::{CARGO_MANIFEST_FILE, WIX};
+use wix::{CARGO_MANIFEST_FILE, Result, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {
@@ -42,14 +47,19 @@ lazy_static! {
     };
 }
 
+fn run(b: &mut Builder) -> Result<()> {
+    b.capture_output(!env::var(NO_CAPTURE_VAR_NAME).is_ok()).build().run()
+}
+
 #[test]
 fn default_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -62,12 +72,13 @@ fn default_works() {
 
 #[test]
 fn metadata_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_metadata();
     let expected_msi_file = TARGET_WIX_DIR.join("Metadata-2.1.0-x86_64.msi");
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -80,6 +91,7 @@ fn metadata_works() {
 
 #[test]
 fn output_trailing_forwardslash_works() {
+    init_logging();
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let output_dir_str = format!("{}/", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
@@ -87,10 +99,7 @@ fn output_trailing_forwardslash_works() {
     let expected_msi_file = output_dir.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Builder::new()
-        .output(Some(output_dir_str.as_str()))
-        .build()
-        .run();
+    let result = run(Builder::default().output(Some(output_dir_str.as_str())));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -103,6 +112,7 @@ fn output_trailing_forwardslash_works() {
 
 #[test]
 fn output_trailing_backslash_works() {
+    init_logging();
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let output_dir_str = format!("{}\\", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
@@ -110,10 +120,7 @@ fn output_trailing_backslash_works() {
     let expected_msi_file = output_dir.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Builder::new()
-        .output(Some(output_dir_str.as_str()))
-        .build()
-        .run();
+    let result = run(Builder::default().output(Some(output_dir_str.as_str())));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -126,6 +133,7 @@ fn output_trailing_backslash_works() {
 
 #[test]
 fn output_existing_dir_works() {
+    init_logging();
     let output_dir = PathBuf::from("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -133,7 +141,7 @@ fn output_existing_dir_works() {
     env::set_current_dir(package.path()).unwrap();
     fs::create_dir(&output_dir).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Builder::new().output(output_dir.to_str()).build().run();
+    let result = run(Builder::default().output(output_dir.to_str()));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -146,6 +154,7 @@ fn output_existing_dir_works() {
 
 #[test]
 fn output_file_without_extension_works() {
+    init_logging();
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -153,7 +162,7 @@ fn output_file_without_extension_works() {
     let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Builder::new().output(output_file.to_str()).build().run();
+    let result = run(Builder::default().output(output_file.to_str()));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -166,16 +175,14 @@ fn output_file_without_extension_works() {
 
 #[test]
 fn output_file_with_extension_works() {
+    init_logging();
     let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = Builder::new()
-        .output(expected_msi_file.to_str())
-        .build()
-        .run();
+    let result = run(Builder::default().output(expected_msi_file.to_str()));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -188,6 +195,7 @@ fn output_file_with_extension_works() {
 
 #[test]
 fn init_with_package_section_fields_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -234,7 +242,7 @@ fn init_with_package_section_fields_works() {
         cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
     }
     initialize::Execution::default().run().unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -247,6 +255,7 @@ fn init_with_package_section_fields_works() {
 
 #[test]
 fn init_with_all_options_works() {
+    init_logging();
     const LICENSE_FILE: &str = "License_Example.txt";
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -293,7 +302,7 @@ fn init_with_all_options_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -306,6 +315,7 @@ fn init_with_all_options_works() {
 
 #[test]
 fn init_with_banner_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -320,7 +330,7 @@ fn init_with_banner_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -333,6 +343,7 @@ fn init_with_banner_option_works() {
 
 #[test]
 fn init_with_binaries_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -347,7 +358,7 @@ fn init_with_binaries_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -360,12 +371,13 @@ fn init_with_binaries_option_works() {
 
 #[test]
 fn init_with_multiple_binaries_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_binaries();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::new().build().run().unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -378,6 +390,7 @@ fn init_with_multiple_binaries_works() {
 
 #[test]
 fn init_with_description_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -387,7 +400,7 @@ fn init_with_description_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -400,6 +413,7 @@ fn init_with_description_option_works() {
 
 #[test]
 fn init_with_dialog_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -414,7 +428,7 @@ fn init_with_dialog_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -427,6 +441,7 @@ fn init_with_dialog_option_works() {
 
 #[test]
 fn init_with_eula_in_cwd_works() {
+    init_logging();
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -441,7 +456,7 @@ fn init_with_eula_in_cwd_works() {
         .build()
         .run()
         .expect("Initialization");
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -454,6 +469,7 @@ fn init_with_eula_in_cwd_works() {
 
 #[test]
 fn init_with_eula_in_docs_works() {
+    init_logging();
     const EULA_FILE: &str = "Eula_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -470,7 +486,7 @@ fn init_with_eula_in_docs_works() {
         .build()
         .run()
         .expect("Initialization");
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -483,6 +499,7 @@ fn init_with_eula_in_docs_works() {
 
 #[test]
 fn init_with_help_url_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -492,7 +509,7 @@ fn init_with_help_url_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -505,6 +522,7 @@ fn init_with_help_url_option_works() {
 
 #[test]
 fn init_with_license_in_cwd_works() {
+    init_logging();
     const LICENSE_FILE: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -519,7 +537,7 @@ fn init_with_license_in_cwd_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -532,6 +550,7 @@ fn init_with_license_in_cwd_works() {
 
 #[test]
 fn init_with_license_in_docs_works() {
+    init_logging();
     const EULA_FILE: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -548,7 +567,7 @@ fn init_with_license_in_docs_works() {
         .build()
         .run()
         .expect("Initialization");
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -561,6 +580,7 @@ fn init_with_license_in_docs_works() {
 
 #[test]
 fn init_with_manufacturer_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -570,7 +590,7 @@ fn init_with_manufacturer_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -583,6 +603,7 @@ fn init_with_manufacturer_option_works() {
 
 #[test]
 fn init_with_product_icon_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -597,7 +618,7 @@ fn init_with_product_icon_option_works() {
         .build()
         .run()
         .unwrap();
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -610,6 +631,7 @@ fn init_with_product_icon_option_works() {
 
 #[test]
 fn init_with_product_name_option_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
@@ -624,7 +646,7 @@ fn init_with_product_name_option_works() {
     let mut wxs_content = String::new();
     wxs_handle.read_to_string(&mut wxs_content).unwrap();
     println!("{}", wxs_content);
-    let result = Execution::default().run();
+    let result = run(&mut Builder::default());
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -637,12 +659,10 @@ fn init_with_product_name_option_works() {
 
 #[test]
 fn input_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let output = package.path().join("assets").join("windows");
-    fs::create_dir(output.parent().unwrap()).unwrap();
-    fs::create_dir(&output).unwrap();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     let mut toml: Value = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
@@ -686,14 +706,10 @@ fn input_works() {
     }
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::default()
-        .output(output.to_str())
         .build()
         .run()
         .unwrap();
-    let result = Builder::default()
-        .input(package_manifest.path().to_str())
-        .build()
-        .run();
+    let result = run(Builder::default().input(package_manifest.path().to_str()));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -706,19 +722,18 @@ fn input_works() {
 
 #[test]
 fn includes_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_wxs_sources();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     let one_wxs = package.path().join("misc").join("one.wxs");
     let two_wxs = package.path().join("misc").join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
-    let result = Builder::default()
+    let result = run(Builder::default()
         .includes(Some(vec![
             one_wxs.to_str().unwrap(),
             two_wxs.to_str().unwrap(),
-        ]))
-        .build()
-        .run();
+        ])));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package

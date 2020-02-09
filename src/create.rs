@@ -667,11 +667,7 @@ impl Execution {
                 // Remove the `Cargo.toml` file from the path
                 manifest_path.parent().ok_or(Error::Generic(format!(
                     "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-                ))).map(|d| {
-                    let mut dst = PathBuf::from(d);
-                    dst.push(TARGET_FOLDER_NAME);
-                    dst
-                })
+                ))).map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME).join(WIX).join(filename))
             } else {
                 trace!("Using the current working directory (CWD) to build the WiX object files destination");
                 Ok(PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename))
@@ -686,11 +682,7 @@ impl Execution {
             // Remove the `Cargo.toml` file from the path
             manifest_path.parent().ok_or(Error::Generic(format!(
                 "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-            ))).map(|d| {
-                let mut dst = PathBuf::from(d);
-                dst.push(TARGET_FOLDER_NAME);
-                dst
-            })
+            ))).map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME))
         } else {
             trace!("Using the current working directory (CWD) to build the WiX object files destination");
             Ok(PathBuf::from(TARGET_FOLDER_NAME))
@@ -727,11 +719,7 @@ impl Execution {
             trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
             manifest_path.parent().ok_or(Error::Generic(format!(
                 "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-            ))).map(|d| {
-                let mut dst = PathBuf::from(d);
-                dst.push(WIX);
-                dst
-            })
+            ))).map(|d| PathBuf::from(d).join(WIX))
         } else {
             trace!("Using the current working directory (CWD) to obtain all WXS files");
             Ok(PathBuf::from(WIX))
