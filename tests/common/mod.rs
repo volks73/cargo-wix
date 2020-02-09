@@ -321,6 +321,6 @@ pub fn init_logging() {
                 _ => LevelFilter::Trace,
             },
         )
-        .init();
+        .try_init().ok();
 }
 
