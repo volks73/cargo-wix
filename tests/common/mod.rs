@@ -285,8 +285,10 @@ pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
 #[allow(dead_code)]
 pub fn init_logging() {
     let log_level = match std::env::var("CARGO_WIX_TEST_LOG") {
-        Ok(level) => level.parse::<i32>().expect("Integer for CARGO_WIX_TEST_LOG value"),
-        Err(_) => 0
+        Ok(level) => level
+            .parse::<i32>()
+            .expect("Integer for CARGO_WIX_TEST_LOG value"),
+        Err(_) => 0,
     };
     let mut builder = Builder::new();
     builder
@@ -321,6 +323,6 @@ pub fn init_logging() {
                 _ => LevelFilter::Trace,
             },
         )
-        .try_init().ok();
+        .try_init()
+        .ok();
 }
-

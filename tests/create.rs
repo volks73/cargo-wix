@@ -25,8 +25,8 @@ use assert_fs::prelude::*;
 
 use predicates::prelude::*;
 
-use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
 use crate::common::init_logging;
+use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
 
 use std::env;
 use std::fs::{self, File};
@@ -37,7 +37,7 @@ use toml::Value;
 
 use wix::create::Builder;
 use wix::initialize;
-use wix::{CARGO_MANIFEST_FILE, Result, WIX};
+use wix::{Result, CARGO_MANIFEST_FILE, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {
@@ -50,7 +50,9 @@ lazy_static! {
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
-    b.capture_output(!env::var(NO_CAPTURE_VAR_NAME).is_ok()).build().run()
+    b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
+        .build()
+        .run()
 }
 
 #[test]
@@ -667,10 +669,7 @@ fn input_works_inside_cwd() {
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
-    initialize::Builder::default()
-        .build()
-        .run()
-        .unwrap();
+    initialize::Builder::default().build().run().unwrap();
     let result = run(Builder::default().input(package_manifest.path().to_str()));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
@@ -687,7 +686,8 @@ fn input_works_outside_cwd() {
     init_logging();
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let expected_msi_file = package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
+    let expected_msi_file =
+        package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
     initialize::Builder::default()
         .input(package_manifest.path().to_str())
         .build()
@@ -712,15 +712,11 @@ fn includes_works_with_wix_dir() {
     let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
     let three_wxs = package.path().join(MISC_NAME).join("three.wxs");
     env::set_current_dir(package.path()).unwrap();
-    initialize::Builder::default()
-        .build()
-        .run()
-        .unwrap();
-    let result = run(Builder::default()
-        .includes(Some(vec![
-            two_wxs.to_str().unwrap(),
-            three_wxs.to_str().unwrap(),
-        ])));
+    initialize::Builder::default().build().run().unwrap();
+    let result = run(Builder::default().includes(Some(vec![
+        two_wxs.to_str().unwrap(),
+        three_wxs.to_str().unwrap(),
+    ])));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -740,11 +736,10 @@ fn includes_works_without_wix_dir() {
     let one_wxs = package.path().join(MISC_NAME).join("one.wxs");
     let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
-    let result = run(Builder::default()
-        .includes(Some(vec![
-            one_wxs.to_str().unwrap(),
-            two_wxs.to_str().unwrap(),
-        ])));
+    let result = run(Builder::default().includes(Some(vec![
+        one_wxs.to_str().unwrap(),
+        two_wxs.to_str().unwrap(),
+    ])));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -760,7 +755,8 @@ fn includes_works_with_input_outside_cwd() {
     init_logging();
     let package = common::create_test_package_multiple_wxs_sources();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let expected_msi_file = package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
+    let expected_msi_file =
+        package.child(TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME)));
     let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
     let three_wxs = package.path().join(MISC_NAME).join("three.wxs");
     env::set_current_dir(package.path()).unwrap();
@@ -783,4 +779,3 @@ fn includes_works_with_input_outside_cwd() {
         .child(expected_msi_file.path())
         .assert(predicate::path::exists());
 }
-

@@ -313,7 +313,8 @@ impl Execution {
                 builder.stdout(Stdio::null());
                 builder.stderr(Stdio::null());
             }
-            builder.arg("build")
+            builder
+                .arg("build")
                 .arg("--release")
                 .arg("--manifest-path")
                 .arg(&manifest_path);
@@ -372,11 +373,9 @@ impl Execution {
         debug!("linker = {:?}", linker);
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
-        let base_path = manifest_path
-            .parent()
-            .ok_or(Error::Generic(String::from(
-                "The base path for the linker is invalid"
-            )))?;
+        let base_path = manifest_path.parent().ok_or_else(|| {
+            Error::Generic(String::from("The base path for the linker is invalid"))
+        })?;
         debug!("base_path = {:?}", base_path);
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_LINKER);
@@ -674,29 +673,48 @@ impl Execution {
             } else {
                 Ok(path.to_owned())
             }
+        } else if let Some(manifest_path) = &self.input {
+            trace!(
+                "Using the package's manifest (Cargo.toml) file path to specify \
+                        the MSI destination"
+            );
+            // Remove the `Cargo.toml` file from the path
+            manifest_path
+                .parent()
+                .ok_or_else(|| {
+                    Error::Generic(format!(
+                        "The '{}' path for the package's manifest file is invalid",
+                        manifest_path.display()
+                    ))
+                })
+                .map(|d| {
+                    PathBuf::from(d)
+                        .join(TARGET_FOLDER_NAME)
+                        .join(WIX)
+                        .join(filename)
+                })
         } else {
-            if let Some(manifest_path) = &self.input {
-                trace!("Using the package's manifest (Cargo.toml) file path to specify \
-                        the MSI destination");
-                // Remove the `Cargo.toml` file from the path
-                manifest_path.parent().ok_or(Error::Generic(format!(
-                    "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-                ))).map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME).join(WIX).join(filename))
-            } else {
-                trace!("Using the current working directory (CWD) to build the WiX object files destination");
-                Ok(PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename))
-            }
+            trace!("Using the current working directory (CWD) to build the WiX object files destination");
+            Ok(PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename))
         }
     }
 
     fn wixobj_destination(&self) -> Result<PathBuf> {
         let mut dst = if let Some(manifest_path) = &self.input {
-            trace!("Using the package's manifest (Cargo.toml) file path to build \
-                the Wix object files destination");
+            trace!(
+                "Using the package's manifest (Cargo.toml) file path to build \
+                the Wix object files destination"
+            );
             // Remove the `Cargo.toml` file from the path
-            manifest_path.parent().ok_or(Error::Generic(format!(
-                "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-            ))).map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME))
+            manifest_path
+                .parent()
+                .ok_or_else(|| {
+                    Error::Generic(format!(
+                        "The '{}' path for the package's manifest file is invalid",
+                        manifest_path.display()
+                    ))
+                })
+                .map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME))
         } else {
             trace!("Using the current working directory (CWD) to build the WiX object files destination");
             Ok(PathBuf::from(TARGET_FOLDER_NAME))
@@ -731,9 +749,15 @@ impl Execution {
     fn wxs_sources(&self, manifest: &Value) -> Result<Vec<PathBuf>> {
         let project_wix_dir = if let Some(manifest_path) = &self.input {
             trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
-            manifest_path.parent().ok_or(Error::Generic(format!(
-                "The '{}' path for the package's manifest file is invalid", manifest_path.display()
-            ))).map(|d| PathBuf::from(d).join(WIX))
+            manifest_path
+                .parent()
+                .ok_or_else(|| {
+                    Error::Generic(format!(
+                        "The '{}' path for the package's manifest file is invalid",
+                        manifest_path.display()
+                    ))
+                })
+                .map(|d| PathBuf::from(d).join(WIX))
         } else {
             trace!("Using the current working directory (CWD) to obtain all WXS files");
             Ok(PathBuf::from(WIX))
@@ -1000,7 +1024,10 @@ mod tests {
             );
             assert!(!execution.capture_output);
             assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
-            assert_eq!(execution.includes, Some(vec![PathBuf::from(EXPECTED_INCLUDES)]));
+            assert_eq!(
+                execution.includes,
+                Some(vec![PathBuf::from(EXPECTED_INCLUDES)])
+            );
             assert_eq!(execution.input, Some(PathBuf::from(EXPECTED_INPUT)));
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
@@ -1089,12 +1116,14 @@ mod tests {
                 output = "target/wix/test.msi"
             "#;
             let execution = Execution::default();
-            let output = execution.msi_destination(
-                "Different",
-                &"2.1.0".parse::<Version>().unwrap(),
-                Platform::X64,
-                &PKG_META_WIX.parse::<Value>().unwrap(),
-            ).unwrap();
+            let output = execution
+                .msi_destination(
+                    "Different",
+                    &"2.1.0".parse::<Version>().unwrap(),
+                    Platform::X64,
+                    &PKG_META_WIX.parse::<Value>().unwrap(),
+                )
+                .unwrap();
             assert_eq!(output, PathBuf::from("target/wix/test.msi"));
         }
 
@@ -1108,7 +1137,10 @@ mod tests {
             let sources = execution
                 .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
-            assert_eq!(sources, vec![PathBuf::from("wix\\main.wxs"), PathBuf::from("Cargo.toml")]);
+            assert_eq!(
+                sources,
+                vec![PathBuf::from("wix\\main.wxs"), PathBuf::from("Cargo.toml")]
+            );
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
