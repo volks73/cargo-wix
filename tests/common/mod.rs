@@ -58,7 +58,6 @@ pub const MISC_NAME: &str = "misc";
 ///
 /// This will panic if a temporary directory fails to be created or if cargo
 /// fails to create the project/package.
-#[allow(dead_code)]
 pub fn create_test_package() -> TempDir {
     let temp_dir = TempDir::new().unwrap();
     let cargo_init_status = Command::new("cargo")
@@ -95,7 +94,6 @@ pub fn create_test_package() -> TempDir {
 ///
 /// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
 /// project layout for multiple binaries.
-#[allow(dead_code)]
 pub fn create_test_package_multiple_binaries() -> TempDir {
     let package = create_test_package();
     let package_manifest = package.child("Cargo.toml");
@@ -157,7 +155,6 @@ path = "src/main3.rs"
 ///
 /// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
 /// project layout for multiple binaries.
-#[allow(dead_code)]
 pub fn create_test_package_metadata() -> TempDir {
     let package = create_test_package();
     let package_manifest = package.child("Cargo.toml");
@@ -190,7 +187,6 @@ inputs = ["wix\\main.wxs"]
 /// project layout for multiple binaries.
 ///
 /// This function will panic if the `wix` sub-folder could not be created.
-#[allow(dead_code)]
 pub fn create_test_package_multiple_wxs_sources() -> TempDir {
     let one_wxs = include_str!("one.wxs");
     let two_wxs = include_str!("two.wxs");
@@ -220,7 +216,6 @@ pub fn create_test_package_multiple_wxs_sources() -> TempDir {
 /// prefix.
 ///
 /// All values are currently returned as strings.
-#[allow(dead_code)]
 pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
     let mut wxs = File::open(wxs).expect("Open Wix Source file");
     let mut wxs_content = String::new();
@@ -282,7 +277,6 @@ pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
 /// ```
 ///
 /// where `<TEST_NAME>` is the name of a test, a.k.a. function name with the `#[test]` attribute.
-#[allow(dead_code)]
 pub fn init_logging() {
     let log_level = match std::env::var("CARGO_WIX_TEST_LOG") {
         Ok(level) => level
