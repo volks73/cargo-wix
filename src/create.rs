@@ -287,9 +287,10 @@ impl<'a> Builder<'a> {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
-            compiler_args: self.compiler_args
+            compiler_args: self
+                .compiler_args
                 .as_ref()
-                .map(|c| c.iter().map(|s| s.to_string()).collect()),
+                .map(|c| c.iter().map(|s| (*s).to_string()).collect()),
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
             debug_name: self.debug_name,
@@ -298,9 +299,10 @@ impl<'a> Builder<'a> {
                 .as_ref()
                 .map(|v| v.iter().map(&PathBuf::from).collect()),
             input: self.input.map(PathBuf::from),
-            linker_args: self.linker_args
+            linker_args: self
+                .linker_args
                 .as_ref()
-                .map(|l| l.iter().map(|s| s.to_string()).collect()),
+                .map(|l| l.iter().map(|s| (*s).to_string()).collect()),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,

@@ -864,7 +864,7 @@ fn linker_args_flags_only_works() {
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::default().build().run().unwrap();
-    let result = run(Builder::default().compiler_args(Some(vec!["-nologo", "-wx"])));
+    let result = run(Builder::default().linker_args(Some(vec!["-nologo", "-wx"])));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
