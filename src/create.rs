@@ -646,7 +646,8 @@ impl Execution {
                 a.iter()
                     .map(|s| s.as_str().map(String::from).unwrap())
                     .collect::<Vec<String>>()
-            }).or(self.compiler_args.to_owned())
+            })
+            .or_else(|| self.compiler_args.to_owned())
     }
 
     fn linker_args(&self, manifest: &Value) -> Option<Vec<String>> {
@@ -663,7 +664,8 @@ impl Execution {
                 a.iter()
                     .map(|s| s.as_str().map(String::from).unwrap())
                     .collect::<Vec<String>>()
-            }).or(self.linker_args.to_owned())
+            })
+            .or_else(|| self.linker_args.to_owned())
     }
 
     fn culture(&self, manifest: &Value) -> Result<Cultures> {
@@ -1418,9 +1420,11 @@ mod tests {
                 compiler-args = ["-nologo", "-ws"]
             "#;
             let execution = Execution::default();
-            let args = execution
-                .compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
-            assert_eq!(args, Some(vec![String::from("-nologo"), String::from("-ws")]));
+            let args = execution.compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(
+                args,
+                Some(vec![String::from("-nologo"), String::from("-ws")])
+            );
         }
 
         #[test]
@@ -1430,9 +1434,11 @@ mod tests {
                 linker-args = ["-nologo", "-ws"]
             "#;
             let execution = Execution::default();
-            let args = execution
-                .linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
-            assert_eq!(args, Some(vec![String::from("-nologo"), String::from("-ws")]));
+            let args = execution.linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(
+                args,
+                Some(vec![String::from("-nologo"), String::from("-ws")])
+            );
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;

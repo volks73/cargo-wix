@@ -414,10 +414,12 @@
 //!
 //! ```toml
 //! [package.metadata.wix]
+//! compiler-args = ["-nologo", "-wn"]
 //! culture = "Fr-Fr"
 //! dbg-build = false
 //! dbg-name = false
 //! include = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
+//! linker-args = ["-nologo"]
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"
 //! no-build = false
@@ -507,6 +509,18 @@
 //! include in the installer. The value is a path to a binary file. The file
 //! stem (file name without extension) is used as the binary name within the WXS
 //! file. A relative or absolute path is acceptable.
+//!
+//! ### `-C,--compiler-arg`
+//!
+//! Available for the default _create (`cargo wix`) subcommand.
+//!
+//! Appends an argument to the WiX compiler (candle.exe) invocation. This
+//! provides a mechanism for "passing" arguments to the compiler. This can be called
+//! multiple times to pass multiple arguments (flags or options). Note, if it is an
+//! option, i.e. argument with an accompanying value, then the value must be passed
+//! as a separate usage of this option. For example, adding an user-defined compiler
+//! extension would require the following command `cargo wix -C -ext -C
+//! UserDefinedExtension` to yield a `candle -ext UserDefinedExtension` invocation.
 //!
 //! ### `-c,--culture`
 //!
@@ -625,6 +639,19 @@
 //! along side the `bin` folder. A file containing the license, such as a TXT,
 //! PDF, or RTF file, can be added later by directly editing the generated WiX
 //! Source file (WXS) in a text editor.
+//!
+//! ### `-L,--linker-arg`
+//!
+//! Available for the default _create (`cargo wix`) subcommand.
+//!
+//! Appends an argument to the WiX linker (light.exe) invocation. This provides
+//! a mechanism for "passing" arguments to the linker. This can be called
+//! multiple times to pass multiple arguments (flags or options). Note, if it is
+//! an option, i.e. argument with an accompanying value, then the value must be
+//! passed as a separate usage of this option. For example, adding an
+//! user-defined linker extension would require the following command `cargo wix
+//! -L -ext -L UserDefinedExtension` to yield a `light -ext
+//! UserDefinedExtension` invocation.
 //!
 //! ### `-l,--locale`
 //!
