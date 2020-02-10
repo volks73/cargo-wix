@@ -362,8 +362,12 @@ impl Execution {
         debug!("name = {:?}", name);
         let version = self.version(&manifest)?;
         debug!("version = {:?}", version);
+        let compiler_args = self.compiler_args(&manifest);
+        debug!("compiler_args = {:?}", compiler_args);
         let culture = self.culture(&manifest)?;
         debug!("culture = {:?}", culture);
+        let linker_args = self.linker_args(&manifest);
+        debug!("linker_args = {:?}", linker_args);
         let locale = self.locale(&manifest)?;
         debug!("locale = {:?}", locale);
         let platform = self.platform();
@@ -430,7 +434,7 @@ impl Execution {
             .arg("WixUtilExtension")
             .arg("-o")
             .arg(&wixobj_destination);
-        if let Some(args) = &self.compiler_args {
+        if let Some(args) = &compiler_args {
             trace!("Appending compiler arguments");
             compiler.args(args);
         }
@@ -487,7 +491,7 @@ impl Execution {
             .arg(&msi_destination)
             .arg("-b")
             .arg(&base_path);
-        if let Some(args) = &self.linker_args {
+        if let Some(args) = &linker_args {
             trace!("Appending linker arguments");
             linker.args(args);
         }
@@ -626,6 +630,40 @@ impl Execution {
         } else {
             false
         }
+    }
+
+    fn compiler_args(&self, manifest: &Value) -> Option<Vec<String>> {
+        manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
+            .and_then(|t| t.get("compiler-args"))
+            .and_then(|i| i.as_array())
+            .map(|a| {
+                a.iter()
+                    .map(|s| s.as_str().map(String::from).unwrap())
+                    .collect::<Vec<String>>()
+            }).or(self.compiler_args.to_owned())
+    }
+
+    fn linker_args(&self, manifest: &Value) -> Option<Vec<String>> {
+        manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
+            .and_then(|t| t.get("linker-args"))
+            .and_then(|i| i.as_array())
+            .map(|a| {
+                a.iter()
+                    .map(|s| s.as_str().map(String::from).unwrap())
+                    .collect::<Vec<String>>()
+            }).or(self.linker_args.to_owned())
     }
 
     fn culture(&self, manifest: &Value) -> Result<Cultures> {
@@ -1371,6 +1409,30 @@ mod tests {
                 .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
             assert_eq!(sources, vec![PathBuf::from("Cargo.toml")]);
+        }
+
+        #[test]
+        fn compiler_args_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                compiler-args = ["-nologo", "-ws"]
+            "#;
+            let execution = Execution::default();
+            let args = execution
+                .compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(args, Some(vec![String::from("-nologo"), String::from("-ws")]));
+        }
+
+        #[test]
+        fn linker_args_metadata_works() {
+            const PKG_META_WIX: &str = r#"
+                [package.metadata.wix]
+                linker-args = ["-nologo", "-ws"]
+            "#;
+            let execution = Execution::default();
+            let args = execution
+                .linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(args, Some(vec![String::from("-nologo"), String::from("-ws")]));
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
