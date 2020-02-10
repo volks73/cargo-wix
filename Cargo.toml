@@ -11,6 +11,7 @@ keywords = ["cargo-subcommand", "installer", "wix-toolset", "wix"]
 homepage = "https://github.com/volks73/cargo-wix"
 readme = "README.md"
 edition = "2018"
+exclude = ["/.travis.yml"]
 
 [[bin]]
 name = "cargo-wix"
@@ -41,4 +42,9 @@ sxd-xpath = "0.4"
 version = "2"
 default-features = false
 features = ["suggestions", "vec_map"]
+
+[badges]
+travis-ci = { repository = "volks73/cargo-wix" }
+is-it-maintained-issue-resolution = { respository = "volks73/cargo-wix" }
+is-it-maintained-open-issues = { respository = "volks73/cargo-wix" }
 
