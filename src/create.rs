@@ -340,7 +340,8 @@ impl Execution {
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let msi_destination = self.msi_destination(&name, &version, platform, debug_name, &manifest)?;
+        let msi_destination =
+            self.msi_destination(&name, &version, platform, debug_name, &manifest)?;
         debug!("msi_destination = {:?}", msi_destination);
         let no_build = self.no_build(&manifest);
         debug!("no_build = {:?}", no_build);
@@ -1277,10 +1278,7 @@ mod tests {
             let sources = execution
                 .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
                 .unwrap();
-            assert_eq!(
-                sources,
-                vec![PathBuf::from("Cargo.toml")]
-            );
+            assert_eq!(sources, vec![PathBuf::from("Cargo.toml")]);
         }
 
         const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
