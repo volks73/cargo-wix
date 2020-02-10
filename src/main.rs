@@ -1030,6 +1030,18 @@ fn main() {
                     .short("c")
                     .default_value(&default_culture)
                     .takes_value(true))
+                .arg(Arg::with_name("compiler-arg")
+                    .help("Send an argument to the WiX compiler (candle.exe)")
+                    .long_help("Appends the argument to the command that is \
+                        invoked when linking an installer. This is the same as \
+                        manually typing the option or flag for the linker at the \
+                        command line. If the argument is for an option with a value, \
+                        the option's value must be passed as a separate call of this \
+                        option. For example, '-C -ext -C WixUtilExtension'.")
+                    .long("compiler-arg")
+                    .short("C")
+                    .takes_value(true)
+                    .multiple(true))
                 .arg(Arg::with_name("debug-build")
                     .help("Builds the package using the Debug profile")
                     .long_help("Uses the Debug profile when building the package \
@@ -1119,6 +1131,18 @@ fn main() {
                     .long("install-version")
                     .short("i")
                     .takes_value(true))
+                .arg(Arg::with_name("linker-arg")
+                    .help("Send an argument to the WiX linker (light.exe)")
+                    .long_help("Appends the argument to the command that is \
+                        invoked when linking an installer. This is the same as \
+                        manually typing the option or flag for the linker at the \
+                        command line. If the argument is for an option with a value, \
+                        the option's value must be passed as a separate call of this \
+                        option. For example, '-L -ext -L WixUIExtension'.")
+                    .long("linker-arg")
+                    .short("L")
+                    .takes_value(true)
+                    .multiple(true))
                 .arg(Arg::with_name("locale")
                     .help("A path to a WiX localization file (.wxl)")
                     .long_help("Sets the path to a WiX localization file (wxl) \
@@ -1412,11 +1436,13 @@ fn main() {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
             create.capture_output(!matches.is_present("no-capture"));
+            create.compiler_args(matches.values_of("compiler-arg").map(|a| a.collect()));
             create.culture(matches.value_of("culture"));
             create.debug_build(matches.is_present("debug-build"));
             create.debug_name(matches.is_present("debug-name"));
             create.includes(matches.values_of("include").map(|a| a.collect()));
             create.input(matches.value_of("INPUT"));
+            create.linker_args(matches.values_of("linker-arg").map(|a| a.collect()));
             create.locale(matches.value_of("locale"));
             create.name(matches.value_of("name"));
             create.no_build(matches.is_present("no-build"));

@@ -53,11 +53,13 @@ use toml::Value;
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
     capture_output: bool,
+    compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
     debug_build: bool,
     debug_name: bool,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
+    linker_args: Option<Vec<&'a str>>,
     locale: Option<&'a str>,
     name: Option<&'a str>,
     no_build: bool,
@@ -71,11 +73,13 @@ impl<'a> Builder<'a> {
         Builder {
             bin_path: None,
             capture_output: true,
+            compiler_args: None,
             culture: None,
             debug_build: false,
             debug_name: false,
             includes: None,
             input: None,
+            linker_args: None,
             locale: None,
             name: None,
             no_build: false,
@@ -102,6 +106,16 @@ impl<'a> Builder<'a> {
     /// console but the log statements.
     pub fn capture_output(&mut self, c: bool) -> &mut Self {
         self.capture_output = c;
+        self
+    }
+
+    /// Adds an argument to the compiler command.
+    ///
+    /// This "passes" the argument directly to the WiX compiler (candle.exe).
+    /// See the help documentation for the WiX compiler for information about
+    /// valid options and flags.
+    pub fn compiler_args(&mut self, c: Option<Vec<&'a str>>) -> &mut Self {
+        self.compiler_args = c;
         self
     }
 
@@ -169,6 +183,16 @@ impl<'a> Builder<'a> {
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
+        self
+    }
+
+    /// Adds an argument to the linker command.
+    ///
+    /// This "passes" the argument directly to the WiX linker (light.exe). See
+    /// the help documentation for the WiX compiler for information about valid
+    /// options and flags.
+    pub fn linker_args(&mut self, l: Option<Vec<&'a str>>) -> &mut Self {
+        self.linker_args = l;
         self
     }
 
@@ -263,6 +287,9 @@ impl<'a> Builder<'a> {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
+            compiler_args: self.compiler_args
+                .as_ref()
+                .map(|c| c.iter().map(|s| s.to_string()).collect()),
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
             debug_name: self.debug_name,
@@ -271,6 +298,9 @@ impl<'a> Builder<'a> {
                 .as_ref()
                 .map(|v| v.iter().map(&PathBuf::from).collect()),
             input: self.input.map(PathBuf::from),
+            linker_args: self.linker_args
+                .as_ref()
+                .map(|l| l.iter().map(|s| s.to_string()).collect()),
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
@@ -291,11 +321,13 @@ impl<'a> Default for Builder<'a> {
 pub struct Execution {
     bin_path: Option<PathBuf>,
     capture_output: bool,
+    compiler_args: Option<Vec<String>>,
     culture: Option<String>,
     debug_build: bool,
     debug_name: bool,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
+    linker_args: Option<Vec<String>>,
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
@@ -309,11 +341,13 @@ impl Execution {
     pub fn run(self) -> Result<()> {
         debug!("self.bin_path = {:?}", self.bin_path);
         debug!("self.capture_output = {:?}", self.capture_output);
+        debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
         debug!("self.debug_build = {:?}", self.debug_build);
         debug!("self.debug_name = {:?}", self.debug_name);
         debug!("self.includes = {:?}", self.includes);
         debug!("self.input = {:?}", self.input);
+        debug!("self.linker_args = {:?}", self.linker_args);
         debug!("self.locale = {:?}", self.locale);
         debug!("self.name = {:?}", self.name);
         debug!("self.no_build = {:?}", self.no_build);
@@ -393,8 +427,12 @@ impl Execution {
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg("-o")
-            .arg(&wixobj_destination)
-            .args(&wxs_sources);
+            .arg(&wixobj_destination);
+        if let Some(args) = &self.compiler_args {
+            trace!("Appending compiler arguments");
+            compiler.args(args);
+        }
+        compiler.args(&wxs_sources);
         debug!("command = {:?}", compiler);
         let status = compiler.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
@@ -446,8 +484,12 @@ impl Execution {
             .arg("-out")
             .arg(&msi_destination)
             .arg("-b")
-            .arg(&base_path)
-            .args(&wixobj_sources);
+            .arg(&base_path);
+        if let Some(args) = &self.linker_args {
+            trace!("Appending linker arguments");
+            linker.args(args);
+        }
+        linker.args(&wixobj_sources);
         debug!("command = {:?}", linker);
         let status = linker.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
@@ -988,11 +1030,13 @@ mod tests {
             let actual = Builder::new();
             assert!(actual.bin_path.is_none());
             assert!(actual.capture_output);
+            assert!(actual.compiler_args.is_none());
             assert!(actual.culture.is_none());
             assert!(!actual.debug_build);
             assert!(!actual.debug_name);
             assert!(actual.includes.is_none());
             assert!(actual.input.is_none());
+            assert!(actual.linker_args.is_none());
             assert!(actual.locale.is_none());
             assert!(actual.name.is_none());
             assert!(!actual.no_build);
@@ -1013,6 +1057,22 @@ mod tests {
             let mut actual = Builder::new();
             actual.capture_output(false);
             assert!(!actual.capture_output);
+        }
+
+        #[test]
+        fn compiler_args_with_single_value_works() {
+            const EXPECTED: &str = "-nologo";
+            let mut actual = Builder::new();
+            actual.compiler_args(Some(vec![EXPECTED]));
+            assert_eq!(actual.compiler_args, Some(vec![EXPECTED]));
+        }
+
+        #[test]
+        fn compiler_args_with_multiple_values_works() {
+            let expected: Vec<&str> = vec!["-arch", "x86"];
+            let mut actual = Builder::new();
+            actual.compiler_args(Some(expected.clone()));
+            assert_eq!(actual.compiler_args, Some(expected));
         }
 
         #[test]
@@ -1051,6 +1111,22 @@ mod tests {
             let mut actual = Builder::new();
             actual.input(Some(EXPECTED));
             assert_eq!(actual.input, Some(EXPECTED));
+        }
+
+        #[test]
+        fn linker_args_with_single_value_works() {
+            const EXPECTED: &str = "-nologo";
+            let mut actual = Builder::new();
+            actual.linker_args(Some(vec![EXPECTED]));
+            assert_eq!(actual.linker_args, Some(vec![EXPECTED]));
+        }
+
+        #[test]
+        fn linker_args_with_multiple_values_works() {
+            let expected: Vec<&str> = vec!["-ext", "HelloExtension"];
+            let mut actual = Builder::new();
+            actual.linker_args(Some(expected.clone()));
+            assert_eq!(actual.linker_args, Some(expected));
         }
 
         #[test]
@@ -1098,11 +1174,13 @@ mod tests {
             let default_execution = b.build();
             assert!(default_execution.bin_path.is_none());
             assert!(default_execution.capture_output);
+            assert!(default_execution.compiler_args.is_none());
             assert!(default_execution.culture.is_none());
             assert!(!default_execution.debug_build);
             assert!(!default_execution.debug_name);
             assert!(default_execution.includes.is_none());
             assert!(default_execution.input.is_none());
+            assert!(default_execution.linker_args.is_none());
             assert!(default_execution.locale.is_none());
             assert!(default_execution.name.is_none());
             assert!(!default_execution.no_build);
@@ -1114,8 +1192,10 @@ mod tests {
         fn build_with_all_works() {
             const EXPECTED_BIN_PATH: &str = "C:\\Wix Toolset\\bin";
             const EXPECTED_CULTURE: &str = "FrFr";
+            const EXPECTED_COMPILER_ARGS: &str = "-nologo";
             const EXPECTED_INCLUDES: &str = "C:\\tmp\\hello_world\\wix\\main.wxs";
             const EXPECTED_INPUT: &str = "C:\\tmp\\hello_world\\Cargo.toml";
+            const EXPECTED_LINKER_ARGS: &str = "-nologo";
             const EXPECTED_LOCALE: &str = "C:\\tmp\\hello_world\\wix\\main.wxl";
             const EXPECTED_NAME: &str = "Name";
             const EXPECTED_OUTPUT: &str = "C:\\tmp\\hello_world\\output";
@@ -1124,10 +1204,12 @@ mod tests {
             b.bin_path(Some(EXPECTED_BIN_PATH));
             b.capture_output(false);
             b.culture(Some(EXPECTED_CULTURE));
+            b.compiler_args(Some(vec![EXPECTED_COMPILER_ARGS]));
             b.debug_build(true);
             b.debug_name(true);
             b.includes(Some(vec![EXPECTED_INCLUDES]));
             b.input(Some(EXPECTED_INPUT));
+            b.linker_args(Some(vec![EXPECTED_LINKER_ARGS]));
             b.locale(Some(EXPECTED_LOCALE));
             b.name(Some(EXPECTED_NAME));
             b.no_build(true);
@@ -1139,6 +1221,10 @@ mod tests {
                 Some(EXPECTED_BIN_PATH).map(PathBuf::from)
             );
             assert!(!execution.capture_output);
+            assert_eq!(
+                execution.compiler_args,
+                Some(vec![String::from(EXPECTED_COMPILER_ARGS)])
+            );
             assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
             assert!(execution.debug_build);
             assert!(execution.debug_name);
@@ -1147,6 +1233,10 @@ mod tests {
                 Some(vec![PathBuf::from(EXPECTED_INCLUDES)])
             );
             assert_eq!(execution.input, Some(PathBuf::from(EXPECTED_INPUT)));
+            assert_eq!(
+                execution.linker_args,
+                Some(vec![String::from(EXPECTED_LINKER_ARGS)])
+            );
             assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
             assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
             assert!(execution.no_build);
