@@ -415,6 +415,8 @@
 //! ```toml
 //! [package.metadata.wix]
 //! culture = "Fr-Fr"
+//! dbg-build = false
+//! dbg-name = false
 //! include = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"
@@ -513,6 +515,29 @@
 //! Sets the culture for localization. Use with the [`-l,--locale`] option. See
 //! the [WixUI localization documentation] for more information about acceptable
 //! culture codes. The codes are case insensitive.
+//!
+//! ### `-d,--dbg-build`
+//!
+//! Available only for the default _create_ (`cargo wix`) subcommmand.
+//!
+//! Builds the package using the Debug profile instead of the Release profile
+//! with Cargo. This flag is ignored if the `--no-build` flag is used. The
+//! default is to build the package with the Release profile.
+//!
+//! ### `-D,--dbg-name`
+//!
+//! Available only for the default _create_ (`cargo wix`) subcommand.
+//!
+//! Appends `-debug` to the file stem (portion before the dot and file
+//! extension) of the installer's file name. The default is to _not_ include the
+//! suffix. Generally, this should be used to indicate an installer contains a
+//! binary that was built with debugging information and minimal optimizations
+//! as a tradeoff for being able to troubleshoot execution of the application on
+//! an end-user's system. A release build generally does not contain any
+//! debugging information but includes optimizations. It is typical to use this
+//! flag with the `-d,--dbg-build` flag but it is not required. This allows a
+//! developer to provide other mechanisms for creating a debugging variant of
+//! his or her application and still use the Release profile.
 //!
 //! ### `-d,--description`
 //!
