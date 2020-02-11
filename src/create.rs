@@ -848,7 +848,7 @@ impl Execution {
         extension: Option<String>,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let extension = extension.unwrap_or(MSI_FILE_EXTENSION.to_string());
+        let extension = extension.unwrap_or_else(||MSI_FILE_EXTENSION.to_string());
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
