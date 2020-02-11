@@ -57,6 +57,7 @@ pub struct Builder<'a> {
     culture: Option<&'a str>,
     debug_build: bool,
     debug_name: bool,
+    extension: Option<&'a str>,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
     linker_args: Option<Vec<&'a str>>,
@@ -77,6 +78,7 @@ impl<'a> Builder<'a> {
             culture: None,
             debug_build: false,
             debug_name: false,
+            extension: None,
             includes: None,
             input: None,
             linker_args: None,
@@ -155,6 +157,15 @@ impl<'a> Builder<'a> {
     /// installed binary.
     pub fn debug_name(&mut self, d: bool) -> &mut Self {
         self.debug_name = d;
+        self
+    }
+
+    /// Uses a specific filename extension.
+    ///
+    /// By default `.msi` is the filename extension.  The extension can be
+    /// changed to `.exe`, for example, when building a bundled installer.
+    pub fn extension(&mut self, e: Option<&'a str>) -> &mut Self {
+        self.extension = e;
         self
     }
 
@@ -294,6 +305,7 @@ impl<'a> Builder<'a> {
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
             debug_name: self.debug_name,
+            extension: self.extension.map(String::from),
             includes: self
                 .includes
                 .as_ref()
@@ -327,6 +339,7 @@ pub struct Execution {
     culture: Option<String>,
     debug_build: bool,
     debug_name: bool,
+    extension: Option<String>,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
     linker_args: Option<Vec<String>>,
@@ -347,6 +360,7 @@ impl Execution {
         debug!("self.culture = {:?}", self.culture);
         debug!("self.debug_build = {:?}", self.debug_build);
         debug!("self.debug_name = {:?}", self.debug_name);
+        debug!("self.extension = {:?}", self.extension);
         debug!("self.includes = {:?}", self.includes);
         debug!("self.input = {:?}", self.input);
         debug!("self.linker_args = {:?}", self.linker_args);
@@ -376,12 +390,14 @@ impl Execution {
         debug!("debug_build = {:?}", debug_build);
         let debug_name = self.debug_name(&manifest);
         debug!("debug_name = {:?}", debug_name);
+        let extension = self.extension(&manifest);
+        debug!("extension = {:?}", extension);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let msi_destination =
-            self.msi_destination(&name, &version, platform, debug_name, &manifest)?;
+            self.msi_destination(&name, &version, platform, debug_name, extension, &manifest)?;
         debug!("msi_destination = {:?}", msi_destination);
         let no_build = self.no_build(&manifest);
         debug!("no_build = {:?}", no_build);
@@ -613,6 +629,26 @@ impl Execution {
         }
     }
 
+    fn extension(&self, manifest: &Value) -> Option<String> {
+        if let Some(ref p) = self.extension {
+            Some(p.to_owned())
+        } else if let Some(pkg_meta_wix_extension) = manifest
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("metadata"))
+            .and_then(|m| m.as_table())
+            .and_then(|t| t.get("wix"))
+            .and_then(|w| w.as_table())
+            .and_then(|t| t.get("extension"))
+            .and_then(|n| n.as_str())
+            .map(String::from)
+        {
+            Some(pkg_meta_wix_extension)
+        } else {
+            None
+        }
+    }
+
     fn no_build(&self, manifest: &Value) -> bool {
         if self.no_build {
             true
@@ -809,15 +845,17 @@ impl Execution {
         version: &Version,
         platform: Platform,
         debug_name: bool,
+        extension: Option<String>,
         manifest: &Value,
     ) -> Result<PathBuf> {
+        let extension = extension.unwrap_or(MSI_FILE_EXTENSION.to_string());
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
                 name,
                 version,
                 platform.arch(),
-                MSI_FILE_EXTENSION
+                extension
             )
         } else {
             format!(
@@ -825,7 +863,7 @@ impl Execution {
                 name,
                 version,
                 platform.arch(),
-                MSI_FILE_EXTENSION
+                extension
             )
         };
         if let Some(ref path_str) = self.output {
@@ -1076,6 +1114,7 @@ mod tests {
             assert!(actual.culture.is_none());
             assert!(!actual.debug_build);
             assert!(!actual.debug_name);
+            assert!(actual.extension.is_none());
             assert!(actual.includes.is_none());
             assert!(actual.input.is_none());
             assert!(actual.linker_args.is_none());
@@ -1394,6 +1433,7 @@ mod tests {
                     &"2.1.0".parse::<Version>().unwrap(),
                     Platform::X64,
                     false,
+                    None,
                     &PKG_META_WIX.parse::<Value>().unwrap(),
                 )
                 .unwrap();
