@@ -1036,6 +1036,15 @@ fn main() {
                      .long("bin-path")
                      .short("b")
                      .takes_value(true))
+                .arg(Arg::with_name("bundle")
+                    .help("Creates a bundle installer instead of a product installer")
+                    .long_help("By default a product installer is created with with an 'msi' \
+                        filename extension. The correct filename extension for bundle installers \
+                        is 'exe'. This option overrides the default behavior and creates an \
+                        installer with an 'exe' extension.
+                    ")
+                    .long("bundle")
+                    .short("B"))
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' folder")
@@ -1087,17 +1096,6 @@ fn main() {
                         binary with the Debug profile.")
                     .long("dbg-name")
                     .short("D"))
-                .arg(Arg::with_name("extension")
-                    .help("Builds the installer with a different extension")
-                    .long_help("By default the installer is created with a .msi extension. When \
-                        building a bundled package a .exe extensions is expected and the linker \
-                        complains if it is not correct.
-                        where the wxs file is not located in the default location, \
-                        i.e. 'wix'. Use this option multiple times to include \
-                        multiple wxs files.")
-                    .long("extension")
-                    .short("x")
-                    .takes_value(true))
                 .arg(Arg::with_name("include")
                     .help("Include an additional WiX Source (wxs) file")
                     .long_help("Includes a WiX source (wxs) file for a project, \
@@ -1473,12 +1471,12 @@ fn main() {
         _ => {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
+            create.bundle(matches.is_present("bundle"));
             create.capture_output(!matches.is_present("no-capture"));
             create.compiler_args(matches.values_of("compiler-arg").map(|a| a.collect()));
             create.culture(matches.value_of("culture"));
             create.debug_build(matches.is_present("debug-build"));
             create.debug_name(matches.is_present("debug-name"));
-            create.extension(matches.value_of("extension"));
             create.includes(matches.values_of("include").map(|a| a.collect()));
             create.input(matches.value_of("INPUT"));
             create.linker_args(matches.values_of("linker-arg").map(|a| a.collect()));

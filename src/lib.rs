@@ -62,6 +62,7 @@
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 
 extern crate chrono;
+extern crate encoding_rs_io;
 #[macro_use]
 extern crate log;
 #[cfg_attr(test, macro_use)]
@@ -74,6 +75,7 @@ extern crate uuid;
 
 pub use crate::templates::Template;
 
+pub mod bundle;
 pub mod clean;
 pub mod create;
 mod eula;

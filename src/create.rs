@@ -22,6 +22,7 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
+use crate::bundle::{BundleBuildStatus, is_bundle_build};
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -52,12 +53,12 @@ use toml::Value;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
+    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
     debug_build: bool,
     debug_name: bool,
-    extension: Option<&'a str>,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
     linker_args: Option<Vec<&'a str>>,
@@ -73,12 +74,12 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             bin_path: None,
+            bundle: false,
             capture_output: true,
             compiler_args: None,
             culture: None,
             debug_build: false,
             debug_name: false,
-            extension: None,
             includes: None,
             input: None,
             linker_args: None,
@@ -98,6 +99,15 @@ impl<'a> Builder<'a> {
     /// Toolset. This will override any value obtained from the environment.
     pub fn bin_path(&mut self, b: Option<&'a str>) -> &mut Self {
         self.bin_path = b;
+        self
+    }
+
+    /// Sets the target to be a bundle installer instead of a product installer.
+    ///
+    /// By default a product installer is built with an 'msi' extension. This
+    /// option allows a bundle installer to be built with an 'exe' extension.
+    pub fn bundle(&mut self, v: bool) -> &mut Self {
+        self.bundle = v;
         self
     }
 
@@ -157,15 +167,6 @@ impl<'a> Builder<'a> {
     /// installed binary.
     pub fn debug_name(&mut self, d: bool) -> &mut Self {
         self.debug_name = d;
-        self
-    }
-
-    /// Uses a specific filename extension.
-    ///
-    /// By default `.msi` is the filename extension.  The extension can be
-    /// changed to `.exe`, for example, when building a bundled installer.
-    pub fn extension(&mut self, e: Option<&'a str>) -> &mut Self {
-        self.extension = e;
         self
     }
 
@@ -297,6 +298,7 @@ impl<'a> Builder<'a> {
     pub fn build(&mut self) -> Execution {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
+            bundle: self.bundle,
             capture_output: self.capture_output,
             compiler_args: self
                 .compiler_args
@@ -305,7 +307,6 @@ impl<'a> Builder<'a> {
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
             debug_name: self.debug_name,
-            extension: self.extension.map(String::from),
             includes: self
                 .includes
                 .as_ref()
@@ -334,12 +335,12 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     bin_path: Option<PathBuf>,
+    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<String>>,
     culture: Option<String>,
     debug_build: bool,
     debug_name: bool,
-    extension: Option<String>,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
     linker_args: Option<Vec<String>>,
@@ -355,12 +356,12 @@ impl Execution {
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
         debug!("self.bin_path = {:?}", self.bin_path);
+        debug!("self.bundle = {:?}", self.bundle);
         debug!("self.capture_output = {:?}", self.capture_output);
         debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
         debug!("self.debug_build = {:?}", self.debug_build);
         debug!("self.debug_name = {:?}", self.debug_name);
-        debug!("self.extension = {:?}", self.extension);
         debug!("self.includes = {:?}", self.includes);
         debug!("self.input = {:?}", self.input);
         debug!("self.linker_args = {:?}", self.linker_args);
@@ -390,15 +391,12 @@ impl Execution {
         debug!("debug_build = {:?}", debug_build);
         let debug_name = self.debug_name(&manifest);
         debug!("debug_name = {:?}", debug_name);
-        let extension = self.extension(&manifest);
-        debug!("extension = {:?}", extension);
+        let bundle = self.bundle(&manifest);
+        debug!("bundle = {:?}", bundle);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let msi_destination =
-            self.msi_destination(&name, &version, platform, debug_name, extension, &manifest)?;
-        debug!("msi_destination = {:?}", msi_destination);
         let no_build = self.no_build(&manifest);
         debug!("no_build = {:?}", no_build);
         if no_build {
@@ -477,6 +475,13 @@ impl Execution {
                 self.capture_output,
             ));
         }
+        let bundle = match is_bundle_build(&wixobj_destination) {
+            BundleBuildStatus::Yes => true,
+            _ => bundle,
+        };
+        let msi_destination =
+            self.msi_destination(&name, &version, platform, debug_name, bundle, &manifest)?;
+        debug!("msi_destination = {:?}", msi_destination);
         // Link the installer
         info!("Linking the installer");
         let mut linker = self.linker()?;
@@ -629,23 +634,22 @@ impl Execution {
         }
     }
 
-    fn extension(&self, manifest: &Value) -> Option<String> {
-        if let Some(ref p) = self.extension {
-            Some(p.to_owned())
-        } else if let Some(pkg_meta_wix_extension) = manifest
+    fn bundle(&self, manifest: &Value) -> bool {
+        if self.bundle {
+            true
+        } else if let Some(pkg_meta_wix_bundle) = manifest
             .get("package")
             .and_then(|p| p.as_table())
             .and_then(|t| t.get("metadata"))
             .and_then(|m| m.as_table())
             .and_then(|t| t.get("wix"))
             .and_then(|w| w.as_table())
-            .and_then(|t| t.get("extension"))
-            .and_then(|n| n.as_str())
-            .map(String::from)
+            .and_then(|t| t.get("bundle"))
+            .and_then(|v| v.as_bool())
         {
-            Some(pkg_meta_wix_extension)
+            pkg_meta_wix_bundle
         } else {
-            None
+            false
         }
     }
 
@@ -845,10 +849,10 @@ impl Execution {
         version: &Version,
         platform: Platform,
         debug_name: bool,
-        extension: Option<String>,
+        bundle: bool,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let extension = extension.unwrap_or_else(||MSI_FILE_EXTENSION.to_string());
+        let extension = if bundle { EXE_FILE_EXTENSION } else { MSI_FILE_EXTENSION };
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
@@ -1109,12 +1113,12 @@ mod tests {
         fn defaults_are_correct() {
             let actual = Builder::new();
             assert!(actual.bin_path.is_none());
+            assert!(!actual.bundle);
             assert!(actual.capture_output);
             assert!(actual.compiler_args.is_none());
             assert!(actual.culture.is_none());
             assert!(!actual.debug_build);
             assert!(!actual.debug_name);
-            assert!(actual.extension.is_none());
             assert!(actual.includes.is_none());
             assert!(actual.input.is_none());
             assert!(actual.linker_args.is_none());
@@ -1433,7 +1437,7 @@ mod tests {
                     &"2.1.0".parse::<Version>().unwrap(),
                     Platform::X64,
                     false,
-                    None,
+                    false,
                     &PKG_META_WIX.parse::<Value>().unwrap(),
                 )
                 .unwrap();

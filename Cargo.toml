@@ -21,6 +21,7 @@ name = "wix"
 
 [dependencies]
 chrono = "0.4"
+encoding_rs_io = "0.1"
 env_logger = "0.7"
 log = "0.4"
 maplit = "1"
@@ -30,6 +31,7 @@ semver = "0.9"
 termcolor = "1"
 toml = "0.5"
 uuid = { version = "0.7", features = ["v4"] }
+xml-rs = "0.8"
 
 [dev-dependencies]
 assert_fs = "0.11"
