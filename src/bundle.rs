@@ -23,16 +23,16 @@ use sxd_xpath::{Context, Factory};
 
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum BuildType {
     Unknown,
     Product,
     Bundle,
 }
 
-pub fn get_build_type(wxiobj: &Path) -> Result<BuildType> {
+pub fn get_build_type_for_one(wxiobj: &Path) -> Result<BuildType> {
     let file = File::open(wxiobj)?;
     let mut decoder = DecodeReaderBytes::new(file);
     let mut content = String::new();
@@ -52,6 +52,22 @@ pub fn get_build_type(wxiobj: &Path) -> Result<BuildType> {
     }
     else if value == "bundle" {
         Ok(BuildType::Bundle)
+    }
+    else {
+        Ok(BuildType::Unknown)
+    }
+}
+
+pub fn get_build_type(wxiobjs: &Vec<PathBuf>) -> Result<BuildType> {
+    if wxiobjs.len() > 0 {
+        let build_type = get_build_type_for_one(&wxiobjs[0])?;
+        for ref rover in wxiobjs.iter().skip(1) {
+            let current = get_build_type_for_one(rover)?;
+            if current != build_type {
+                return Ok(BuildType::Unknown);
+            }
+        }
+        Ok(build_type)
     }
     else {
         Ok(BuildType::Unknown)

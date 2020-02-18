@@ -475,7 +475,9 @@ impl Execution {
                 self.capture_output,
             ));
         }
-        let bundle = match get_build_type(&wixobj_destination)? {
+        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
+        debug!("wixobj_sources = {:?}", wixobj_sources);
+        let bundle = match get_build_type(&wixobj_sources)? {
             BuildType::Unknown => bundle,
             BuildType::Product => bundle,
             BuildType::Bundle => true,
@@ -487,8 +489,6 @@ impl Execution {
         info!("Linking the installer");
         let mut linker = self.linker()?;
         debug!("linker = {:?}", linker);
-        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
-        debug!("wixobj_sources = {:?}", wixobj_sources);
         let base_path = manifest_path.parent().ok_or_else(|| {
             Error::Generic(String::from("The base path for the linker is invalid"))
         })?;
