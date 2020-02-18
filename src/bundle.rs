@@ -15,47 +15,45 @@
 //! The implementation for is_bundle_build.  This function probes a compiler output file (wxiobj)
 //! for indications of what is being built: product or bundle installer.
 
+use crate::Result;
+
 use encoding_rs_io::DecodeReaderBytes;
-use xml::reader::{EventReader, XmlEvent};
+use sxd_document::parser;
+use sxd_xpath::{Context, Factory};
 
 use std::fs::File;
-use std::io::BufReader;
+use std::io::Read;
 use std::path::Path;
 
 #[derive(Debug)]
-pub enum BundleBuildStatus {
+pub enum BuildType {
     Unknown,
-    No,
-    Yes,
+    Product,
+    Bundle,
 }
 
-pub fn is_bundle_build(wxiobj: &Path) -> BundleBuildStatus {
-    if let Ok(file) = File::open(wxiobj) {
-        let file = BufReader::new(file);
-        let decoder = DecodeReaderBytes::new(file);
-        let parser = EventReader::new(decoder);
-
-        // For each XML element read until the first StartDocument with the name "section".
-        for ref parsed in parser {
-            if let Ok(ref event) = parsed {
-                if let XmlEvent::StartElement{ref name, ref attributes, ..} = event {
-                    if name.local_name == "section" {
-                        // For each attribute scan for the "type"
-                        for ref attribute in attributes {
-                             if attribute.name.local_name == "type" {
-                                if attribute.value == "product" {
-                                    return BundleBuildStatus::No;
-                                }
-                                else if attribute.value == "bundle" {
-                                    return BundleBuildStatus::Yes;
-                                }
-                             }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
+pub fn get_build_type(wxiobj: &Path) -> Result<BuildType> {
+    let file = File::open(wxiobj)?;
+    let mut decoder = DecodeReaderBytes::new(file);
+    let mut content = String::new();
+    decoder.read_to_string(&mut content)?;
+    let package = parser::parse(&content)?;
+    let document = package.as_document();
+    let mut context = Context::new();
+    context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/objects");
+    // The assumption is that the following cannot fail because the path is known to be valid at
+    // compile-time.
+    let xpath = Factory::new().build("/wix:wixObject/wix:section/@type").unwrap().unwrap();
+    let value = xpath
+        .evaluate(&context, document.root())?
+        .string();
+    if value == "product" {
+        Ok(BuildType::Product)
     }
-    BundleBuildStatus::Unknown
+    else if value == "bundle" {
+        Ok(BuildType::Bundle)
+    }
+    else {
+        Ok(BuildType::Unknown)
+    }
 }

@@ -22,7 +22,7 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use crate::bundle::{BundleBuildStatus, is_bundle_build};
+use crate::bundle::{BuildType, get_build_type};
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -475,9 +475,10 @@ impl Execution {
                 self.capture_output,
             ));
         }
-        let bundle = match is_bundle_build(&wixobj_destination) {
-            BundleBuildStatus::Yes => true,
-            _ => bundle,
+        let bundle = match get_build_type(&wixobj_destination)? {
+            BuildType::Unknown => bundle,
+            BuildType::Product => bundle,
+            BuildType::Bundle => true,
         };
         let msi_destination =
             self.msi_destination(&name, &version, platform, debug_name, bundle, &manifest)?;

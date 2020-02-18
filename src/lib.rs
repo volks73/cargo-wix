@@ -70,6 +70,8 @@ extern crate maplit;
 extern crate mustache;
 extern crate regex;
 extern crate semver;
+extern crate sxd_document;
+extern crate sxd_xpath;
 extern crate toml;
 extern crate uuid;
 
@@ -241,6 +243,10 @@ pub enum Error {
     Toml(toml::de::Error),
     /// Parsing error for a version string or field.
     Version(semver::SemVerError),
+    /// Error parsing the intermediate wxiobj file
+    Parser(sxd_document::parser::Error),
+    /// Error evaluating an XPath expression
+    Executor(sxd_xpath::ExecutionError),
 }
 
 impl Error {
@@ -267,6 +273,8 @@ impl Error {
             Error::Mustache(..) => 5,
             Error::Toml(..) => 6,
             Error::Version(..) => 7,
+            Error::Parser(..) => 8,
+            Error::Executor(..) => 9,
         }
     }
 
@@ -336,6 +344,8 @@ impl Error {
             Error::Mustache(..) => "Mustache",
             Error::Toml(..) => "TOML",
             Error::Version(..) => "Version",
+            Error::Parser(..) => "Parser",
+            Error::Executor(..) => "Executor",
         }
     }
 }
@@ -351,6 +361,8 @@ impl StdError for Error {
             Error::Mustache(ref err) => Some(err),
             Error::Toml(ref err) => Some(err),
             Error::Version(ref err) => Some(err),
+            Error::Parser(ref err) => Some(err),
+            Error::Executor(ref err) => Some(err),
             _ => None,
         }
     }
@@ -401,6 +413,8 @@ impl fmt::Display for Error {
             Error::Mustache(ref err) => err.fmt(f),
             Error::Toml(ref err) => err.fmt(f),
             Error::Version(ref err) => err.fmt(f),
+            Error::Parser(ref err) => err.fmt(f),
+            Error::Executor(ref err) => err.fmt(f),
         }
     }
 }
@@ -444,6 +458,18 @@ impl From<semver::SemVerError> for Error {
 impl From<std::path::StripPrefixError> for Error {
     fn from(err: std::path::StripPrefixError) -> Self {
         Error::Generic(err.to_string())
+    }
+}
+
+impl From<sxd_document::parser::Error> for Error {
+    fn from(err: sxd_document::parser::Error) -> Self {
+        Error::Parser(err)
+    }
+}
+
+impl From<sxd_xpath::ExecutionError> for Error {
+    fn from(err: sxd_xpath::ExecutionError) -> Self {
+        Error::Executor(err)
     }
 }
 
