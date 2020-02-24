@@ -22,7 +22,7 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use crate::bundle::{BuildType, get_build_type};
+use crate::bundle::InstallerKind;
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -41,6 +41,7 @@ use crate::WIX_SOURCE_FILE_EXTENSION;
 
 use semver::Version;
 
+use std::convert::TryFrom;
 use std::env;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
@@ -477,11 +478,20 @@ impl Execution {
         }
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
+
+        let installer_kind: Result<InstallerKind> = wixobj_sources
+            .iter()
+            .map(|p| InstallerKind::try_from(p))
+            .sum();
+        let installer_kind = installer_kind?;
+        let bundle = installer_kind.is_bundle();
+/* rmv
         let bundle = match get_build_type(&wixobj_sources)? {
             BuildType::Unknown => bundle,
             BuildType::Product => bundle,
             BuildType::Bundle => true,
         };
+*/
         let msi_destination =
             self.msi_destination(&name, &version, platform, debug_name, bundle, &manifest)?;
         debug!("msi_destination = {:?}", msi_destination);
