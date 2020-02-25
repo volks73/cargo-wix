@@ -461,11 +461,8 @@ impl Execution {
         }
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
-
-        let installer_kind: Result<InstallerKind> = wixobj_sources
-            .iter()
-            .map(InstallerKind::try_from)
-            .sum();
+        let installer_kind: Result<InstallerKind> =
+            wixobj_sources.iter().map(InstallerKind::try_from).sum();
         let installer_kind = installer_kind?;
         let msi_destination = self.msi_destination(
             &name,
@@ -839,13 +836,7 @@ impl Execution {
                 extension
             )
         } else {
-            format!(
-                "{}-{}-{}.{}",
-                name,
-                version,
-                platform.arch(),
-                extension
-            )
+            format!("{}-{}-{}.{}", name, version, platform.arch(), extension)
         };
         if let Some(ref path_str) = self.output {
             trace!("Using the explicitly specified output path for the MSI destination");
@@ -1111,7 +1102,7 @@ impl FromStr for InstallerKind {
         } else if value == "fragment" {
             Ok(InstallerKind::Unknown)
         } else {
-           Err(Self::Err::Generic(format!(
+            Err(Self::Err::Generic(format!(
                 "Unknown '{}' installer kind",
                 value
             )))
@@ -1181,9 +1172,7 @@ impl TryFrom<&PathBuf> for InstallerKind {
             .build("/wix:wixObject/wix:section/@type")
             .unwrap()
             .unwrap();
-        let value = xpath
-            .evaluate(&context, document.root())?
-            .string();
+        let value = xpath.evaluate(&context, document.root())?.string();
         InstallerKind::from_str(&value)
     }
 }
