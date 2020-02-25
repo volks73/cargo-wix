@@ -22,7 +22,7 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-use crate::bundle::InstallerKind;
+// rmv use crate::bundle::InstallerKind;
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -43,7 +43,7 @@ use semver::Version;
 
 use std::convert::TryFrom;
 use std::env;
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
@@ -54,7 +54,7 @@ use toml::Value;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
-    bundle: bool,
+//rmv    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
@@ -75,7 +75,7 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             bin_path: None,
-            bundle: false,
+//rmv            bundle: false,
             capture_output: true,
             compiler_args: None,
             culture: None,
@@ -103,6 +103,7 @@ impl<'a> Builder<'a> {
         self
     }
 
+/*
     /// Sets the target to be a bundle installer instead of a product installer.
     ///
     /// By default a product installer is built with an 'msi' extension. This
@@ -111,6 +112,7 @@ impl<'a> Builder<'a> {
         self.bundle = v;
         self
     }
+*/
 
     /// Enables or disables capturing of the output from the builder (`cargo`),
     /// compiler (`candle`), linker (`light`), and signer (`signtool`).
@@ -299,7 +301,7 @@ impl<'a> Builder<'a> {
     pub fn build(&mut self) -> Execution {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
-            bundle: self.bundle,
+//rmv            bundle: self.bundle,
             capture_output: self.capture_output,
             compiler_args: self
                 .compiler_args
@@ -336,7 +338,7 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     bin_path: Option<PathBuf>,
-    bundle: bool,
+//rmv    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<String>>,
     culture: Option<String>,
@@ -357,7 +359,7 @@ impl Execution {
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
         debug!("self.bin_path = {:?}", self.bin_path);
-        debug!("self.bundle = {:?}", self.bundle);
+//rmv        debug!("self.bundle = {:?}", self.bundle);
         debug!("self.capture_output = {:?}", self.capture_output);
         debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
@@ -392,8 +394,8 @@ impl Execution {
         debug!("debug_build = {:?}", debug_build);
         let debug_name = self.debug_name(&manifest);
         debug!("debug_name = {:?}", debug_name);
-        let bundle = self.bundle(&manifest);
-        debug!("bundle = {:?}", bundle);
+//rmv        let bundle = self.bundle(&manifest);
+//rmv        debug!("bundle = {:?}", bundle);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
@@ -645,6 +647,7 @@ impl Execution {
         }
     }
 
+/* rmv
     fn bundle(&self, manifest: &Value) -> bool {
         if self.bundle {
             true
@@ -663,6 +666,7 @@ impl Execution {
             false
         }
     }
+*/
 
     fn no_build(&self, manifest: &Value) -> bool {
         if self.no_build {
@@ -1113,6 +1117,106 @@ impl Default for Execution {
     }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum InstallerKind {
+    None,
+    Product,
+    Bundle,
+    Both,
+}
+
+impl InstallerKind {
+    pub fn is_bundle(&self) -> bool {
+        match *self {
+            Self::None => false,
+            Self::Product => false,
+            Self::Bundle => true,
+            Self::Both => false,
+        }
+    }
+}
+
+impl FromStr for InstallerKind {
+    type Err = crate::Error;
+
+    fn from_str(value: &str) -> Result<Self> {
+        if value == "product" {
+            Ok(InstallerKind::Product)
+        }
+        else if value == "bundle" {
+            Ok(InstallerKind::Bundle)
+        }
+        else {
+            Err(Self::Err::Generic(format!("Unknown '{}' installer kind", value)))
+        }
+    }
+}
+
+impl std::ops::Add<InstallerKind> for InstallerKind {
+    type Output = InstallerKind;
+
+    fn add(self, rhs: InstallerKind) -> InstallerKind {
+        if self == rhs {
+            self
+        }
+        else if self == InstallerKind::None {
+            rhs
+        }
+        else if rhs == InstallerKind::None {
+            self
+        }
+        else {
+            InstallerKind::Both
+        }
+    }
+}
+
+impl std::ops::AddAssign for InstallerKind {
+    fn add_assign(&mut self, other: Self) {
+        if *self == InstallerKind::None {
+            *self = other;
+        }
+        else if *self != other {
+            *self = InstallerKind::Both;
+        }
+        else {
+            // The two already have to be equal but this covers all possibilities.
+            *self = other;
+        }
+    }
+}
+
+impl std::iter::Sum for InstallerKind {
+    fn sum<I>(i: I) -> Self
+        where I: Iterator<Item = Self>,
+    {
+        i.fold(InstallerKind::None, |a, v| a + v)
+    }
+}
+
+impl TryFrom<&PathBuf> for InstallerKind
+{
+    type Error = crate::Error;
+
+    fn try_from(path: &PathBuf) -> Result<Self> {
+		let file = std::fs::File::open(path)?;
+		let mut decoder = encoding_rs_io::DecodeReaderBytes::new(file);
+		let mut content = String::new();
+		decoder.read_to_string(&mut content)?;
+		let package = sxd_document::parser::parse(&content)?;
+		let document = package.as_document();
+		let mut context = sxd_xpath::Context::new();
+		context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/objects");
+		// The assumption is that the following cannot fail because the path is known to be valid at
+		// compile-time.
+		let xpath = sxd_xpath::Factory::new().build("/wix:wixObject/wix:section/@type").unwrap().unwrap();
+		let value = xpath
+			.evaluate(&context, document.root())?
+			.string();
+        InstallerKind::from_str(&value)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1124,7 +1228,7 @@ mod tests {
         fn defaults_are_correct() {
             let actual = Builder::new();
             assert!(actual.bin_path.is_none());
-            assert!(!actual.bundle);
+//rmv            assert!(!actual.bundle);
             assert!(actual.capture_output);
             assert!(actual.compiler_args.is_none());
             assert!(actual.culture.is_none());
