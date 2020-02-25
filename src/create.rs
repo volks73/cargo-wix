@@ -1086,6 +1086,7 @@ pub enum InstallerKind {
     Product,
     Bundle,
     Both,
+    Unknown,
 }
 
 impl InstallerKind {
@@ -1095,6 +1096,7 @@ impl InstallerKind {
             Self::Product => false,
             Self::Bundle => true,
             Self::Both => false,
+            Self::Unknown => false,
         }
     }
 }
@@ -1109,6 +1111,9 @@ impl FromStr for InstallerKind {
         else if value == "bundle" {
             Ok(InstallerKind::Bundle)
         }
+        else if value == "fragment" {
+            Ok(InstallerKind::Unknown)
+        }
         else {
             Err(Self::Err::Generic(format!("Unknown '{}' installer kind", value)))
         }
@@ -1119,32 +1124,39 @@ impl std::ops::Add<InstallerKind> for InstallerKind {
     type Output = InstallerKind;
 
     fn add(self, rhs: InstallerKind) -> InstallerKind {
-        if self == rhs {
-            self
-        }
-        else if self == InstallerKind::None {
-            rhs
-        }
-        else if rhs == InstallerKind::None {
-            self
+        if rhs != InstallerKind::Unknown {
+            if self == rhs {
+                self
+            }
+            else if self == InstallerKind::None {
+                rhs
+            }
+            else if rhs == InstallerKind::None {
+                self
+            }
+            else {
+                InstallerKind::Both
+            }
         }
         else {
-            InstallerKind::Both
+            self
         }
     }
 }
 
 impl std::ops::AddAssign for InstallerKind {
     fn add_assign(&mut self, other: Self) {
-        if *self == InstallerKind::None {
-            *self = other;
-        }
-        else if *self != other {
-            *self = InstallerKind::Both;
-        }
-        else {
-            // The two already have to be equal but this covers all possibilities.
-            *self = other;
+        if other != InstallerKind::Unknown {
+            if *self == InstallerKind::None {
+                *self = other;
+            }
+            else if *self != other {
+                *self = InstallerKind::Both;
+            }
+            else {
+                // The two already have to be equal but this covers all possibilities.
+                *self = other;
+            }
         }
     }
 }
