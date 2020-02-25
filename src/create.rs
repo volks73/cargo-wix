@@ -22,7 +22,6 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
-// rmv use crate::bundle::InstallerKind;
 use crate::Cultures;
 use crate::Error;
 use crate::Platform;
@@ -54,7 +53,6 @@ use toml::Value;
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     bin_path: Option<&'a str>,
-//rmv    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
@@ -75,7 +73,6 @@ impl<'a> Builder<'a> {
     pub fn new() -> Self {
         Builder {
             bin_path: None,
-//rmv            bundle: false,
             capture_output: true,
             compiler_args: None,
             culture: None,
@@ -301,7 +298,6 @@ impl<'a> Builder<'a> {
     pub fn build(&mut self) -> Execution {
         Execution {
             bin_path: self.bin_path.map(PathBuf::from),
-//rmv            bundle: self.bundle,
             capture_output: self.capture_output,
             compiler_args: self
                 .compiler_args
@@ -338,7 +334,6 @@ impl<'a> Default for Builder<'a> {
 #[derive(Debug)]
 pub struct Execution {
     bin_path: Option<PathBuf>,
-//rmv    bundle: bool,
     capture_output: bool,
     compiler_args: Option<Vec<String>>,
     culture: Option<String>,
@@ -359,7 +354,6 @@ impl Execution {
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
         debug!("self.bin_path = {:?}", self.bin_path);
-//rmv        debug!("self.bundle = {:?}", self.bundle);
         debug!("self.capture_output = {:?}", self.capture_output);
         debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
@@ -394,8 +388,6 @@ impl Execution {
         debug!("debug_build = {:?}", debug_build);
         let debug_name = self.debug_name(&manifest);
         debug!("debug_name = {:?}", debug_name);
-//rmv        let bundle = self.bundle(&manifest);
-//rmv        debug!("bundle = {:?}", bundle);
         let wxs_sources = self.wxs_sources(&manifest)?;
         debug!("wxs_sources = {:?}", wxs_sources);
         let wixobj_destination = self.wixobj_destination()?;
@@ -486,16 +478,8 @@ impl Execution {
             .map(|p| InstallerKind::try_from(p))
             .sum();
         let installer_kind = installer_kind?;
-        let bundle = installer_kind.is_bundle();
-/* rmv
-        let bundle = match get_build_type(&wixobj_sources)? {
-            BuildType::Unknown => bundle,
-            BuildType::Product => bundle,
-            BuildType::Bundle => true,
-        };
-*/
         let msi_destination =
-            self.msi_destination(&name, &version, platform, debug_name, bundle, &manifest)?;
+            self.msi_destination(&name, &version, platform, debug_name, installer_kind.is_bundle(), &manifest)?;
         debug!("msi_destination = {:?}", msi_destination);
         // Link the installer
         info!("Linking the installer");
@@ -646,27 +630,6 @@ impl Execution {
             false
         }
     }
-
-/* rmv
-    fn bundle(&self, manifest: &Value) -> bool {
-        if self.bundle {
-            true
-        } else if let Some(pkg_meta_wix_bundle) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
-            .and_then(|t| t.get("bundle"))
-            .and_then(|v| v.as_bool())
-        {
-            pkg_meta_wix_bundle
-        } else {
-            false
-        }
-    }
-*/
 
     fn no_build(&self, manifest: &Value) -> bool {
         if self.no_build {
@@ -1228,7 +1191,6 @@ mod tests {
         fn defaults_are_correct() {
             let actual = Builder::new();
             assert!(actual.bin_path.is_none());
-//rmv            assert!(!actual.bundle);
             assert!(actual.capture_output);
             assert!(actual.compiler_args.is_none());
             assert!(actual.culture.is_none());

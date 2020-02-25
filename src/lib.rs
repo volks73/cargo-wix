@@ -77,7 +77,6 @@ extern crate uuid;
 
 pub use crate::templates::Template;
 
-pub mod bundle;
 pub mod clean;
 pub mod create;
 mod eula;

@@ -1036,17 +1036,6 @@ fn main() {
                      .long("bin-path")
                      .short("b")
                      .takes_value(true))
-/* rmv
-                .arg(Arg::with_name("bundle")
-                    .help("Creates a bundle installer instead of a product installer")
-                    .long_help("By default a product installer is created with with an 'msi' \
-                        filename extension. The correct filename extension for bundle installers \
-                        is 'exe'. This option overrides the default behavior and creates an \
-                        installer with an 'exe' extension.
-                    ")
-                    .long("bundle")
-                    .short("B"))
-*/
                 .subcommand(SubCommand::with_name("clean")
                     .version(crate_version!())
                     .about("Deletes the 'target\\wix' folder")
@@ -1473,7 +1462,6 @@ fn main() {
         _ => {
             let mut create = create::Builder::new();
             create.bin_path(matches.value_of("bin-path"));
-//rmv            create.bundle(matches.is_present("bundle"));
             create.capture_output(!matches.is_present("no-capture"));
             create.compiler_args(matches.values_of("compiler-arg").map(|a| a.collect()));
             create.culture(matches.value_of("culture"));
