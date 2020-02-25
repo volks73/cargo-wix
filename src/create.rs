@@ -100,17 +100,6 @@ impl<'a> Builder<'a> {
         self
     }
 
-/*
-    /// Sets the target to be a bundle installer instead of a product installer.
-    ///
-    /// By default a product installer is built with an 'msi' extension. This
-    /// option allows a bundle installer to be built with an 'exe' extension.
-    pub fn bundle(&mut self, v: bool) -> &mut Self {
-        self.bundle = v;
-        self
-    }
-*/
-
     /// Enables or disables capturing of the output from the builder (`cargo`),
     /// compiler (`candle`), linker (`light`), and signer (`signtool`).
     ///
@@ -475,11 +464,17 @@ impl Execution {
 
         let installer_kind: Result<InstallerKind> = wixobj_sources
             .iter()
-            .map(|p| InstallerKind::try_from(p))
+            .map(InstallerKind::try_from)
             .sum();
         let installer_kind = installer_kind?;
-        let msi_destination =
-            self.msi_destination(&name, &version, platform, debug_name, installer_kind.is_bundle(), &manifest)?;
+        let msi_destination = self.msi_destination(
+            &name,
+            &version,
+            platform,
+            debug_name,
+            installer_kind.is_bundle(),
+            &manifest,
+        )?;
         debug!("msi_destination = {:?}", msi_destination);
         // Link the installer
         info!("Linking the installer");
@@ -830,7 +825,11 @@ impl Execution {
         bundle: bool,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let extension = if bundle { EXE_FILE_EXTENSION } else { MSI_FILE_EXTENSION };
+        let extension = if bundle {
+            EXE_FILE_EXTENSION
+        } else {
+            MSI_FILE_EXTENSION
+        };
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
@@ -1107,15 +1106,15 @@ impl FromStr for InstallerKind {
     fn from_str(value: &str) -> Result<Self> {
         if value == "product" {
             Ok(InstallerKind::Product)
-        }
-        else if value == "bundle" {
+        } else if value == "bundle" {
             Ok(InstallerKind::Bundle)
-        }
-        else if value == "fragment" {
+        } else if value == "fragment" {
             Ok(InstallerKind::Unknown)
-        }
-        else {
-            Err(Self::Err::Generic(format!("Unknown '{}' installer kind", value)))
+        } else {
+           Err(Self::Err::Generic(format!(
+                "Unknown '{}' installer kind",
+                value
+            )))
         }
     }
 }
@@ -1127,18 +1126,14 @@ impl std::ops::Add<InstallerKind> for InstallerKind {
         if rhs != InstallerKind::Unknown {
             if self == rhs {
                 self
-            }
-            else if self == InstallerKind::None {
+            } else if self == InstallerKind::None {
                 rhs
-            }
-            else if rhs == InstallerKind::None {
+            } else if rhs == InstallerKind::None {
                 self
-            }
-            else {
+            } else {
                 InstallerKind::Both
             }
-        }
-        else {
+        } else {
             self
         }
     }
@@ -1149,11 +1144,9 @@ impl std::ops::AddAssign for InstallerKind {
         if other != InstallerKind::Unknown {
             if *self == InstallerKind::None {
                 *self = other;
-            }
-            else if *self != other {
+            } else if *self != other {
                 *self = InstallerKind::Both;
-            }
-            else {
+            } else {
                 // The two already have to be equal but this covers all possibilities.
                 *self = other;
             }
@@ -1163,31 +1156,34 @@ impl std::ops::AddAssign for InstallerKind {
 
 impl std::iter::Sum for InstallerKind {
     fn sum<I>(i: I) -> Self
-        where I: Iterator<Item = Self>,
+    where
+        I: Iterator<Item = Self>,
     {
         i.fold(InstallerKind::None, |a, v| a + v)
     }
 }
 
-impl TryFrom<&PathBuf> for InstallerKind
-{
+impl TryFrom<&PathBuf> for InstallerKind {
     type Error = crate::Error;
 
     fn try_from(path: &PathBuf) -> Result<Self> {
-		let file = std::fs::File::open(path)?;
-		let mut decoder = encoding_rs_io::DecodeReaderBytes::new(file);
-		let mut content = String::new();
-		decoder.read_to_string(&mut content)?;
-		let package = sxd_document::parser::parse(&content)?;
-		let document = package.as_document();
-		let mut context = sxd_xpath::Context::new();
-		context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/objects");
-		// The assumption is that the following cannot fail because the path is known to be valid at
-		// compile-time.
-		let xpath = sxd_xpath::Factory::new().build("/wix:wixObject/wix:section/@type").unwrap().unwrap();
-		let value = xpath
-			.evaluate(&context, document.root())?
-			.string();
+        let file = std::fs::File::open(path)?;
+        let mut decoder = encoding_rs_io::DecodeReaderBytes::new(file);
+        let mut content = String::new();
+        decoder.read_to_string(&mut content)?;
+        let package = sxd_document::parser::parse(&content)?;
+        let document = package.as_document();
+        let mut context = sxd_xpath::Context::new();
+        context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/objects");
+        // The assumption is that the following cannot fail because the path is known to be valid at
+        // compile-time.
+        let xpath = sxd_xpath::Factory::new()
+            .build("/wix:wixObject/wix:section/@type")
+            .unwrap()
+            .unwrap();
+        let value = xpath
+            .evaluate(&context, document.root())?
+            .string();
         InstallerKind::from_str(&value)
     }
 }
