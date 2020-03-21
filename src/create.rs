@@ -1141,7 +1141,15 @@ impl TryFrom<&PathBuf> for WixObjKind {
         let mut decoder = encoding_rs_io::DecodeReaderBytes::new(file);
         let mut content = String::new();
         decoder.read_to_string(&mut content)?;
-        let package = sxd_document::parser::parse(&content)?;
+        Self::try_from(&content)
+    }
+}
+
+impl TryFrom<&String> for WixObjKind {
+    type Error = crate::Error;
+
+    fn try_from(content: &String) -> Result<Self> {
+        let package = sxd_document::parser::parse(content)?;
         let document = package.as_document();
         let mut context = sxd_xpath::Context::new();
         context.set_namespace("wix", "http://schemas.microsoft.com/wix/2006/objects");
