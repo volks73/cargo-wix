@@ -462,10 +462,12 @@ impl Execution {
         }
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
-        let installer_kind = InstallerKind::try_from(wixobj_sources
-            .iter()
-            .map(WixObjKind::try_from)
-            .collect::<Result<Vec<WixObjKind>>>()?)?;
+        let installer_kind = InstallerKind::try_from(
+            wixobj_sources
+                .iter()
+                .map(WixObjKind::try_from)
+                .collect::<Result<Vec<WixObjKind>>>()?,
+        )?;
         debug!("installer_kind = {:?}", installer_kind);
         let installer_destination = self.installer_destination(
             &name,
@@ -834,7 +836,13 @@ impl Execution {
                 installer_kind
             )
         } else {
-            format!("{}-{}-{}.{}", name, version, platform.arch(), installer_kind)
+            format!(
+                "{}-{}-{}.{}",
+                name,
+                version,
+                platform.arch(),
+                installer_kind
+            )
         };
         if let Some(ref path_str) = self.output {
             trace!("Using the explicitly specified output path for the MSI destination");
@@ -1126,10 +1134,10 @@ impl FromStr for WixObjKind {
             "bundle" => Ok(Self::Bundle),
             "fragment" => Ok(Self::Fragment),
             "product" => Ok(Self::Product),
-            v @ _ => Err(Self::Err::Generic(format!(
+            v => Err(Self::Err::Generic(format!(
                 "Unknown '{}' tag name from a WiX Object (wixobj) file.",
                 v
-            )))
+            ))),
         }
     }
 }
@@ -1174,7 +1182,7 @@ pub enum InstallerKind {
     /// [Installation Package Bundle]: https://wixtoolset.org/documentation/manual/v3/bundle/
     Exe,
     /// A Microsoft installer. This is the more common and typical installer to be created.
-    Msi
+    Msi,
 }
 
 impl InstallerKind {
@@ -1202,7 +1210,7 @@ impl InstallerKind {
     pub fn extension(&self) -> &'static str {
         match *self {
             Self::Exe => EXE_FILE_EXTENSION,
-            Self::Msi => MSI_FILE_EXTENSION
+            Self::Msi => MSI_FILE_EXTENSION,
         }
     }
 }
@@ -1214,7 +1222,10 @@ impl FromStr for InstallerKind {
         match &*value.to_lowercase() {
             "exe" => Ok(Self::Exe),
             "msi" => Ok(Self::Msi),
-            _ => Err(Self::Err::Generic(format!("Unknown '{}' file extension for an installer", value)))
+            _ => Err(Self::Err::Generic(format!(
+                "Unknown '{}' file extension for an installer",
+                value
+            ))),
         }
     }
 }
@@ -1229,16 +1240,17 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
     type Error = crate::Error;
 
     fn try_from(v: Vec<WixObjKind>) -> Result<Self> {
-        v.iter().fold(None, |a , v| {
-            match v {
+        v.iter()
+            .fold(None, |a, v| match v {
                 WixObjKind::Bundle => Some(Self::Exe),
                 WixObjKind::Product => a.or_else(|| Some(Self::Msi)),
                 _ => a,
-            }
-        }).ok_or(Self::Error::Generic(String::from(
-            "Could not determine the installer kind based on the WiX object \
+            })
+            .ok_or_else(|| Self::Error::Generic(String::from(
+                "Could not determine the installer kind based on the WiX object \
             files. There needs to be at least one 'product' or 'bundle' tag in \
-            the collective WiX source files (wxs).")))
+            the collective WiX source files (wxs).",
+            )))
     }
 }
 
@@ -1710,7 +1722,10 @@ mod tests {
 
         #[test]
         fn try_from_product_object_works() {
-            assert_eq!(WixObjKind::try_from(PRODUCT_WIXOBJ), Ok(WixObjKind::Product));
+            assert_eq!(
+                WixObjKind::try_from(PRODUCT_WIXOBJ),
+                Ok(WixObjKind::Product)
+            );
         }
 
         #[test]
@@ -1720,7 +1735,10 @@ mod tests {
 
         #[test]
         fn try_from_fragment_object_works() {
-            assert_eq!(WixObjKind::try_from(FRAGMENT_WIXOBJ), Ok(WixObjKind::Fragment));
+            assert_eq!(
+                WixObjKind::try_from(FRAGMENT_WIXOBJ),
+                Ok(WixObjKind::Fragment)
+            );
         }
 
         #[test]
@@ -1735,12 +1753,18 @@ mod tests {
 
         #[test]
         fn try_from_wixobj_single_product_works() {
-            assert_eq!(InstallerKind::try_from(vec![WixObjKind::Product]), Ok(InstallerKind::Msi))
+            assert_eq!(
+                InstallerKind::try_from(vec![WixObjKind::Product]),
+                Ok(InstallerKind::Msi)
+            )
         }
 
         #[test]
         fn try_from_wixobj_single_bundle_works() {
-            assert_eq!(InstallerKind::try_from(vec![WixObjKind::Bundle]), Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![WixObjKind::Bundle]),
+                Ok(InstallerKind::Exe)
+            )
         }
 
         #[test]
@@ -1755,80 +1779,100 @@ mod tests {
             InstallerKind::try_from(vec![
                 WixObjKind::Fragment,
                 WixObjKind::Fragment,
-                WixObjKind::Fragment]).unwrap();
+                WixObjKind::Fragment,
+            ])
+            .unwrap();
         }
 
         #[test]
         fn try_from_wixobj_product_and_bundle_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Product,
-                WixObjKind::Bundle]),
-            Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![WixObjKind::Product, WixObjKind::Bundle]),
+                Ok(InstallerKind::Exe)
+            )
         }
 
         #[test]
         fn try_from_wixobj_multiple_products_and_single_bundle_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Product,
-                WixObjKind::Product,
-                WixObjKind::Bundle,
-                WixObjKind::Product]),
-            Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Product,
+                    WixObjKind::Product,
+                    WixObjKind::Bundle,
+                    WixObjKind::Product
+                ]),
+                Ok(InstallerKind::Exe)
+            )
         }
 
         #[test]
         fn try_from_wixobj_multiple_fragments_and_single_product_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Fragment,
-                WixObjKind::Fragment,
-                WixObjKind::Product,
-                WixObjKind::Fragment]),
-            Ok(InstallerKind::Msi))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Fragment,
+                    WixObjKind::Fragment,
+                    WixObjKind::Product,
+                    WixObjKind::Fragment
+                ]),
+                Ok(InstallerKind::Msi)
+            )
         }
 
         #[test]
         fn try_from_wixobj_multiple_fragments_and_single_bundle_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Fragment,
-                WixObjKind::Fragment,
-                WixObjKind::Bundle,
-                WixObjKind::Fragment]),
-            Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Fragment,
+                    WixObjKind::Fragment,
+                    WixObjKind::Bundle,
+                    WixObjKind::Fragment
+                ]),
+                Ok(InstallerKind::Exe)
+            )
         }
 
         #[test]
         fn try_from_wixobj_multiple_fragments_and_products_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Fragment,
-                WixObjKind::Fragment,
-                WixObjKind::Product,
-                WixObjKind::Fragment,
-                WixObjKind::Product]),
-            Ok(InstallerKind::Msi))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Fragment,
+                    WixObjKind::Fragment,
+                    WixObjKind::Product,
+                    WixObjKind::Fragment,
+                    WixObjKind::Product
+                ]),
+                Ok(InstallerKind::Msi)
+            )
         }
 
-       #[test]
+        #[test]
         fn try_from_wixobj_multiple_products_and_bundles_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Product,
-                WixObjKind::Product,
-                WixObjKind::Bundle,
-                WixObjKind::Product,
-                WixObjKind::Bundle,
-                WixObjKind::Product]),
-            Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Product,
+                    WixObjKind::Product,
+                    WixObjKind::Bundle,
+                    WixObjKind::Product,
+                    WixObjKind::Bundle,
+                    WixObjKind::Product
+                ]),
+                Ok(InstallerKind::Exe)
+            )
         }
 
         #[test]
         fn try_from_wixobj_multiple_products_fragments_and_single_bundle_works() {
-            assert_eq!(InstallerKind::try_from(vec![
-                WixObjKind::Product,
-                WixObjKind::Product,
-                WixObjKind::Bundle,
-                WixObjKind::Fragment,
-                WixObjKind::Fragment,
-                WixObjKind::Product]),
-            Ok(InstallerKind::Exe))
+            assert_eq!(
+                InstallerKind::try_from(vec![
+                    WixObjKind::Product,
+                    WixObjKind::Product,
+                    WixObjKind::Bundle,
+                    WixObjKind::Fragment,
+                    WixObjKind::Fragment,
+                    WixObjKind::Product
+                ]),
+                Ok(InstallerKind::Exe)
+            )
         }
     }
 }
