@@ -242,10 +242,10 @@ pub enum Error {
     Toml(toml::de::Error),
     /// Parsing error for a version string or field.
     Version(semver::SemVerError),
-    /// Error parsing the intermediate wxiobj file
-    Parser(sxd_document::parser::Error),
-    /// Error evaluating an XPath expression
-    Executor(sxd_xpath::ExecutionError),
+    /// Parsing the intermediate WiX Object (wixobj) file, which is XML, failed.
+    Xml(sxd_document::parser::Error),
+    /// Evaluation of an XPath expression failed.
+    XPath(sxd_xpath::ExecutionError),
 }
 
 impl Error {
@@ -272,8 +272,8 @@ impl Error {
             Error::Mustache(..) => 5,
             Error::Toml(..) => 6,
             Error::Version(..) => 7,
-            Error::Parser(..) => 8,
-            Error::Executor(..) => 9,
+            Error::Xml(..) => 8,
+            Error::XPath(..) => 9,
         }
     }
 
@@ -343,8 +343,8 @@ impl Error {
             Error::Mustache(..) => "Mustache",
             Error::Toml(..) => "TOML",
             Error::Version(..) => "Version",
-            Error::Parser(..) => "Parser",
-            Error::Executor(..) => "Executor",
+            Error::Xml(..) => "XML",
+            Error::XPath(..) => "XPath",
         }
     }
 }
@@ -360,8 +360,8 @@ impl StdError for Error {
             Error::Mustache(ref err) => Some(err),
             Error::Toml(ref err) => Some(err),
             Error::Version(ref err) => Some(err),
-            Error::Parser(ref err) => Some(err),
-            Error::Executor(ref err) => Some(err),
+            Error::Xml(ref err) => Some(err),
+            Error::XPath(ref err) => Some(err),
             _ => None,
         }
     }
@@ -412,8 +412,8 @@ impl fmt::Display for Error {
             Error::Mustache(ref err) => err.fmt(f),
             Error::Toml(ref err) => err.fmt(f),
             Error::Version(ref err) => err.fmt(f),
-            Error::Parser(ref err) => err.fmt(f),
-            Error::Executor(ref err) => err.fmt(f),
+            Error::Xml(ref err) => err.fmt(f),
+            Error::XPath(ref err) => err.fmt(f),
         }
     }
 }
@@ -462,13 +462,13 @@ impl From<std::path::StripPrefixError> for Error {
 
 impl From<sxd_document::parser::Error> for Error {
     fn from(err: sxd_document::parser::Error) -> Self {
-        Error::Parser(err)
+        Error::Xml(err)
     }
 }
 
 impl From<sxd_xpath::ExecutionError> for Error {
     fn from(err: sxd_xpath::ExecutionError) -> Self {
-        Error::Executor(err)
+        Error::XPath(err)
     }
 }
 
