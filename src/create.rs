@@ -1067,21 +1067,52 @@ impl Default for Execution {
     }
 }
 
+/// The kind of WiX Object (wixobj) file.
 #[derive(Debug, PartialEq)]
 pub enum WixObjKind {
+    /// A WiX Object (wixobj) file that ultimately links back to a WiX Source
+    /// (wxs) file with a [`bundle`] tag.
+    ///
+    /// [`bundle`]: https://wixtoolset.org/documentation/manual/v3/xsd/wix/bundle.html
     Bundle,
+    /// A WiX Object (wixobj) file that ultimately links back to a WiX Source
+    /// (wxs) file with a [`fragment`] tag.
+    ///
+    /// [`fragment`]: https://wixtoolset.org/documentation/manual/v3/xsd/wix/fragment.html
     Fragment,
+    /// A WiX Object (wixobj) file that ultimately links back to a WiX Source
+    /// (wxs) file with a [`product`] tag.
+    ///
+    /// [`product`]: https://wixtoolset.org/documentation/manual/v3/xsd/wix/product.html
     Product,
-    Unknown,
 }
 
 impl WixObjKind {
+    /// Determines if the WiX Object (wixobj) file kind is a [`bundle`].
+    ///
+    /// # Examples
+    ///
+    /// A WiX Object (wixobj) file identified as a WXS Source (wxs) file
+    /// containing a [`bundle`] tag.
+    ///
+    /// ```
+    /// assert!(WixObjKind::Bundle.is_bundle())
+    /// ```
+    ///
+    /// A WiX Object (wixobj) file identified as a WXS Source (wxs) file
+    /// containing a [`product`] tag.
+    ///
+    /// ```
+    /// assert!(!WixObjKind::Product.is_bundle())
+    /// ```
+    ///
+    /// [`bundle`]: https://wixtoolset.org/documentation/manual/v3/xsd/wix/bundle.html
+    /// [`product`]: https://wixtoolset.org/documentation/manual/v3/xsd/wix/product.html
     pub fn is_bundle(&self) -> bool {
         match *self {
             Self::Bundle => true,
             Self::Fragment => false,
             Self::Product => false,
-            Self::Unknown => false,
         }
     }
 }
@@ -1094,7 +1125,10 @@ impl FromStr for WixObjKind {
             "bundle" => Ok(Self::Bundle),
             "fragment" => Ok(Self::Fragment),
             "product" => Ok(Self::Product),
-            _ => Ok(Self::Unknown)
+            v @ _ => Err(Self::Err::Generic(format!(
+                "Unknown '{}' tag name from a WiX Object (wixobj) file.",
+                v
+            )))
         }
     }
 }
@@ -1122,13 +1156,40 @@ impl TryFrom<&PathBuf> for WixObjKind {
     }
 }
 
+/// The kinds of installers that can be created using the WiX compiler
+/// (candle.exe) and linker (light.exe).
 #[derive(Debug, PartialEq)]
 pub enum InstallerKind {
+    /// An executable is used when an [Installation Package Bundle] is created.
+    ///
+    /// [Installation Package Bundle]: https://wixtoolset.org/documentation/manual/v3/bundle/
     Exe,
+    /// A Microsoft installer. This is the more common and typical installer to be created.
     Msi
 }
 
 impl InstallerKind {
+    /// Gets the file extension _without_ the dot separator.
+    ///
+    /// # Examples
+    ///
+    /// The extension for an installer of an [Installation Package Bundle]. Also
+    /// see the [`EXE_FILE_EXTENSION`] constant.
+    ///
+    /// ```
+    /// assert_eq!(InstallerKind::Exe.extension(), "exe")
+    /// ```
+    ///
+    /// The extension for a typical Microsoft installer. Also see the
+    /// [`MSI_FILE_EXTENSION`] constant.
+    ///
+    /// ```
+    /// assert_eq!(InstallerKind::Msi.extension(), "msi")
+    /// ```
+    ///
+    /// [Installation Package Bundle]: https://wixtoolset.org/documentation/manual/v3/bundle/
+    /// [`EXE_FILE_EXTENSION`]: lib.html#exe-file-extension
+    /// [`MSI_FILE_EXTENSION`]: lib.html#msi-file-extension
     pub fn extension(&self) -> &'static str {
         match *self {
             Self::Exe => EXE_FILE_EXTENSION,
