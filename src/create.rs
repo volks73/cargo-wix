@@ -1246,11 +1246,13 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
                 WixObjKind::Product => a.or_else(|| Some(Self::Msi)),
                 _ => a,
             })
-            .ok_or_else(|| Self::Error::Generic(String::from(
-                "Could not determine the installer kind based on the WiX object \
+            .ok_or_else(|| {
+                Self::Error::Generic(String::from(
+                    "Could not determine the installer kind based on the WiX object \
             files. There needs to be at least one 'product' or 'bundle' tag in \
             the collective WiX source files (wxs).",
-            )))
+                ))
+            })
     }
 }
 
@@ -1700,6 +1702,10 @@ mod tests {
     mod wixobj_kind {
         use super::*;
 
+        // I do not know if any of these XML strings are actually valid WiX
+        // Object (wixobj) files. These are just snippets to test the XPath
+        // evaluation.
+
         const PRODUCT_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
             <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
                 <section id="*" type="product"></section>
@@ -1720,6 +1726,18 @@ mod tests {
                 <section id="*" type="unknown"></section>
             </wixObject>"#;
 
+        const BUNDLE_AND_PRODUCT_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="bundle"></section>
+                <section id="*" type="product"></section>
+            </wixObject>"#;
+
+        const PRODUCT_AND_FRAGMENT_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="product"></section>
+                <section id="*" type="fragment"></section>
+            </wixObject>"#;
+
         #[test]
         fn try_from_product_object_works() {
             assert_eq!(
@@ -1738,6 +1756,22 @@ mod tests {
             assert_eq!(
                 WixObjKind::try_from(FRAGMENT_WIXOBJ),
                 Ok(WixObjKind::Fragment)
+            );
+        }
+
+        #[test]
+        fn try_from_bundle_and_product_object_works() {
+            assert_eq!(
+                WixObjKind::try_from(BUNDLE_AND_PRODUCT_WIXOBJ),
+                Ok(WixObjKind::Bundle)
+            );
+        }
+
+        #[test]
+        fn try_from_product_and_fragment_object_works() {
+            assert_eq!(
+                WixObjKind::try_from(PRODUCT_AND_FRAGMENT_WIXOBJ),
+                Ok(WixObjKind::Product)
             );
         }
 
