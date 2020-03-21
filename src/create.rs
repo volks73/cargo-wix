@@ -466,7 +466,8 @@ impl Execution {
             .iter()
             .map(WixObjKind::try_from)
             .collect::<Result<Vec<WixObjKind>>>()?)?;
-        let msi_destination = self.msi_destination(
+        debug!("installer_kind = {:?}", installer_kind);
+        let installer_destination = self.installer_destination(
             &name,
             &version,
             platform,
@@ -474,7 +475,7 @@ impl Execution {
             &installer_kind,
             &manifest,
         )?;
-        debug!("msi_destination = {:?}", msi_destination);
+        debug!("installer_destination = {:?}", installer_destination);
         // Link the installer
         info!("Linking the installer");
         let mut linker = self.linker()?;
@@ -500,7 +501,7 @@ impl Execution {
             .arg("WixUtilExtension")
             .arg(format!("-cultures:{}", culture))
             .arg("-out")
-            .arg(&msi_destination)
+            .arg(&installer_destination)
             .arg("-b")
             .arg(&base_path);
         if let Some(args) = &linker_args {
@@ -815,7 +816,7 @@ impl Execution {
         }
     }
 
-    fn msi_destination(
+    fn installer_destination(
         &self,
         name: &str,
         version: &Version,
@@ -1576,7 +1577,7 @@ mod tests {
             "#;
             let execution = Execution::default();
             let output = execution
-                .msi_destination(
+                .installer_destination(
                     "Different",
                     &"2.1.0".parse::<Version>().unwrap(),
                     Platform::X64,
