@@ -491,10 +491,6 @@ impl Execution {
             linker.stdout(Stdio::null());
             linker.stderr(Stdio::null());
         }
-        if let Some(l) = locale {
-            trace!("Using the a WiX localization file");
-            linker.arg("-loc").arg(l);
-        }
         linker
             .arg("-spdb")
             .arg("-ext")
@@ -506,6 +502,14 @@ impl Execution {
             .arg(&installer_destination)
             .arg("-b")
             .arg(&base_path);
+        if let Some(l) = locale {
+            trace!("Using the a WiX localization file");
+            linker.arg("-loc").arg(l);
+        }
+        if let InstallerKind::Exe = installer_kind {
+            trace!("Adding the WixBalExtension for the bundle-based installer");
+            linker.arg("-ext").arg("WixBalExtension");
+        }
         if let Some(args) = &linker_args {
             trace!("Appending linker arguments");
             linker.args(args);
