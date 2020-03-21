@@ -1141,14 +1141,14 @@ impl TryFrom<&PathBuf> for WixObjKind {
         let mut decoder = encoding_rs_io::DecodeReaderBytes::new(file);
         let mut content = String::new();
         decoder.read_to_string(&mut content)?;
-        Self::try_from(&content)
+        Self::try_from(content.as_str())
     }
 }
 
-impl TryFrom<&String> for WixObjKind {
+impl TryFrom<&str> for WixObjKind {
     type Error = crate::Error;
 
-    fn try_from(content: &String) -> Result<Self> {
+    fn try_from(content: &str) -> Result<Self> {
         let package = sxd_document::parser::parse(content)?;
         let document = package.as_document();
         let mut context = sxd_xpath::Context::new();
@@ -1685,31 +1685,72 @@ mod tests {
     }
 
     mod wixobj_kind {
+        use super::*;
 
+        const PRODUCT_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="product"></section>
+            </wixObject>"#;
+
+        const BUNDLE_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="bundle"></section>
+            </wixObject>"#;
+
+        const FRAGMENT_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="fragment"></section>
+            </wixObject>"#;
+
+        const UNKNOWN_WIXOBJ: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+            <wixObject version="3.0.2002.0" xmlns="http://schemas.microsoft.com/wix/2006/objects">
+                <section id="*" type="unknown"></section>
+            </wixObject>"#;
+
+        #[test]
+        fn try_from_product_object_works() {
+            assert_eq!(WixObjKind::try_from(PRODUCT_WIXOBJ), Ok(WixObjKind::Product));
+        }
+
+        #[test]
+        fn try_from_bundle_object_works() {
+            assert_eq!(WixObjKind::try_from(BUNDLE_WIXOBJ), Ok(WixObjKind::Bundle));
+        }
+
+        #[test]
+        fn try_from_fragment_object_works() {
+            assert_eq!(WixObjKind::try_from(FRAGMENT_WIXOBJ), Ok(WixObjKind::Fragment));
+        }
+
+        #[test]
+        #[should_panic]
+        fn try_from_unknown_object_fails() {
+            WixObjKind::try_from(UNKNOWN_WIXOBJ).unwrap();
+        }
     }
 
     mod installer_kind {
         use super::*;
 
         #[test]
-        fn from_wixobj_single_product_works() {
+        fn try_from_wixobj_single_product_works() {
             assert_eq!(InstallerKind::try_from(vec![WixObjKind::Product]), Ok(InstallerKind::Msi))
         }
 
         #[test]
-        fn from_wixobj_single_bundle_works() {
+        fn try_from_wixobj_single_bundle_works() {
             assert_eq!(InstallerKind::try_from(vec![WixObjKind::Bundle]), Ok(InstallerKind::Exe))
         }
 
         #[test]
         #[should_panic]
-        fn from_wixobj_single_fragment_fails() {
+        fn try_from_wixobj_single_fragment_fails() {
             InstallerKind::try_from(vec![WixObjKind::Fragment]).unwrap();
         }
 
         #[test]
         #[should_panic]
-        fn from_wixobj_multiple_fragments_fails() {
+        fn try_from_wixobj_multiple_fragments_fails() {
             InstallerKind::try_from(vec![
                 WixObjKind::Fragment,
                 WixObjKind::Fragment,
@@ -1717,7 +1758,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_product_and_bundle_works() {
+        fn try_from_wixobj_product_and_bundle_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Product,
                 WixObjKind::Bundle]),
@@ -1725,7 +1766,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_multiple_products_and_single_bundle_works() {
+        fn try_from_wixobj_multiple_products_and_single_bundle_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Product,
                 WixObjKind::Product,
@@ -1735,7 +1776,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_multiple_fragments_and_single_product_works() {
+        fn try_from_wixobj_multiple_fragments_and_single_product_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Fragment,
                 WixObjKind::Fragment,
@@ -1745,7 +1786,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_multiple_fragments_and_single_bundle_works() {
+        fn try_from_wixobj_multiple_fragments_and_single_bundle_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Fragment,
                 WixObjKind::Fragment,
@@ -1755,7 +1796,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_multiple_fragments_and_products_works() {
+        fn try_from_wixobj_multiple_fragments_and_products_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Fragment,
                 WixObjKind::Fragment,
@@ -1766,7 +1807,7 @@ mod tests {
         }
 
        #[test]
-        fn from_wixobj_multiple_products_and_bundles_works() {
+        fn try_from_wixobj_multiple_products_and_bundles_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Product,
                 WixObjKind::Product,
@@ -1778,7 +1819,7 @@ mod tests {
         }
 
         #[test]
-        fn from_wixobj_multiple_products_fragments_and_single_bundle_works() {
+        fn try_from_wixobj_multiple_products_fragments_and_single_bundle_works() {
             assert_eq!(InstallerKind::try_from(vec![
                 WixObjKind::Product,
                 WixObjKind::Product,
