@@ -1109,6 +1109,8 @@ impl WixObjKind {
     /// containing a [`bundle`] tag.
     ///
     /// ```
+    /// use wix::create::WixObjKind;
+    ///
     /// assert!(WixObjKind::Bundle.is_bundle())
     /// ```
     ///
@@ -1116,6 +1118,8 @@ impl WixObjKind {
     /// containing a [`product`] tag.
     ///
     /// ```
+    /// use wix::create::WixObjKind;
+    ///
     /// assert!(!WixObjKind::Product.is_bundle())
     /// ```
     ///
@@ -1198,6 +1202,8 @@ impl InstallerKind {
     /// see the [`EXE_FILE_EXTENSION`] constant.
     ///
     /// ```
+    /// use wix::create::InstallerKind;
+    ///
     /// assert_eq!(InstallerKind::Exe.extension(), "exe")
     /// ```
     ///
@@ -1205,6 +1211,8 @@ impl InstallerKind {
     /// [`MSI_FILE_EXTENSION`] constant.
     ///
     /// ```
+    /// use wix::create::InstallerKind;
+    ///
     /// assert_eq!(InstallerKind::Msi.extension(), "msi")
     /// ```
     ///
