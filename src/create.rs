@@ -42,6 +42,7 @@ use semver::Version;
 
 use std::convert::TryFrom;
 use std::env;
+use std::fmt;
 use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -461,15 +462,16 @@ impl Execution {
         }
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
-        let installer_kind: Result<InstallerKind> =
-            wixobj_sources.iter().map(InstallerKind::try_from).sum();
-        let installer_kind = installer_kind?;
+        let installer_kind = InstallerKind::try_from(wixobj_sources
+            .iter()
+            .map(WixObjKind::try_from)
+            .collect::<Result<Vec<WixObjKind>>>()?)?;
         let msi_destination = self.msi_destination(
             &name,
             &version,
             platform,
             debug_name,
-            installer_kind.is_bundle(),
+            &installer_kind,
             &manifest,
         )?;
         debug!("msi_destination = {:?}", msi_destination);
@@ -819,24 +821,19 @@ impl Execution {
         version: &Version,
         platform: Platform,
         debug_name: bool,
-        bundle: bool,
+        installer_kind: &InstallerKind,
         manifest: &Value,
     ) -> Result<PathBuf> {
-        let extension = if bundle {
-            EXE_FILE_EXTENSION
-        } else {
-            MSI_FILE_EXTENSION
-        };
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
                 name,
                 version,
                 platform.arch(),
-                extension
+                installer_kind
             )
         } else {
-            format!("{}-{}-{}.{}", name, version, platform.arch(), extension)
+            format!("{}-{}-{}.{}", name, version, platform.arch(), installer_kind)
         };
         if let Some(ref path_str) = self.output {
             trace!("Using the explicitly specified output path for the MSI destination");
@@ -1071,90 +1068,38 @@ impl Default for Execution {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum InstallerKind {
-    None,
-    Product,
+pub enum WixObjKind {
     Bundle,
-    Both,
+    Fragment,
+    Product,
     Unknown,
 }
 
-impl InstallerKind {
+impl WixObjKind {
     pub fn is_bundle(&self) -> bool {
         match *self {
-            Self::None => false,
-            Self::Product => false,
             Self::Bundle => true,
-            Self::Both => false,
+            Self::Fragment => false,
+            Self::Product => false,
             Self::Unknown => false,
         }
     }
 }
 
-impl FromStr for InstallerKind {
+impl FromStr for WixObjKind {
     type Err = crate::Error;
 
     fn from_str(value: &str) -> Result<Self> {
-        if value == "product" {
-            Ok(InstallerKind::Product)
-        } else if value == "bundle" {
-            Ok(InstallerKind::Bundle)
-        } else if value == "fragment" {
-            Ok(InstallerKind::Unknown)
-        } else {
-            Err(Self::Err::Generic(format!(
-                "Unknown '{}' installer kind",
-                value
-            )))
+        match &*value.to_lowercase() {
+            "bundle" => Ok(Self::Bundle),
+            "fragment" => Ok(Self::Fragment),
+            "product" => Ok(Self::Product),
+            _ => Ok(Self::Unknown)
         }
     }
 }
 
-impl std::ops::Add<InstallerKind> for InstallerKind {
-    type Output = InstallerKind;
-
-    fn add(self, rhs: InstallerKind) -> InstallerKind {
-        if rhs != InstallerKind::Unknown {
-            if self == rhs {
-                self
-            } else if self == InstallerKind::None {
-                rhs
-            } else if rhs == InstallerKind::None {
-                self
-            } else {
-                InstallerKind::Both
-            }
-        } else {
-            self
-        }
-    }
-}
-
-impl std::ops::AddAssign for InstallerKind {
-    fn add_assign(&mut self, other: Self) {
-        if other != InstallerKind::Unknown {
-            if *self == InstallerKind::None {
-                *self = other;
-            } else if *self != other {
-                *self = InstallerKind::Both;
-            } else {
-                // The two already have to be equal but this covers all possibilities.
-                *self = other;
-            }
-        }
-    }
-}
-
-impl std::iter::Sum for InstallerKind {
-    fn sum<I>(i: I) -> Self
-    where
-        I: Iterator<Item = Self>,
-    {
-        i.fold(InstallerKind::None, |a, v| a + v)
-    }
-}
-
-impl TryFrom<&PathBuf> for InstallerKind {
+impl TryFrom<&PathBuf> for WixObjKind {
     type Error = crate::Error;
 
     fn try_from(path: &PathBuf) -> Result<Self> {
@@ -1173,7 +1118,63 @@ impl TryFrom<&PathBuf> for InstallerKind {
             .unwrap()
             .unwrap();
         let value = xpath.evaluate(&context, document.root())?.string();
-        InstallerKind::from_str(&value)
+        Self::from_str(&value)
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum InstallerKind {
+    Exe,
+    Msi
+}
+
+impl InstallerKind {
+    pub fn extension(&self) -> &'static str {
+        match *self {
+            Self::Exe => EXE_FILE_EXTENSION,
+            Self::Msi => MSI_FILE_EXTENSION
+        }
+    }
+}
+
+impl FromStr for InstallerKind {
+    type Err = crate::Error;
+
+    fn from_str(value: &str) -> Result<Self> {
+        match &*value.to_lowercase() {
+            "exe" => Ok(Self::Exe),
+            "msi" => Ok(Self::Msi),
+            _ => Err(Self::Err::Generic(format!("Unknown '{}' file extension for an installer", value)))
+        }
+    }
+}
+
+impl fmt::Display for InstallerKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.extension())
+    }
+}
+
+impl TryFrom<Vec<WixObjKind>> for InstallerKind {
+    type Error = crate::Error;
+
+    fn try_from(v: Vec<WixObjKind>) -> Result<Self> {
+        v.iter().fold(None, |a , v| {
+            match v {
+                WixObjKind::Bundle => Some(Self::Exe),
+                WixObjKind::Product => a.or_else(|| Some(Self::Msi)),
+                _ => a,
+            }
+        }).ok_or(Self::Error::Generic(String::from(
+            "Could not determine the installer kind based on the WiX object \
+            files. There needs to be at least one 'product' or 'bundle' tag in \
+            the collective WiX source files (wxs).")))
+    }
+}
+
+impl Default for InstallerKind {
+    fn default() -> Self {
+        InstallerKind::Msi
     }
 }
 
@@ -1511,7 +1512,7 @@ mod tests {
                     &"2.1.0".parse::<Version>().unwrap(),
                     Platform::X64,
                     false,
-                    false,
+                    &InstallerKind::default(),
                     &PKG_META_WIX.parse::<Value>().unwrap(),
                 )
                 .unwrap();
@@ -1611,6 +1612,112 @@ mod tests {
                 execution.wixobj_destination().unwrap(),
                 PathBuf::from("target\\wix\\")
             )
+        }
+    }
+
+    mod wixobj_kind {
+
+    }
+
+    mod installer_kind {
+        use super::*;
+
+        #[test]
+        fn from_wixobj_single_product_works() {
+            assert_eq!(InstallerKind::try_from(vec![WixObjKind::Product]), Ok(InstallerKind::Msi))
+        }
+
+        #[test]
+        fn from_wixobj_single_bundle_works() {
+            assert_eq!(InstallerKind::try_from(vec![WixObjKind::Bundle]), Ok(InstallerKind::Exe))
+        }
+
+        #[test]
+        #[should_panic]
+        fn from_wixobj_single_fragment_fails() {
+            InstallerKind::try_from(vec![WixObjKind::Fragment]).unwrap();
+        }
+
+        #[test]
+        #[should_panic]
+        fn from_wixobj_multiple_fragments_fails() {
+            InstallerKind::try_from(vec![
+                WixObjKind::Fragment,
+                WixObjKind::Fragment,
+                WixObjKind::Fragment]).unwrap();
+        }
+
+        #[test]
+        fn from_wixobj_product_and_bundle_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Product,
+                WixObjKind::Bundle]),
+            Ok(InstallerKind::Exe))
+        }
+
+        #[test]
+        fn from_wixobj_multiple_products_and_single_bundle_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Product,
+                WixObjKind::Product,
+                WixObjKind::Bundle,
+                WixObjKind::Product]),
+            Ok(InstallerKind::Exe))
+        }
+
+        #[test]
+        fn from_wixobj_multiple_fragments_and_single_product_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Fragment,
+                WixObjKind::Fragment,
+                WixObjKind::Product,
+                WixObjKind::Fragment]),
+            Ok(InstallerKind::Msi))
+        }
+
+        #[test]
+        fn from_wixobj_multiple_fragments_and_single_bundle_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Fragment,
+                WixObjKind::Fragment,
+                WixObjKind::Bundle,
+                WixObjKind::Fragment]),
+            Ok(InstallerKind::Exe))
+        }
+
+        #[test]
+        fn from_wixobj_multiple_fragments_and_products_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Fragment,
+                WixObjKind::Fragment,
+                WixObjKind::Product,
+                WixObjKind::Fragment,
+                WixObjKind::Product]),
+            Ok(InstallerKind::Msi))
+        }
+
+       #[test]
+        fn from_wixobj_multiple_products_and_bundles_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Product,
+                WixObjKind::Product,
+                WixObjKind::Bundle,
+                WixObjKind::Product,
+                WixObjKind::Bundle,
+                WixObjKind::Product]),
+            Ok(InstallerKind::Exe))
+        }
+
+        #[test]
+        fn from_wixobj_multiple_products_fragments_and_single_bundle_works() {
+            assert_eq!(InstallerKind::try_from(vec![
+                WixObjKind::Product,
+                WixObjKind::Product,
+                WixObjKind::Bundle,
+                WixObjKind::Fragment,
+                WixObjKind::Fragment,
+                WixObjKind::Product]),
+            Ok(InstallerKind::Exe))
         }
     }
 }
