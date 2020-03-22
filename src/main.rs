@@ -85,7 +85,7 @@
 //! C:\Path\to\Project> cargo init --bin --vcs none --name example
 //! ```
 //!
-//! This will create a simple binary package named "example" without any verison
+//! This will create a simple binary package named "example" without any version
 //! control. While the `cargo wix` subcommand and binary does work with
 //! libraries (crates) in addition to binaries (applications), generally an
 //! installer is needed for a binary (application) not a library. Rust libraries
@@ -134,8 +134,8 @@
 //! ```
 //!
 //! This may take a moment to complete as the `cargo wix` subcommand will build
-//! the application with the _Release_ target and then build the installer. The
-//! installer will be located in the `target\wix` folder.
+//! the application with the _Release_ target profile and then build the
+//! installer. The installer will be located in the `target\wix` folder.
 //!
 //! ```dos
 //! C:\Path\to\Project> dir target\wix /B
@@ -162,7 +162,7 @@
 //! have this same license appear in the installation folder for the application
 //! so end-users can review it after installation.
 //!
-//! The license agreement dialog for a WiX Toolset created installer must be in
+//! The license agreement dialog for a WiX Toolset-created installer must be in
 //! the [Rich Text Format] (.rtf). The majority of Rust binaries and libraries
 //! are developed and distributed with an open source license. We will do the
 //! same for the example binary here and use the GPL-3.0 license. Creating a RTF
