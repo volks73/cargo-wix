@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Builder","A builder for running the `cargo wix` subcommand."],["Execution","A context for creating, or building, an installer."]]});
+initSidebarItems({"enum":[["InstallerKind","The kinds of installers that can be created using the WiX compiler (candle.exe) and linker (light.exe)."],["WixObjKind","The kind of WiX Object (wixobj) file."]],"struct":[["Builder","A builder for running the `cargo wix` subcommand."],["Execution","A context for creating, or building, an installer."]]});

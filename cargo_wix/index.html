@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><div class="block items"><ul><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1344' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><div class="block items"><ul><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1735' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
 <p>The goal of the cargo-wix project and the <code>cargo wix</code> subcommand is to make
 it easy to create a Windows installer (msi) for any Rust project. The
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but the core
@@ -10,7 +10,15 @@ focuses on the usage and features of the <code>cargo wix</code> subcommand.</p>
 <ul>
 <li><a href="#quick-start">Quick Start</a></li>
 <li><a href="#examples">Examples</a></li>
-<li><a href="#features">Features</a></li>
+<li><a href="#features">Features</a>
+<ul>
+<li><a href="#signing">Signing</a></li>
+<li><a href="#templates">Templates</a></li>
+<li><a href="#extensions">Extensions</a></li>
+<li><a href="#multiple-wix-sources">Multiple WiX Sources</a></li>
+<li><a href="#bundles">Bundles</a></li>
+</ul>
+</li>
 <li><a href="#configuration">Configuration</a></li>
 <li><a href="#flags-and-options">Flags and Options</a></li>
 </ul>
@@ -47,15 +55,16 @@ installation destination is <code>C:\Program Files\&lt;project name&gt;</code>, 
 <h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>All of the following examples use the native Command Prompt (cmd.exe) for
 the Windows OS; however, the <a href="https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx">Developer Prompt</a> installed with the <a href="https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017">VC Build
-Tools</a> is recommended. The <a href="https://gitforwindows.org/">git bash</a> terminal can also be used.</p>
-<p>Begin each example by staring the appropriate prompt and navigating to the
+Tools</a> is recommended. A <a href="https://gitforwindows.org/">git bash</a>, <a href="https://github.com/PowerShell/PowerShell">PowerShell</a>, or <a href="https://github.com/alacritty/alacritty">Alacritty</a> terminal can
+also be used.</p>
+<p>Begin each example by starting the appropriate prompt and navigating to the
 root folder of the Rust project. The <code>cargo wix</code> subcommand and binary
 assumes the current working directory (cwd) is the project, a.k.a. package,
 root folder, i.e. the same folder as the package's manifest (Cargo.toml).</p>
 <p>Let's create a basic project with Cargo and then an installer.</p>
 <pre><code class="language-dos">C:\Path\to\Project&gt; cargo init --bin --vcs none --name example
 </code></pre>
-<p>This will create a simple binary package named &quot;example&quot; without any verison
+<p>This will create a simple binary package named &quot;example&quot; without any version
 control. While the <code>cargo wix</code> subcommand and binary does work with
 libraries (crates) in addition to binaries (applications), generally an
 installer is needed for a binary (application) not a library. Rust libraries
@@ -92,16 +101,15 @@ created:</p>
 <pre><code class="language-dos">C:\Path\to\Project&gt; cargo wix
 </code></pre>
 <p>This may take a moment to complete as the <code>cargo wix</code> subcommand will build
-the application with the <em>Release</em> target and then build the installer. The
-installer will be located in the <code>target\wix</code> folder.</p>
+the application with the <em>Release</em> target profile and then build the
+installer. The installer will be located in the <code>target\wix</code> folder.</p>
 <pre><code class="language-dos">C:\Path\to\Project&gt; dir target\wix /B
 example-0.1.0-x86_64.msi
-example-0.1.0-x86_64.wixpdb
 main.wixobj
 </code></pre>
-<p>Great! An installer (msi) exists for the application. The
-<code>example-0.1.0-x86_54.wixpdb</code> and <code>main.wixobj</code> files are artifacts of the
-installer build process and can be ignored and/or deleted.</p>
+<p>Great! An installer (msi) exists for the application. The <code>main.wixobj</code> file
+is an artifact of the installer build process and can be ignored and/or
+deleted.</p>
 <p>The installer that is created with the above steps and commands will install
 the <code>example.exe</code> file to: <code>C:\Program Files\example\bin\example.exe</code>. It
 will also add the <code>C:\Program Files\example\bin</code> path to the <code>PATH</code> system
@@ -115,7 +123,7 @@ dialog appear in the installer that allows the end-user to review and
 acknowledge the End User License Agreement (EULA). It would also be nice to
 have this same license appear in the installation folder for the application
 so end-users can review it after installation.</p>
-<p>The license agreement dialog for a WiX Toolset created installer must be in
+<p>The license agreement dialog for a WiX Toolset-created installer must be in
 the <a href="https://en.wikipedia.org/wiki/Rich_Text_Format">Rich Text Format</a> (.rtf). The majority of Rust binaries and libraries
 are developed and distributed with an open source license. We will do the
 same for the example binary here and use the GPL-3.0 license. Creating a RTF
@@ -218,26 +226,29 @@ variable that is created during installation of the WiX Toolset is a path to
 the installation folder that contains the <code>bin</code> folder. The <code>WIX</code> system
 environment variable is used by the <code>cargo wix</code> subcommand with
 the <a href="https://doc.rust-lang.org/std/process/struct.Command.html"><code>std::process::Command</code></a> module to create installers.</p>
+<h3 id="signing" class="section-header"><a href="#signing">Signing</a></h3>
 <p>The Windows SDK provides a signer (<code>signtool</code>) application for signing
 installers. The application is installed in the <code>bin</code> folder of the Windows
 SDK installation. The location of the <code>bin</code> folder varies depending on the
 version. It is recommended to use the Developer Prompt to ensure the
 <code>signtool</code> application is available. Signing an installer is optional.</p>
-<p>The WiX Toolset requires a WiX Source (wxs) file, which is an <a href="https://en.wikipedia.org/wiki/XML">XML</a> file. A
+<h3 id="templates" class="section-header"><a href="#templates">Templates</a></h3>
+<p>The WiX Toolset requires a WiX Source (WXS) file, which is an <a href="https://en.wikipedia.org/wiki/XML">XML</a> file. A
 template is provided with this binary that attempts to meet the majority
 of use cases for developers and avoid requiring extensive knowledge of the
 WiX Toolset and Windows installer technologies. Modification of the template
 is encouraged, but please consult the WiX Toolset's extensive
 <a href="http://wixtoolset.org/documentation/">documentation</a> and <a href="https://www.firegiant.com/wix/tutorial/">tutorials</a> for information about writing (authoring),
-customizing, and using wxs files. This documentation here is only for this
+customizing, and using WXS files. This documentation here is only for this
 binary and subcommand.</p>
 <p>The <a href="../wix/enum.Template.html">WXS</a> template is embedded in the binary installation of the subcommand
 and it can be printed to STDOUT using the <code>cargo wix print wxs</code> command from
 the command prompt (cmd.exe). Note, each time the <code>cargo wix print wxs</code>
-command is invoked, new GUIDs are generated for fields that require them.
-Thus, a developer does not need to worry about generating GUIDs and can
-begin using the template immediately with this subcommand or the WiX
-Toolset's compiler (<code>candle.exe</code>) and linker (<code>light.exe</code>) applications.</p>
+command is invoked, new Globally Unique Identifiers (<a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">GUID</a>) are generated
+for fields that require them. Thus, a developer does not need to worry about
+generating GUIDs and can begin using the template immediately with this
+subcommand or the WiX Toolset's compiler (<code>candle.exe</code>) and linker
+(<code>light.exe</code>) applications.</p>
 <p>In addition to the WXS template, there are several license templates which
 are used to generate an End User License Agreement (EULA) during the <code>cargo wix init</code> command. Depending on the license ID(s) in the <code>license</code> field for
 a package's manifest (Cargo.toml), a license file in the Rich Text Format
@@ -256,7 +267,7 @@ if a <a href="https://en.wikipedia.org/wiki/Sidecar_file">sidecar</a> license fi
 alongside the <code>bin</code> folder. The <code>license</code> field appears to be the more
 commonly used field to describe the licensing for a Rust project and
 package, while the <code>license-file</code> field is used to specify a custom, or
-properitary, license.</p>
+proprietary, license.</p>
 <p>The top three most common licenses for Rust projects are supported from the
 <code>license</code> field, i.e. MIT, Apache-2.0, and GPLv3. If any of these three
 supported open source licenses are used for the <code>license</code> field, then a
@@ -271,13 +282,203 @@ sidecar file is included in the installation and no license agreement dialog
 appears during installation. This default behavior can be overridden with
 the <code>-l,--license</code> and <code>-e,--eula</code> options for the <code>cargo wix init</code>
 subcommand.</p>
-<p>The <a href="https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html">WixUIExtension</a> and <a href="https://wixtoolset.org/documentation/manual/v3/xsd/util/">WixUtilExtension</a> is included in every execution
-of the default create cargo-wix subcommand, i.e. <code>cargo wix</code>. This is the
+<h3 id="extensions" class="section-header"><a href="#extensions">Extensions</a></h3>
+<p>The <a href="https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html">WixUIExtension</a> and <a href="https://wixtoolset.org/documentation/manual/v3/xsd/util/">WixUtilExtension</a> are included in every execution
+of the default <em>create</em> cargo-wix subcommand, i.e. <code>cargo wix</code>. This is the
 same as calling either the compiler (candle.exe) or the linker (light.exe)
 with the <code>-ext WixUIExtension -ext WixUtilExtension</code> options. These two
 extensions are commonly used to create installers when using the WiX
 Toolset, so these are included by default. Additionally, the WixUIExtension
 is used for the template WXS file.</p>
+<p>Additionally, the <a href="https://wixtoolset.org/documentation/manual/v3/bundle/wixstdba/">WixBalExtension</a> is automatically included if the
+cargo-wix subcommand detects a bundle (exe) is to be created instead of a
+MSI package. See the <a href="#bundles">Bundles</a> section for more information about
+creating and managing bundles with the cargo-wix subcommand.</p>
+<h3 id="multiple-wix-sources" class="section-header"><a href="#multiple-wix-sources">Multiple WiX Sources</a></h3>
+<p>The cargo-wix subcommand supports including multiple WXS files when creating
+an installer. A lot of customization is possible through the WXS file and
+sometimes the installer's source code becomes its own project where
+organization and formatting are important. Breaking up a single, large WXS
+file into multiple WXS files can be useful for code readability and project
+navigation. Thus, cargo-wix will include any file with the <code>.wxs</code> file
+extension found in the default source folder, <code>wix</code>, when creating an
+installer. For example, say you have the following project with three WXS
+files in the <code>wix</code> sub-folder:</p>
+<pre><code class="language-dos">C:\Path\to\Project&gt; dir /B
+Cargo.toml
+src
+wix
+C:\Path\to\Project&gt; dir wix /B
+first.wxs
+second.wxs
+third.wxs
+</code></pre>
+<p>When the <code>cargo wix</code> default <em>create</em> command is executed, all three WXS files
+will be included and used to create the installer. Generally, this
+translates to the following set of commands:</p>
+<pre><code class="language-dos">C:\Path\to\Project&gt; candle -out target\wix\ wix\first.wxs wix\second.wxs wix\third.wxs
+C:\Path\to\Project&gt; light -out target\wix\example-0.1.0-x86_64.msi target\wix\first.wixobj target\wix\second.wixobj target\wix\third.wixobj
+</code></pre>
+<p>Alternatively, multiple WXS files can also be included when creating an
+installer by including the relative or absolute paths to the WXS files as
+arguments to the subcommand, but any WXS files in the default, <code>wix</code>,
+sub-folder are ignored and would have to be explicitly included. For
+example,</p>
+<pre><code class="language-dos">C:\Path\To\Project&gt; cargo wix path\to\first\wxs\file\one.wxs path\to\second\wxs\file\two.wxs
+</code></pre>
+<h3 id="bundles" class="section-header"><a href="#bundles">Bundles</a></h3>
+<p>It is possible to create <a href="https://wixtoolset.org/documentation/manual/v3/bundle/">bundle-based installers</a> with the WiX Toolset. The
+cargo-wix subcommand and binary currently offer limited support for creating
+bundles from Rust projects. This includes automatically detecting if a
+bundle is to be created by inspecting all WiX Object (wixobj) files before
+linking and changing the file extension from <code>msi</code> to <code>exe</code>, as bundles
+require the executable (exe) file extension. In addition to automatically
+changing the file extension of the installer, the <a href="https://wixtoolset.org/documentation/manual/v3/bundle/wixstdba/">WixBalExtension</a> is
+included automatically during linking if a bundle is detected because this
+extension includes a standard bootstrapper application that is commonly used
+to build and customize bundles.</p>
+<p>While the cargo-wix subcommand does provide some support for bundles with
+automatic file extension determination and inclusion of useful
+bundle-centric extensions, the process for creating a bundle for a Rust
+project is currently a manual process. Let's assume the following
+<a href="https://doc.rust-lang.org/cargo/reference/workspaces.html">workspace</a>-based Rust project layout and structure:</p>
+<pre><code class="language-text">|-- C:\Path\to\Rust\Project
+|-- |-- Cargo.toml
+|-- |-- client
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- server
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+</code></pre>
+<p>The virtual manifest, Cargo.toml, in the root of the project is a <a href="https://doc.rust-lang.org/cargo/reference/workspaces.html">virtual
+manifest</a> that only contains the following:</p>
+<pre><code class="language-toml">[workspace]
+members = [&quot;client&quot;, &quot;server&quot;]
+</code></pre>
+<p>The package manifests for the workspace members, <code>client\Cargo.toml</code> and
+<code>server\Cargo.toml</code>, are the typical package manifests content for a binary
+package.</p>
+<p>The goal is to create a bundle-based executable that contains and
+installs both the client and server packages through their respective
+installers (MSI packages). A combination of manual file manipulation and the
+cargo-wix subcommand can be used to accomplish this goal, all from the root
+of the workspace. Begin by creating the WiX Source (wxs) files for the
+client and server MSI packages:</p>
+<pre><code class="language-dos">C:\Path\to\Rust\Workspace&gt; cargo wix init client\Cargo.toml
+C:\Path\to\Rust\Workspace&gt; cargo wix init server\Cargo.toml
+</code></pre>
+<p>The following project layout should have been created:</p>
+<pre><code class="language-text">|-- C:\Path\to\Rust\Workspace
+|-- |-- Cargo.toml
+|-- |-- client
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+|-- |-- server
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+</code></pre>
+<p>The WiX Source (wxs) files created for the client and server crates of the
+Rust workspace using the cargo-wix subcommand will be generated following
+the normal rules, features, and templates when using the <code>cargo wix init</code>
+within a non-workspace-based project.</p>
+<p>With the WiX Source (wxs) files created for the two MSI-based installers, a
+bundle-based WiX Source (wxs) file must be created for the workspace and
+bundle. Create a new <code>main.wxs</code> file and place it in a <code>wix</code> sub-folder
+relative to the workspace root. The following project layout should exist:</p>
+<pre><code class="language-text">|-- C:\Path\to\Rust\Workspace
+|-- |-- Cargo.toml
+|-- |-- client
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+|-- |-- server
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+|-- |-- wix
+|-- |-- |-- main.wxs
+</code></pre>
+<p>Open the <code>wix\main.wxs</code> file in a suitable text editor and add the following
+XML to it to define the bundle:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;Wix xmlns=&quot;http://schemas.microsoft.com/wix/2006/wi&quot;&gt;
+  &lt;Bundle Version=&quot;1.0.0&quot; UpgradeCode=&quot;[Your GUID Here]&quot;&gt;
+    &lt;BootstrapperApplicationRef Id=&quot;WixStandardBootstrapperApplication.RtfLicense&quot;/&gt;
+    &lt;Chain&gt;
+      &lt;MsiPackage SourceFile=&quot;client\target\wix\client-0.1.0-x86_64.msi&quot; /&gt;
+      &lt;MsiPackage SourceFile=&quot;server\target\wix\server-0.1.0-x86_64.msi&quot; /&gt;
+    &lt;/Chain&gt;
+  &lt;/Bundle&gt;
+&lt;/Wix&gt;
+</code></pre>
+<p>A GUID will need to be manually generated for the <code>UpgradeCode</code> attribute of
+the <code>Bundle</code> tag and used to replace the <code>[Your GUID Here]</code> value. Now, the
+bundle can be created but first both the client and server MSI packages must
+be created. Thus, creating the bundle is a multi-step, or multi-command,
+process:</p>
+<pre><code class="language-dos">C:\Path\to\Workspace&gt; cargo wix client\Cargo.toml
+C:\Path\to\Workspace&gt; cargo wix server\Cargo.toml
+C:\Path\to\Workspace&gt; cargo wix --name Bundle --install-version 1.0.0
+</code></pre>
+<p>The following project layout should exist:</p>
+<pre><code class="language-text">|-- C:\Path\to\Rust\Workspace
+|-- |-- Cargo.toml
+|-- |-- client
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- target
+|-- |-- |-- |-- wix
+|-- |-- |-- |-- |-- server-0.1.0-x86_64.msi
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+|-- |-- server
+|-- |-- |-- Cargo.toml
+|-- |-- |-- src
+|-- |-- |-- |-- main.rs
+|-- |-- |-- target
+|-- |-- |-- |-- wix
+|-- |-- |-- |-- |-- server-0.1.0-x86_64.msi
+|-- |-- |-- wix
+|-- |-- |-- |-- main.wxs
+|-- |-- target
+|-- |-- |-- Release
+|-- |-- |-- |-- client.exe
+|-- |-- |-- |-- server.exe
+|-- |-- |-- wix
+|-- |-- |-- |-- Bundle-1.0.0-x86_64.exe
+|-- |-- wix
+|-- |-- |-- main.wxs
+</code></pre>
+<p>Note the built binaries are located in the <code>target\Release</code> folder relative
+to the workspace root as opposed to the <code>client\target\Release</code> and
+<code>server\target\Release</code> folders, even though the MSI packages are available
+in the member's <code>target\wix</code> folders. This will fail if the various <code>cargo wix</code> commands are <em>not</em> executed from the workspace root.</p>
+<p>The <code>name</code> and <code>install-version</code> options can be moved into a
+<a href="#configuration">configuration</a> section for the subcommand within the
+virtual manifest of the workspace, i.e. the Cargo.toml file with the
+<code>[workspace]</code> section to avoid having to retype them each time a bundle is
+created, but all three <code>cargo wix</code> commands must be issued each time.</p>
+<p>While the above steps will create a bundle installer for the workspace-based
+Rust project with a default, placeholder EULA, it is very manual and
+cumbersome. For example, the bundle-based WiX Source (wxs) file will have to
+be manually updated each time the version numbers of the member MSI packages
+are changed because the paths to the source files are hard-coded in the XML.
+Efforts are underway to improve support within the cargo-wix subcommand for
+both workspaces and bundles (<a href="https://github.com/volks73/cargo-wix/issues/74">Issue #74</a> and <a href="https://github.com/volks73/cargo-wix/issues/98">Issue #98</a>).</p>
 <h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
 <p>The default subcommand, <code>cargo wix</code>, which creates a MSI based on the
 contents of the package's manifest (Cargo.toml) can be configured by adding
@@ -289,8 +490,12 @@ override the value in the metadata section.</p>
 <p>Below is an example <code>[package.metadata.wix]</code> section from a package's
 manifest that configures the default <em>create</em> subcommand:</p>
 <pre><code class="language-toml">[package.metadata.wix]
+compiler-args = [&quot;-nologo&quot;, &quot;-wn&quot;]
 culture = &quot;Fr-Fr&quot;
-input = &quot;Path\to\WIX\Source\File.wxs&quot;
+dbg-build = false
+dbg-name = false
+include = [&quot;Path\to\WIX\Source\File\One.wxs&quot;, &quot;Path\to\WIX\Source\File\Two.wxs&quot;]
+linker-args = [&quot;-nologo&quot;]
 locale = &quot;Path\to\WIX\Localization\File.wxl&quot;
 name = &quot;example&quot;
 no-build = false
@@ -306,6 +511,16 @@ a different version number from the package, which is useful with multiple
 binaries, workspaces, or distributing a &quot;suite&quot; of applications, where the
 version number would be for the suite and not necessarily the individual
 applications within the suite.</p>
+<p>Please note that unlike most of the fields, the <code>include</code> field is an <a href="https://github.com/toml-lang/toml#user-content-array">TOML
+array</a> instead of a string value. This is the same as passing multiple paths
+to the default <em>create</em> subcommand using multiple <code>-I,--include</code> options or
+including multiple WXS files in the default, <code>wix</code>, project source location.</p>
+<p>The only CLI option, or argument, that is not supported in the
+<code>[package.metadata.wix]</code> section is the <code>&lt;INPUT&gt;</code> argument for the default
+<em>create</em> command, which specifies a relative or absolute path to a package's
+manifest file. The assumption is that the package manifest (Cargo.toml) to
+be used for the default <em>create</em> subcommand is the same manifest that
+contains the <code>[package.metadata.wix]</code> section.</p>
 <h2 id="flags-and-options" class="section-header"><a href="#flags-and-options">Flags and Options</a></h2>
 <p>Generally, any value that is obtained from the package's manifest
 (Cargo.toml) can be overridden at the command line with an appropriate
@@ -327,8 +542,7 @@ subcommands.</p>
 the top of each dialog in the installer. The banner image dimensions should
 be 493 x 58 pixels.</p>
 <h3 id="-b--bin-path" class="section-header"><a href="#-b--bin-path"><code>-b,--bin-path</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>)
-subcommands.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>) subcommands.</p>
 <p>The <code>-b,--bin-path</code> option can be used to specify a path (relative or
 absolute) to the WiX Toolset <code>bin</code> folder. The <code>-b,--bin-path</code> option is
 useful if a different version of the WiX Toolset needs to be used to create
@@ -353,11 +567,36 @@ installer.</p>
 include in the installer. The value is a path to a binary file. The file
 stem (file name without extension) is used as the binary name within the WXS
 file. A relative or absolute path is acceptable.</p>
+<h3 id="-c--compiler-arg" class="section-header"><a href="#-c--compiler-arg"><code>-C,--compiler-arg</code></a></h3>
+<p>Available for the default _create (<code>cargo wix</code>) subcommand.</p>
+<p>Appends an argument to the WiX compiler (candle.exe) invocation. This
+provides a mechanism for &quot;passing&quot; arguments to the compiler. This can be called
+multiple times to pass multiple arguments (flags or options). Note, if it is an
+option, i.e. argument with an accompanying value, then the value must be passed
+as a separate usage of this option. For example, adding an user-defined compiler
+extension would require the following command <code>cargo wix -C -ext -C UserDefinedExtension</code> to yield a <code>candle -ext UserDefinedExtension</code> invocation.</p>
 <h3 id="-c--culture" class="section-header"><a href="#-c--culture"><code>-c,--culture</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Sets the culture for localization. Use with the [<code>-l,--locale</code>] option. See
 the <a href="http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html">WixUI localization documentation</a> for more information about acceptable
 culture codes. The codes are case insensitive.</p>
+<h3 id="-d--dbg-build" class="section-header"><a href="#-d--dbg-build"><code>-d,--dbg-build</code></a></h3>
+<p>Available only for the default <em>create</em> (<code>cargo wix</code>) subcommmand.</p>
+<p>Builds the package using the Debug profile instead of the Release profile
+with Cargo. This flag is ignored if the <code>--no-build</code> flag is used. The
+default is to build the package with the Release profile.</p>
+<h3 id="-d--dbg-name" class="section-header"><a href="#-d--dbg-name"><code>-D,--dbg-name</code></a></h3>
+<p>Available only for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Appends <code>-debug</code> to the file stem (portion before the dot and file
+extension) of the installer's file name. The default is to <em>not</em> include the
+suffix. Generally, this should be used to indicate an installer contains a
+binary that was built with debugging information and minimal optimizations
+as a tradeoff for being able to troubleshoot execution of the application on
+an end-user's system. A release build generally does not contain any
+debugging information but includes optimizations. It is typical to use this
+flag with the <code>-d,--dbg-build</code> flag but it is not required. This allows a
+developer to provide other mechanisms for creating a debugging variant of
+his or her application and still use the Release profile.</p>
 <h3 id="-d--description" class="section-header"><a href="#-d--description"><code>-d,--description</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>), <em>print</em> (<code>cargo wix print</code>),
 and <em>sign</em> (<code>cargo wix sign</code>) subcommands.</p>
@@ -367,8 +606,8 @@ installer. This can be overridden using the <code>-d,--description</code> option
 the <code>cargo wix init</code> or <code>cargo wix sign</code> subcommands, respectively.</p>
 <h3 id="-d--dialog" class="section-header"><a href="#-d--dialog"><code>-D,--dialog</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
-subcommands.
-Sets the path to a bitmap (.bmp) image file that will be displayed to the
+subcommands.</p>
+<p>Sets the path to a bitmap (.bmp) image file that will be displayed to the
 left on the first dialog of the installer. The dialog image dimensions
 should be 493 x 312 pixels. The first dialog is known as the &quot;Welcome&quot;
 dialog.</p>
@@ -380,11 +619,11 @@ Agreement (EULA) for the license agreement dialog of the installer. The
 default is to disable the license agreement dialog unless one of the
 supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the
 value of the <code>license</code> field in the package's manifest (Cargo.toml). An EULA
-can be enabled later by directly modifying the WiX Source (wxs) file with a
+can be enabled later by directly modifying the WiX Source (WXS) file with a
 text editor.</p>
 <h3 id="--force" class="section-header"><a href="#--force"><code>--force</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) subcommand.</p>
-<p>Forces overriding of generated files from the <em>init</em> subcommand. Use with
+<p>Forces overwriting of generated files from the <em>init</em> subcommand. Use with
 caution! This cannot be undone.</p>
 <h3 id="-h--help" class="section-header"><a href="#-h--help"><code>-h,--help</code></a></h3>
 <p>Available for all subcommands.</p>
@@ -393,12 +632,21 @@ the long flag, <code>--help</code>, will print a more detailed version of the he
 text.</p>
 <h3 id="-u--homepage" class="section-header"><a href="#-u--homepage"><code>-u,--homepage</code></a></h3>
 <p>Available for the <em>sign</em> (<code>cargo wix sign</code>) subcommand.</p>
-<p>This will be display in the ACL dialog.</p>
+<p>This will be displayed in the ACL dialog.</p>
 <h3 id="-i--install-version" class="section-header"><a href="#-i--install-version"><code>-i,--install-version</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Overrides the version from the package's manifest (Cargo.toml), which is
 used for the installer name and appears in the Add/Remove Programs (ARP)
 control panel.</p>
+<h3 id="-i--include" class="section-header"><a href="#-i--include"><code>-I,--include</code></a></h3>
+<p>Available only for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
+<p>This option can be used multiple times to include multiple WiX Source (WXS)
+files in the creation of an installer. The option takes a path to a single
+WXS file as its value. Any WXS files located in the default <code>wix</code> folder
+located within the package's root folder, i.e. same location as the
+package's manifest (Cargo.toml) are automatically included and used in the
+creation of the installer. This option allows the inclusion of other WXS
+files outside of the default <code>wix</code> location.</p>
 <h3 id="-l--license" class="section-header"><a href="#-l--license"><code>-l,--license</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
@@ -408,9 +656,17 @@ license file does not exist, cannot be found, or is not specified, then no
 license file is included in the installer or in the installation folder
 along side the <code>bin</code> folder. A file containing the license, such as a TXT,
 PDF, or RTF file, can be added later by directly editing the generated WiX
-Source file (wxs) in a text editor.</p>
+Source file (WXS) in a text editor.</p>
+<h3 id="-l--linker-arg" class="section-header"><a href="#-l--linker-arg"><code>-L,--linker-arg</code></a></h3>
+<p>Available for the default _create (<code>cargo wix</code>) subcommand.</p>
+<p>Appends an argument to the WiX linker (light.exe) invocation. This provides
+a mechanism for &quot;passing&quot; arguments to the linker. This can be called
+multiple times to pass multiple arguments (flags or options). Note, if it is
+an option, i.e. argument with an accompanying value, then the value must be
+passed as a separate usage of this option. For example, adding an
+user-defined linker extension would require the following command <code>cargo wix -L -ext -L UserDefinedExtension</code> to yield a <code>light -ext UserDefinedExtension</code> invocation.</p>
 <h3 id="-l--locale" class="section-header"><a href="#-l--locale"><code>-l,--locale</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Sets the path to a WiX localization file (wxl) which contains localized
 strings. Use in conjunction with the [<code>-c,--culture</code>] option.</p>
 <h3 id="-m--manufacturer" class="section-header"><a href="#-m--manufacturer"><code>-m,--manufacturer</code></a></h3>
@@ -419,31 +675,31 @@ subcommands.</p>
 <p>Overrides the first author in the <code>authors</code> field of the package's manifest
 (Cargo.toml) as the manufacturer within the installer. The manufacturer can
 be changed after initialization by directly modifying the WiX Source file
-(wxs) with a text editor.</p>
+(WXS) with a text editor.</p>
 <h3 id="-n--name" class="section-header"><a href="#-n--name"><code>-n,--name</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Overrides the <code>name</code> field in the package's manifest (Cargo.toml), which is
 used in the file name of the installer (msi). This does not change the name
 of the executable <em>within</em> the installer.</p>
 <h3 id="--no-build" class="section-header"><a href="#--no-build"><code>--no-build</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) subcommand.</p>
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>This skips building the Rust package using Cargo for the Release target.</p>
 <h3 id="--nocapture" class="section-header"><a href="#--nocapture"><code>--nocapture</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>)
+<p>Available for the default <em>create</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>)
 subcommands.</p>
 <p>Displays all output from the builder (Cargo), compiler (candle.exe), linker
 (light.exe), and signer (signtool.exe) applications.</p>
 <h3 id="-o--output" class="section-header"><a href="#-o--output"><code>-o,--output</code></a></h3>
-<p>Available for the <em>default</em> (<code>cargo wix</code>), <em>init</em> (<code>cargo wix init</code>) and
+<p>Available for the default <em>create</em> (<code>cargo wix</code>), <em>init</em> (<code>cargo wix init</code>) and
 <em>print</em> (<code>cargo wix print</code>) subcommands.</p>
 <p>Sets the destination for <em>init</em> subcommand files, such as the WiX Source
-file (wxs), an alternative to stdout for <em>print</em> subcommand, and the created
-installer for the <em>default</em> subcommand.</p>
-<p>When used with the <em>default</em> subcommand to create an installer (MSI), if the
-path is to an existing directory or the path has a trailing <code>/</code> or <code>\</code>, then
-the MSI will be available after creation at the specified path, but the MSI
-file name will be the default file name based on the package name, version,
-and platform.</p>
+file (WXS), an alternative to stdout for <em>print</em> subcommand, and the created
+installer for the default <em>create</em> subcommand.</p>
+<p>When used with the default <em>create</em> subcommand to create an installer (MSI),
+if the path is to an existing directory or the path has a trailing <code>/</code> or
+<code>\</code>, then the MSI will be available after creation at the specified path,
+but the MSI file name will be the default file name based on the package
+name, version, and platform.</p>
 <h3 id="-o--owner" class="section-header"><a href="#-o--owner"><code>-O,--owner</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>

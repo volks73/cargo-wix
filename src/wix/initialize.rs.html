@@ -854,41 +854,6 @@
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2018 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -1299,12 +1264,7 @@
                     <span class="ident">eula_printer</span>
                         .<span class="ident">copyright_holder</span>(<span class="self">self</span>.<span class="ident">copyright_holder</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
                     <span class="ident">eula_printer</span>.<span class="ident">copyright_year</span>(<span class="self">self</span>.<span class="ident">copyright_year</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
-                    <span class="ident">eula_printer</span>.<span class="ident">input</span>(
-                        <span class="self">self</span>.<span class="ident">input</span>
-                            .<span class="ident">as_ref</span>()
-                            .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                            .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-                    );
+                    <span class="ident">eula_printer</span>.<span class="ident">input</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
                     <span class="ident">eula_printer</span>.<span class="ident">output</span>(<span class="ident">destination</span>.<span class="ident">as_path</span>().<span class="ident">to_str</span>());
                     <span class="ident">eula_printer</span>.<span class="ident">build</span>().<span class="ident">run</span>(<span class="ident">template</span>)<span class="question-mark">?</span>;
                 }
@@ -1326,12 +1286,7 @@
         } <span class="kw">else</span> {
             <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Creating the &#39;{}&#39; file&quot;</span>, <span class="ident">destination</span>.<span class="ident">display</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wxs_printer</span> <span class="op">=</span> <span class="ident">print</span>::<span class="ident">wxs</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
-            <span class="ident">wxs_printer</span>.<span class="ident">banner</span>(
-                <span class="self">self</span>.<span class="ident">banner</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
+            <span class="ident">wxs_printer</span>.<span class="ident">banner</span>(<span class="self">self</span>.<span class="ident">banner</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">binaries</span>(<span class="self">self</span>.<span class="ident">binaries</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> {
                 <span class="ident">b</span>.<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
@@ -1339,39 +1294,14 @@
                     .<span class="ident">collect</span>()
             }));
             <span class="ident">wxs_printer</span>.<span class="ident">description</span>(<span class="self">self</span>.<span class="ident">description</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
-            <span class="ident">wxs_printer</span>.<span class="ident">dialog</span>(
-                <span class="self">self</span>.<span class="ident">dialog</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
-            <span class="ident">wxs_printer</span>.<span class="ident">eula</span>(
-                <span class="ident">eula_wxs_path</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
+            <span class="ident">wxs_printer</span>.<span class="ident">dialog</span>(<span class="self">self</span>.<span class="ident">dialog</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
+            <span class="ident">wxs_printer</span>.<span class="ident">eula</span>(<span class="ident">eula_wxs_path</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">help_url</span>(<span class="self">self</span>.<span class="ident">help_url</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
-            <span class="ident">wxs_printer</span>.<span class="ident">input</span>(
-                <span class="self">self</span>.<span class="ident">input</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
-            <span class="ident">wxs_printer</span>.<span class="ident">license</span>(
-                <span class="ident">license_wxs_path</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
+            <span class="ident">wxs_printer</span>.<span class="ident">input</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
+            <span class="ident">wxs_printer</span>.<span class="ident">license</span>(<span class="ident">license_wxs_path</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">manufacturer</span>(<span class="self">self</span>.<span class="ident">manufacturer</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">output</span>(<span class="ident">destination</span>.<span class="ident">as_path</span>().<span class="ident">to_str</span>());
-            <span class="ident">wxs_printer</span>.<span class="ident">product_icon</span>(
-                <span class="self">self</span>.<span class="ident">product_icon</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">as_path</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>),
-            );
+            <span class="ident">wxs_printer</span>.<span class="ident">product_icon</span>(<span class="self">self</span>.<span class="ident">product_icon</span>.<span class="ident">as_deref</span>().<span class="ident">and_then</span>(<span class="ident">Path</span>::<span class="ident">to_str</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">product_name</span>(<span class="self">self</span>.<span class="ident">product_name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">as_ref</span>));
             <span class="ident">wxs_printer</span>.<span class="ident">build</span>().<span class="ident">run</span>()<span class="question-mark">?</span>;
         }
