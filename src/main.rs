@@ -27,6 +27,11 @@
 //! - [Quick Start](#quick-start)
 //! - [Examples](#examples)
 //! - [Features](#features)
+//!   - [Signing](#signing)
+//!   - [Templates](#templates)
+//!   - [Extensions](#extensions)
+//!   - [Multiple WiX Sources](#multiple-wix-sources)
+//!   - [Bundles](#bundles)
 //! - [Configuration](#configuration)
 //! - [Flags and Options](#flags-and-options)
 //!
@@ -289,11 +294,15 @@
 //! environment variable is used by the `cargo wix` subcommand with
 //! the [`std::process::Command`] module to create installers.
 //!
+//! ### Signing
+//!
 //! The Windows SDK provides a signer (`signtool`) application for signing
 //! installers. The application is installed in the `bin` folder of the Windows
 //! SDK installation. The location of the `bin` folder varies depending on the
 //! version. It is recommended to use the Developer Prompt to ensure the
 //! `signtool` application is available. Signing an installer is optional.
+//!
+//! ### Templates
 //!
 //! The WiX Toolset requires a WiX Source (WXS) file, which is an [XML] file. A
 //! template is provided with this binary that attempts to meet the majority
@@ -335,7 +344,7 @@
 //! alongside the `bin` folder. The `license` field appears to be the more
 //! commonly used field to describe the licensing for a Rust project and
 //! package, while the `license-file` field is used to specify a custom, or
-//! properitary, license.
+//! proprietary, license.
 //!
 //! The top three most common licenses for Rust projects are supported from the
 //! `license` field, i.e. MIT, Apache-2.0, and GPLv3. If any of these three
@@ -352,6 +361,8 @@
 //! the `-l,--license` and `-e,--eula` options for the `cargo wix init`
 //! subcommand.
 //!
+//! ### Extensions
+//!
 //! The [WixUIExtension] and [WixUtilExtension] are included in every execution
 //! of the default _create_ cargo-wix subcommand, i.e. `cargo wix`. This is the
 //! same as calling either the compiler (candle.exe) or the linker (light.exe)
@@ -359,6 +370,13 @@
 //! extensions are commonly used to create installers when using the WiX
 //! Toolset, so these are included by default. Additionally, the WixUIExtension
 //! is used for the template WXS file.
+//!
+//! Additionally, the [WixBalExtension] is automatically included if the
+//! cargo-wix subcommand detects a bundle (exe) is to be created instead of a
+//! MSI package. See the [Bundles](#bundles) section for more information about
+//! creating and managing bundles with the cargo-wix subcommand.
+//!
+//! ### Multiple WiX Sources
 //!
 //! The cargo-wix subcommand supports including multiple WXS files when creating
 //! an installer. A lot of customization is possible through the WXS file and
@@ -399,6 +417,10 @@
 //! ```dos
 //! C:\Path\To\Project> cargo wix path\to\first\wxs\file\one.wxs path\to\second\wxs\file\two.wxs
 //! ```
+//!
+//! ### Bundles
+//!
+//! TODO: Add information about the handling of bundles
 //!
 //! ## Configuration
 //!
@@ -811,6 +833,7 @@
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
 //! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html
 //! [WixUtilExtension]: https://wixtoolset.org/documentation/manual/v3/xsd/util/
+//! [WixBalExtension]: https://wixtoolset.org/documentation/manual/v3/bundle/wixstdba/
 //! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
