@@ -71,7 +71,8 @@
 //!
 //! All of the following examples use the native Command Prompt (cmd.exe) for
 //! the Windows OS; however, the [Developer Prompt] installed with the [VC Build
-//! Tools] is recommended. The [git bash] terminal can also be used.
+//! Tools] is recommended. A [git bash], [PowerShell], or [Alacritty] terminal can
+//! also be used.
 //!
 //! Begin each example by starting the appropriate prompt and navigating to the
 //! root folder of the Rust project. The `cargo wix` subcommand and binary
@@ -788,6 +789,8 @@
 //! [`documentation`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [documentation]: http://wixtoolset.org/documentation/
 //! [git bash]: https://gitforwindows.org/
+//! [PowerShell]: https://github.com/PowerShell/PowerShell
+//! [Alacritty]: https://github.com/alacritty/alacritty
 //! [`homepage`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [library]: ../wix/index.html
 //! [LibreOffice]: https://www.libreoffice.org/
