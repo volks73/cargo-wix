@@ -407,12 +407,7 @@ impl Execution {
                     eula_printer
                         .copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
                     eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
-                    eula_printer.input(
-                        self.input
-                            .as_ref()
-                            .map(PathBuf::as_path)
-                            .and_then(Path::to_str),
-                    );
+                    eula_printer.input(self.input.as_deref().and_then(Path::to_str));
                     eula_printer.output(destination.as_path().to_str());
                     eula_printer.build().run(template)?;
                 }
@@ -434,12 +429,7 @@ impl Execution {
         } else {
             info!("Creating the '{}' file", destination.display());
             let mut wxs_printer = print::wxs::Builder::new();
-            wxs_printer.banner(
-                self.banner
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
+            wxs_printer.banner(self.banner.as_deref().and_then(Path::to_str));
             wxs_printer.binaries(self.binaries.as_ref().map(|b| {
                 b.iter()
                     .map(PathBuf::as_path)
@@ -447,39 +437,14 @@ impl Execution {
                     .collect()
             }));
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
-            wxs_printer.dialog(
-                self.dialog
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
-            wxs_printer.eula(
-                eula_wxs_path
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
+            wxs_printer.dialog(self.dialog.as_deref().and_then(Path::to_str));
+            wxs_printer.eula(eula_wxs_path.as_deref().and_then(Path::to_str));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
-            wxs_printer.input(
-                self.input
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
-            wxs_printer.license(
-                license_wxs_path
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
+            wxs_printer.input(self.input.as_deref().and_then(Path::to_str));
+            wxs_printer.license(license_wxs_path.as_deref().and_then(Path::to_str));
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
-            wxs_printer.product_icon(
-                self.product_icon
-                    .as_ref()
-                    .map(PathBuf::as_path)
-                    .and_then(Path::to_str),
-            );
+            wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
         }
