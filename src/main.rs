@@ -316,10 +316,11 @@
 //! The [WXS] template is embedded in the binary installation of the subcommand
 //! and it can be printed to STDOUT using the `cargo wix print wxs` command from
 //! the command prompt (cmd.exe). Note, each time the `cargo wix print wxs`
-//! command is invoked, new GUIDs are generated for fields that require them.
-//! Thus, a developer does not need to worry about generating GUIDs and can
-//! begin using the template immediately with this subcommand or the WiX
-//! Toolset's compiler (`candle.exe`) and linker (`light.exe`) applications.
+//! command is invoked, new Globally Unique Identifiers ([GUID]) are generated
+//! for fields that require them. Thus, a developer does not need to worry about
+//! generating GUIDs and can begin using the template immediately with this
+//! subcommand or the WiX Toolset's compiler (`candle.exe`) and linker
+//! (`light.exe`) applications.
 //!
 //! In addition to the WXS template, there are several license templates which
 //! are used to generate an End User License Agreement (EULA) during the `cargo
@@ -420,7 +421,191 @@
 //!
 //! ### Bundles
 //!
-//! TODO: Add information about the handling of bundles
+//! It is possible to create [bundle-based installers] with the WiX Toolset. The
+//! cargo-wix subcommand and binary currently offer limited support for creating
+//! bundles from Rust projects. This includes automatically detecting if a
+//! bundle is to be created by inspecting all WiX Object (wixobj) files before
+//! linking and changing the file extension from `msi` to `exe`, as bundles
+//! require the executable (exe) file extension. In addition to automatically
+//! changing the file extension of the installer, the [WixBalExtension] is
+//! included automatically during linking if a bundle is detected because this
+//! extension includes a standard bootstrapper application that is commonly used
+//! to build and customize bundles.
+//!
+//! While the cargo-wix subcommand does provide some support for bundles with
+//! automatic file extension determination and inclusion of useful
+//! bundle-centric extensions, the process for creating a bundle for a Rust
+//! project is currently a manual process. Let's assume the following
+//! [workspace]-based Rust project layout and structure:
+//!
+//! ```text
+//! |-- C:\Path\to\Rust\Project
+//! |-- |-- Cargo.toml
+//! |-- |-- client
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- server
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! ```
+//!
+//! The virtual manifest, Cargo.toml, in the root of the project is a [virtual
+//! manifest] that only contains the following:
+//!
+//! ```toml
+//! [workspace]
+//! members = ["client", "server"]
+//! ```
+//!
+//! The package manifests for the workspace members, `client\Cargo.toml` and
+//! `server\Cargo.toml`, are the typical package manifests content for a binary
+//! package.
+//!
+//! The goal is to create a bundle-based executable that contains and
+//! installs both the client and server packages through their respective
+//! installers (MSI packages). A combination of manual file manipulation and the
+//! cargo-wix subcommand can be used to accomplish this goal, all from the root
+//! of the workspace. Begin by creating the WiX Source (wxs) files for the
+//! client and server MSI packages:
+//!
+//! ```dos
+//! C:\Path\to\Rust\Workspace> cargo wix init client\Cargo.toml
+//! C:\Path\to\Rust\Workspace> cargo wix init server\Cargo.toml
+//! ```
+//!
+//! The following project layout should have been created:
+//!
+//! ```text
+//! |-- C:\Path\to\Rust\Workspace
+//! |-- |-- Cargo.toml
+//! |-- |-- client
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! |-- |-- server
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! ```
+//!
+//! The WiX Source (wxs) files created for the client and server crates of the
+//! Rust workspace using the cargo-wix subcommand will be generated following
+//! the normal rules, features, and templates when using the `cargo wix init`
+//! within a non-workspace-based project.
+//!
+//! With the WiX Source (wxs) files created for the two MSI-based installers, a
+//! bundle-based WiX Source (wxs) file must be created for the workspace and
+//! bundle. Create a new `main.wxs` file and place it in a `wix` sub-folder
+//! relative to the workspace root. The following project layout should exist:
+//!
+//! ```text
+//! |-- C:\Path\to\Rust\Workspace
+//! |-- |-- Cargo.toml
+//! |-- |-- client
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! |-- |-- server
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! |-- |-- wix
+//! |-- |-- |-- main.wxs
+//! ```
+//!
+//! Open the `wix\main.wxs` file in a suitable text editor and add the following
+//! XML to it to define the bundle:
+//!
+//! ```xml
+//! <?xml version="1.0"?>
+//! <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+//!   <Bundle Version="1.0.0" UpgradeCode="[Your GUID Here]">
+//!     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense"/>
+//!     <Chain>
+//!       <MsiPackage SourceFile="client\target\wix\client-0.1.0-x86_64.msi" />
+//!       <MsiPackage SourceFile="server\target\wix\server-0.1.0-x86_64.msi" />
+//!     </Chain>
+//!   </Bundle>
+//! </Wix>
+//! ```
+//!
+//! A GUID will need to be manually generated for the `UpgradeCode` attribute of
+//! the `Bundle` tag and used to replace the `[Your GUID Here]` value. Now, the
+//! bundle can be created but first both the client and server MSI packages must
+//! be created. Thus, creating the bundle is a multi-step, or multi-command,
+//! process:
+//!
+//! ```dos
+//! C:\Path\to\Workspace> cargo wix client\Cargo.toml
+//! C:\Path\to\Workspace> cargo wix server\Cargo.toml
+//! C:\Path\to\Workspace> cargo wix --name Bundle --install-version 1.0.0
+//! ```
+//!
+//! The following project layout should exist:
+//!
+//! ```text
+//! |-- C:\Path\to\Rust\Workspace
+//! |-- |-- Cargo.toml
+//! |-- |-- client
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- target
+//! |-- |-- |-- |-- wix
+//! |-- |-- |-- |-- |-- server-0.1.0-x86_64.msi
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! |-- |-- server
+//! |-- |-- |-- Cargo.toml
+//! |-- |-- |-- src
+//! |-- |-- |-- |-- main.rs
+//! |-- |-- |-- target
+//! |-- |-- |-- |-- wix
+//! |-- |-- |-- |-- |-- server-0.1.0-x86_64.msi
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- main.wxs
+//! |-- |-- target
+//! |-- |-- |-- Release
+//! |-- |-- |-- |-- client.exe
+//! |-- |-- |-- |-- server.exe
+//! |-- |-- |-- wix
+//! |-- |-- |-- |-- Bundle-1.0.0-x86_64.exe
+//! |-- |-- wix
+//! |-- |-- |-- main.wxs
+//! ```
+//!
+//! Note the built binaries are located in the `target\Release` folder relative
+//! to the workspace root as opposed to the `client\target\Release` and
+//! `server\target\Release` folders, even though the MSI packages are available
+//! in the member's `target\wix` folders. This will fail if the various `cargo
+//! wix` commands are _not_ executed from the workspace root.
+//!
+//! The `name` and `install-version` options can be moved into a
+//! [configuration](#configuration) section for the subcommand within the
+//! virtual manifest of the workspace, i.e. the Cargo.toml file with the
+//! `[workspace]` section to avoid having to retype them each time a bundle is
+//! created, but all three `cargo wix` commands must be issued each time.
+//!
+//! While the above steps will create a bundle installer for the workspace-based
+//! Rust project with a default, placeholder EULA, it is very manual and
+//! cumbersome. For example, the bundle-based WiX Source (wxs) file will have to
+//! be manually updated each time the version numbers of the member MSI packages
+//! are changed because the paths to the source files are hard-coded in the XML.
+//! Efforts are underway to improve support within the cargo-wix subcommand for
+//! both workspaces and bundles ([Issue #74] and [Issue #98]).
+//!
+//! [Issue #74]: https://github.com/volks73/cargo-wix/issues/74
+//! [Issue #98]: https://github.com/volks73/cargo-wix/issues/98
 //!
 //! ## Configuration
 //!
@@ -803,6 +988,8 @@
 //! one of the supported licenses based on the value of the `license` field in
 //! the package's manifest (Cargo.toml).
 //!
+//! [Alacritty]: https://github.com/alacritty/alacritty
+//! [bundle-based installers]: https://wixtoolset.org/documentation/manual/v3/bundle/
 //! [Cargo]: https://crates.io
 //! [cargo subcommand]: https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands
 //! [crates.io]: https://crates.io
@@ -811,8 +998,7 @@
 //! [`documentation`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [documentation]: http://wixtoolset.org/documentation/
 //! [git bash]: https://gitforwindows.org/
-//! [PowerShell]: https://github.com/PowerShell/PowerShell
-//! [Alacritty]: https://github.com/alacritty/alacritty
+//! [GUID]: https://en.wikipedia.org/wiki/Universally_unique_identifier
 //! [`homepage`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [library]: ../wix/index.html
 //! [LibreOffice]: https://www.libreoffice.org/
@@ -820,6 +1006,7 @@
 //! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [Microsoft Office]: https://products.office.com/en-us/home
 //! [Microsoft Notepad]: https://en.wikipedia.org/wiki/Microsoft_Notepad
+//! [PowerShell]: https://github.com/PowerShell/PowerShell
 //! [`repository`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata
 //! [Rich Text Format]: https://en.wikipedia.org/wiki/Rich_Text_Format
 //! [Rust]: https://www.rust-lang.org
@@ -830,13 +1017,15 @@
 //! [TOML array]: https://github.com/toml-lang/toml#user-content-array
 //! [tutorials]: https://www.firegiant.com/wix/tutorial/
 //! [VC Build Tools]: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017
+//! [virtual manifest]: https://doc.rust-lang.org/cargo/reference/workspaces.html
 //! [Windows 10 SDK]: https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+//! [WixBalExtension]: https://wixtoolset.org/documentation/manual/v3/bundle/wixstdba/
 //! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html
 //! [WixUtilExtension]: https://wixtoolset.org/documentation/manual/v3/xsd/util/
-//! [WixBalExtension]: https://wixtoolset.org/documentation/manual/v3/bundle/wixstdba/
 //! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
+//! [workspace]: https://doc.rust-lang.org/cargo/reference/workspaces.html
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
