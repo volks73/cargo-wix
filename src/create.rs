@@ -903,7 +903,7 @@ impl Execution {
         let mut dst = if let Some(manifest_path) = &self.input {
             trace!(
                 "Using the package's manifest (Cargo.toml) file path to build \
-                the Wix object files destination"
+                 the Wix object files destination"
             );
             // Remove the `Cargo.toml` file from the path
             manifest_path
@@ -990,7 +990,7 @@ impl Execution {
                 } else {
                     return Err(Error::Generic(format!(
                         "The '{0}' file does not exist. Consider using the 'cargo \
-                        wix print WXS > {0}' command to create it.",
+                         wix print WXS > {0}' command to create it.",
                         p.display()
                     )));
                 }
@@ -1016,23 +1016,23 @@ impl Execution {
                     if pkg_meta_wix_source.is_dir() {
                         return Err(Error::Generic(format!(
                             "The '{}' path is not a file. Please check the path and \
-                            ensure it is to a WiX Source (wxs) file in the \
-                            'package.metadata.wix' section of the package's manifest \
-                            (Cargo.toml).",
+                             ensure it is to a WiX Source (wxs) file in the \
+                             'package.metadata.wix' section of the package's manifest \
+                             (Cargo.toml).",
                             pkg_meta_wix_source.display()
                         )));
                     } else {
                         trace!(
                             "Using the '{}' WiX source file from the \
-                            'package.metadata.wix' section in the package's manifest.",
+                             'package.metadata.wix' section in the package's \
+                             manifest.",
                             pkg_meta_wix_source.display()
                         );
                     }
                 } else {
                     return Err(Error::Generic(format!(
-                        "The '{0}' file does not exist. \
-                        Consider using the 'cargo wix print WXS > {0} command to create \
-                        it.",
+                        "The '{0}' file does not exist. Consider using the \
+                         'cargo wix print WXS > {0} command to create it.",
                         pkg_meta_wix_source.display()
                     )));
                 }
@@ -1260,9 +1260,9 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
             })
             .ok_or_else(|| {
                 Self::Error::Generic(String::from(
-                    "Could not determine the installer kind based on the WiX object \
-            files. There needs to be at least one 'product' or 'bundle' tag in \
-            the collective WiX source files (wxs).",
+                    "Could not determine the installer kind based on the WiX \
+                     object files. There needs to be at least one 'product' or \
+                     'bundle' tag in the collective WiX source files (wxs).",
                 ))
             })
     }
