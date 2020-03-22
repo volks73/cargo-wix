@@ -654,7 +654,7 @@
 //! `[package.metadata.wix]` section is the `<INPUT>` argument for the default
 //! _create_ command, which specifies a relative or absolute path to a package's
 //! manifest file. The assumption is that the package manifest (Cargo.toml) to
-//! be used for the cdefault _create_ subcommand is the same manifest that
+//! be used for the default _create_ subcommand is the same manifest that
 //! contains the `[package.metadata.wix]` section.
 //!
 //! ## Flags and Options
@@ -775,7 +775,7 @@
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
-//
+//!
 //! Sets the path to a bitmap (.bmp) image file that will be displayed to the
 //! left on the first dialog of the installer. The dialog image dimensions
 //! should be 493 x 312 pixels. The first dialog is known as the "Welcome"
