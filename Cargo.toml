@@ -46,3 +46,5 @@ features = ["suggestions", "vec_map"]
 
 [badges]
 travis-ci = { repository = "volks73/cargo-wix" }
+is-it-maintained-issue-resolution = { repository = "volks73/cargo-wix" }
+is-it-maintained-open-issues = { repository = "volks73/cargo-wix" }
