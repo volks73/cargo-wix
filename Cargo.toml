@@ -11,7 +11,7 @@ keywords = ["cargo-subcommand", "installer", "wix-toolset", "wix"]
 homepage = "https://github.com/volks73/cargo-wix"
 readme = "README.md"
 edition = "2018"
-exclude = ["/.travis.yml"]
+exclude = ["/.github"]
 
 [[bin]]
 name = "cargo-wix"
@@ -45,6 +45,5 @@ default-features = false
 features = ["suggestions", "vec_map"]
 
 [badges]
-travis-ci = { repository = "volks73/cargo-wix" }
 is-it-maintained-issue-resolution = { repository = "volks73/cargo-wix" }
 is-it-maintained-open-issues = { repository = "volks73/cargo-wix" }
