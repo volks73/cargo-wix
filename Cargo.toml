@@ -32,10 +32,10 @@ sxd-document = "0.3"
 sxd-xpath = "0.4"
 termcolor = "1"
 toml = "0.5"
-uuid = { version = "0.7", features = ["v4"] }
+uuid = { version = "0.8", features = ["v4"] }
 
 [dev-dependencies]
-assert_fs = "0.11"
+assert_fs = "1.0"
 lazy_static = "1"
 predicates = "1.0"
 

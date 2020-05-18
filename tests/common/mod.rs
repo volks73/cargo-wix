@@ -72,7 +72,7 @@ pub fn create_test_package() -> TempDir {
         .status()
         .expect("Creation of test Cargo package");
     assert!(cargo_init_status.success());
-    temp_dir.persist_if(env::var(PERSIST_VAR_NAME).is_ok())
+    temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
 }
 
 /// Create a new cargo project/package for a project with multiple binaries in a
