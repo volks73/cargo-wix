@@ -954,3 +954,28 @@ impl Default for Cultures {
         Cultures::EnUs
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod culture {
+        use super::*;
+
+        #[test]
+        fn from_str_is_correct_for_dash_russian() {
+            assert_eq!(Cultures::from_str("ru-ru"), Ok(Cultures::RuRu));
+        }
+
+        #[test]
+        #[should_panic]
+        fn from_str_fails_for_underscore_russian() {
+            Cultures::from_str("ru_ru").unwrap();
+        }
+
+        #[test]
+        fn display_is_correct_for_russian() {
+            assert_eq!(format!("{}", Cultures::RuRu), String::from("ru-RU"));
+        }
+    }
+}
