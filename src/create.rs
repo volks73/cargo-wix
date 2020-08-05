@@ -1340,6 +1340,14 @@ mod tests {
         }
 
         #[test]
+        fn russian_culture_works() {
+            const EXPECTED: &str = "RuRu";
+            let mut actual = Builder::new();
+            actual.culture(Some(EXPECTED));
+            assert_eq!(actual.culture, Some(EXPECTED));
+        }
+
+        #[test]
         fn debug_build_works() {
             let mut actual = Builder::new();
             actual.debug_build(true);
