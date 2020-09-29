@@ -94,7 +94,7 @@ C:\Path\to\Cargo\Wix> set "CARGO_WIX_TEST_LOG="
 C:\Path\to\Cargo\Wix> set "CARGO_WIX_TEST_PERSIST="
 ```
 
-where `<TEST NAME>` is replaced with the name of an integration tests. The last three lines/commands are optional and unsets the three environment variables to avoid additional tests from also persisting, logging, and dumping output to the terminal/console. Note, the `-- --nocapture` option is _not_ needed to display the logging statements or the output from the WiX Toolset compiler (candle.exe) and linker (light.exe). Here is the same example with [Powershell](https://docs.microsoft.com/en-us/powershell/):
+where `<TEST NAME>` is replaced with the name of an integration test. The last three lines/commands are optional and unsets the three environment variables to avoid additional tests from also persisting, logging, and dumping output to the terminal/console. Note, the `-- --nocapture` option is _not_ needed to display the logging statements or the output from the WiX Toolset compiler (candle.exe) and linker (light.exe). Here is the same example with [Powershell](https://docs.microsoft.com/en-us/powershell/):
 
 ```powershell
 PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_PERSIST=1; $env:CARGO_WIX_TEST_LOG=5; $env:CARGO_WIX_TEST_NO_CAPTURE=1; 
