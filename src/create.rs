@@ -30,7 +30,6 @@ use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
 use crate::EXE_FILE_EXTENSION;
 use crate::MSI_FILE_EXTENSION;
-use crate::TARGET_FOLDER_NAME;
 use crate::WIX;
 use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
@@ -394,7 +393,7 @@ impl Execution {
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
         debug!("wxs_sources = {:?}", wxs_sources);
-        let wixobj_destination = self.wixobj_destination()?;
+        let wixobj_destination = self.wixobj_destination(&manifest.target_directory)?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
@@ -858,26 +857,7 @@ impl Execution {
         }
     }
 
-    fn wixobj_destination(&self) -> Result<PathBuf> {
-        let mut dst = if let Some(manifest_path) = &self.input {
-            trace!(
-                "Using the package's manifest (Cargo.toml) file path to build \
-                 the Wix object files destination"
-            );
-            // Remove the `Cargo.toml` file from the path
-            manifest_path
-                .parent()
-                .ok_or_else(|| {
-                    Error::Generic(format!(
-                        "The '{}' path for the package's manifest file is invalid",
-                        manifest_path.display()
-                    ))
-                })
-                .map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME))
-        } else {
-            trace!("Using the current working directory (CWD) to build the WiX object files destination");
-            Ok(PathBuf::from(TARGET_FOLDER_NAME))
-        }?;
+    fn wixobj_destination(&self, target_directory: &Path) -> Result<PathBuf> {
         // A trailing slash is needed; otherwise, candle tries to dump the
         // object files to a `target\wix` file instead of dumping the object
         // files in the `target\wix\` folder for the `-out` option. The trailing
@@ -888,7 +868,7 @@ impl Execution {
         // for PathBuf, but it was unexpected and kind of annoying because I am
         // not sure how to add a trailing slash in a cross-platform way with
         // PathBuf, not that cargo-wix needs to be cross-platform.
-        dst.push(format!("{}\\", WIX));
+        let dst = target_directory.join("");
         Ok(dst)
     }
 
@@ -1714,7 +1694,7 @@ mod tests {
         fn wixobj_destination_works() {
             let execution = Execution::default();
             assert_eq!(
-                execution.wixobj_destination().unwrap(),
+                execution.wixobj_destination(Path::new("target")).unwrap(),
                 PathBuf::from("target").join("wix")
             )
         }

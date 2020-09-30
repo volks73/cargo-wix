@@ -126,10 +126,6 @@ pub const SIGNTOOL: &str = "signtool";
 /// application.
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
 
-/// The name of the folder where output from the builder, compiler, linker, and
-/// signer.
-pub const TARGET_FOLDER_NAME: &str = "target";
-
 /// The default name of the folder for output from this subcommand.
 pub const WIX: &str = "wix";
 

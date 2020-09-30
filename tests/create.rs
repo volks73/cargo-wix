@@ -936,7 +936,7 @@ fn custom_target_dir_works() {
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
-        .child(TARGET_WIX_DIR.as_path())
+        .child(PathBuf::from("my-target/wix"))
         .assert(predicate::path::exists());
     package
         .child(expected_msi_file)

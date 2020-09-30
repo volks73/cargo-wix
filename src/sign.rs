@@ -23,14 +23,13 @@ use crate::EXE_FILE_EXTENSION;
 use crate::MSI_FILE_EXTENSION;
 use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
-use crate::TARGET_FOLDER_NAME;
 use crate::WIX;
 
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
@@ -181,7 +180,7 @@ impl Execution {
             product_name
         };
         debug!("description = {:?}", description);
-        let msi = self.msi()?;
+        let msi = self.msi(&manifest.target_directory)?;
         let mut signer = self.signer()?;
         debug!("signer = {:?}", signer);
         if self.capture_output {
@@ -239,7 +238,7 @@ impl Execution {
         })
     }
 
-    fn msi(&self) -> Result<PathBuf> {
+    fn msi(&self, target_directory: &Path) -> Result<PathBuf> {
         if let Some(ref i) = self.input {
             trace!("The path to an installer to sign has been explicitly set");
             let msi = PathBuf::from(i);
@@ -254,9 +253,7 @@ impl Execution {
             }
         } else {
             trace!("The path to an installer has not been explicitly set");
-            let mut cwd = env::current_dir()?;
-            cwd.push(TARGET_FOLDER_NAME);
-            cwd.push(WIX);
+            let cwd = target_directory.join(WIX);
             for entry in fs::read_dir(cwd)? {
                 let entry = entry?;
                 let path = entry.path();
@@ -453,7 +450,8 @@ mod tests {
 
         #[test]
         fn msi_with_nonexistent_installer_fails() {
-            let result = Execution::default().msi();
+            let result = Execution::default()
+                .msi(Path::new("target"));
             assert!(result.is_err());
         }
 
@@ -465,7 +463,7 @@ mod tests {
             let actual = Builder::new()
                 .input(msi_path.to_str())
                 .build()
-                .msi()
+                .msi(Path::new("target"))
                 .unwrap();
             assert_eq!(actual, msi_path);
         }
