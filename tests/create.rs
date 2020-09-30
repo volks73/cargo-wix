@@ -26,12 +26,14 @@ use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 use crate::common::init_logging;
-use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME};
+use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, PERSIST_VAR_NAME};
+
+use assert_fs::TempDir;
 
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use toml::Value;
 
@@ -924,19 +926,25 @@ fn compiler_and_linker_args_works_with_metadata() {
 #[test]
 fn custom_target_dir_works() {
     init_logging();
+    let target_tmpdir = TempDir::new().unwrap()
+        .into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok());
+
     let original_working_directory = env::current_dir().unwrap();
-    std::env::set_var("CARGO_TARGET_DIR", original_working_directory.join("my-target"));
     let package = common::create_test_package();
-    let expected_msi_file = PathBuf::from("my-target").join(format!("{}-1.1.0-x86_64.msi", PACKAGE_NAME));
+    let expected_msi_file = Path::new(WIX).join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = run(&mut Builder::default());
+    env::set_var("CARGO_TARGET_DIR", target_tmpdir.path());
+    let result = Builder::default()
+        .capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
+        .build()
+        .run();
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
-    package
-        .child(PathBuf::from("my-target").join("wix"))
+    target_tmpdir
+        .child(WIX)
         .assert(predicate::path::exists());
-    package
+    target_tmpdir
         .child(expected_msi_file)
         .assert(predicate::path::exists());
 }
