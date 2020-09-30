@@ -26,7 +26,7 @@ use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 use crate::common::init_logging;
-use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
+use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME};
 
 use std::env;
 use std::fs::{self, File};
@@ -41,15 +41,24 @@ use wix::{Result, CARGO_MANIFEST_FILE, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {
-        let mut p = PathBuf::from(TARGET_NAME);
+        let mut p = TARGET_NAME.clone();
         p.push(WIX);
         p
+    };
+}
+
+lazy_static! {
+    static ref TARGET_NAME: PathBuf = {
+        let tmp = std::env::temp_dir();
+        tmp.join("wix_target/");
+        tmp
     };
 }
 
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
+    env::set_var("CARGO_TARGET_DIR", &*TARGET_NAME);
     b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
         .run()
@@ -153,7 +162,7 @@ fn metadata_works() {
 #[test]
 fn output_trailing_forwardslash_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let output_dir_str = format!("{}/", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -174,7 +183,7 @@ fn output_trailing_forwardslash_works() {
 #[test]
 fn output_trailing_backslash_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let output_dir_str = format!("{}\\", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -216,7 +225,7 @@ fn output_existing_dir_works() {
 #[test]
 fn output_file_without_extension_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let output_file = output_dir.join(PACKAGE_NAME);
@@ -237,7 +246,7 @@ fn output_file_without_extension_works() {
 #[test]
 fn output_file_with_extension_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
