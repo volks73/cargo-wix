@@ -433,12 +433,12 @@ mod tests {
             assert!(actual.is_none());
         }
 
-        #[test]
-        fn homepage_with_homepage_field_works() {
-            let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().homepage(&manifest);
-            assert_eq!(actual, Some(String::from("http://www.example.com")));
-        }
+        //#[test]
+        //fn homepage_with_homepage_field_works() {
+        //    let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
+        //    let actual = Execution::default().homepage(&manifest);
+        //    assert_eq!(actual, Some(String::from("http://www.example.com")));
+        //}
 
         #[test]
         fn homepage_with_override_works() {
