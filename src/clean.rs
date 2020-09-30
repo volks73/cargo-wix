@@ -75,6 +75,7 @@ impl Execution {
     pub fn run(self) -> Result<()> {
         debug!("input = {:?}", self.input);
         let manifest = super::manifest(self.input.as_ref())?;
+        debug!("target_directory = {:?}", manifest.target_directory);
         let target_wix = self.target_wix(&manifest.target_directory)?;
         debug!("target_wix = {:?}", target_wix);
         if target_wix.exists() {

@@ -372,6 +372,7 @@ impl Execution {
         let manifest_path = super::cargo_toml_file(self.input.as_ref())?;
         debug!("manifest_path = {:?}", manifest_path);
         let manifest = super::manifest(self.input.as_ref())?;
+        debug!("target_directory = {:?}", manifest.target_directory);
         let package = super::package(&manifest, self.package.as_deref())?;
         let metadata = package.metadata.clone();
         let name = self.name(&package)?;

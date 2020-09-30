@@ -170,6 +170,7 @@ impl Execution {
         debug!("product_name = {:?}", self.product_name);
         debug!("timestamp = {:?}", self.timestamp);
         let manifest = super::manifest(self.input.as_ref())?;
+        debug!("target_directory = {:?}", manifest.target_directory);
         let package = super::package(&manifest, None)?;
         let product_name = super::product_name(self.product_name.as_ref(), &package)?;
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
