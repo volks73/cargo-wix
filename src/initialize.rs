@@ -387,13 +387,14 @@ impl Execution {
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
         let manifest = super::manifest(self.input.as_ref())?;
+        let package = super::package(&manifest, None)?;
         let mut destination = self.destination()?;
         debug!("destination = {:?}", destination);
         if !destination.exists() {
             info!("Creating the '{}' directory", destination.display());
             fs::create_dir(&destination)?;
         }
-        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_ref(), &manifest)? {
+        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_ref(), &package)? {
             Eula::CommandLine(path) => (Some(path), self.license),
             Eula::Manifest(path) => (Some(path), self.license),
             Eula::Generate(template) => {

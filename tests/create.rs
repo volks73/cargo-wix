@@ -912,3 +912,24 @@ fn compiler_and_linker_args_works_with_metadata() {
         .child(expected_msi_file)
         .assert(predicate::path::exists());
 }
+
+
+#[test]
+fn custom_target_dir_works() {
+    init_logging();
+    std::env::set_var("CARGO_TARGET_DIR", "my-target");
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = PathBuf::from("my-target").join(format!("{}-1.1.0-x86_64.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = run(&mut Builder::default());
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}

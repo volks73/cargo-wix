@@ -27,12 +27,15 @@ log = "0.4"
 maplit = "1"
 mustache = "0.9"
 regex = "1"
-semver = "0.9"
+semver = "0.10"
 sxd-document = "0.3"
 sxd-xpath = "0.4"
 termcolor = "1"
+# TODO: Remove
 toml = "0.5"
 uuid = { version = "0.8", features = ["v4"] }
+cargo_metadata = "0.11"
+serde_json = "1.0"
 
 [dev-dependencies]
 assert_fs = "1.0"

@@ -96,7 +96,7 @@ use std::io::{self, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::{MetadataCommand, Metadata, Package};
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
@@ -180,45 +180,43 @@ fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
 }
 
 fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
-    cargo_toml_file(input).and_then(|p| {
-        Ok(p.parent()
+    cargo_toml_file(input).map(|p| {
+        p.parent()
             .map(PathBuf::from)
-            .expect("The Cargo.toml file to NOT be root."))
+            .expect("The Cargo.toml file to NOT be root.")
     })
 }
 
-fn manifest(input: Option<&PathBuf>) -> Result<Value> {
+fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
     let cargo_file_path = cargo_toml_file(input)?;
     debug!("cargo_file_path = {:?}", cargo_file_path);
-    let mut cargo_file = File::open(cargo_file_path)?;
-    let mut cargo_file_content = String::new();
-    cargo_file.read_to_string(&mut cargo_file_content)?;
-    let manifest = cargo_file_content.parse::<Value>()?;
-    Ok(manifest)
+    Ok(MetadataCommand::new().exec().unwrap())
 }
 
-fn description(description: Option<String>, manifest: &Value) -> Option<String> {
+fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
+    let package_id = if let Some(v) = package {
+        manifest.workspace_members.iter().find(|u| {
+            manifest[u].name == v
+        }).unwrap()
+    } else if manifest.workspace_members.len() == 1 {
+        &manifest.workspace_members[0]
+    } else {
+        return Err(Error::Generic(String::from("Workspace detected. Please pass a package name.")))
+    };
+    Ok(manifest[package_id].clone())
+}
+
+fn description(description: Option<String>, manifest: &Package) -> Option<String> {
     description.or_else(|| {
-        manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("description"))
-            .and_then(|d| d.as_str())
-            .map(String::from)
+        manifest.description.clone()
     })
 }
 
-fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<String> {
+fn product_name(product_name: Option<&String>, manifest: &Package) -> Result<String> {
     if let Some(p) = product_name {
         Ok(p.to_owned())
     } else {
-        manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("name"))
-            .and_then(|n| n.as_str())
-            .map(String::from)
-            .ok_or(Error::Manifest("name"))
+        Ok(manifest.name.clone())
     }
 }
 

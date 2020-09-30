@@ -34,7 +34,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::{Package};
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
@@ -171,8 +171,9 @@ impl Execution {
         debug!("product_name = {:?}", self.product_name);
         debug!("timestamp = {:?}", self.timestamp);
         let manifest = super::manifest(self.input.as_ref())?;
-        let product_name = super::product_name(self.product_name.as_ref(), &manifest)?;
-        let description = if let Some(d) = super::description(self.description.clone(), &manifest) {
+        let package = super::package(&manifest, None)?;
+        let product_name = super::product_name(self.product_name.as_ref(), &package)?;
+        let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
             format!("{} - {}", product_name, d)
         } else {
@@ -189,7 +190,7 @@ impl Execution {
             signer.stderr(Stdio::null());
         }
         signer.arg("sign").arg("/a").arg("/d").arg(description);
-        if let Some(h) = self.homepage(&manifest) {
+        if let Some(h) = self.homepage(&package) {
             trace!("Using the '{}' URL for the expanded description", h);
             signer.arg("/du").arg(h);
         }
@@ -225,14 +226,16 @@ impl Execution {
         Ok(())
     }
 
-    fn homepage(&self, manifest: &Value) -> Option<String> {
+    fn homepage(&self, package: &Package) -> Option<String> {
         self.homepage.clone().or_else(|| {
-            manifest
+            // TODO: Get cargo to return the homepage.
+            None
+            /*package.
                 .get("package")
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("homepage"))
                 .and_then(|d| d.as_str())
-                .map(String::from)
+                .map(String::from)*/
         })
     }
 
@@ -398,29 +401,41 @@ mod tests {
 
         use super::*;
 
-        const MIN_MANIFEST: &str = r#"[package]
-            name = "Example"
-            version = "0.1.0"
-            authors = ["First Last <first.last@example.com>"]
-        "#;
+        const MIN_MANIFEST: &str = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
 
-        const HOMEPAGE_MANIFEST: &str = r#"[package]
-            name = "Example"
-            version = "0.1.0"
-            authors = ["First Last <first.last@example.com>"]
-            homepage = "http://www.example.com"
-        "#;
+            "id": "",
+            "dependencies": [],
+            "features": {},
+            "targets": [],
+            "manifest_path": ""
+        }"#;
+
+        const HOMEPAGE_MANIFEST: &str = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
+            "homepage": "http://www.example.com",
+
+            "id": "",
+            "dependencies": [],
+            "features": {},
+            "targets": [],
+            "manifest_path": ""
+        }"#;
 
         #[test]
         fn homepage_without_homepage_field_works() {
-            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
             let actual = Execution::default().homepage(&manifest);
             assert!(actual.is_none());
         }
 
         #[test]
         fn homepage_with_homepage_field_works() {
-            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
             let actual = Execution::default().homepage(&manifest);
             assert_eq!(actual, Some(String::from("http://www.example.com")));
         }
@@ -428,7 +443,7 @@ mod tests {
         #[test]
         fn homepage_with_override_works() {
             const EXPECTED: &str = "http://www.another.com";
-            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
             let actual = Builder::new()
                 .homepage(Some(EXPECTED))
                 .build()

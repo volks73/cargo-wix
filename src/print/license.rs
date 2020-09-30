@@ -17,6 +17,7 @@
 use chrono::{Datelike, Utc};
 
 use crate::manifest;
+use crate::package;
 use crate::Error;
 use crate::Result;
 use crate::Template;
@@ -25,7 +26,7 @@ use mustache::{self, MapBuilder};
 
 use std::path::PathBuf;
 
-use toml::Value;
+use cargo_metadata::Package;
 
 /// A builder for creating an execution context to print a license.
 #[derive(Debug, Clone)]
@@ -126,18 +127,19 @@ impl Execution {
         debug!("input = {:?}", self.input);
         debug!("output = {:?}", self.output);
         let manifest = manifest(self.input.as_ref())?;
+        let package = package(&manifest, None)?;
         let mut destination = super::destination(self.output.as_ref())?;
         let template = mustache::compile_str(template.to_str())?;
         let data = MapBuilder::new()
             .insert_str("copyright-year", self.copyright_year())
-            .insert_str("copyright-holder", self.copyright_holder(&manifest)?)
+            .insert_str("copyright-holder", self.copyright_holder(&package)?)
             .build();
         template
             .render_data(&mut destination, &data)
             .map_err(Error::from)
     }
 
-    fn copyright_holder(&self, manifest: &Value) -> Result<String> {
+    fn copyright_holder(&self, manifest: &Package) -> Result<String> {
         if let Some(ref h) = self.copyright_holder {
             Ok(h.to_owned())
         } else {
@@ -202,15 +204,21 @@ mod tests {
     mod execution {
         use super::*;
 
-        const MIN_MANIFEST: &str = r#"[package]
-            name = "Example"
-            version = "0.1.0"
-            authors = ["First Last <first.last@example.com>"]
-        "#;
+        const MIN_MANIFEST: &str = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
+
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": ""
+        }"#;
 
         #[test]
         fn copyright_holder_works() {
-            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
             let actual = Execution::default().copyright_holder(&manifest).unwrap();
             assert_eq!(actual, String::from("First Last"));
         }
@@ -218,7 +226,7 @@ mod tests {
         #[test]
         fn copyright_holder_with_override_works() {
             const EXPECTED: &str = "Dr. Example";
-            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
+            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
             let actual = Builder::new()
                 .copyright_holder(Some(EXPECTED))
                 .build()

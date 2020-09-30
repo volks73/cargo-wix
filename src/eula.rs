@@ -22,7 +22,7 @@ use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::Package;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Eula {
@@ -33,22 +33,16 @@ pub enum Eula {
 }
 
 impl Eula {
-    pub fn new(p: Option<&PathBuf>, manifest: &Value) -> Result<Self> {
+    pub fn new(p: Option<&PathBuf>, package: &Package) -> Result<Self> {
         if let Some(ref path) = p {
             Ok(Eula::CommandLine(path.into()))
         } else {
-            Eula::from_manifest(&manifest)
+            Eula::from_manifest(&package)
         }
     }
 
-    pub fn from_manifest(manifest: &Value) -> Result<Self> {
-        if let Some(license_file_path) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("license-file"))
-            .and_then(|l| l.as_str())
-            .map(PathBuf::from)
-        {
+    pub fn from_manifest(package: &Package) -> Result<Self> {
+        if let Some(license_file_path) = package.license_file() {
             trace!("The 'license-file' field is specified in the package's manifest (Cargo.toml)");
             debug!("license_file_path = {:?}", license_file_path);
             if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {
@@ -80,15 +74,10 @@ impl Eula {
                 );
                 Ok(Eula::Disabled)
             }
-        } else if let Some(license_name) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("license"))
-            .and_then(|n| n.as_str())
-        {
+        } else if let Some(license_name) = package.license.as_ref() {
             trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
             debug!("license_name = {:?}", license_name);
-            if let Ok(template) = Template::from_str(license_name) {
+            if let Ok(template) = Template::from_str(&license_name) {
                 trace!(
                     "An embedded template for the '{}' license from the package's \
                      manifest (Cargo.toml) exists.",

@@ -1058,6 +1058,9 @@ use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    let package = Arg::with_name("package")
+        .help("The name of the package in the current workspace to operate on")
+        .takes_value(true);
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
@@ -1547,6 +1550,7 @@ fn main() {
                         .takes_value(true))
                     .arg(verbose.clone()))
                 .arg(verbose)
+                .arg(package)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
@@ -1690,6 +1694,7 @@ fn main() {
             create.no_build(matches.is_present("no-build"));
             create.output(matches.value_of("output"));
             create.version(matches.value_of("install-version"));
+            create.package(matches.value_of("package"));
             create.build().run()
         }
     };
