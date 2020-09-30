@@ -296,7 +296,7 @@ impl Execution {
         let package = package(&manifest, None)?;
         let mut destination = super::destination(self.output.as_ref())?;
         let template = mustache::compile_str(Template::Wxs.to_str())?;
-        let binaries = self.binaries(&package, &manifest.target_directory)?;
+        let binaries = self.binaries(&package)?;
         let mut map = MapBuilder::new()
             .insert_vec("binaries", |mut builder| {
                 for binary in &binaries {
@@ -385,7 +385,7 @@ impl Execution {
             .map_err(Error::from)
     }
 
-    fn binaries(&self, package: &Package, target_path: &Path) -> Result<Vec<HashMap<&'static str, String>>> {
+    fn binaries(&self, package: &Package) -> Result<Vec<HashMap<&'static str, String>>> {
         let mut binaries = Vec::new();
         if let Some(binary_paths) = &self.binaries {
             let mut map = HashMap::with_capacity(3);
@@ -413,16 +413,16 @@ impl Execution {
                 let mut map = HashMap::with_capacity(3);
                 map.insert("binary-index", index.to_string());
                 map.insert("binary-name", binary.name.clone());
-                map.insert("binary-source", Self::default_binary_path(&binary.name, target_path));
+                map.insert("binary-source", Self::default_binary_path(&binary.name));
                 binaries.push(map);
             }
         }
         Ok(binaries)
     }
 
-    fn default_binary_path(name: &str, target_path: &Path) -> String {
+    fn default_binary_path(name: &str) -> String {
         // TODO: Handle cross-compilation?
-        let mut path = target_path.join("$(var.Profile)").join(name);
+        let mut path = Path::new("$(var.CargoTargetDir)").join("$(var.Profile)").join(name);
         path.set_extension(EXE_FILE_EXTENSION);
         path.to_str()
             .map(String::from)
@@ -851,13 +851,13 @@ mod tests {
         #[test]
         fn binaries_with_no_bin_section_works() {
             let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest, Path::new("target")).unwrap();
+            let actual = Execution::default().binaries(&manifest).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Example"),
-                    "binary-source" => String::from("target\\$(var.Profile)\\Example.exe")
+                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\Example.exe")
                 }]
             )
         }
@@ -865,7 +865,7 @@ mod tests {
         #[test]
         fn binaries_with_single_bin_section_works() {
             let manifest = serde_json::from_str(MIT_MANIFEST_BIN).expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest, Path::new("target")).unwrap();
+            let actual = Execution::default().binaries(&manifest).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
@@ -881,24 +881,24 @@ mod tests {
             let manifest = serde_json::from_str(MULTIPLE_BIN_MANIFEST
                 )
                 .expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest, Path::new("target")).unwrap();
+            let actual = Execution::default().binaries(&manifest).unwrap();
             assert_eq!(
                 actual,
                 vec![
                     hashmap! {
                         "binary-index" => 0.to_string(),
                         "binary-name" => String::from("binary0"),
-                        "binary-source" => String::from("target\\$(var.Profile)\\binary0.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary0.exe")
                     },
                     hashmap! {
                         "binary-index" => 1.to_string(),
                         "binary-name" => String::from("binary1"),
-                        "binary-source" => String::from("target\\$(var.Profile)\\binary1.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary1.exe")
                     },
                     hashmap! {
                         "binary-index" => 2.to_string(),
                         "binary-name" => String::from("binary2"),
-                        "binary-source" => String::from("target\\$(var.Profile)\\binary2.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary2.exe")
                     }
                 ]
             )

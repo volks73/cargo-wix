@@ -46,6 +46,7 @@ use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+use std::ffi::OsString;
 
 use cargo_metadata::{Metadata, Package, MetadataCommand};
 use serde_json::Value;
@@ -442,6 +443,11 @@ impl Execution {
         compiler
             .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
+            .arg({
+                let mut s = OsString::from("-dCargoTargetDir=");
+                s.push(&manifest.target_directory);
+                s
+            })
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg("-o")
