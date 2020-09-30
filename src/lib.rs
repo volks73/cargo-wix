@@ -186,7 +186,7 @@ fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
 fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
     let cargo_file_path = cargo_toml_file(input)?;
     debug!("cargo_file_path = {:?}", cargo_file_path);
-    Ok(MetadataCommand::new().exec().unwrap())
+    Ok(MetadataCommand::new().manifest_path(cargo_file_path).exec().unwrap())
 }
 
 fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
