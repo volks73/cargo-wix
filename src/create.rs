@@ -854,7 +854,7 @@ impl Execution {
             }
         } else {
             trace!("Using the current working directory (CWD) to build the WiX object files destination");
-            Ok(target_directory.to_owned())
+            Ok(target_directory.join(WIX).join(filename))
         }
     }
 
