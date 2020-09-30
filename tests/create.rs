@@ -49,16 +49,14 @@ lazy_static! {
 
 lazy_static! {
     static ref TARGET_NAME: PathBuf = {
-        let tmp = std::env::temp_dir();
-        tmp.join("wix_target/");
-        tmp
+        PathBuf::from("target")
     };
 }
-
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
-    env::set_var("CARGO_TARGET_DIR", &*TARGET_NAME);
+    // Forcefully set the target dir to its default location
+    env::set_var("CARGO_TARGET_DIR", "target");
     b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
         .run()
