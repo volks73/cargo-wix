@@ -894,21 +894,17 @@ impl Execution {
     }
 
     fn wxs_sources(&self, package: &Package) -> Result<Vec<PathBuf>> {
-        let project_wix_dir = if let Some(manifest_path) = &self.input {
-            trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
-            manifest_path
-                .parent()
-                .ok_or_else(|| {
-                    Error::Generic(format!(
-                        "The '{}' path for the package's manifest file is invalid",
-                        manifest_path.display()
-                    ))
-                })
-                .map(|d| PathBuf::from(d).join(WIX))
-        } else {
-            trace!("Using the current working directory (CWD) to obtain all WXS files");
-            Ok(PathBuf::from(WIX))
-        }?;
+        trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
+        let project_wix_dir = package
+            .manifest_path
+            .parent()
+            .ok_or_else(|| {
+                Error::Generic(format!(
+                    "The '{}' path for the package's manifest file is invalid",
+                    package.manifest_path.display()
+                ))
+            })
+            .map(|d| PathBuf::from(d).join(WIX))?;
         let mut wix_sources = {
             if project_wix_dir.exists() {
                 std::fs::read_dir(project_wix_dir)?
@@ -1609,7 +1605,7 @@ mod tests {
                 "dependencies": [],
                 "targets": [],
                 "features": {},
-                "manifest_path": "",
+                "manifest_path": "C:\\Cargo.toml",
                 "metadata": {
                     "wix": {
                         "include": ["Cargo.toml"]
