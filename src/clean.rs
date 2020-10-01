@@ -124,14 +124,17 @@ mod tests {
 
         #[test]
         fn target_wix_works() {
-            let actual = Execution::default().target_wix(Path::new("target")).unwrap();
             let mut cwd = env::current_dir().expect("Current Working Directory");
+            let actual = Execution::default().target_wix(&cwd.join("target")).unwrap();
             cwd.push("target");
             cwd.push(WIX);
             assert_eq!(actual, cwd);
         }
 
+        // This will blow up in run(), when trying to acquire the manifest.
+        // Target_wix can't fail anymore.
         #[test]
+        #[ignore]
         fn target_wix_with_nonexistent_manifest_fails() {
             let result = Builder::new()
                 .input(Some("C:\\Cargo.toml"))
@@ -144,12 +147,13 @@ mod tests {
         fn target_wix_with_existing_cargo_toml_works() {
             let temp_dir = assert_fs::TempDir::new().unwrap();
             let cargo_toml_path = temp_dir.path().join("Cargo.toml");
-            let expected = temp_dir.path().join("target").join(WIX);
+            let target = temp_dir.path().join("target");
+            let expected = target.join(WIX);
             let _non_cargo_toml_handle = File::create(&cargo_toml_path).expect("Create file");
             let actual = Builder::new()
                 .input(cargo_toml_path.to_str())
                 .build()
-                .target_wix(&expected)
+                .target_wix(&target)
                 .unwrap();
             assert_eq!(actual, expected);
         }

@@ -871,7 +871,7 @@ mod tests {
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Different"),
-                    "binary-source" => String::from("target\\$(var.Profile)\\Different.exe")
+                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\Different.exe")
                 }]
             )
         }
