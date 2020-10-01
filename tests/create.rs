@@ -55,8 +55,15 @@ lazy_static! {
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
+    run_with_package(b, &std::env::current_dir()?)
+}
+
+/// Run the _create_ subcommand with the output capture toggled by the
+/// `CARGO_WIX_TEST_NO_CAPTURE` environment variable, and the CARGO_TARGET_DIR
+/// env variable set to <package path>/target.
+fn run_with_package(b: &mut Builder, package_path: &Path) -> Result<()> {
     // Forcefully set the target dir to its default location
-    env::set_var("CARGO_TARGET_DIR", "target");
+    env::set_var("CARGO_TARGET_DIR", package_path.join("target"));
     b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
         .run()
@@ -757,7 +764,7 @@ fn input_works_outside_cwd() {
         .build()
         .run()
         .unwrap();
-    let result = run(Builder::default().input(package_manifest.path().to_str()));
+    let result = run_with_package(Builder::default().input(package_manifest.path().to_str()), &package.path());
     result.expect("OK result");
     package
         .child(TARGET_WIX_DIR.as_path())
