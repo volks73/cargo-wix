@@ -1060,6 +1060,7 @@ const SUBCOMMAND_NAME: &str = "wix";
 fn main() {
     let package = Arg::with_name("package")
         .help("The name of the package in the current workspace to operate on")
+        .long("package")
         .takes_value(true);
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
