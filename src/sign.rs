@@ -226,7 +226,7 @@ impl Execution {
         Ok(())
     }
 
-    fn homepage(&self, package: &Package) -> Option<String> {
+    fn homepage(&self, _package: &Package) -> Option<String> {
         self.homepage.clone().or_else(|| {
             // TODO: Get cargo to return the homepage.
             None

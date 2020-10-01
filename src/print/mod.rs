@@ -46,10 +46,10 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
 
 fn first_author(package: &Package) -> Result<String> {
     package.authors.first()
-        .and_then(|s| {
+        .map(|s| {
             // Strip email if it exists.
             let re = Regex::new(r"<(.*?)>").unwrap();
-            Some(re.replace_all(s, ""))
+            re.replace_all(s, "")
         })
         .map(|s| String::from(s.trim()))
         .ok_or(Error::Manifest("authors"))

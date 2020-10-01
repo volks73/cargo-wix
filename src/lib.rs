@@ -91,8 +91,7 @@ use std::env;
 use std::error::Error as StdError;
 use std::ffi::OsStr;
 use std::fmt;
-use std::fs::File;
-use std::io::{self, ErrorKind, Read};
+use std::io::{self, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 

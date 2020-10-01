@@ -471,9 +471,9 @@ impl Execution {
                     Ok(input
                         .parent()
                         .map(|p| p.to_path_buf())
-                        .and_then(|mut p| {
+                        .map(|mut p| {
                             p.push(WIX);
-                            Some(p)
+                            p
                         })
                         .unwrap())
                 } else {
@@ -494,9 +494,9 @@ impl Execution {
                     Ok(cwd
                         .parent()
                         .map(|p| p.to_path_buf())
-                        .and_then(|mut p| {
+                        .map(|mut p| {
                             p.push(WIX);
-                            Some(p)
+                            p
                         })
                         .unwrap())
                 } else {

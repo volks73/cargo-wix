@@ -15,13 +15,9 @@
 //! The implementation for the `clean` command. This command is focused on
 //! cleaning up build output, similar to the `cargo clean` subcommand.
 
-use crate::Error;
 use crate::Result;
-use crate::CARGO_MANIFEST_FILE;
 use crate::WIX;
 
-use std::env;
-use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -121,6 +117,7 @@ mod tests {
 
         use super::*;
         use std::fs::File;
+        use std::env;
 
         #[test]
         fn target_wix_works() {

@@ -48,7 +48,7 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::ffi::OsString;
 
-use cargo_metadata::{Metadata, Package, MetadataCommand};
+use cargo_metadata::Package;
 use serde_json::Value;
 
 /// A builder for running the `cargo wix` subcommand.
@@ -806,6 +806,7 @@ impl Execution {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn installer_destination(
         &self,
         name: &str,
