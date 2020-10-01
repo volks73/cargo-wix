@@ -33,7 +33,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use cargo_metadata::{Package};
+use cargo_metadata::Package;
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
@@ -231,11 +231,11 @@ impl Execution {
             // TODO: Get cargo to return the homepage.
             None
             /*package.
-                .get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("homepage"))
-                .and_then(|d| d.as_str())
-                .map(String::from)*/
+            .get("package")
+            .and_then(|p| p.as_table())
+            .and_then(|t| t.get("homepage"))
+            .and_then(|d| d.as_str())
+            .map(String::from)*/
         })
     }
 
@@ -451,8 +451,7 @@ mod tests {
 
         #[test]
         fn msi_with_nonexistent_installer_fails() {
-            let result = Execution::default()
-                .msi(Path::new("target"));
+            let result = Execution::default().msi(Path::new("target"));
             assert!(result.is_err());
         }
 

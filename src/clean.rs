@@ -116,13 +116,15 @@ mod tests {
         extern crate assert_fs;
 
         use super::*;
-        use std::fs::File;
         use std::env;
+        use std::fs::File;
 
         #[test]
         fn target_wix_works() {
             let mut cwd = env::current_dir().expect("Current Working Directory");
-            let actual = Execution::default().target_wix(&cwd.join("target")).unwrap();
+            let actual = Execution::default()
+                .target_wix(&cwd.join("target"))
+                .unwrap();
             cwd.push("target");
             cwd.push(WIX);
             assert_eq!(actual, cwd);

@@ -50,9 +50,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref TARGET_NAME: PathBuf = {
-        PathBuf::from("target")
-    };
+    static ref TARGET_NAME: PathBuf = { PathBuf::from("target") };
 }
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
@@ -922,11 +920,11 @@ fn compiler_and_linker_args_works_with_metadata() {
         .assert(predicate::path::exists());
 }
 
-
 #[test]
 fn custom_target_dir_works() {
     init_logging();
-    let target_tmpdir = TempDir::new().unwrap()
+    let target_tmpdir = TempDir::new()
+        .unwrap()
         .into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok());
 
     let original_working_directory = env::current_dir().unwrap();
@@ -941,9 +939,7 @@ fn custom_target_dir_works() {
         .run();
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
-    target_tmpdir
-        .child(WIX)
-        .assert(predicate::path::exists());
+    target_tmpdir.child(WIX).assert(predicate::path::exists());
     target_tmpdir
         .child(expected_msi_file)
         .assert(predicate::path::exists());

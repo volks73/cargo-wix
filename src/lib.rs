@@ -95,7 +95,7 @@ use std::io::{self, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use cargo_metadata::{MetadataCommand, Metadata, Package};
+use cargo_metadata::{Metadata, MetadataCommand, Package};
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
@@ -185,26 +185,31 @@ fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
 fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
     let cargo_file_path = cargo_toml_file(input)?;
     debug!("cargo_file_path = {:?}", cargo_file_path);
-    Ok(MetadataCommand::new().manifest_path(cargo_file_path).exec().unwrap())
+    Ok(MetadataCommand::new()
+        .manifest_path(cargo_file_path)
+        .exec()
+        .unwrap())
 }
 
 fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
     let package_id = if let Some(v) = package {
-        manifest.workspace_members.iter().find(|u| {
-            manifest[u].name == v
-        }).unwrap()
+        manifest
+            .workspace_members
+            .iter()
+            .find(|u| manifest[u].name == v)
+            .unwrap()
     } else if manifest.workspace_members.len() == 1 {
         &manifest.workspace_members[0]
     } else {
-        return Err(Error::Generic(String::from("Workspace detected. Please pass a package name.")))
+        return Err(Error::Generic(String::from(
+            "Workspace detected. Please pass a package name.",
+        )));
     };
     Ok(manifest[package_id].clone())
 }
 
 fn description(description: Option<String>, manifest: &Package) -> Option<String> {
-    description.or_else(|| {
-        manifest.description.clone()
-    })
+    description.or_else(|| manifest.description.clone())
 }
 
 fn product_name(product_name: Option<&String>, manifest: &Package) -> Result<String> {

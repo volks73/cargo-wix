@@ -45,7 +45,9 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
 }
 
 fn first_author(package: &Package) -> Result<String> {
-    package.authors.first()
+    package
+        .authors
+        .first()
         .map(|s| {
             // Strip email if it exists.
             let re = Regex::new(r"<(.*?)>").unwrap();
@@ -85,16 +87,14 @@ mod tests {
 
     #[test]
     fn first_author_with_single_author_works() {
-        let manifest = serde_json::from_str(SINGLE_AUTHOR_MANIFEST)
-            .expect("Parsing TOML");
+        let manifest = serde_json::from_str(SINGLE_AUTHOR_MANIFEST).expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("First Last"));
     }
 
     #[test]
     fn first_author_with_multiple_authors_works() {
-        let manifest = serde_json::from_str(MULTIPLE_AUTHORS_MANIFEST)
-            .expect("Parsing TOML");
+        let manifest = serde_json::from_str(MULTIPLE_AUTHORS_MANIFEST).expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("1 Author"));
     }

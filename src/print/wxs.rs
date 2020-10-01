@@ -405,10 +405,10 @@ impl Execution {
             }
             binaries.push(map);
         } else {
-            let binaries_iter = package.targets
+            let binaries_iter = package
+                .targets
                 .iter()
-                .filter(|v|
-                    v.kind.iter().any(|v| v == "bin"));
+                .filter(|v| v.kind.iter().any(|v| v == "bin"));
             for (index, binary) in binaries_iter.enumerate() {
                 let mut map = HashMap::with_capacity(3);
                 map.insert("binary-index", index.to_string());
@@ -422,7 +422,9 @@ impl Execution {
 
     fn default_binary_path(name: &str) -> String {
         // TODO: Handle cross-compilation?
-        let mut path = Path::new("$(var.CargoTargetDir)").join("$(var.Profile)").join(name);
+        let mut path = Path::new("$(var.CargoTargetDir)")
+            .join("$(var.Profile)")
+            .join(name);
         path.set_extension(EXE_FILE_EXTENSION);
         path.to_str()
             .map(String::from)
@@ -431,11 +433,10 @@ impl Execution {
 
     fn help_url(manifest: &Package) -> Option<String> {
         // TODO: Get documentation || homepage || repository.
-        manifest.repository.as_ref()
-            .map(|s| {
-                trace!("Using '{}' for the help URL", s);
-                s.clone()
-            })
+        manifest.repository.as_ref().map(|s| {
+            trace!("Using '{}' for the help URL", s);
+            s.clone()
+        })
     }
 
     fn eula(&self, manifest: &Package) -> Result<Eula> {
@@ -457,21 +458,16 @@ impl Execution {
         if let Some(ref l) = self.license.clone().map(PathBuf::from) {
             l.file_name().and_then(|f| f.to_str()).map(String::from)
         } else {
-            manifest.license.as_ref()
-                .filter(|l| {
-                    Template::license_ids().contains(&l)
-                })
+            manifest
+                .license
+                .as_ref()
+                .filter(|l| Template::license_ids().contains(&l))
                 .map(|_| String::from(LICENSE_FILE_NAME))
                 .or_else(|| {
-                    manifest.license_file()
-                        .and_then(|l| {
-                            l
-                                .file_name()
-                                .and_then(|f| f.to_str())
-                                .map(String::from)
-                        })
+                    manifest
+                        .license_file()
+                        .and_then(|l| l.file_name().and_then(|f| f.to_str()).map(String::from))
                 })
-
         }
     }
 
@@ -479,24 +475,25 @@ impl Execution {
         if let Some(ref path) = self.license.clone().map(PathBuf::from) {
             Ok(path.to_str().map(String::from))
         } else {
-            Ok(manifest.license.as_ref()
-                .filter(|l| {
-                    Template::license_ids().contains(&l)
-                })
+            Ok(manifest
+                .license
+                .as_ref()
+                .filter(|l| Template::license_ids().contains(&l))
                 .map(|_| LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
                 .or_else(|| {
-                    manifest.license_file()
-                        .and_then(|s| {
-                            if s.exists() {
-                                trace!("The '{}' path from the 'license-file' field in the package's \
-                                    manifest (Cargo.toml) exists.", s.display());
-                                Some(s.into_os_string().into_string().unwrap())
-                            } else {
-                                None
-                            }
-                        })
-                })
-            )
+                    manifest.license_file().and_then(|s| {
+                        if s.exists() {
+                            trace!(
+                                "The '{}' path from the 'license-file' field in the package's \
+                                manifest (Cargo.toml) exists.",
+                                s.display()
+                            );
+                            Some(s.into_os_string().into_string().unwrap())
+                        } else {
+                            None
+                        }
+                    })
+                }))
         }
     }
 
@@ -878,9 +875,7 @@ mod tests {
 
         #[test]
         fn binaries_with_multiple_bin_sections_works() {
-            let manifest = serde_json::from_str(MULTIPLE_BIN_MANIFEST
-                )
-                .expect("Parsing TOML");
+            let manifest = serde_json::from_str(MULTIPLE_BIN_MANIFEST).expect("Parsing TOML");
             let actual = Execution::default().binaries(&manifest).unwrap();
             assert_eq!(
                 actual,
@@ -1011,7 +1006,8 @@ mod tests {
             let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(&format!(r#"{{
+            let manifest = serde_json::from_str(&format!(
+                r#"{{
                 "name": "Example",
                 "version": "0.1.0",
                 "authors": ["First Last <first.last@example.com>"],
@@ -1035,7 +1031,8 @@ mod tests {
             let temp_dir = assert_fs::TempDir::new().unwrap();
             let license_file_path = temp_dir.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(&format!(r#"{{
+            let manifest = serde_json::from_str(&format!(
+                r#"{{
                 "name": "Example",
                 "version": "0.1.0",
                 "authors": ["First Last <first.last@example.com>"],

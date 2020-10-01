@@ -41,12 +41,12 @@ use semver::Version;
 
 use std::convert::TryFrom;
 use std::env;
+use std::ffi::OsString;
 use std::fmt;
 use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use std::ffi::OsString;
 
 use cargo_metadata::Package;
 use serde_json::Value;
@@ -1591,7 +1591,7 @@ mod tests {
                     false,
                     &InstallerKind::default(),
                     &serde_json::from_str(PKG_META_WIX).unwrap(),
-                    Path::new("target/")
+                    Path::new("target/"),
                 )
                 .unwrap();
             assert_eq!(output, PathBuf::from("target/wix/test.msi"));
