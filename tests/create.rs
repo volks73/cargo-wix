@@ -766,7 +766,8 @@ fn input_works_outside_cwd() {
         .unwrap();
     let result = run_with_package(
         Builder::default().input(package_manifest.path().to_str()),
-        &package.path());
+        &package.path(),
+    );
     result.expect("OK result");
     package
         .child(TARGET_WIX_DIR.as_path())
