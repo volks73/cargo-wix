@@ -485,7 +485,7 @@ impl Execution {
                         if s.exists() {
                             trace!(
                                 "The '{}' path from the 'license-file' field in the package's \
-                                manifest (Cargo.toml) exists.",
+                                 manifest (Cargo.toml) exists.",
                                 s.display()
                             );
                             Some(s.into_os_string().into_string().unwrap())
