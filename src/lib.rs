@@ -197,7 +197,12 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
             .workspace_members
             .iter()
             .find(|u| manifest[u].name == v)
-            .unwrap()
+            .ok_or_else(|| {
+                Error::Generic(format!(
+                    "package ID specification `{}` matched no packages",
+                    v
+                ))
+            })?
     } else if manifest.workspace_members.len() == 1 {
         &manifest.workspace_members[0]
     } else {
