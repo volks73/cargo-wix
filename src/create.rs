@@ -861,7 +861,7 @@ impl Execution {
                 Ok(path.to_owned())
             }
         } else {
-            trace!("Using the current working directory (CWD) to build the WiX object files destination");
+            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
             Ok(target_directory.join(WIX).join(filename))
         }
     }
