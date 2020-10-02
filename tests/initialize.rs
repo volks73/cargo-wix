@@ -33,8 +33,10 @@ use toml::Value;
 use wix::initialize::{Builder, Execution};
 use wix::{
     CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
-    WIX_SOURCE_FILE_NAME,
+    WIX_SOURCE_FILE_NAME
 };
+
+use crate::common::SUBPACKAGE1_NAME;
 
 lazy_static! {
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;
@@ -782,4 +784,41 @@ fn multiple_binaries_works() {
         ),
         EXPECTED_SOURCE_3
     );
+}
+
+#[test]
+fn workspace_no_package_fails() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_err());
+}
+
+#[test]
+fn workspace_package_works() {
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .package(Some(SUBPACKAGE1_NAME))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::missing());
 }
