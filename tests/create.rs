@@ -26,7 +26,9 @@ use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 use crate::common::init_logging;
-use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, SUBPACKAGE1_NAME, PERSIST_VAR_NAME};
+use crate::common::{
+    MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, PERSIST_VAR_NAME, SUBPACKAGE1_NAME,
+};
 
 use assert_fs::TempDir;
 
@@ -962,7 +964,11 @@ fn workspace_package_works() {
     let package = common::create_test_workspace();
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", SUBPACKAGE1_NAME));
     env::set_current_dir(package.path()).unwrap();
-    initialize::Builder::new().package(Some(SUBPACKAGE1_NAME)).build().run().unwrap();
+    initialize::Builder::new()
+        .package(Some(SUBPACKAGE1_NAME))
+        .build()
+        .run()
+        .unwrap();
     let result = run(&mut Builder::default().package(Some(SUBPACKAGE1_NAME)));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");

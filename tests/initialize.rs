@@ -33,7 +33,7 @@ use toml::Value;
 use wix::initialize::{Builder, Execution};
 use wix::{
     CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
-    WIX_SOURCE_FILE_NAME
+    WIX_SOURCE_FILE_NAME,
 };
 
 use crate::common::{init_logging, SUBPACKAGE1_NAME};
@@ -791,9 +791,7 @@ fn workspace_no_package_fails() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_workspace();
     env::set_current_dir(package.path()).unwrap();
-    let result = Builder::default()
-        .build()
-        .run();
+    let result = Builder::default().build().run();
     env::set_current_dir(original_working_directory).unwrap();
     assert!(result.is_err());
 }

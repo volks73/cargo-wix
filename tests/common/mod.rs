@@ -225,8 +225,15 @@ pub fn create_test_workspace() -> TempDir {
     fs::create_dir(temp_dir.path().join(SUBPACKAGE2_NAME)).unwrap();
     create_test_package_at_path(&temp_dir.path().join(SUBPACKAGE1_NAME), SUBPACKAGE1_NAME);
     create_test_package_at_path(&temp_dir.path().join(SUBPACKAGE2_NAME), SUBPACKAGE2_NAME);
-	fs::write(temp_dir.path().join("Cargo.toml"), format!(r#"[workspace]
-	members = [{:?}, {:?}]"#, SUBPACKAGE1_NAME, SUBPACKAGE2_NAME)).unwrap();
+    fs::write(
+        temp_dir.path().join("Cargo.toml"),
+        format!(
+            r#"[workspace]
+            members = [{:?}, {:?}]"#,
+            SUBPACKAGE1_NAME, SUBPACKAGE2_NAME
+        ),
+    )
+    .unwrap();
     temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
 }
 
