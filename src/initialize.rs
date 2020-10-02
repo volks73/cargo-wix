@@ -54,6 +54,7 @@ pub struct Builder<'a> {
     license: Option<&'a str>,
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
+    package: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
 }
@@ -75,9 +76,16 @@ impl<'a> Builder<'a> {
             license: None,
             manufacturer: None,
             output: None,
+            package: None,
             product_icon: None,
             product_name: None,
         }
+    }
+
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
     }
 
     /// Sets the path to a bitmap (BMP) file to be used as a banner image across
@@ -335,6 +343,7 @@ impl<'a> Builder<'a> {
             license: self.license.map(PathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
+            package: self.package.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
         }
@@ -363,6 +372,7 @@ pub struct Execution {
     license: Option<PathBuf>,
     manufacturer: Option<String>,
     output: Option<PathBuf>,
+    package: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
 }
@@ -384,10 +394,11 @@ impl Execution {
         debug!("license = {:?}", self.license);
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
+        debug!("package = {:?}", self.package);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
         let manifest = super::manifest(self.input.as_ref())?;
-        let package = super::package(&manifest, None)?;
+        let package = super::package(&manifest, self.package.as_deref())?;
         let mut destination = self.destination()?;
         debug!("destination = {:?}", destination);
         if !destination.exists() {

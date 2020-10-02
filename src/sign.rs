@@ -43,6 +43,7 @@ pub struct Builder<'a> {
     description: Option<&'a str>,
     homepage: Option<&'a str>,
     input: Option<&'a str>,
+    package: Option<&'a str>,
     product_name: Option<&'a str>,
     timestamp: Option<&'a str>,
 }
@@ -56,11 +57,17 @@ impl<'a> Builder<'a> {
             description: None,
             homepage: None,
             input: None,
+            package: None,
             product_name: None,
             timestamp: None,
         }
     }
 
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
+    }
     /// Sets the path to the folder containing the `signtool.exe` file.
     ///
     // Normally the `signtool.exe` is installed in the `bin` folder of the
@@ -134,6 +141,7 @@ impl<'a> Builder<'a> {
             description: self.description.map(String::from),
             homepage: self.homepage.map(String::from),
             input: self.input.map(PathBuf::from),
+            package: self.package.map(String::from),
             product_name: self.product_name.map(String::from),
             timestamp: self.timestamp.map(String::from),
         }
@@ -154,6 +162,7 @@ pub struct Execution {
     description: Option<String>,
     homepage: Option<String>,
     input: Option<PathBuf>,
+    package: Option<String>,
     product_name: Option<String>,
     timestamp: Option<String>,
 }
@@ -167,11 +176,12 @@ impl Execution {
         debug!("description = {:?}", self.description);
         debug!("homepage = {:?}", self.homepage);
         debug!("input = {:?}", self.input);
+        debug!("package = {:?}", self.package);
         debug!("product_name = {:?}", self.product_name);
         debug!("timestamp = {:?}", self.timestamp);
         let manifest = super::manifest(self.input.as_ref())?;
         debug!("target_directory = {:?}", manifest.target_directory);
-        let package = super::package(&manifest, None)?;
+        let package = super::package(&manifest, self.package.as_deref())?;
         let product_name = super::product_name(self.product_name.as_ref(), &package)?;
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");

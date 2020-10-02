@@ -1630,6 +1630,7 @@ fn main() {
             init.license(m.value_of("license"));
             init.manufacturer(m.value_of("manufacturer"));
             init.output(m.value_of("output"));
+            init.package(m.value_of("package"));
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
             init.build().run()
@@ -1649,6 +1650,7 @@ fn main() {
                     print.license(m.value_of("license"));
                     print.manufacturer(m.value_of("manufacturer"));
                     print.output(m.value_of("output"));
+                    print.package(m.value_of("package"));
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
                     print.build().run()
@@ -1675,6 +1677,7 @@ fn main() {
             sign.description(m.value_of("description"));
             sign.homepage(m.value_of("homepage"));
             sign.input(m.value_of("INPUT"));
+            sign.package(m.value_of("package"));
             sign.product_name(m.value_of("product-name"));
             sign.timestamp(m.value_of("timestamp"));
             sign.build().run()
