@@ -956,6 +956,21 @@ impl Default for Cultures {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assert_fs::TempDir;
+    use std::env;
+    use std::fs;
+
+    /// Create a simple project with the provided TOML.
+    pub fn setup_project(toml: &str) -> TempDir {
+        pub const PERSIST_VAR_NAME: &str = "CARGO_WIX_TEST_PERSIST";
+
+        let temp_dir = TempDir::new().unwrap();
+        fs::write(temp_dir.path().join("Cargo.toml"), toml).unwrap();
+        fs::create_dir(temp_dir.path().join("src")).unwrap();
+        fs::write(temp_dir.path().join("src").join("main.rs"), "fn main() {}").unwrap();
+
+        temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
+    }
 
     mod culture {
         use super::*;

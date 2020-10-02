@@ -28,8 +28,8 @@ use crate::RTF_FILE_EXTENSION;
 
 use mustache::{self, MapBuilder};
 
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::{collections::HashMap, fs, str::FromStr};
 
 use cargo_metadata::Package;
 
@@ -431,12 +431,25 @@ impl Execution {
             .expect("Path to string conversion")
     }
 
-    fn help_url(manifest: &Package) -> Option<String> {
-        // TODO: Get documentation || homepage || repository.
-        manifest.repository.as_ref().map(|s| {
-            trace!("Using '{}' for the help URL", s);
-            s.clone()
-        })
+    fn help_url(package: &Package) -> Option<String> {
+        let manifest = fs::read_to_string(&package.manifest_path)
+            .ok()
+            .and_then(|v| toml::Value::from_str(&v).ok());
+
+        manifest
+            .as_ref()
+            .and_then(|v| v.get("package"))
+            .and_then(|p| p.as_table())
+            .and_then(|t| {
+                t.get("documentation")
+                    .or_else(|| t.get("homepage"))
+                    .or_else(|| t.get("repository"))
+            })
+            .and_then(|h| h.as_str())
+            .map(|s| {
+                trace!("Using '{}' for the help URL", s);
+                String::from(s)
+            })
     }
 
     fn eula(&self, manifest: &Package) -> Result<Eula> {
@@ -620,193 +633,164 @@ mod tests {
         extern crate assert_fs;
 
         use super::*;
+        use crate::tests::setup_project;
         use std::fs::File;
 
-        const MIN_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
+        const MIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "targets": [{
-                "name": "Example",
-                "kind": ["bin"],
-                "src_path": "src/main.rs"
-            }],
-            "features": {},
-            "manifest_path": ""
-        }"#;
+        const MIT_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+        "#;
 
-        const MIT_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "MIT",
+        const GPL3_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "GPL-3.0"
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "targets": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
+        const APACHE2_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "Apache-2.0"
+        "#;
 
-        const GPL3_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "GPL-3.0",
+        const UNKNOWN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "XYZ"
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "targets": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
+        const MIT_MANIFEST_BIN: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
 
-        const APACHE2_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "Apache-2.0",
+            [[bin]]
+            name = "Different"
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "targets": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
+        const MULTIPLE_BIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
 
-        const UNKNOWN_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "XYZ",
+            [[bin]]
+            name = "binary0"
+            path = "src/binary0/main.rs"
 
-            "id": "",
-            "dependencies": [],
-            "targets": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
+            [[bin]]
+            name = "binary1"
+            path = "src/binary1/main.rs"
 
-        const MIT_MANIFEST_BIN: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "MIT",
-            "targets": [{
-                "name": "Different",
-                "kind": ["bin"],
-                "src_path": "src/main.rs"
-            }],
+            [[bin]]
+            name = "binary2"
+            path = "src/binary2/main.rs"
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
-
-        const MULTIPLE_BIN_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "MIT",
-
-            "targets": [
-                {
-                    "name": "binary0",
-                    "kind": ["bin"],
-                    "src_path": "src/binary0/main.rs"
-                },
-                {
-                    "name": "binary1",
-                    "kind": ["bin"],
-                    "src_path": "src/binary1/main.rs"
-                },
-                {
-                    "name": "binary2",
-                    "kind": ["bin"],
-                    "src_path": "src/binary2/main.rs"
-                }
-            ],
-
-            "id": "",
-            "dependencies": [],
-            "features": {},
-            "manifest_path": ""
-        }"#;
-
-        /*const DOCUMENTATION_MANIFEST: &str = r#"[package]
+        const DOCUMENTATION_MANIFEST: &str = r#"[package]
             name = "Example"
             version = "0.1.0"
             authors = ["First Last <first.last@example.com>"]
             license = "MIT"
             documentation = "http://www.example.com"
-        "#;*/
+        "#;
 
-        // TODO: Add homepage to cargo metadata output
-        //const HOMEPAGE_MANIFEST: &str = r#"[package]
-        //    name = "Example"
-        //    version = "0.1.0"
-        //    authors = ["First Last <first.last@example.com>"]
-        //    license = "MIT"
-        //    homepage = "http://www.example.com"
-        //"#;
+        const HOMEPAGE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+            homepage = "http://www.example.com"
+        "#;
 
-        const REPOSITORY_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "license": "MIT",
-            "repository": "http://www.example.com",
+        const REPOSITORY_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+            repository = "http://www.example.com"
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "features": {},
-            "targets": [],
-            "manifest_path": ""
-        }"#;
+        const LICENSE_FILE_RTF_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license-file = "Example.rtf"
+        "#;
+
+        const LICENSE_FILE_TXT_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license-file = "Example.txt"
+        "#;
 
         #[test]
         fn license_name_with_mit_license_field_works() {
-            let manifest = serde_json::from_str(MIT_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(MIT_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_name(&manifest)
+                .license_name(&package)
                 .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
         fn license_name_with_gpl3_license_field_works() {
-            let manifest = serde_json::from_str(GPL3_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(GPL3_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_name(&manifest)
+                .license_name(&package)
                 .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
         fn license_name_with_apache2_license_field_works() {
-            let manifest = serde_json::from_str(APACHE2_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(APACHE2_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_name(&manifest)
+                .license_name(&package)
                 .expect("License name");
             assert_eq!(actual, String::from(LICENSE_FILE_NAME));
         }
 
         #[test]
         fn license_name_with_unknown_license_field_works() {
-            let manifest = serde_json::from_str(UNKNOWN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().license_name(&manifest);
+            let project = setup_project(UNKNOWN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().license_name(&package);
             assert!(actual.is_none());
         }
 
         #[test]
         fn license_source_with_mit_license_field_works() {
-            let manifest = serde_json::from_str(MIT_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(MIT_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_source(&manifest)
+                .license_source(&package)
                 .expect("License source");
             assert_eq!(
                 actual,
@@ -816,9 +800,12 @@ mod tests {
 
         #[test]
         fn license_source_with_gpl3_license_field_works() {
-            let manifest = serde_json::from_str(GPL3_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(GPL3_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_source(&manifest)
+                .license_source(&package)
                 .expect("License source");
             assert_eq!(
                 actual,
@@ -828,9 +815,12 @@ mod tests {
 
         #[test]
         fn license_source_with_apache2_license_field_works() {
-            let manifest = serde_json::from_str(APACHE2_MANIFEST).expect("Parsing TOML");
+            let project = setup_project(APACHE2_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Execution::default()
-                .license_source(&manifest)
+                .license_source(&package)
                 .expect("License source");
             assert_eq!(
                 actual,
@@ -840,15 +830,21 @@ mod tests {
 
         #[test]
         fn license_source_with_unknown_license_field_works() {
-            let manifest = serde_json::from_str(UNKNOWN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().license_source(&manifest).unwrap();
+            let project = setup_project(UNKNOWN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().license_source(&package).unwrap();
             assert!(actual.is_none());
         }
 
         #[test]
         fn binaries_with_no_bin_section_works() {
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest).unwrap();
+            let project = setup_project(MIT_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
@@ -861,8 +857,11 @@ mod tests {
 
         #[test]
         fn binaries_with_single_bin_section_works() {
-            let manifest = serde_json::from_str(MIT_MANIFEST_BIN).expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest).unwrap();
+            let project = setup_project(MIT_MANIFEST_BIN);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
@@ -875,8 +874,11 @@ mod tests {
 
         #[test]
         fn binaries_with_multiple_bin_sections_works() {
-            let manifest = serde_json::from_str(MULTIPLE_BIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().binaries(&manifest).unwrap();
+            let project = setup_project(MULTIPLE_BIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![
@@ -902,165 +904,183 @@ mod tests {
         #[test]
         fn manufacturer_with_defaults_works() {
             const EXPECTED: &str = "First Last";
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().manufacturer(&manifest).unwrap();
+
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().manufacturer(&package).unwrap();
             assert_eq!(actual, String::from(EXPECTED));
         }
 
         #[test]
         fn manufacturer_with_override_works() {
             const EXPECTED: &str = "Example";
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
+
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Builder::default()
                 .manufacturer(Some(EXPECTED))
                 .build()
-                .manufacturer(&manifest)
+                .manufacturer(&package)
                 .unwrap();
             assert_eq!(actual, String::from(EXPECTED));
         }
 
         #[test]
         fn help_url_with_defaults_works() {
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::help_url(&manifest);
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::help_url(&package);
             assert!(actual.is_none());
         }
 
-        /*#[test]
+        #[test]
         fn help_url_with_documentation_works() {
             const EXPECTED: &str = "http://www.example.com";
-            let manifest = serde_json::from_str(DOCUMENTATION_MANIFEST
-                )
-                .expect("Parsing TOML");
-            let actual = Execution::help_url(&manifest);
-            assert_eq!(actual, Some(String::from(EXPECTED)));
-        }*/
 
-        //#[test]
-        //fn help_url_with_homepage_works() {
-        //    const EXPECTED: &str = "http://www.example.com";
-        //    let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
-        //    let actual = Execution::help_url(&manifest);
-        //    assert_eq!(actual, Some(String::from(EXPECTED)));
-        //}
+            let project = setup_project(DOCUMENTATION_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::help_url(&package);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
+
+        #[test]
+        fn help_url_with_homepage_works() {
+            const EXPECTED: &str = "http://www.example.com";
+
+            let project = setup_project(HOMEPAGE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::help_url(&package);
+            assert_eq!(actual, Some(String::from(EXPECTED)));
+        }
 
         #[test]
         fn help_url_with_repository_works() {
             const EXPECTED: &str = "http://www.example.com";
-            let manifest = serde_json::from_str(REPOSITORY_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::help_url(&manifest);
+
+            let project = setup_project(REPOSITORY_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::help_url(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
         #[test]
         fn eula_with_defaults_works() {
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Disabled);
         }
 
         #[test]
         fn eula_with_mit_license_field_works() {
-            let manifest = serde_json::from_str(MIT_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let project = setup_project(MIT_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Generate(Template::Mit));
         }
 
         #[test]
         fn eula_with_apache2_license_field_works() {
-            let manifest = serde_json::from_str(APACHE2_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let project = setup_project(APACHE2_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Generate(Template::Apache2));
         }
 
         #[test]
         fn eula_with_gpl3_license_field_works() {
-            let manifest = serde_json::from_str(GPL3_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let project = setup_project(GPL3_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Generate(Template::Gpl3));
         }
 
         #[test]
         fn eula_with_unknown_license_field_works() {
-            let manifest = serde_json::from_str(UNKNOWN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let project = setup_project(UNKNOWN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Disabled);
         }
 
         #[test]
         fn eula_with_override_works() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let license_file_path = temp_dir.path().join("Example.rtf");
+            let project = setup_project(MIT_MANIFEST);
+            let license_file_path = project.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(MIT_MANIFEST).expect("Parsing TOML");
+
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Builder::default()
                 .eula(license_file_path.to_str())
                 .build()
-                .eula(&manifest)
+                .eula(&package)
                 .unwrap();
             assert_eq!(actual, Eula::CommandLine(license_file_path));
         }
 
         #[test]
         fn eula_with_license_file_field_works() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let license_file_path = temp_dir.path().join("Example.rtf");
+            let project = setup_project(LICENSE_FILE_RTF_MANIFEST);
+            let license_file_path = project.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(&format!(
-                r#"{{
-                "name": "Example",
-                "version": "0.1.0",
-                "authors": ["First Last <first.last@example.com>"],
-                "license_file": {:?},
 
-                "id": "",
-                "dependencies": [],
-                "targets": [],
-                "features": {{}},
-                "manifest_path": ""
-            }}"#,
-                license_file_path
-            ))
-            .expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Manifest(license_file_path));
         }
 
         #[test]
         fn eula_with_license_file_extension_works() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let license_file_path = temp_dir.path().join("Example.txt");
+            let project = setup_project(LICENSE_FILE_TXT_MANIFEST);
+            let license_file_path = project.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(&format!(
-                r#"{{
-                "name": "Example",
-                "version": "0.1.0",
-                "authors": ["First Last <first.last@example.com>"],
-                "license_file": {:?},
 
-                "id": "",
-                "dependencies": [],
-                "targets": [],
-                "features": {{}},
-                "manifest_path": ""
-            }}"#,
-                license_file_path
-            ))
-            .expect("Parsing TOML");
-            let actual = Execution::default().eula(&manifest).unwrap();
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().eula(&package).unwrap();
             assert_eq!(actual, Eula::Disabled);
         }
 
         #[test]
         fn eula_with_wrong_file_extension_override_works() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let license_file_path = temp_dir.path().join("Example.txt");
+            let project = setup_project(LICENSE_FILE_TXT_MANIFEST);
+            let license_file_path = project.path().join("Example.txt");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
-            let manifest = serde_json::from_str(MIT_MANIFEST).expect("Parsing TOML");
+
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Builder::default()
                 .eula(license_file_path.to_str())
                 .build()
-                .eula(&manifest)
+                .eula(&package)
                 .unwrap();
             assert_eq!(actual, Eula::CommandLine(license_file_path));
         }

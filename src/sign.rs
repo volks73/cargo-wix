@@ -226,16 +226,18 @@ impl Execution {
         Ok(())
     }
 
-    fn homepage(&self, _package: &Package) -> Option<String> {
+    fn homepage(&self, package: &Package) -> Option<String> {
         self.homepage.clone().or_else(|| {
-            // TODO: Get cargo to return the homepage.
-            None
-            /*package.
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("homepage"))
-            .and_then(|d| d.as_str())
-            .map(String::from)*/
+            let manifest = fs::read_to_string(&package.manifest_path)
+                .ok()
+                .and_then(|v| toml::Value::from_str(&v).ok());
+            manifest
+                .as_ref()
+                .and_then(|v| v.get("package"))
+                .and_then(|p| p.as_table())
+                .and_then(|t| t.get("homepage"))
+                .and_then(|d| d.as_str())
+                .map(String::from)
         })
     }
 
@@ -398,54 +400,53 @@ mod tests {
         use std::fs::File;
 
         use super::*;
+        use crate::tests::setup_project;
 
-        const MIN_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
+        const MIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
 
-            "id": "",
-            "dependencies": [],
-            "features": {},
-            "targets": [],
-            "manifest_path": ""
-        }"#;
-
-        const HOMEPAGE_MANIFEST: &str = r#"{
-            "name": "Example",
-            "version": "0.1.0",
-            "authors": ["First Last <first.last@example.com>"],
-            "homepage": "http://www.example.com",
-
-            "id": "",
-            "dependencies": [],
-            "features": {},
-            "targets": [],
-            "manifest_path": ""
-        }"#;
+        const HOMEPAGE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            homepage = "http://www.example.com"
+        "#;
 
         #[test]
         fn homepage_without_homepage_field_works() {
-            let manifest = serde_json::from_str(MIN_MANIFEST).expect("Parsing TOML");
-            let actual = Execution::default().homepage(&manifest);
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().homepage(&package);
             assert!(actual.is_none());
         }
 
-        //#[test]
-        //fn homepage_with_homepage_field_works() {
-        //    let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
-        //    let actual = Execution::default().homepage(&manifest);
-        //    assert_eq!(actual, Some(String::from("http://www.example.com")));
-        //}
+        #[test]
+        fn homepage_with_homepage_field_works() {
+            let project = setup_project(HOMEPAGE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().homepage(&package);
+            assert_eq!(actual, Some(String::from("http://www.example.com")));
+        }
 
         #[test]
         fn homepage_with_override_works() {
             const EXPECTED: &str = "http://www.another.com";
-            let manifest = serde_json::from_str(HOMEPAGE_MANIFEST).expect("Parsing TOML");
+
+            let project = setup_project(HOMEPAGE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Builder::new()
                 .homepage(Some(EXPECTED))
                 .build()
-                .homepage(&manifest);
+                .homepage(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
