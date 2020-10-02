@@ -788,6 +788,7 @@ fn multiple_binaries_works() {
 
 #[test]
 fn workspace_no_package_fails() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_workspace();
     env::set_current_dir(package.path()).unwrap();
@@ -798,6 +799,7 @@ fn workspace_no_package_fails() {
 
 #[test]
 fn workspace_package_works() {
+    init_logging();
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_workspace();
     env::set_current_dir(package.path()).unwrap();
