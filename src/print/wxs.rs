@@ -288,6 +288,7 @@ pub struct Execution {
 }
 
 impl Execution {
+    #[allow(clippy::cognitive_complexity)]
     /// Prints a WiX Source (wxs) file based on the built context.
     pub fn run(self) -> Result<()> {
         debug!("banner = {:?}", self.banner);
