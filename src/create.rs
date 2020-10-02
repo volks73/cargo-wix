@@ -877,7 +877,7 @@ impl Execution {
         // for PathBuf, but it was unexpected and kind of annoying because I am
         // not sure how to add a trailing slash in a cross-platform way with
         // PathBuf, not that cargo-wix needs to be cross-platform.
-        let dst = target_directory.join("wix\\");
+        let dst = target_directory.join(WIX).join("");
         Ok(dst)
     }
 
