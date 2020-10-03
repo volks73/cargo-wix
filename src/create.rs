@@ -30,7 +30,6 @@ use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
 use crate::EXE_FILE_EXTENSION;
 use crate::MSI_FILE_EXTENSION;
-use crate::TARGET_FOLDER_NAME;
 use crate::WIX;
 use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
@@ -42,17 +41,20 @@ use semver::Version;
 
 use std::convert::TryFrom;
 use std::env;
+use std::ffi::OsString;
 use std::fmt;
 use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::Package;
+use serde_json::Value;
 
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
+    package: Option<&'a str>,
     bin_path: Option<&'a str>,
     capture_output: bool,
     compiler_args: Option<Vec<&'a str>>,
@@ -73,6 +75,7 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
+            package: None,
             bin_path: None,
             capture_output: true,
             compiler_args: None,
@@ -88,6 +91,12 @@ impl<'a> Builder<'a> {
             output: None,
             version: None,
         }
+    }
+
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
     }
 
     /// Sets the path to the WiX Toolset's `bin` folder.
@@ -287,6 +296,7 @@ impl<'a> Builder<'a> {
     /// Builds a context for creating, or building, the installer.
     pub fn build(&mut self) -> Execution {
         Execution {
+            package: self.package.map(String::from),
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             compiler_args: self
@@ -323,6 +333,7 @@ impl<'a> Default for Builder<'a> {
 /// A context for creating, or building, an installer.
 #[derive(Debug)]
 pub struct Execution {
+    package: Option<String>,
     bin_path: Option<PathBuf>,
     capture_output: bool,
     compiler_args: Option<Vec<String>>,
@@ -343,6 +354,7 @@ impl Execution {
     /// Creates, or builds, an installer within a built context.
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
+        debug!("self.package = {:?}", self.package);
         debug!("self.bin_path = {:?}", self.bin_path);
         debug!("self.capture_output = {:?}", self.capture_output);
         debug!("self.compiler_args = {:?}", self.compiler_args);
@@ -356,33 +368,37 @@ impl Execution {
         debug!("self.name = {:?}", self.name);
         debug!("self.no_build = {:?}", self.no_build);
         debug!("self.output = {:?}", self.output);
+        debug!("self.package = {:?}", self.package);
         debug!("self.version = {:?}", self.version);
         let manifest_path = super::cargo_toml_file(self.input.as_ref())?;
         debug!("manifest_path = {:?}", manifest_path);
         let manifest = super::manifest(self.input.as_ref())?;
-        let name = self.name(&manifest)?;
+        debug!("target_directory = {:?}", manifest.target_directory);
+        let package = super::package(&manifest, self.package.as_deref())?;
+        let metadata = package.metadata.clone();
+        let name = self.name(&package)?;
         debug!("name = {:?}", name);
-        let version = self.version(&manifest)?;
+        let version = self.version(&package)?;
         debug!("version = {:?}", version);
-        let compiler_args = self.compiler_args(&manifest);
+        let compiler_args = self.compiler_args(&metadata);
         debug!("compiler_args = {:?}", compiler_args);
-        let culture = self.culture(&manifest)?;
+        let culture = self.culture(&metadata)?;
         debug!("culture = {:?}", culture);
-        let linker_args = self.linker_args(&manifest);
+        let linker_args = self.linker_args(&metadata);
         debug!("linker_args = {:?}", linker_args);
-        let locale = self.locale(&manifest)?;
+        let locale = self.locale(&metadata)?;
         debug!("locale = {:?}", locale);
         let platform = self.platform();
         debug!("platform = {:?}", platform);
-        let debug_build = self.debug_build(&manifest);
+        let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
-        let debug_name = self.debug_name(&manifest);
+        let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
-        let wxs_sources = self.wxs_sources(&manifest)?;
+        let wxs_sources = self.wxs_sources(&package)?;
         debug!("wxs_sources = {:?}", wxs_sources);
-        let wixobj_destination = self.wixobj_destination()?;
+        let wixobj_destination = self.wixobj_destination(&manifest.target_directory)?;
         debug!("wixobj_destination = {:?}", wixobj_destination);
-        let no_build = self.no_build(&manifest);
+        let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
         if no_build {
             warn!("Skipped building the release binary");
@@ -429,6 +445,11 @@ impl Execution {
         compiler
             .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform))
+            .arg({
+                let mut s = OsString::from("-dCargoTargetDir=");
+                s.push(&manifest.target_directory);
+                s
+            })
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg("-o")
@@ -475,7 +496,8 @@ impl Execution {
             platform,
             debug_name,
             &installer_kind,
-            &manifest,
+            &package,
+            &manifest.target_directory,
         )?;
         debug!("installer_destination = {:?}", installer_destination);
         // Link the installer
@@ -594,16 +616,12 @@ impl Execution {
         }
     }
 
-    fn debug_build(&self, manifest: &Value) -> bool {
+    fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
-        } else if let Some(pkg_meta_wix_debug_build) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_debug_build) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("dbg-build"))
             .and_then(|c| c.as_bool())
         {
@@ -613,16 +631,12 @@ impl Execution {
         }
     }
 
-    fn debug_name(&self, manifest: &Value) -> bool {
+    fn debug_name(&self, metadata: &Value) -> bool {
         if self.debug_name {
             true
-        } else if let Some(pkg_meta_wix_debug_name) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_debug_name) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("dbg-name"))
             .and_then(|c| c.as_bool())
         {
@@ -632,16 +646,12 @@ impl Execution {
         }
     }
 
-    fn no_build(&self, manifest: &Value) -> bool {
+    fn no_build(&self, metadata: &Value) -> bool {
         if self.no_build {
             true
-        } else if let Some(pkg_meta_wix_no_build) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_no_build) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("no-build"))
             .and_then(|c| c.as_bool())
         {
@@ -651,14 +661,10 @@ impl Execution {
         }
     }
 
-    fn compiler_args(&self, manifest: &Value) -> Option<Vec<String>> {
-        manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+    fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
+        metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("compiler-args"))
             .and_then(|i| i.as_array())
             .map(|a| {
@@ -669,14 +675,10 @@ impl Execution {
             .or_else(|| self.compiler_args.to_owned())
     }
 
-    fn linker_args(&self, manifest: &Value) -> Option<Vec<String>> {
-        manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+    fn linker_args(&self, metadata: &Value) -> Option<Vec<String>> {
+        metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("linker-args"))
             .and_then(|i| i.as_array())
             .map(|a| {
@@ -687,16 +689,12 @@ impl Execution {
             .or_else(|| self.linker_args.to_owned())
     }
 
-    fn culture(&self, manifest: &Value) -> Result<Cultures> {
+    fn culture(&self, metadata: &Value) -> Result<Cultures> {
         if let Some(culture) = &self.culture {
             Cultures::from_str(culture)
-        } else if let Some(pkg_meta_wix_culture) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_culture) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("culture"))
             .and_then(|c| c.as_str())
         {
@@ -706,7 +704,7 @@ impl Execution {
         }
     }
 
-    fn locale(&self, manifest: &Value) -> Result<Option<PathBuf>> {
+    fn locale(&self, metadata: &Value) -> Result<Option<PathBuf>> {
         if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
             if locale.exists() {
                 Ok(Some(locale))
@@ -717,13 +715,9 @@ impl Execution {
                     locale.display()
                 )))
             }
-        } else if let Some(pkg_meta_wix_locale) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_locale) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("locale"))
             .and_then(|l| l.as_str())
             .map(PathBuf::from)
@@ -796,32 +790,24 @@ impl Execution {
         }
     }
 
-    fn name(&self, manifest: &Value) -> Result<String> {
+    fn name(&self, package: &Package) -> Result<String> {
         if let Some(ref p) = self.name {
             Ok(p.to_owned())
-        } else if let Some(pkg_meta_wix_name) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_name) = package
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("name"))
             .and_then(|n| n.as_str())
             .map(String::from)
         {
             Ok(pkg_meta_wix_name)
         } else {
-            manifest
-                .get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("name"))
-                .and_then(|n| n.as_str())
-                .map(String::from)
-                .ok_or(Error::Manifest("name"))
+            Ok(package.name.clone())
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn installer_destination(
         &self,
         name: &str,
@@ -829,7 +815,8 @@ impl Execution {
         platform: Platform,
         debug_name: bool,
         installer_kind: &InstallerKind,
-        manifest: &Value,
+        package: &Package,
+        target_directory: &Path,
     ) -> Result<PathBuf> {
         let filename = if debug_name {
             format!(
@@ -856,13 +843,10 @@ impl Execution {
             } else {
                 Ok(path.to_owned())
             }
-        } else if let Some(pkg_meta_wix_output) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_output) = package
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("output"))
             .and_then(|o| o.as_str())
         {
@@ -876,49 +860,13 @@ impl Execution {
             } else {
                 Ok(path.to_owned())
             }
-        } else if let Some(manifest_path) = &self.input {
-            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
-            // Remove the `Cargo.toml` file from the path
-            manifest_path
-                .parent()
-                .ok_or_else(|| {
-                    Error::Generic(format!(
-                        "The '{}' path for the package's manifest file is invalid",
-                        manifest_path.display()
-                    ))
-                })
-                .map(|d| {
-                    PathBuf::from(d)
-                        .join(TARGET_FOLDER_NAME)
-                        .join(WIX)
-                        .join(filename)
-                })
         } else {
-            trace!("Using the current working directory (CWD) to build the WiX object files destination");
-            Ok(PathBuf::from(TARGET_FOLDER_NAME).join(WIX).join(filename))
+            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
+            Ok(target_directory.join(WIX).join(filename))
         }
     }
 
-    fn wixobj_destination(&self) -> Result<PathBuf> {
-        let mut dst = if let Some(manifest_path) = &self.input {
-            trace!(
-                "Using the package's manifest (Cargo.toml) file path to build \
-                 the Wix object files destination"
-            );
-            // Remove the `Cargo.toml` file from the path
-            manifest_path
-                .parent()
-                .ok_or_else(|| {
-                    Error::Generic(format!(
-                        "The '{}' path for the package's manifest file is invalid",
-                        manifest_path.display()
-                    ))
-                })
-                .map(|d| PathBuf::from(d).join(TARGET_FOLDER_NAME))
-        } else {
-            trace!("Using the current working directory (CWD) to build the WiX object files destination");
-            Ok(PathBuf::from(TARGET_FOLDER_NAME))
-        }?;
+    fn wixobj_destination(&self, target_directory: &Path) -> Result<PathBuf> {
         // A trailing slash is needed; otherwise, candle tries to dump the
         // object files to a `target\wix` file instead of dumping the object
         // files in the `target\wix\` folder for the `-out` option. The trailing
@@ -929,7 +877,7 @@ impl Execution {
         // for PathBuf, but it was unexpected and kind of annoying because I am
         // not sure how to add a trailing slash in a cross-platform way with
         // PathBuf, not that cargo-wix needs to be cross-platform.
-        dst.push(format!("{}\\", WIX));
+        let dst = target_directory.join(WIX).join("");
         Ok(dst)
     }
 
@@ -946,22 +894,18 @@ impl Execution {
         }
     }
 
-    fn wxs_sources(&self, manifest: &Value) -> Result<Vec<PathBuf>> {
-        let project_wix_dir = if let Some(manifest_path) = &self.input {
-            trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
-            manifest_path
-                .parent()
-                .ok_or_else(|| {
-                    Error::Generic(format!(
-                        "The '{}' path for the package's manifest file is invalid",
-                        manifest_path.display()
-                    ))
-                })
-                .map(|d| PathBuf::from(d).join(WIX))
-        } else {
-            trace!("Using the current working directory (CWD) to obtain all WXS files");
-            Ok(PathBuf::from(WIX))
-        }?;
+    fn wxs_sources(&self, package: &Package) -> Result<Vec<PathBuf>> {
+        trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
+        let project_wix_dir = package
+            .manifest_path
+            .parent()
+            .ok_or_else(|| {
+                Error::Generic(format!(
+                    "The '{}' path for the package's manifest file is invalid",
+                    package.manifest_path.display()
+                ))
+            })
+            .map(|d| PathBuf::from(d).join(WIX))?;
         let mut wix_sources = {
             if project_wix_dir.exists() {
                 std::fs::read_dir(project_wix_dir)?
@@ -996,13 +940,10 @@ impl Execution {
                 }
             }
             wix_sources.extend(paths.clone());
-        } else if let Some(pkg_meta_wix_sources) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_sources) = package
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("include"))
             .and_then(|i| i.as_array())
             .map(|a| {
@@ -1048,28 +989,19 @@ impl Execution {
         }
     }
 
-    fn version(&self, manifest: &Value) -> Result<Version> {
+    fn version(&self, package: &Package) -> Result<Version> {
         if let Some(ref v) = self.version {
             Version::parse(v).map_err(Error::from)
-        } else if let Some(pkg_meta_wix_version) = manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("metadata"))
-            .and_then(|m| m.as_table())
-            .and_then(|t| t.get("wix"))
-            .and_then(|w| w.as_table())
+        } else if let Some(pkg_meta_wix_version) = package
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
             .and_then(|t| t.get("version"))
             .and_then(|v| v.as_str())
         {
             Version::parse(pkg_meta_wix_version).map_err(Error::from)
         } else {
-            manifest
-                .get("package")
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("version"))
-                .and_then(|v| v.as_str())
-                .ok_or(Error::Manifest("version"))
-                .and_then(|s| Version::parse(s).map_err(Error::from))
+            Ok(package.version.clone())
         }
     }
 }
@@ -1514,10 +1446,11 @@ mod tests {
 
         #[test]
         fn debug_build_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                dbg-build = true
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "dbg-build": true
+                }
+            }"#;
             let execution = Execution::default();
             let debug_build = execution.debug_build(&PKG_META_WIX.parse::<Value>().unwrap());
             assert!(debug_build);
@@ -1525,10 +1458,11 @@ mod tests {
 
         #[test]
         fn debug_name_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                dbg-name = true
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "dbg-name": true
+                }
+            }"#;
             let execution = Execution::default();
             let debug_name = execution.debug_name(&PKG_META_WIX.parse::<Value>().unwrap());
             assert!(debug_name);
@@ -1537,41 +1471,62 @@ mod tests {
         #[test]
         fn version_metadata_works() {
             const PKG_META_WIX: &str = r#"
-                [package]
-                version = "0.1.0"
+            {
+                "name": "Example",
+                "version": "0.1.0",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "Apache-2.0",
 
-                [package.metadata.wix]
-                version = "2.1.0"
-            "#;
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": "",
+
+                "metadata": {
+                    "wix": {
+                        "version": "2.1.0"
+                    }
+                }
+            }"#;
             let execution = Execution::default();
             let version = execution
-                .version(&PKG_META_WIX.parse::<Value>().unwrap())
+                .version(&serde_json::from_str(PKG_META_WIX).unwrap())
                 .unwrap();
             assert_eq!(version, Version::parse("2.1.0").unwrap());
         }
 
         #[test]
         fn name_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package]
-                name = "example"
+            const PKG_META_WIX: &str = r#"{
+                "name": "Example",
+                "version": "0.1.0",
+                "metadata": {
+                    "wix": {
+                        "name": "Metadata"
+                    }
+                },
 
-                [package.metadata.wix]
-                name = "Metadata"
-            "#;
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": ""
+            }"#;
             let execution = Execution::default();
             let name = execution
-                .name(&PKG_META_WIX.parse::<Value>().unwrap())
+                .name(&serde_json::from_str(PKG_META_WIX).unwrap())
                 .unwrap();
             assert_eq!(name, "Metadata".to_owned());
         }
 
         #[test]
         fn no_build_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                no-build = true
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "no-build": true
+                }
+            }"#;
             let execution = Execution::default();
             let no_build = execution.no_build(&PKG_META_WIX.parse::<Value>().unwrap());
             assert!(no_build);
@@ -1579,10 +1534,11 @@ mod tests {
 
         #[test]
         fn culture_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                culture = "Fr-Fr"
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "culture": "Fr-Fr"
+                }
+            }"#;
             let execution = Execution::default();
             let culture = execution
                 .culture(&PKG_META_WIX.parse::<Value>().unwrap())
@@ -1592,10 +1548,11 @@ mod tests {
 
         #[test]
         fn locale_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                locale = "wix/French.wxl"
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "locale": "wix/French.wxl"
+                }
+            }"#;
             let execution = Execution::default();
             let locale = execution
                 .locale(&PKG_META_WIX.parse::<Value>().unwrap())
@@ -1605,10 +1562,23 @@ mod tests {
 
         #[test]
         fn output_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                output = "target/wix/test.msi"
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "name": "Example",
+                "version": "0.1.0",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "XYZ",
+
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": "",
+                "metadata": {
+                    "wix": {
+                        "output": "target/wix/test.msi"
+                    }
+                }
+            }"#;
             let execution = Execution::default();
             let output = execution
                 .installer_destination(
@@ -1617,7 +1587,8 @@ mod tests {
                     Platform::X64,
                     false,
                     &InstallerKind::default(),
-                    &PKG_META_WIX.parse::<Value>().unwrap(),
+                    &serde_json::from_str(PKG_META_WIX).unwrap(),
+                    Path::new("target/"),
                 )
                 .unwrap();
             assert_eq!(output, PathBuf::from("target/wix/test.msi"));
@@ -1625,23 +1596,37 @@ mod tests {
 
         #[test]
         fn include_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                include = ["Cargo.toml"]
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "name": "Example",
+                "version": "0.1.0",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "XYZ",
+
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": "C:\\Cargo.toml",
+                "metadata": {
+                    "wix": {
+                        "include": ["Cargo.toml"]
+                    }
+                }
+            }"#;
             let execution = Execution::default();
             let sources = execution
-                .wxs_sources(&PKG_META_WIX.parse::<Value>().unwrap())
+                .wxs_sources(&serde_json::from_str(PKG_META_WIX).unwrap())
                 .unwrap();
             assert_eq!(sources, vec![PathBuf::from("Cargo.toml")]);
         }
 
         #[test]
         fn compiler_args_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                compiler-args = ["-nologo", "-ws"]
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "compiler-args": ["-nologo", "-ws"]
+                }
+            }"#;
             let execution = Execution::default();
             let args = execution.compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
             assert_eq!(
@@ -1652,10 +1637,11 @@ mod tests {
 
         #[test]
         fn linker_args_metadata_works() {
-            const PKG_META_WIX: &str = r#"
-                [package.metadata.wix]
-                linker-args = ["-nologo", "-ws"]
-            "#;
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "linker-args": ["-nologo", "-ws"]
+                }
+            }"#;
             let execution = Execution::default();
             let args = execution.linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
             assert_eq!(
@@ -1664,7 +1650,7 @@ mod tests {
             );
         }
 
-        const EMPTY_PKG_META_WIX: &str = r#"[package.metadata.wix]"#;
+        const EMPTY_PKG_META_WIX: &str = r#"{"wix": {}}"#;
 
         #[test]
         fn culture_works() {
@@ -1713,8 +1699,8 @@ mod tests {
         fn wixobj_destination_works() {
             let execution = Execution::default();
             assert_eq!(
-                execution.wixobj_destination().unwrap(),
-                PathBuf::from("target\\wix\\")
+                execution.wixobj_destination(Path::new("target")).unwrap(),
+                PathBuf::from("target").join("wix")
             )
         }
     }

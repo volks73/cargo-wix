@@ -37,6 +37,24 @@ pub const PERSIST_VAR_NAME: &str = "CARGO_WIX_TEST_PERSIST";
 
 pub const MISC_NAME: &str = "misc";
 
+pub const SUBPACKAGE1_NAME: &str = "subproject1";
+pub const SUBPACKAGE2_NAME: &str = "subproject2";
+
+fn create_test_package_at_path(path: &Path, package_name: &str) {
+    let cargo_init_status = Command::new("cargo")
+        .arg("init")
+        .arg("--bin")
+        .arg("--quiet")
+        .arg("--vcs")
+        .arg("none")
+        .arg("--name")
+        .arg(package_name)
+        .arg(path)
+        .status()
+        .expect("Creation of test Cargo package");
+    assert!(cargo_init_status.success());
+}
+
 /// Create a new cargo project/package for a binary project in a temporary
 /// directory.
 ///
@@ -60,18 +78,7 @@ pub const MISC_NAME: &str = "misc";
 /// fails to create the project/package.
 pub fn create_test_package() -> TempDir {
     let temp_dir = TempDir::new().unwrap();
-    let cargo_init_status = Command::new("cargo")
-        .arg("init")
-        .arg("--bin")
-        .arg("--quiet")
-        .arg("--vcs")
-        .arg("none")
-        .arg("--name")
-        .arg(PACKAGE_NAME)
-        .arg(temp_dir.path())
-        .status()
-        .expect("Creation of test Cargo package");
-    assert!(cargo_init_status.success());
+    create_test_package_at_path(temp_dir.path(), PACKAGE_NAME);
     temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
 }
 
@@ -207,6 +214,27 @@ pub fn create_test_package_multiple_wxs_sources() -> TempDir {
     let mut three_wxs_handle = File::create(&misc_dir).unwrap();
     three_wxs_handle.write_all(three_wxs.as_bytes()).unwrap();
     package
+}
+
+/// Create a new cargo workspace with multiple sub-projects in a
+/// temporary directory. See the [create_test_package] function for more
+/// information.
+pub fn create_test_workspace() -> TempDir {
+    let temp_dir = TempDir::new().unwrap();
+    fs::create_dir(temp_dir.path().join(SUBPACKAGE1_NAME)).unwrap();
+    fs::create_dir(temp_dir.path().join(SUBPACKAGE2_NAME)).unwrap();
+    create_test_package_at_path(&temp_dir.path().join(SUBPACKAGE1_NAME), SUBPACKAGE1_NAME);
+    create_test_package_at_path(&temp_dir.path().join(SUBPACKAGE2_NAME), SUBPACKAGE2_NAME);
+    fs::write(
+        temp_dir.path().join("Cargo.toml"),
+        format!(
+            r#"[workspace]
+            members = [{:?}, {:?}]"#,
+            SUBPACKAGE1_NAME, SUBPACKAGE2_NAME
+        ),
+    )
+    .unwrap();
+    temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
 }
 
 /// Evaluates an XPath expression for a WiX Source file.

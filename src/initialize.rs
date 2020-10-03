@@ -22,19 +22,18 @@
 //! exists for the project, the `init` command does not need to be executed
 //! again.
 
+use cargo_metadata::Package;
+
 use crate::eula::Eula;
 use crate::print;
 use crate::Error;
 use crate::Result;
-use crate::CARGO_MANIFEST_FILE;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
 
-use std::env;
-use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -54,6 +53,7 @@ pub struct Builder<'a> {
     license: Option<&'a str>,
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
+    package: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
 }
@@ -75,9 +75,16 @@ impl<'a> Builder<'a> {
             license: None,
             manufacturer: None,
             output: None,
+            package: None,
             product_icon: None,
             product_name: None,
         }
+    }
+
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
     }
 
     /// Sets the path to a bitmap (BMP) file to be used as a banner image across
@@ -335,6 +342,7 @@ impl<'a> Builder<'a> {
             license: self.license.map(PathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
+            package: self.package.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
         }
@@ -363,6 +371,7 @@ pub struct Execution {
     license: Option<PathBuf>,
     manufacturer: Option<String>,
     output: Option<PathBuf>,
+    package: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
 }
@@ -384,16 +393,18 @@ impl Execution {
         debug!("license = {:?}", self.license);
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
+        debug!("package = {:?}", self.package);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
         let manifest = super::manifest(self.input.as_ref())?;
-        let mut destination = self.destination()?;
+        let package = super::package(&manifest, self.package.as_deref())?;
+        let mut destination = self.destination(&package)?;
         debug!("destination = {:?}", destination);
         if !destination.exists() {
             info!("Creating the '{}' directory", destination.display());
             fs::create_dir(&destination)?;
         }
-        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_ref(), &manifest)? {
+        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_ref(), &package)? {
             Eula::CommandLine(path) => (Some(path), self.license),
             Eula::Manifest(path) => (Some(path), self.license),
             Eula::Generate(template) => {
@@ -444,6 +455,7 @@ impl Execution {
             wxs_printer.license(license_wxs_path.as_deref().and_then(Path::to_str));
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
+            wxs_printer.package(self.package.as_deref());
             wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
@@ -451,57 +463,21 @@ impl Execution {
         Ok(())
     }
 
-    fn destination(&self) -> Result<PathBuf> {
+    fn destination(&self, package: &Package) -> Result<PathBuf> {
         if let Some(ref output) = self.output {
             trace!("An output path has been explicity specified");
             Ok(output.to_owned())
         } else {
-            trace!("An output path has NOT been explicity specified. Implicitly determine output.");
-            if let Some(ref input) = self.input {
-                trace!("An input path has been explicitly specified");
-                if input.exists()
-                    && input.is_file()
-                    && input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE))
-                {
-                    trace!(
-                        "The input path exists, it is a file, and it appears to be {}",
-                        CARGO_MANIFEST_FILE
-                    );
-                    Ok(input
-                        .parent()
-                        .map(|p| p.to_path_buf())
-                        .and_then(|mut p| {
-                            p.push(WIX);
-                            Some(p)
-                        })
-                        .unwrap())
-                } else {
-                    Err(Error::not_found(input))
-                }
-            } else {
-                trace!(
-                    "An input path has NOT been explicitly specified, implicitly using the \
-                     current working directory"
-                );
-                let mut cwd = env::current_dir()?;
-                cwd.push(CARGO_MANIFEST_FILE);
-                if cwd.exists() && cwd.is_file() {
-                    trace!(
-                        "The current working directory has a {} file",
-                        CARGO_MANIFEST_FILE
-                    );
-                    Ok(cwd
-                        .parent()
-                        .map(|p| p.to_path_buf())
-                        .and_then(|mut p| {
-                            p.push(WIX);
-                            Some(p)
-                        })
-                        .unwrap())
-                } else {
-                    Err(Error::not_found(&cwd))
-                }
-            }
+            trace!("An output path has NOT been explicity specified. Implicitly determine output from manifest location.");
+            Ok(package
+                .manifest_path
+                .parent()
+                .map(|p| p.to_path_buf())
+                .map(|mut p| {
+                    p.push(WIX);
+                    p
+                })
+                .unwrap())
         }
     }
 }
@@ -747,20 +723,26 @@ mod tests {
         extern crate assert_fs;
 
         use super::*;
-        use std::fs::File;
-        use std::io::ErrorKind;
+        use std::env;
+
+        const MIN_PACKAGE: &str = r#"[package]
+        name = "cargowixtest"
+        version = "1.0.0"
+        "#;
 
         #[test]
         fn destination_is_correct_with_defaults() {
             let original = env::current_dir().unwrap();
-            let temp_dir = assert_fs::TempDir::new().unwrap();
+            let temp_dir = crate::tests::setup_project(MIN_PACKAGE);
             env::set_current_dir(temp_dir.path()).unwrap();
-            let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
-            File::create(&temp_cargo_toml).unwrap();
             let mut expected = env::current_dir().unwrap();
             expected.push(WIX);
             let e = Execution::default();
-            let result = e.destination();
+
+            let result = crate::manifest(None)
+                .and_then(|manifest| crate::package(&manifest, None))
+                .and_then(|package| e.destination(&package));
+
             env::set_current_dir(original).unwrap();
             let actual = result.unwrap();
             assert_eq!(actual, expected);
@@ -769,88 +751,18 @@ mod tests {
         #[test]
         fn destination_is_correct_with_output() {
             let expected = PathBuf::from("output");
+
+            let temp_dir = crate::tests::setup_project(MIN_PACKAGE);
+
             let mut e = Execution::default();
             e.output = Some(expected.clone());
-            let actual = e.destination().unwrap();
+
+            let actual = crate::manifest(Some(&temp_dir.path().join("Cargo.toml")))
+                .and_then(|manifest| crate::package(&manifest, None))
+                .and_then(|package| e.destination(&package))
+                .unwrap();
+
             assert_eq!(actual, expected);
-        }
-
-        #[test]
-        fn destination_is_correct_with_input() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let temp_cargo_toml = temp_dir.path().join("Cargo.toml");
-            File::create(&temp_cargo_toml).unwrap();
-            let expected = temp_dir.path().join(WIX);
-            let mut e = Execution::default();
-            e.input = Some(temp_cargo_toml);
-            let actual = e.destination().unwrap();
-            assert_eq!(actual, expected);
-        }
-
-        #[test]
-        fn destination_fails_with_nonexistent_input() {
-            let mut e = Execution::default();
-            e.input = Some(PathBuf::from("not_real.toml"));
-            assert!(e.destination().is_err());
-        }
-
-        #[test]
-        fn destination_fails_with_directory_input() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let mut e = Execution::default();
-            e.input = Some(temp_dir.path().into());
-            assert!(e.destination().is_err());
-        }
-
-        #[test]
-        fn destination_fails_when_input_is_not_a_manifest() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
-            File::create(&not_a_manifest).unwrap();
-            let mut e = Execution::default();
-            e.input = Some(not_a_manifest);
-            assert!(e.destination().is_err());
-        }
-
-        #[test]
-        fn destination_fails_correctly_when_input_is_not_a_manifest() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let not_a_manifest = temp_dir.path().join("Not_a_Manifest.txt");
-            File::create(&not_a_manifest).unwrap();
-            let mut e = Execution::default();
-            e.input = Some(not_a_manifest);
-            if let Error::Io(e) = e.destination().err().unwrap() {
-                assert_eq!(e.kind(), ErrorKind::NotFound);
-            } else {
-                panic!("Incorrect error");
-            }
-        }
-
-        #[test]
-        fn destination_fails_when_cwd_has_no_manifest() {
-            let original = env::current_dir().unwrap();
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            env::set_current_dir(temp_dir.path()).unwrap();
-            let e = Execution::default();
-            let result = e.destination();
-            env::set_current_dir(original).unwrap();
-            assert!(result.is_err());
-        }
-
-        #[test]
-        fn destination_fails_correctly_when_cwd_has_no_manifest() {
-            let temp_dir = assert_fs::TempDir::new().unwrap();
-            let original = env::current_dir().unwrap();
-            env::set_current_dir(temp_dir.path()).unwrap();
-            let e = Execution::default();
-            let result = e.destination();
-            env::set_current_dir(original).unwrap();
-            let err = result.err().unwrap();
-            if let Error::Io(e) = err {
-                assert_eq!(e.kind(), ErrorKind::NotFound);
-            } else {
-                panic!("Incorrect error");
-            }
         }
     }
 }

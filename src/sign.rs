@@ -23,18 +23,17 @@ use crate::EXE_FILE_EXTENSION;
 use crate::MSI_FILE_EXTENSION;
 use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
-use crate::TARGET_FOLDER_NAME;
 use crate::WIX;
 
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
 use std::io::ErrorKind;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::Package;
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
@@ -44,6 +43,7 @@ pub struct Builder<'a> {
     description: Option<&'a str>,
     homepage: Option<&'a str>,
     input: Option<&'a str>,
+    package: Option<&'a str>,
     product_name: Option<&'a str>,
     timestamp: Option<&'a str>,
 }
@@ -57,11 +57,17 @@ impl<'a> Builder<'a> {
             description: None,
             homepage: None,
             input: None,
+            package: None,
             product_name: None,
             timestamp: None,
         }
     }
 
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
+    }
     /// Sets the path to the folder containing the `signtool.exe` file.
     ///
     // Normally the `signtool.exe` is installed in the `bin` folder of the
@@ -135,6 +141,7 @@ impl<'a> Builder<'a> {
             description: self.description.map(String::from),
             homepage: self.homepage.map(String::from),
             input: self.input.map(PathBuf::from),
+            package: self.package.map(String::from),
             product_name: self.product_name.map(String::from),
             timestamp: self.timestamp.map(String::from),
         }
@@ -155,6 +162,7 @@ pub struct Execution {
     description: Option<String>,
     homepage: Option<String>,
     input: Option<PathBuf>,
+    package: Option<String>,
     product_name: Option<String>,
     timestamp: Option<String>,
 }
@@ -168,11 +176,14 @@ impl Execution {
         debug!("description = {:?}", self.description);
         debug!("homepage = {:?}", self.homepage);
         debug!("input = {:?}", self.input);
+        debug!("package = {:?}", self.package);
         debug!("product_name = {:?}", self.product_name);
         debug!("timestamp = {:?}", self.timestamp);
         let manifest = super::manifest(self.input.as_ref())?;
-        let product_name = super::product_name(self.product_name.as_ref(), &manifest)?;
-        let description = if let Some(d) = super::description(self.description.clone(), &manifest) {
+        debug!("target_directory = {:?}", manifest.target_directory);
+        let package = super::package(&manifest, self.package.as_deref())?;
+        let product_name = super::product_name(self.product_name.as_ref(), &package)?;
+        let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
             format!("{} - {}", product_name, d)
         } else {
@@ -180,7 +191,7 @@ impl Execution {
             product_name
         };
         debug!("description = {:?}", description);
-        let msi = self.msi()?;
+        let msi = self.msi(&manifest.target_directory)?;
         let mut signer = self.signer()?;
         debug!("signer = {:?}", signer);
         if self.capture_output {
@@ -189,7 +200,7 @@ impl Execution {
             signer.stderr(Stdio::null());
         }
         signer.arg("sign").arg("/a").arg("/d").arg(description);
-        if let Some(h) = self.homepage(&manifest) {
+        if let Some(h) = self.homepage(&package) {
             trace!("Using the '{}' URL for the expanded description", h);
             signer.arg("/du").arg(h);
         }
@@ -225,10 +236,14 @@ impl Execution {
         Ok(())
     }
 
-    fn homepage(&self, manifest: &Value) -> Option<String> {
+    fn homepage(&self, package: &Package) -> Option<String> {
         self.homepage.clone().or_else(|| {
+            let manifest = fs::read_to_string(&package.manifest_path)
+                .ok()
+                .and_then(|v| toml::Value::from_str(&v).ok());
             manifest
-                .get("package")
+                .as_ref()
+                .and_then(|v| v.get("package"))
                 .and_then(|p| p.as_table())
                 .and_then(|t| t.get("homepage"))
                 .and_then(|d| d.as_str())
@@ -236,7 +251,7 @@ impl Execution {
         })
     }
 
-    fn msi(&self) -> Result<PathBuf> {
+    fn msi(&self, target_directory: &Path) -> Result<PathBuf> {
         if let Some(ref i) = self.input {
             trace!("The path to an installer to sign has been explicitly set");
             let msi = PathBuf::from(i);
@@ -251,9 +266,7 @@ impl Execution {
             }
         } else {
             trace!("The path to an installer has not been explicitly set");
-            let mut cwd = env::current_dir()?;
-            cwd.push(TARGET_FOLDER_NAME);
-            cwd.push(WIX);
+            let cwd = target_directory.join(WIX);
             for entry in fs::read_dir(cwd)? {
                 let entry = entry?;
                 let path = entry.path();
@@ -397,6 +410,7 @@ mod tests {
         use std::fs::File;
 
         use super::*;
+        use crate::tests::setup_project;
 
         const MIN_MANIFEST: &str = r#"[package]
             name = "Example"
@@ -413,32 +427,42 @@ mod tests {
 
         #[test]
         fn homepage_without_homepage_field_works() {
-            let manifest = MIN_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().homepage(&manifest);
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().homepage(&package);
             assert!(actual.is_none());
         }
 
         #[test]
         fn homepage_with_homepage_field_works() {
-            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
-            let actual = Execution::default().homepage(&manifest);
+            let project = setup_project(HOMEPAGE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Execution::default().homepage(&package);
             assert_eq!(actual, Some(String::from("http://www.example.com")));
         }
 
         #[test]
         fn homepage_with_override_works() {
             const EXPECTED: &str = "http://www.another.com";
-            let manifest = HOMEPAGE_MANIFEST.parse::<Value>().expect("Parsing TOML");
+
+            let project = setup_project(HOMEPAGE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
             let actual = Builder::new()
                 .homepage(Some(EXPECTED))
                 .build()
-                .homepage(&manifest);
+                .homepage(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
         #[test]
         fn msi_with_nonexistent_installer_fails() {
-            let result = Execution::default().msi();
+            let result = Execution::default().msi(Path::new("target"));
             assert!(result.is_err());
         }
 
@@ -450,7 +474,7 @@ mod tests {
             let actual = Builder::new()
                 .input(msi_path.to_str())
                 .build()
-                .msi()
+                .msi(Path::new("target"))
                 .unwrap();
             assert_eq!(actual, msi_path);
         }

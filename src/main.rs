@@ -1058,6 +1058,10 @@ use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
+    let package = Arg::with_name("package")
+        .help("The name of the package in the current workspace to operate on")
+        .long("package")
+        .takes_value(true);
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
@@ -1547,6 +1551,7 @@ fn main() {
                         .takes_value(true))
                     .arg(verbose.clone()))
                 .arg(verbose)
+                .arg(package)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
@@ -1625,6 +1630,7 @@ fn main() {
             init.license(m.value_of("license"));
             init.manufacturer(m.value_of("manufacturer"));
             init.output(m.value_of("output"));
+            init.package(m.value_of("package"));
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
             init.build().run()
@@ -1644,6 +1650,7 @@ fn main() {
                     print.license(m.value_of("license"));
                     print.manufacturer(m.value_of("manufacturer"));
                     print.output(m.value_of("output"));
+                    print.package(m.value_of("package"));
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
                     print.build().run()
@@ -1670,6 +1677,7 @@ fn main() {
             sign.description(m.value_of("description"));
             sign.homepage(m.value_of("homepage"));
             sign.input(m.value_of("INPUT"));
+            sign.package(m.value_of("package"));
             sign.product_name(m.value_of("product-name"));
             sign.timestamp(m.value_of("timestamp"));
             sign.build().run()
@@ -1690,6 +1698,7 @@ fn main() {
             create.no_build(matches.is_present("no-build"));
             create.output(matches.value_of("output"));
             create.version(matches.value_of("install-version"));
+            create.package(matches.value_of("package"));
             create.build().run()
         }
     };

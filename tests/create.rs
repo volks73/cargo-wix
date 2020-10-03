@@ -26,12 +26,16 @@ use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 use crate::common::init_logging;
-use crate::common::{MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, TARGET_NAME};
+use crate::common::{
+    MISC_NAME, NO_CAPTURE_VAR_NAME, PACKAGE_NAME, PERSIST_VAR_NAME, SUBPACKAGE1_NAME,
+};
+
+use assert_fs::TempDir;
 
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use toml::Value;
 
@@ -41,15 +45,27 @@ use wix::{Result, CARGO_MANIFEST_FILE, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {
-        let mut p = PathBuf::from(TARGET_NAME);
+        let mut p = TARGET_NAME.clone();
         p.push(WIX);
         p
     };
 }
 
+lazy_static! {
+    static ref TARGET_NAME: PathBuf = { PathBuf::from("target") };
+}
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {
+    run_with_package(b, &std::env::current_dir()?)
+}
+
+/// Run the _create_ subcommand with the output capture toggled by the
+/// `CARGO_WIX_TEST_NO_CAPTURE` environment variable, and the CARGO_TARGET_DIR
+/// env variable set to <package path>/target.
+fn run_with_package(b: &mut Builder, package_path: &Path) -> Result<()> {
+    // Forcefully set the target dir to its default location
+    env::set_var("CARGO_TARGET_DIR", package_path.join("target"));
     b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
         .run()
@@ -153,7 +169,7 @@ fn metadata_works() {
 #[test]
 fn output_trailing_forwardslash_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let output_dir_str = format!("{}/", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -174,7 +190,7 @@ fn output_trailing_forwardslash_works() {
 #[test]
 fn output_trailing_backslash_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let output_dir_str = format!("{}\\", output_dir.to_str().unwrap());
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -216,7 +232,7 @@ fn output_existing_dir_works() {
 #[test]
 fn output_file_without_extension_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let output_file = output_dir.join(PACKAGE_NAME);
@@ -237,7 +253,7 @@ fn output_file_without_extension_works() {
 #[test]
 fn output_file_with_extension_works() {
     init_logging();
-    let output_dir = PathBuf::from(TARGET_NAME).join("output_dir");
+    let output_dir = TARGET_NAME.join("output_dir");
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
     let expected_msi_file = output_dir.join(format!("{}.msi", PACKAGE_NAME));
@@ -750,7 +766,10 @@ fn input_works_outside_cwd() {
         .build()
         .run()
         .unwrap();
-    let result = run(Builder::default().input(package_manifest.path().to_str()));
+    let result = run_with_package(
+        Builder::default().input(package_manifest.path().to_str()),
+        &package.path(),
+    );
     result.expect("OK result");
     package
         .child(TARGET_WIX_DIR.as_path())
@@ -903,6 +922,54 @@ fn compiler_and_linker_args_works_with_metadata() {
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::default().build().run().unwrap();
     let result = run(&mut Builder::default());
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn custom_target_dir_works() {
+    init_logging();
+    let target_tmpdir = TempDir::new()
+        .unwrap()
+        .into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok());
+
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = Path::new(WIX).join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    env::set_var("CARGO_TARGET_DIR", target_tmpdir.path());
+    let result = Builder::default()
+        .capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    target_tmpdir.child(WIX).assert(predicate::path::exists());
+    target_tmpdir
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+fn workspace_package_works() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", SUBPACKAGE1_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Builder::new()
+        .package(Some(SUBPACKAGE1_NAME))
+        .build()
+        .run()
+        .unwrap();
+    let result = run(&mut Builder::default().package(Some(SUBPACKAGE1_NAME)));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package

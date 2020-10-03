@@ -91,12 +91,11 @@ use std::env;
 use std::error::Error as StdError;
 use std::ffi::OsStr;
 use std::fmt;
-use std::fs::File;
-use std::io::{self, ErrorKind, Read};
+use std::io::{self, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use toml::Value;
+use cargo_metadata::{Metadata, MetadataCommand, Package};
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
@@ -125,10 +124,6 @@ pub const SIGNTOOL: &str = "signtool";
 /// The name of the environment variable to specify the path to the signer
 /// application.
 pub const SIGNTOOL_PATH_KEY: &str = "SIGNTOOL_PATH";
-
-/// The name of the folder where output from the builder, compiler, linker, and
-/// signer.
-pub const TARGET_FOLDER_NAME: &str = "target";
 
 /// The default name of the folder for output from this subcommand.
 pub const WIX: &str = "wix";
@@ -180,45 +175,53 @@ fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
 }
 
 fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
-    cargo_toml_file(input).and_then(|p| {
-        Ok(p.parent()
+    cargo_toml_file(input).map(|p| {
+        p.parent()
             .map(PathBuf::from)
-            .expect("The Cargo.toml file to NOT be root."))
+            .expect("The Cargo.toml file to NOT be root.")
     })
 }
 
-fn manifest(input: Option<&PathBuf>) -> Result<Value> {
+fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
     let cargo_file_path = cargo_toml_file(input)?;
     debug!("cargo_file_path = {:?}", cargo_file_path);
-    let mut cargo_file = File::open(cargo_file_path)?;
-    let mut cargo_file_content = String::new();
-    cargo_file.read_to_string(&mut cargo_file_content)?;
-    let manifest = cargo_file_content.parse::<Value>()?;
-    Ok(manifest)
+    Ok(MetadataCommand::new()
+        .manifest_path(cargo_file_path)
+        .exec()
+        .unwrap())
 }
 
-fn description(description: Option<String>, manifest: &Value) -> Option<String> {
-    description.or_else(|| {
+fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
+    let package_id = if let Some(v) = package {
         manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("description"))
-            .and_then(|d| d.as_str())
-            .map(String::from)
-    })
+            .workspace_members
+            .iter()
+            .find(|u| manifest[u].name == v)
+            .ok_or_else(|| {
+                Error::Generic(format!(
+                    "package ID specification `{}` matched no packages",
+                    v
+                ))
+            })?
+    } else if manifest.workspace_members.len() == 1 {
+        &manifest.workspace_members[0]
+    } else {
+        return Err(Error::Generic(String::from(
+            "Workspace detected. Please pass a package name.",
+        )));
+    };
+    Ok(manifest[package_id].clone())
 }
 
-fn product_name(product_name: Option<&String>, manifest: &Value) -> Result<String> {
+fn description(description: Option<String>, manifest: &Package) -> Option<String> {
+    description.or_else(|| manifest.description.clone())
+}
+
+fn product_name(product_name: Option<&String>, manifest: &Package) -> Result<String> {
     if let Some(p) = product_name {
         Ok(p.to_owned())
     } else {
-        manifest
-            .get("package")
-            .and_then(|p| p.as_table())
-            .and_then(|t| t.get("name"))
-            .and_then(|n| n.as_str())
-            .map(String::from)
-            .ok_or(Error::Manifest("name"))
+        Ok(manifest.name.clone())
     }
 }
 
@@ -958,6 +961,21 @@ impl Default for Cultures {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use assert_fs::TempDir;
+    use std::env;
+    use std::fs;
+
+    /// Create a simple project with the provided TOML.
+    pub fn setup_project(toml: &str) -> TempDir {
+        pub const PERSIST_VAR_NAME: &str = "CARGO_WIX_TEST_PERSIST";
+
+        let temp_dir = TempDir::new().unwrap();
+        fs::write(temp_dir.path().join("Cargo.toml"), toml).unwrap();
+        fs::create_dir(temp_dir.path().join("src")).unwrap();
+        fs::write(temp_dir.path().join("src").join("main.rs"), "fn main() {}").unwrap();
+
+        temp_dir.into_persistent_if(env::var(PERSIST_VAR_NAME).is_ok())
+    }
 
     mod culture {
         use super::*;

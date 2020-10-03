@@ -28,7 +28,7 @@ use std::fs::File;
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-use toml::Value;
+use cargo_metadata::Package;
 
 fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {
@@ -44,18 +44,14 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     }
 }
 
-fn first_author(manifest: &Value) -> Result<String> {
-    manifest
-        .get("package")
-        .and_then(|p| p.as_table())
-        .and_then(|t| t.get("authors"))
-        .and_then(|a| a.as_array())
-        .and_then(|a| a.get(0))
-        .and_then(|f| f.as_str())
-        .and_then(|s| {
+fn first_author(package: &Package) -> Result<String> {
+    package
+        .authors
+        .first()
+        .map(|s| {
             // Strip email if it exists.
             let re = Regex::new(r"<(.*?)>").unwrap();
-            Some(re.replace_all(s, ""))
+            re.replace_all(s, "")
         })
         .map(|s| String::from(s.trim()))
         .ok_or(Error::Manifest("authors"))
@@ -65,32 +61,40 @@ fn first_author(manifest: &Value) -> Result<String> {
 mod tests {
     use super::*;
 
-    const SINGLE_AUTHOR_MANIFEST: &str = r#"[package]
-            name = "Example"
-            version = "0.1.0"
-            authors = ["First Last <first.last@example.com>"]
-        "#;
+    const SINGLE_AUTHOR_MANIFEST: &str = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
 
-    const MULTIPLE_AUTHORS_MANIFEST: &str = r#"[package]
-            name = "Example"
-            version = "0.1.0"
-            authors = ["1 Author <first.last@example.com>", "2 Author <2.author@example.com>", "3 author <3.author@example.com>"]
-        "#;
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": ""
+        }"#;
+
+    const MULTIPLE_AUTHORS_MANIFEST: &str = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["1 Author <first.last@example.com>", "2 Author <2.author@example.com>", "3 author <3.author@example.com>"],
+
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": ""
+        }"#;
 
     #[test]
     fn first_author_with_single_author_works() {
-        let manifest = SINGLE_AUTHOR_MANIFEST
-            .parse::<Value>()
-            .expect("Parsing TOML");
+        let manifest = serde_json::from_str(SINGLE_AUTHOR_MANIFEST).expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("First Last"));
     }
 
     #[test]
     fn first_author_with_multiple_authors_works() {
-        let manifest = MULTIPLE_AUTHORS_MANIFEST
-            .parse::<Value>()
-            .expect("Parsing TOML");
+        let manifest = serde_json::from_str(MULTIPLE_AUTHORS_MANIFEST).expect("Parsing TOML");
         let actual = first_author(&manifest).unwrap();
         assert_eq!(actual, String::from("1 Author"));
     }

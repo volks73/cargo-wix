@@ -36,6 +36,8 @@ use wix::{
     WIX_SOURCE_FILE_NAME,
 };
 
+use crate::common::{init_logging, SUBPACKAGE1_NAME};
+
 lazy_static! {
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;
     static ref LICENSE_RTF: String = LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION;
@@ -729,11 +731,11 @@ fn product_icon_works() {
 #[test]
 fn multiple_binaries_works() {
     const EXPECTED_NAME_1: &str = "main1";
-    const EXPECTED_SOURCE_1: &str = "target\\$(var.Profile)\\main1.exe";
+    const EXPECTED_SOURCE_1: &str = "$(var.CargoTargetDir)\\$(var.Profile)\\main1.exe";
     const EXPECTED_NAME_2: &str = "main2";
-    const EXPECTED_SOURCE_2: &str = "target\\$(var.Profile)\\main2.exe";
+    const EXPECTED_SOURCE_2: &str = "$(var.CargoTargetDir)\\$(var.Profile)\\main2.exe";
     const EXPECTED_NAME_3: &str = "main3";
-    const EXPECTED_SOURCE_3: &str = "target\\$(var.Profile)\\main3.exe";
+    const EXPECTED_SOURCE_3: &str = "$(var.CargoTargetDir)\\$(var.Profile)\\main3.exe";
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package_multiple_binaries();
     env::set_current_dir(package.path()).unwrap();
@@ -782,4 +784,41 @@ fn multiple_binaries_works() {
         ),
         EXPECTED_SOURCE_3
     );
+}
+
+#[test]
+fn workspace_no_package_fails() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default().build().run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_err());
+}
+
+#[test]
+fn workspace_package_works() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .package(Some(SUBPACKAGE1_NAME))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(WIX_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(MAIN_WXS_PATH.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(SUBPACKAGE1_NAME)
+        .child(LICENSE_RTF_PATH.as_path())
+        .assert(predicate::path::missing());
 }
