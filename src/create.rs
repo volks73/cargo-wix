@@ -901,7 +901,6 @@ impl Execution {
     }
 
     fn wxs_sources(&self, package: &Package) -> Result<Vec<PathBuf>> {
-        trace!("Using the package's manifest (Cargo.toml) file path to obtain all WXS files");
         let project_wix_dir = package
             .manifest_path
             .parent()
