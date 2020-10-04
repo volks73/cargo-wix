@@ -193,12 +193,7 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
             .workspace_members
             .iter()
             .find(|n| manifest[n].name == p)
-            .ok_or_else(|| {
-                Error::Generic(format!(
-                    "No `{}` package found in the project",
-                    p
-                ))
-            })?
+            .ok_or_else(|| Error::Generic(format!("No `{}` package found in the project", p)))?
     } else if manifest.workspace_members.len() == 1 {
         &manifest.workspace_members[0]
     } else {
