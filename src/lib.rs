@@ -174,12 +174,8 @@ fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
     }
 }
 
-fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
-    cargo_toml_file(input).map(|p| {
-        p.parent()
-            .map(PathBuf::from)
-            .expect("The Cargo.toml file to NOT be root.")
-    })
+fn description(description: Option<String>, manifest: &Package) -> Option<String> {
+    description.or_else(|| manifest.description.clone())
 }
 
 fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
@@ -213,8 +209,12 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
     Ok(manifest[package_id].clone())
 }
 
-fn description(description: Option<String>, manifest: &Package) -> Option<String> {
-    description.or_else(|| manifest.description.clone())
+fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
+    cargo_toml_file(input).map(|p| {
+        p.parent()
+            .map(PathBuf::from)
+            .expect("The Cargo.toml file to NOT be root.")
+    })
 }
 
 fn product_name(product_name: Option<&String>, manifest: &Package) -> Result<String> {
