@@ -197,6 +197,10 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
     } else if manifest.workspace_members.len() == 1 {
         &manifest.workspace_members[0]
     } else {
+        // TODO: Replace error with creating installers for all packages in a
+        // workspace. I think this currently means that to create installers for
+        // all packages in workspace, a `cargo wix --package <name>` must be
+        // executed for each workspace member.
         return Err(Error::Generic(String::from(
             "Workspace detected. Please pass a package name.",
         )));
