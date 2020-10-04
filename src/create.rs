@@ -275,7 +275,11 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the package on which to operate during this build
+    /// Sets the package.
+    ///
+    /// If the project is organized using a workspace, this selects the package
+    /// by name to create an installer. If a workspace is not used, then this
+    /// has no effect.
     pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
         self.package = p;
         self
