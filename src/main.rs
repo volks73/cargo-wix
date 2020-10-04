@@ -925,6 +925,15 @@
 //! (Cargo.toml). This is only used when generating a license based on the value
 //! of the `license` field in the package's manifest.
 //!
+//! ### `-p,--package`
+//!
+//! Available for the _create_ (`cargo wix`) subcommand.
+//!
+//! Selects the package to create installer by name. This is required if a
+//! project organized with a workspace. A workspace can have one or more
+//! members, where each member may have a separate installer. This option has no
+//! effect if the project does not use a workspace.
+//!
 //! ### `-p,--product-icon`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
