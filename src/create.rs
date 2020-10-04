@@ -1192,7 +1192,7 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
         v.iter()
             .fold(None, |a, v| match v {
                 WixObjKind::Bundle => Some(Self::Exe),
-                WixObjKind::Product => a.or_else(|| Some(Self::Msi)),
+                WixObjKind::Product => a.or(Some(Self::Msi)),
                 _ => a,
             })
             .ok_or_else(|| {
