@@ -188,15 +188,15 @@ fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
 }
 
 fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
-    let package_id = if let Some(v) = package {
+    let package_id = if let Some(p) = package {
         manifest
             .workspace_members
             .iter()
-            .find(|u| manifest[u].name == v)
+            .find(|n| manifest[n].name == p)
             .ok_or_else(|| {
                 Error::Generic(format!(
-                    "package ID specification `{}` matched no packages",
-                    v
+                    "No `{}` package found in the project",
+                    p
                 ))
             })?
     } else if manifest.workspace_members.len() == 1 {
