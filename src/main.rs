@@ -1067,7 +1067,6 @@ use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
-
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
@@ -1196,7 +1195,7 @@ fn main() {
             "Selects the package to build an installer from within a project
             organized with a workspace. Workspaces have one or more members,
             where each member is a package. This option selects the package by
-            name."
+            name.",
         )
         .long("package")
         .short("p")
