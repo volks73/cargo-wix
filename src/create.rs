@@ -93,12 +93,6 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the package on which to operate during this build
-    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
-        self.package = p;
-        self
-    }
-
     /// Sets the path to the WiX Toolset's `bin` folder.
     ///
     /// The WiX Toolset's `bin` folder should contain the needed `candle.exe`
@@ -278,6 +272,12 @@ impl<'a> Builder<'a> {
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
+        self
+    }
+
+    /// Sets the package on which to operate during this build
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
         self
     }
 
