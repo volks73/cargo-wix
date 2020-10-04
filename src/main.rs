@@ -1058,10 +1058,7 @@ use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
-    let package = Arg::with_name("package")
-        .help("The name of the package in the current workspace to operate on")
-        .long("package")
-        .takes_value(true);
+
     // The banner option for the `init` and `print` subcommands.
     let banner = Arg::with_name("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
@@ -1182,6 +1179,18 @@ fn main() {
         )
         .long("owner")
         .short("O")
+        .takes_value(true);
+    // The package option for the `create` subcommand
+    let package = Arg::with_name("package")
+        .help("The name of the package in the current workspace to create an installer")
+        .long_help(
+            "Selects the package to build an installer from within a project
+            organized with a workspace. Workspaces have one or more members,
+            where each member is a package. This option selects the package by
+            name."
+        )
+        .long("package")
+        .short("p")
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
@@ -1434,6 +1443,7 @@ fn main() {
                     .long("output")
                     .short("o")
                     .takes_value(true))
+                .arg(package)
                 .subcommand(SubCommand::with_name("print")
                     .version(crate_version!())
                     .about("Prints a template")
@@ -1551,7 +1561,6 @@ fn main() {
                         .takes_value(true))
                     .arg(verbose.clone()))
                 .arg(verbose)
-                .arg(package)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
