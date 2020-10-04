@@ -379,7 +379,9 @@ impl Execution {
         let manifest = super::manifest(self.input.as_ref())?;
         debug!("target_directory = {:?}", manifest.target_directory);
         let package = super::package(&manifest, self.package.as_deref())?;
+        debug!("package = {:?}", package);
         let metadata = package.metadata.clone();
+        debug!("metadata = {:?}", metadata);
         let name = self.name(&package)?;
         debug!("name = {:?}", name);
         let version = self.version(&package)?;
