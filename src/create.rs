@@ -54,7 +54,6 @@ use serde_json::Value;
 /// A builder for running the `cargo wix` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
-    package: Option<&'a str>,
     bin_path: Option<&'a str>,
     capture_output: bool,
     compiler_args: Option<Vec<&'a str>>,
@@ -68,6 +67,7 @@ pub struct Builder<'a> {
     name: Option<&'a str>,
     no_build: bool,
     output: Option<&'a str>,
+    package: Option<&'a str>,
     version: Option<&'a str>,
 }
 
@@ -75,7 +75,6 @@ impl<'a> Builder<'a> {
     /// Creates a new `Builder` instance.
     pub fn new() -> Self {
         Builder {
-            package: None,
             bin_path: None,
             capture_output: true,
             compiler_args: None,
@@ -89,6 +88,7 @@ impl<'a> Builder<'a> {
             name: None,
             no_build: false,
             output: None,
+            package: None,
             version: None,
         }
     }
@@ -296,7 +296,6 @@ impl<'a> Builder<'a> {
     /// Builds a context for creating, or building, the installer.
     pub fn build(&mut self) -> Execution {
         Execution {
-            package: self.package.map(String::from),
             bin_path: self.bin_path.map(PathBuf::from),
             capture_output: self.capture_output,
             compiler_args: self
@@ -319,6 +318,7 @@ impl<'a> Builder<'a> {
             name: self.name.map(String::from),
             no_build: self.no_build,
             output: self.output.map(String::from),
+            package: self.package.map(String::from),
             version: self.version.map(String::from),
         }
     }
@@ -333,7 +333,6 @@ impl<'a> Default for Builder<'a> {
 /// A context for creating, or building, an installer.
 #[derive(Debug)]
 pub struct Execution {
-    package: Option<String>,
     bin_path: Option<PathBuf>,
     capture_output: bool,
     compiler_args: Option<Vec<String>>,
@@ -347,6 +346,7 @@ pub struct Execution {
     name: Option<String>,
     no_build: bool,
     output: Option<String>,
+    package: Option<String>,
     version: Option<String>,
 }
 
