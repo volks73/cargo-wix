@@ -52,8 +52,9 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref TARGET_NAME: PathBuf = { PathBuf::from("target") };
+    static ref TARGET_NAME: PathBuf = PathBuf::from("target");
 }
+
 /// Run the _create_ subcommand with the output capture toggled by the
 /// `CARGO_WIX_TEST_NO_CAPTURE` environment variable.
 fn run(b: &mut Builder) -> Result<()> {

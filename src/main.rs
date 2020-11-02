@@ -724,11 +724,13 @@
 //!
 //! Appends an argument to the WiX compiler (candle.exe) invocation. This
 //! provides a mechanism for "passing" arguments to the compiler. This can be called
-//! multiple times to pass multiple arguments (flags or options). Note, if it is an
-//! option, i.e. argument with an accompanying value, then the value must be passed
-//! as a separate usage of this option. For example, adding an user-defined compiler
-//! extension would require the following command `cargo wix -C -ext -C
-//! UserDefinedExtension` to yield a `candle -ext UserDefinedExtension` invocation.
+//! multiple times to pass multiple arguments (flags or options), but only one
+//! value per occurrance is allowed to avoid ambiguity during argument parsing.
+//! Note, if it is an option, i.e. argument with an accompanying value, then the
+//! value must be passed as a separate usage of this option. For example, adding
+//! an user-defined compiler extension would require the following command
+//! `cargo wix -C -ext -C UserDefinedExtension` to yield a `candle -ext
+//! UserDefinedExtension` invocation.
 //!
 //! ### `-c,--culture`
 //!
@@ -854,9 +856,10 @@
 //!
 //! Appends an argument to the WiX linker (light.exe) invocation. This provides
 //! a mechanism for "passing" arguments to the linker. This can be called
-//! multiple times to pass multiple arguments (flags or options). Note, if it is
-//! an option, i.e. argument with an accompanying value, then the value must be
-//! passed as a separate usage of this option. For example, adding an
+//! multiple times to pass multiple arguments (flags or options). Only one value
+//! per occurrance is allowed to avoid ambiguity during argument parsing. Note,
+//! if it is an option, i.e. argument with an accompanying value, then the value
+//! must be passed as a separate usage of this option. For example, adding an
 //! user-defined linker extension would require the following command `cargo wix
 //! -L -ext -L UserDefinedExtension` to yield a `light -ext
 //! UserDefinedExtension` invocation.
@@ -1300,11 +1303,15 @@ fn main() {
                         manually typing the option or flag for the compiler at the \
                         command line. If the argument is for an option with a value, \
                         the option's value must be passed as a separate call of this \
-                        option. For example, '-C -ext -C WixUtilExtension'.")
+                        option. Multiple occurrances are possible, but only one \
+                        value per occurrance is allowed to avoid ambiguity in \
+                        argument parsing. For example, '-C -ext -C \
+                        WixUtilExtension'.")
                     .long("compiler-arg")
                     .short("C")
                     .takes_value(true)
                     .multiple(true)
+                    .number_of_values(1)
                     .allow_hyphen_values(true))
                 .arg(Arg::with_name("debug-build")
                     .help("Builds the package using the Debug profile")
@@ -1402,11 +1409,16 @@ fn main() {
                         manually typing the option or flag for the linker at the \
                         command line. If the argument is for an option with a value, \
                         the option's value must be passed as a separate call of this \
-                        option. For example, '-L -ext -L WixUIExtension'.")
+                        option. Multiple occurrances are possible, but only one \
+                        value per occurrance is allowed to avoid ambiguity in \
+                        argument parsing. For example, '-L -ext -L \
+                        WixUIExtension'.")
                     .long("linker-arg")
                     .short("L")
                     .takes_value(true)
-                    .multiple(true))
+                    .multiple(true)
+                    .number_of_values(1)
+                    .allow_hyphen_values(true))
                 .arg(Arg::with_name("locale")
                     .help("A path to a WiX localization file (.wxl)")
                     .long_help("Sets the path to a WiX localization file (wxl) \
