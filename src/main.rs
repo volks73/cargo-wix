@@ -1296,15 +1296,16 @@ fn main() {
                 .arg(Arg::with_name("compiler-arg")
                     .help("Send an argument to the WiX compiler (candle.exe)")
                     .long_help("Appends the argument to the command that is \
-                        invoked when linking an installer. This is the same as \
-                        manually typing the option or flag for the linker at the \
+                        invoked when compiling an installer. This is the same as \
+                        manually typing the option or flag for the compiler at the \
                         command line. If the argument is for an option with a value, \
                         the option's value must be passed as a separate call of this \
                         option. For example, '-C -ext -C WixUtilExtension'.")
                     .long("compiler-arg")
                     .short("C")
                     .takes_value(true)
-                    .multiple(true))
+                    .multiple(true)
+                    .allow_hyphen_values(true))
                 .arg(Arg::with_name("debug-build")
                     .help("Builds the package using the Debug profile")
                     .long_help("Uses the Debug profile when building the package \
