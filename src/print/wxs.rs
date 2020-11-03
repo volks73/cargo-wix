@@ -682,6 +682,14 @@ mod tests {
             actual.product_name(Some(EXPECTED));
             assert_eq!(actual.product_name, Some(EXPECTED));
         }
+
+        #[test]
+        fn upgrade_code_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let mut actual = Builder::new();
+            actual.upgrade_code(Some(&expected));
+            assert_eq!(actual.upgrade_code, Some(expected.as_ref()));
+        }
     }
 
     mod execution {
@@ -790,6 +798,17 @@ mod tests {
             version = "0.1.0"
             authors = ["First Last <first.last@example.com>"]
             license-file = "Example.txt"
+        "#;
+
+        const UPGRADE_CODE: &str = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9";
+
+        const UPGRADE_CODE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+
+            [package.metadata.wix]
+            upgrade-code = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9"
         "#;
 
         #[test]
@@ -1138,6 +1157,48 @@ mod tests {
                 .eula(&package)
                 .unwrap();
             assert_eq!(actual, Eula::CommandLine(license_file_path));
+        }
+
+        #[test]
+        fn upgrade_code_with_override_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default()
+                .upgrade_code(Some(&expected))
+                .build()
+                .upgrade_code(&package)
+                .unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn upgrade_code_metadata_works() {
+            let project = setup_project(UPGRADE_CODE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default().build().upgrade_code(&package).unwrap();
+            assert_eq!(actual, UPGRADE_CODE);
+        }
+
+        #[test]
+        fn upgrade_code_metadata_and_override_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+
+            let project = setup_project(UPGRADE_CODE_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default()
+                .upgrade_code(Some(&expected))
+                .build()
+                .upgrade_code(&package)
+                .unwrap();
+            assert_eq!(actual, expected);
         }
     }
 }
