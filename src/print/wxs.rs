@@ -49,9 +49,10 @@ pub struct Builder<'a> {
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
     package: Option<&'a str>,
+    path_guid: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
-    upgrade_code: Option<&'a str>,
+    upgrade_guid: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -69,9 +70,10 @@ impl<'a> Builder<'a> {
             manufacturer: None,
             output: None,
             package: None,
+            path_guid: None,
             product_icon: None,
             product_name: None,
-            upgrade_code: None,
+            upgrade_guid: None,
         }
     }
 
@@ -213,6 +215,21 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the GUID for the path component.
+    ///
+    /// The default automatically generates the GUID needed for the path
+    /// component. A GUID is needed so that the path component can be
+    /// successfully removed on uninstall.
+    ///
+    /// Generally, the path component GUID should be generated only once per
+    /// project/product and then the same GUID used every time the installer is
+    /// created. The GUID is stored in the WiX Source (WXS) file. However,
+    /// this allows using an existing GUID, possibly obtained with another tool.
+    pub fn path_guid(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.path_guid = p;
+        self
+    }
+
     /// Sets the path to an image file to be used for product icon.
     ///
     /// The product icon is the icon that appears for an installed application
@@ -244,7 +261,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the Upgrade Code GUID.
     ///
-    /// The default automatically generates the need GUID for the `UpgradeCode`
+    /// The default automatically generates the GUID needed for the `UpgradeCode`
     /// attribute to the `Product` tag. The Upgrade Code uniquely identifies the
     /// installer. It is used to determine if the new installer is the same
     /// product and the current installation should be removed and upgraded to
@@ -252,12 +269,12 @@ impl<'a> Builder<'a> {
     /// _not_ match, then Windows will treat the two installers as separate
     /// products.
     ///
-    /// Generally, the upgrade code should be generated only one per
+    /// Generally, the upgrade code should be generated only once per
     /// project/product and then the same code used every time the installer is
-    /// created and the GUID is stored in the WiX Source (WXS) file. However,
-    /// this allows the user to provide an existing GUID for the upgrade code.
-    pub fn upgrade_code(&mut self, u: Option<&'a str>) -> &mut Self {
-        self.upgrade_code = u;
+    /// created. The GUID is stored in the WiX Source (WXS) file. However,
+    /// this allows usage of an existing GUID for the upgrade code.
+    pub fn upgrade_guid(&mut self, u: Option<&'a str>) -> &mut Self {
+        self.upgrade_guid = u;
         self
     }
 
@@ -278,9 +295,10 @@ impl<'a> Builder<'a> {
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
             package: self.package.map(String::from),
+            path_guid: self.path_guid.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
-            upgrade_code: self.upgrade_code.map(String::from),
+            upgrade_guid: self.upgrade_guid.map(String::from),
         }
     }
 }
@@ -305,9 +323,10 @@ pub struct Execution {
     manufacturer: Option<String>,
     output: Option<PathBuf>,
     package: Option<String>,
+    path_guid: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
-    upgrade_code: Option<String>,
+    upgrade_guid: Option<String>,
 }
 
 impl Execution {
@@ -325,9 +344,10 @@ impl Execution {
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
         debug!("package = {:?}", self.package);
+        debug!("path_guid = {:?}", self.path_guid);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
-        debug!("upgrade_code = {:?}", self.upgrade_code);
+        debug!("upgrade_guid = {:?}", self.upgrade_guid);
         let manifest = manifest(self.input.as_ref())?;
         let package = package(&manifest, self.package.as_deref())?;
         let mut destination = super::destination(self.output.as_ref())?;
@@ -350,11 +370,8 @@ impl Execution {
                 product_name(self.product_name.as_ref(), &package)?,
             )
             .insert_str("manufacturer", self.manufacturer(&package)?)
-            .insert_str("upgrade-code-guid", self.upgrade_code(&package)?)
-            .insert_str(
-                "path-component-guid",
-                Uuid::new_v4().to_hyphenated().to_string().to_uppercase(),
-            );
+            .insert_str("upgrade-code-guid", self.upgrade_guid(&package)?)
+            .insert_str("path-component-guid", self.path_guid(&package)?);
         if let Some(ref banner) = self.banner {
             map = map.insert_str("banner", banner.display().to_string());
         }
@@ -551,18 +568,37 @@ impl Execution {
         }
     }
 
-    fn upgrade_code(&self, manifest: &Package) -> Result<String> {
-        if let Some(ref u) = self.upgrade_code {
-            trace!("An upgrade code has been explicitly specified");
+    fn path_guid(&self, manifest: &Package) -> Result<String> {
+        if let Some(ref u) = self.path_guid {
+            trace!("An path GUID has been explicitly specified");
             Ok(u.to_owned())
-        } else if let Some(pkg_meta_wix_upgrade_code) = manifest
+        } else if let Some(pkg_meta_wix_path_guid) = manifest
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("path-guid"))
+            .and_then(|u| u.as_str())
+        {
+            Uuid::from_str(pkg_meta_wix_path_guid)
+                .map(|u| u.to_hyphenated().to_string().to_uppercase())
+                .map_err(Error::from)
+        } else {
+            Ok(Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
+        }
+    }
+
+    fn upgrade_guid(&self, manifest: &Package) -> Result<String> {
+        if let Some(ref u) = self.upgrade_guid {
+            trace!("An upgrade GUID has been explicitly specified");
+            Ok(u.to_owned())
+        } else if let Some(pkg_meta_wix_upgrade_guid) = manifest
             .metadata
             .get("wix")
             .and_then(|w| w.as_object())
             .and_then(|t| t.get("upgrade-guid"))
             .and_then(|u| u.as_str())
         {
-            Uuid::from_str(pkg_meta_wix_upgrade_code)
+            Uuid::from_str(pkg_meta_wix_upgrade_guid)
                 .map(|u| u.to_hyphenated().to_string().to_uppercase())
                 .map_err(Error::from)
         } else {
