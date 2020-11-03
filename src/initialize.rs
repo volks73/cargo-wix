@@ -545,6 +545,7 @@ mod tests {
     mod builder {
         use super::*;
 
+        const PATH_GUID: &str = "0B5DFC00-1480-4044-AC1A-BEF00E0A91BB";
         const UPGRADE_GUID: &str = "0631BBDF-4079-4C20-823F-7EA8DE40BF08";
 
         #[test]
@@ -563,6 +564,7 @@ mod tests {
             assert!(actual.license.is_none());
             assert!(actual.manufacturer.is_none());
             assert!(actual.output.is_none());
+            assert!(actual.path_guid.is_none());
             assert!(actual.product_icon.is_none());
             assert!(actual.product_name.is_none());
             assert!(actual.upgrade_guid.is_none());
@@ -672,6 +674,13 @@ mod tests {
         }
 
         #[test]
+        fn path_guid_works() {
+            let mut actual = Builder::new();
+            actual.path_guid(Some(PATH_GUID));
+            assert_eq!(actual.path_guid, Some(PATH_GUID));
+        }
+
+        #[test]
         fn product_icon_works() {
             const EXPECTED: &str = "img\\Product.ico";
             let mut actual = Builder::new();
@@ -688,7 +697,7 @@ mod tests {
         }
 
         #[test]
-        fn upgrade_code_works() {
+        fn upgrade_guid_works() {
             let mut actual = Builder::new();
             actual.upgrade_guid(Some(UPGRADE_GUID));
             assert_eq!(actual.upgrade_guid, Some(UPGRADE_GUID));
@@ -740,6 +749,7 @@ mod tests {
             b.license(Some(EXPECTED_LICENSE));
             b.manufacturer(Some(EXPECTED_MANUFACTURER));
             b.output(Some(EXPECTED_OUTPUT));
+            b.path_guid(Some(PATH_GUID));
             b.product_icon(Some(EXPECTED_PRODUCT_ICON));
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
             b.upgrade_guid(Some(UPGRADE_GUID));
@@ -770,6 +780,7 @@ mod tests {
                 Some(EXPECTED_MANUFACTURER).map(String::from)
             );
             assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
+            assert_eq!(execution.path_guid, Some(PATH_GUID).map(String::from));
             assert_eq!(
                 execution.product_icon,
                 Some(EXPECTED_PRODUCT_ICON).map(PathBuf::from)
