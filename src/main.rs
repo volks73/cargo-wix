@@ -1214,7 +1214,7 @@ fn main() {
         .long("product-icon")
         .short("p")
         .takes_value(true);
-    // The product name option for the `init`, `print`, and `sign` subcommands
+    // The product name option for the `init`, `print`, and `sign` subcommands.
     let product_name = Arg::with_name("product-name")
         .help("A string for the Add/Remove Programs control panel's Name")
         .long_help(
@@ -1225,6 +1225,21 @@ fn main() {
         )
         .long("product-name")
         .short("P")
+        .takes_value(true);
+    // The upgrade code option for the `init` and `print` subcommands.
+    let upgrade_code = Arg::with_name("upgrade-code")
+        .help("A string formatted as a v4 hyphenated, uppercase UUID for the product's globally unique upgrade code.")
+        .long_help(
+            "Overrides the automatically generated GUID for the product's \
+            upgrade code. The upgrade code is used to determine if the installer \
+            is for a different product or the same product but should be \
+            upgraded instead of a new install. Generally, the upgrade code is \
+            generated once at the start of a product/project and stored in the \
+            WiX Source (WXS) file. Using a different GUID for each installer \
+            creation will install separate versions of a product."
+        )
+        .long("upgrade-code")
+        .short("U")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
     let verbose = Arg::with_name("verbose")
@@ -1380,6 +1395,7 @@ fn main() {
                     .arg(owner.clone())
                     .arg(product_icon.clone())
                     .arg(product_name.clone())
+                    .arg(upgrade_code.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
@@ -1512,6 +1528,7 @@ fn main() {
                             .collect::<Vec<&str>>())
                         .required(true)
                         .index(1))
+                    .arg(upgrade_code)
                     .arg(url)
                     .arg(year)
                     .arg(verbose.clone()))
@@ -1663,6 +1680,7 @@ fn main() {
             init.package(m.value_of("package"));
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
+            init.upgrade_code(m.value_of("upgrade-code"));
             init.build().run()
         }
         ("print", Some(m)) => {
@@ -1683,6 +1701,7 @@ fn main() {
                     print.package(m.value_of("package"));
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
+                    print.upgrade_code(m.value_of("upgrade-code"));
                     print.build().run()
                 }
                 t => {
