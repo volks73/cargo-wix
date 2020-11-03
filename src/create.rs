@@ -670,15 +670,15 @@ impl Execution {
     fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
         self.compiler_args.to_owned().or_else(|| {
             metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("compiler-args"))
-            .and_then(|i| i.as_array())
-            .map(|a| {
-                a.iter()
-                    .map(|s| s.as_str().map(String::from).unwrap())
-                    .collect::<Vec<String>>()
-            })
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("compiler-args"))
+                .and_then(|i| i.as_array())
+                .map(|a| {
+                    a.iter()
+                        .map(|s| s.as_str().map(String::from).unwrap())
+                        .collect::<Vec<String>>()
+                })
         })
     }
 
@@ -1638,10 +1638,7 @@ mod tests {
             builder.compiler_args(Some(vec!["-ws"]));
             let execution = builder.build();
             let args = execution.compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
-            assert_eq!(
-                args,
-                Some(vec![String::from("-ws")])
-            );
+            assert_eq!(args, Some(vec![String::from("-ws")]));
         }
 
         #[test]
@@ -1670,10 +1667,7 @@ mod tests {
             builder.linker_args(Some(vec!["-ws"]));
             let execution = builder.build();
             let args = execution.linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
-            assert_eq!(
-                args,
-                Some(vec![String::from("-ws")])
-            );
+            assert_eq!(args, Some(vec![String::from("-ws")]));
         }
 
         #[test]
