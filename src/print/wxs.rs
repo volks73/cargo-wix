@@ -350,10 +350,7 @@ impl Execution {
                 product_name(self.product_name.as_ref(), &package)?,
             )
             .insert_str("manufacturer", self.manufacturer(&package)?)
-            .insert_str(
-                "upgrade-code-guid",
-                self.upgrade_code(&package)?,
-            )
+            .insert_str("upgrade-code-guid", self.upgrade_code(&package)?)
             .insert_str(
                 "path-component-guid",
                 Uuid::new_v4().to_hyphenated().to_string().to_uppercase(),
@@ -565,9 +562,9 @@ impl Execution {
             .and_then(|t| t.get("upgrade-guid"))
             .and_then(|u| u.as_str())
         {
-            Uuid::from_str(pkg_meta_wix_upgrade_code).map(|u| {
-                u.to_hyphenated().to_string().to_uppercase()
-            }).map_err(Error::from)
+            Uuid::from_str(pkg_meta_wix_upgrade_code)
+                .map(|u| u.to_hyphenated().to_string().to_uppercase())
+                .map_err(Error::from)
         } else {
             Ok(Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
         }

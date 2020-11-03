@@ -753,10 +753,7 @@ mod tests {
                 execution.product_name,
                 Some(EXPECTED_PRODUCT_NAME).map(String::from)
             );
-            assert_eq!(
-                execution.upgrade_code,
-                Some(UPGRADE_CODE).map(String::from)
-            );
+            assert_eq!(execution.upgrade_code, Some(UPGRADE_CODE).map(String::from));
         }
     }
 
