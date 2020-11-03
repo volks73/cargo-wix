@@ -963,6 +963,18 @@
 //! certificate. Valid aliases are: `Comodo` and `Versign`, which are case
 //! insenstive.
 //!
+//! ### `-U,--upgrade-code`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! Overrides the automatically generated GUID for the product's upgrade code
+//! with an existing GUID in the hyphenated, uppercase format. The upgrade code
+//! should only be generated once for a product/project. The same upgrade code
+//! should then be used for all installer creations of the same product/project. If
+//! a new GUID is used every time an installer is created, then each installer will
+//! be installing the same product but as separate installations.
+//!
 //! ### `-u,--url`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
