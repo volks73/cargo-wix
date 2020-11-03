@@ -963,7 +963,7 @@
 //! certificate. Valid aliases are: `Comodo` and `Versign`, which are case
 //! insenstive.
 //!
-//! ### `-U,--upgrade-code`
+//! ### `-U,--upgrade-guid`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
@@ -1238,8 +1238,8 @@ fn main() {
         .long("product-name")
         .short("P")
         .takes_value(true);
-    // The upgrade code option for the `init` and `print` subcommands.
-    let upgrade_code = Arg::with_name("upgrade-code")
+    // The upgrade guid option for the `init` and `print` subcommands.
+    let upgrade_guid = Arg::with_name("upgrade-guid")
         .help("A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code")
         .long_help(
             "Overrides the automatically generated GUID for the product's \
@@ -1250,7 +1250,7 @@ fn main() {
             WiX Source (WXS) file. Using a different GUID for each installer \
             creation will install separate versions of a product."
         )
-        .long("upgrade-code")
+        .long("upgrade-guid")
         .short("U")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
@@ -1407,7 +1407,7 @@ fn main() {
                     .arg(owner.clone())
                     .arg(product_icon.clone())
                     .arg(product_name.clone())
-                    .arg(upgrade_code.clone())
+                    .arg(upgrade_guid.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
@@ -1540,7 +1540,7 @@ fn main() {
                             .collect::<Vec<&str>>())
                         .required(true)
                         .index(1))
-                    .arg(upgrade_code)
+                    .arg(upgrade_guid)
                     .arg(url)
                     .arg(year)
                     .arg(verbose.clone()))
