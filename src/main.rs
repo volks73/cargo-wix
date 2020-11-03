@@ -1207,9 +1207,9 @@ fn main() {
     let package = Arg::with_name("package")
         .help("The name of the package in the current workspace to create an installer")
         .long_help(
-            "Selects the package to build an installer from within a project
-            organized with a workspace. Workspaces have one or more members,
-            where each member is a package. This option selects the package by
+            "Selects the package to build an installer from within a project \
+            organized with a workspace. Workspaces have one or more members, \
+            where each member is a package. This option selects the package by \
             name.",
         )
         .long("package")
