@@ -1228,7 +1228,7 @@ fn main() {
         .takes_value(true);
     // The upgrade code option for the `init` and `print` subcommands.
     let upgrade_code = Arg::with_name("upgrade-code")
-        .help("A string formatted as a v4 hyphenated, uppercase UUID for the product's globally unique upgrade code.")
+        .help("A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code")
         .long_help(
             "Overrides the automatically generated GUID for the product's \
             upgrade code. The upgrade code is used to determine if the installer \
