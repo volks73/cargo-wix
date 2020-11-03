@@ -242,6 +242,20 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the Upgrade Code GUID.
+    ///
+    /// The default automatically generates the need GUID for the `UpgradeCode`
+    /// attribute to the `Product` tag. The Upgrade Code uniquely identifies the
+    /// installer. It is used to determine if the new installer is the same
+    /// product and the current installation should be removed and upgraded to
+    /// this version. If the GUIDs of the current product and new product do
+    /// _not_ match, then Windows will treat the two installers as separate
+    /// products.
+    ///
+    /// Generally, the upgrade code should be generated only one per
+    /// project/product and then the same code used every time the installer is
+    /// created and the GUID is stored in the WiX Source (WXS) file. However,
+    /// this allows the user to provide an existing GUID for the upgrade code.
     pub fn upgrade_code(&mut self, u: Option<&'a str>) -> &mut Self {
         self.upgrade_code = u;
         self
@@ -338,7 +352,7 @@ impl Execution {
             .insert_str("manufacturer", self.manufacturer(&package)?)
             .insert_str(
                 "upgrade-code-guid",
-                upgrade_code(self.upgrade_code.as_ref(), &package)?,
+                self.upgrade_code(&package)?,
             )
             .insert_str(
                 "path-component-guid",
