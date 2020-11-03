@@ -705,6 +705,14 @@ mod tests {
         }
 
         #[test]
+        fn path_guid_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let mut actual = Builder::new();
+            actual.path_guid(Some(&expected));
+            assert_eq!(actual.path_guid, Some(expected.as_ref()));
+        }
+
+        #[test]
         fn product_icon_works() {
             const EXPECTED: &str = "img\\Product.ico";
             let mut actual = Builder::new();
@@ -721,7 +729,7 @@ mod tests {
         }
 
         #[test]
-        fn upgrade_code_works() {
+        fn upgrade_guid_works() {
             let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
             let mut actual = Builder::new();
             actual.upgrade_guid(Some(&expected));
@@ -837,7 +845,17 @@ mod tests {
             license-file = "Example.txt"
         "#;
 
+        const PATH_GUID: &str = "C38A18DB-12CC-4BDC-8A05-DFCB981A0F33";
         const UPGRADE_GUID: &str = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9";
+
+        const PATH_GUID_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+
+            [package.metadata.wix]
+            path-guid = "C38A18DB-12CC-4BDC-8A05-DFCB981A0F33"
+        "#;
 
         const UPGRADE_GUID_MANIFEST: &str = r#"[package]
             name = "Example"
@@ -1197,7 +1215,49 @@ mod tests {
         }
 
         #[test]
-        fn upgrade_code_with_override_works() {
+        fn path_guid_with_override_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default()
+                .path_guid(Some(&expected))
+                .build()
+                .path_guid(&package)
+                .unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn path_guid_metadata_works() {
+            let project = setup_project(PATH_GUID_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default().build().path_guid(&package).unwrap();
+            assert_eq!(actual, PATH_GUID);
+        }
+
+        #[test]
+        fn path_guid_metadata_and_override_works() {
+            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+
+            let project = setup_project(PATH_GUID_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default()
+                .path_guid(Some(&expected))
+                .build()
+                .path_guid(&package)
+                .unwrap();
+            assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn upgrade_guid_with_override_works() {
             let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(MIN_MANIFEST);
@@ -1213,7 +1273,7 @@ mod tests {
         }
 
         #[test]
-        fn upgrade_code_metadata_works() {
+        fn upgrade_guid_metadata_works() {
             let project = setup_project(UPGRADE_GUID_MANIFEST);
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1223,7 +1283,7 @@ mod tests {
         }
 
         #[test]
-        fn upgrade_code_metadata_and_override_works() {
+        fn upgrade_guid_metadata_and_override_works() {
             let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(UPGRADE_GUID_MANIFEST);
