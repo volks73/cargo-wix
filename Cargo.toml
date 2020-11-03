@@ -22,7 +22,7 @@ name = "wix"
 [dependencies]
 chrono = "0.4"
 encoding_rs_io = "0.1"
-env_logger = "0.7"
+env_logger = "0.8"
 log = "0.4"
 maplit = "1"
 mustache = "0.9"
