@@ -11,7 +11,7 @@ jobs:
           override: true
       - run: cargo test --all-targets -- --test-threads=1
   rustfmt:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -21,7 +21,7 @@ jobs:
           components: rustfmt
       - run: cargo fmt --all -- --check
   clippy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
