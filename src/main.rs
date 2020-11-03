@@ -930,14 +930,26 @@
 //!
 //! ### `-p,--package`
 //!
-//! Available for the _create_ (`cargo wix`) subcommand.
+//! Available for the _create_ (`cargo wix`), _init_ (`cargo wix init`), and
+//! _print_ (`cargo wix print`) subcommands.
 //!
-//! Selects the package to create installer by name. This is required if a
-//! project organized with a workspace. A workspace can have one or more
-//! members, where each member may have a separate installer. This option has no
-//! effect if the project does not use a workspace.
+//! Selects the package within a workspace. This is required if a project
+//! organized with a workspace. A workspace can have one or more members, where
+//! each member may have a separate installer. This option has no effect if the
+//! project does not use a workspace.
 //!
-//! ### `-p,--product-icon`
+//! ### `--path-guid`
+//!
+//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
+//! subcommands.
+//!
+//! Overrides the automatically generated GUID for the path component with an
+//! existing GUID in the hyphenated, uppercase format. The path GUID should only
+//! be generated once for a product/project. The same GUID should be used for
+//! all installer creations to ensure no artifacts are left after uninstalling
+//! and proper modification of the `PATH` environment variable.
+//!
+//! ### `--product-icon`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
@@ -945,7 +957,7 @@
 //! Sets the path to an image file that will be display as an icon in the
 //! Add/Remove Programs (ARP) control panel for the installed application.
 //!
-//! ### `-P,--product-name`
+//! ### `--product-name`
 //!
 //! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),
 //! and _sign_ (`cargo wix sign`) subcommands.
@@ -963,7 +975,7 @@
 //! certificate. Valid aliases are: `Comodo` and `Versign`, which are case
 //! insenstive.
 //!
-//! ### `-U,--upgrade-guid`
+//! ### `--upgrade-guid`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
@@ -1237,7 +1249,6 @@ fn main() {
              application.",
         )
         .long("product-icon")
-        .short("p")
         .takes_value(true);
     // The product name option for the `init`, `print`, and `sign` subcommands.
     let product_name = Arg::with_name("product-name")
@@ -1249,7 +1260,6 @@ fn main() {
              file (wxs) with a text editor.",
         )
         .long("product-name")
-        .short("P")
         .takes_value(true);
     // The upgrade guid option for the `init` and `print` subcommands.
     let upgrade_guid = Arg::with_name("upgrade-guid")
