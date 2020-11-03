@@ -562,7 +562,7 @@ impl Execution {
             .metadata
             .get("wix")
             .and_then(|w| w.as_object())
-            .and_then(|t| t.get("upgrade-code"))
+            .and_then(|t| t.get("upgrade-guid"))
             .and_then(|u| u.as_str())
         {
             Uuid::from_str(pkg_meta_wix_upgrade_code).map(|u| {
@@ -808,7 +808,7 @@ mod tests {
             authors = ["First Last <first.last@example.com>"]
 
             [package.metadata.wix]
-            upgrade-code = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9"
+            upgrade-guid = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9"
         "#;
 
         #[test]
