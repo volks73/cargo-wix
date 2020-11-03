@@ -234,7 +234,7 @@ fn input_with_output_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => {
                         t.insert(String::from("license"), Value::from("MIT"))
@@ -364,7 +364,7 @@ fn mit_license_id_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => {
                         t.insert(String::from("license"), Value::from("MIT"))
@@ -429,7 +429,7 @@ fn apache2_license_id_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => {
                         t.insert(String::from("license"), Value::from("Apache-2.0"))
@@ -494,7 +494,7 @@ fn gpl3_license_id_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => {
                         t.insert(String::from("license"), Value::from("GPL-3.0"))
@@ -562,7 +562,7 @@ fn license_file_field_with_rtf_file_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => t.insert(
                         String::from("license-file"),
@@ -622,7 +622,7 @@ fn license_file_field_with_txt_file_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => t.insert(
                         String::from("license-file"),

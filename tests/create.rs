@@ -289,7 +289,7 @@ fn init_with_package_section_fields_works() {
     };
     {
         toml.get_mut("package")
-            .and_then(|p| {
+            .map(|p| {
                 match p {
                     Value::Table(ref mut t) => {
                         t.insert(
