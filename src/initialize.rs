@@ -56,6 +56,7 @@ pub struct Builder<'a> {
     package: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
+    upgrade_code: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -78,6 +79,7 @@ impl<'a> Builder<'a> {
             package: None,
             product_icon: None,
             product_name: None,
+            upgrade_code: None,
         }
     }
 
@@ -321,6 +323,25 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the Upgrade Code GUID.
+    ///
+    /// The default automatically generates the need GUID for the `UpgradeCode`
+    /// attribute to the `Product` tag. The Upgrade Code uniquely identifies the
+    /// installer. It is used to determine if the new installer is the same
+    /// product and the current installation should be removed and upgraded to
+    /// this version. If the GUIDs of the current product and new product do
+    /// _not_ match, then Windows will treat the two installers as separate
+    /// products.
+    ///
+    /// Generally, the upgrade code should be generated only one per
+    /// project/product and then the same code used every time the installer is
+    /// created and the GUID is stored in the WiX Source (WXS) file. However,
+    /// this allows the user to provide an existing GUID for the upgrade code.
+    pub fn upgrade_code(&mut self, u: Option<&'a str>) -> &mut Self {
+        self.upgrade_code = u;
+        self
+    }
+
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
         // let mut wxs_printer = print::wxs::Builder::new();
@@ -374,6 +395,7 @@ pub struct Execution {
     package: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
+    upgrade_code: Option<String>,
 }
 
 impl Execution {
@@ -396,6 +418,7 @@ impl Execution {
         debug!("package = {:?}", self.package);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
+        debug!("upgrade_code = {:?}", self.upgrade_code);
         let manifest = super::manifest(self.input.as_ref())?;
         let package = super::package(&manifest, self.package.as_deref())?;
         let mut destination = self.destination(&package)?;
@@ -458,6 +481,7 @@ impl Execution {
             wxs_printer.package(self.package.as_deref());
             wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
+            wxs_printer.upgrade_code(self.upgrade_code.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
         }
         Ok(())
@@ -465,10 +489,10 @@ impl Execution {
 
     fn destination(&self, package: &Package) -> Result<PathBuf> {
         if let Some(ref output) = self.output {
-            trace!("An output path has been explicity specified");
+            trace!("An output path has been explicitly specified");
             Ok(output.to_owned())
         } else {
-            trace!("An output path has NOT been explicity specified. Implicitly determine output from manifest location.");
+            trace!("An output path has NOT been explicitly specified. Implicitly determine output from manifest location.");
             Ok(package
                 .manifest_path
                 .parent()
