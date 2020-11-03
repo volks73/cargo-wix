@@ -1713,7 +1713,7 @@ fn main() {
                     print.package(m.value_of("package"));
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
-                    print.upgrade_code(m.value_of("upgrade-code"));
+                    print.upgrade_guid(m.value_of("upgrade-code"));
                     print.build().run()
                 }
                 t => {
