@@ -51,6 +51,7 @@ pub struct Builder<'a> {
     package: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
+    upgrade_code: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -70,6 +71,7 @@ impl<'a> Builder<'a> {
             package: None,
             product_icon: None,
             product_name: None,
+            upgrade_code: None,
         }
     }
 
@@ -240,6 +242,11 @@ impl<'a> Builder<'a> {
         self
     }
 
+    pub fn upgrade_code(&mut self, u: Option<&'a str>) -> &mut Self {
+        self.upgrade_code = u;
+        self
+    }
+
     /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
@@ -259,6 +266,7 @@ impl<'a> Builder<'a> {
             package: self.package.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
+            upgrade_code: self.upgrade_code.map(String::from),
         }
     }
 }
@@ -285,6 +293,7 @@ pub struct Execution {
     package: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
+    upgrade_code: Option<String>,
 }
 
 impl Execution {
@@ -304,6 +313,7 @@ impl Execution {
         debug!("package = {:?}", self.package);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
+        debug!("upgrade_code = {:?}", self.upgrade_code);
         let manifest = manifest(self.input.as_ref())?;
         let package = package(&manifest, self.package.as_deref())?;
         let mut destination = super::destination(self.output.as_ref())?;
@@ -328,7 +338,7 @@ impl Execution {
             .insert_str("manufacturer", self.manufacturer(&package)?)
             .insert_str(
                 "upgrade-code-guid",
-                Uuid::new_v4().to_hyphenated().to_string().to_uppercase(),
+                upgrade_code(self.upgrade_code.as_ref(), &package)?,
             )
             .insert_str(
                 "path-component-guid",
@@ -527,6 +537,25 @@ impl Execution {
             Ok(m.to_owned())
         } else {
             super::first_author(&manifest)
+        }
+    }
+
+    fn upgrade_code(&self, manifest: &Package) -> Result<String> {
+        if let Some(ref u) = self.upgrade_code {
+            trace!("An upgrade code has been explicitly specified");
+            Ok(u.to_owned())
+        } else if let Some(pkg_meta_wix_upgrade_code) = manifest
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("upgrade-code"))
+            .and_then(|u| u.as_str())
+        {
+            Uuid::from_str(pkg_meta_wix_upgrade_code).map(|u| {
+                u.to_hyphenated().to_string().to_uppercase()
+            }).map_err(Error::from)
+        } else {
+            Ok(Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
         }
     }
 }

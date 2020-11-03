@@ -242,6 +242,8 @@ pub enum Error {
     Mustache(mustache::Error),
     /// Parsing of the `Cargo.toml` manifest failed.
     Toml(toml::de::Error),
+    /// UUID generation or parsing failed.
+    Uuid(uuid::Error),
     /// Parsing error for a version string or field.
     Version(semver::SemVerError),
     /// Parsing the intermediate WiX Object (wixobj) file, which is XML, failed.
@@ -273,9 +275,10 @@ impl Error {
             Error::Manifest(..) => 4,
             Error::Mustache(..) => 5,
             Error::Toml(..) => 6,
-            Error::Version(..) => 7,
-            Error::Xml(..) => 8,
-            Error::XPath(..) => 9,
+            Error::Uuid(..) => 7,
+            Error::Version(..) => 8,
+            Error::Xml(..) => 9,
+            Error::XPath(..) => 10,
         }
     }
 
@@ -344,6 +347,7 @@ impl Error {
             Error::Manifest(..) => "Manifest",
             Error::Mustache(..) => "Mustache",
             Error::Toml(..) => "TOML",
+            Error::Uuid(..) => "UUID",
             Error::Version(..) => "Version",
             Error::Xml(..) => "XML",
             Error::XPath(..) => "XPath",
@@ -361,6 +365,7 @@ impl StdError for Error {
             Error::Io(ref err) => Some(err),
             Error::Mustache(ref err) => Some(err),
             Error::Toml(ref err) => Some(err),
+            Error::Uuid(ref err) => Some(err),
             Error::Version(ref err) => Some(err),
             Error::Xml(ref err) => Some(err),
             Error::XPath(ref err) => Some(err),
@@ -413,6 +418,7 @@ impl fmt::Display for Error {
             ),
             Error::Mustache(ref err) => err.fmt(f),
             Error::Toml(ref err) => err.fmt(f),
+            Error::Uuid(ref err) => err.fmt(f),
             Error::Version(ref err) => err.fmt(f),
             Error::Xml(ref err) => err.fmt(f),
             Error::XPath(ref err) => err.fmt(f),
@@ -471,6 +477,12 @@ impl From<sxd_document::parser::Error> for Error {
 impl From<sxd_xpath::ExecutionError> for Error {
     fn from(err: sxd_xpath::ExecutionError) -> Self {
         Error::XPath(err)
+    }
+}
+
+impl From<uuid::Error> for Error {
+    fn from(err: uuid::Error) -> Self {
+        Error::Uuid(err)
     }
 }
 
