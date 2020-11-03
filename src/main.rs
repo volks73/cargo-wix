@@ -1692,7 +1692,7 @@ fn main() {
             init.package(m.value_of("package"));
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
-            init.upgrade_code(m.value_of("upgrade-code"));
+            init.upgrade_guid(m.value_of("upgrade-code"));
             init.build().run()
         }
         ("print", Some(m)) => {
