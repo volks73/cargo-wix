@@ -1221,7 +1221,7 @@ fn main() {
         .long_help(
             "Selects the package within a project organized as a workspace. \
              Workspaces have one or more members, where each member is a package. \
-             This option selects the package by name."
+             This option selects the package by name.",
         )
         .long("package")
         .short("p")
@@ -1236,7 +1236,7 @@ fn main() {
              upgrading. Generally, the GUID is generated once at the start \
              of a product/project and stored in the WiX Source (WXS) file. Using \
              a different GUID for each installer creation will leave artifacts \
-             after uninstallation."
+             after uninstallation.",
         )
         .long("path-guid")
         .takes_value(true);
