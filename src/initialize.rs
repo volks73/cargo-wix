@@ -366,6 +366,7 @@ impl<'a> Builder<'a> {
             package: self.package.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
+            upgrade_code: self.upgrade_code.map(String::from),
         }
     }
 }
