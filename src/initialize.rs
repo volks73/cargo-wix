@@ -54,9 +54,10 @@ pub struct Builder<'a> {
     manufacturer: Option<&'a str>,
     output: Option<&'a str>,
     package: Option<&'a str>,
+    path_guid: Option<&'a str>,
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
-    upgrade_code: Option<&'a str>,
+    upgrade_guid: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -77,16 +78,11 @@ impl<'a> Builder<'a> {
             manufacturer: None,
             output: None,
             package: None,
+            path_guid: None,
             product_icon: None,
             product_name: None,
-            upgrade_code: None,
+            upgrade_guid: None,
         }
-    }
-
-    /// Sets the package on which to operate during this build
-    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
-        self.package = p;
-        self
     }
 
     /// Sets the path to a bitmap (BMP) file to be used as a banner image across
@@ -308,6 +304,31 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the package within a workspace to initialize an installer.
+    ///
+    /// Each package within a workspace has its own package manifest, i.e.
+    /// `Cargo.toml`. This indicates within package manifest within a workspace
+    /// should be used when initializing an installer.
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
+    }
+
+    /// Sets the GUID for the path component.
+    ///
+    /// The default automatically generates the GUID needed for the path
+    /// component. A GUID is needed so that the path component can be
+    /// successfully removed on uninstall.
+    ///
+    /// Generally, the path component GUID should be generated only once per
+    /// project/product and then the same GUID used every time the installer is
+    /// created. The GUID is stored in the WiX Source (WXS) file. However,
+    /// this allows using an existing GUID, possibly obtained with another tool.
+    pub fn path_guid(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.path_guid = p;
+        self
+    }
+
     /// Sets the product name.
     ///
     /// The default is to use the `name` field under the `package` section of
@@ -337,8 +358,8 @@ impl<'a> Builder<'a> {
     /// project/product and then the same code used every time the installer is
     /// created and the GUID is stored in the WiX Source (WXS) file. However,
     /// this allows the user to provide an existing GUID for the upgrade code.
-    pub fn upgrade_code(&mut self, u: Option<&'a str>) -> &mut Self {
-        self.upgrade_code = u;
+    pub fn upgrade_guid(&mut self, u: Option<&'a str>) -> &mut Self {
+        self.upgrade_guid = u;
         self
     }
 
@@ -364,9 +385,10 @@ impl<'a> Builder<'a> {
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
             package: self.package.map(String::from),
+            path_guid: self.path_guid.map(String::from),
             product_icon: self.product_icon.map(PathBuf::from),
             product_name: self.product_name.map(String::from),
-            upgrade_code: self.upgrade_code.map(String::from),
+            upgrade_guid: self.upgrade_guid.map(String::from),
         }
     }
 }
@@ -394,9 +416,10 @@ pub struct Execution {
     manufacturer: Option<String>,
     output: Option<PathBuf>,
     package: Option<String>,
+    path_guid: Option<String>,
     product_icon: Option<PathBuf>,
     product_name: Option<String>,
-    upgrade_code: Option<String>,
+    upgrade_guid: Option<String>,
 }
 
 impl Execution {
@@ -417,9 +440,10 @@ impl Execution {
         debug!("manufacturer = {:?}", self.manufacturer);
         debug!("output = {:?}", self.output);
         debug!("package = {:?}", self.package);
+        debug!("path_guid = {:?}", self.path_guid);
         debug!("product_icon = {:?}", self.product_icon);
         debug!("product_name = {:?}", self.product_name);
-        debug!("upgrade_code = {:?}", self.upgrade_code);
+        debug!("upgrade_guid = {:?}", self.upgrade_guid);
         let manifest = super::manifest(self.input.as_ref())?;
         let package = super::package(&manifest, self.package.as_deref())?;
         let mut destination = self.destination(&package)?;
@@ -480,9 +504,10 @@ impl Execution {
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
             wxs_printer.package(self.package.as_deref());
+            wxs_printer.path_guid(self.path_guid.as_ref().map(String::as_ref()));
             wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
-            wxs_printer.upgrade_guid(self.upgrade_code.as_ref().map(String::as_ref));
+            wxs_printer.upgrade_guid(self.upgrade_guid.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
         }
         Ok(())

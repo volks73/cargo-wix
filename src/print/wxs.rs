@@ -77,12 +77,6 @@ impl<'a> Builder<'a> {
         }
     }
 
-    /// Sets the package on which to operate during this build
-    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
-        self.package = p;
-        self
-    }
-
     /// Sets the path to a bitmap (BMP) file to be used as a banner image across
     /// the top of each dialog in the installer.
     ///
@@ -212,6 +206,16 @@ impl<'a> Builder<'a> {
     /// working directory.
     pub fn output(&mut self, o: Option<&'a str>) -> &mut Self {
         self.output = o;
+        self
+    }
+
+    /// Sets the package within a workspace to print a template.
+    ///
+    /// Each package within a workspace has its own package manifest, i.e.
+    /// `Cargo.toml`. This indicates which package manifest within a workspace
+    /// should be used to populate a template.
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
         self
     }
 
