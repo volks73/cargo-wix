@@ -504,7 +504,7 @@ impl Execution {
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(destination.as_path().to_str());
             wxs_printer.package(self.package.as_deref());
-            wxs_printer.path_guid(self.path_guid.as_ref().map(String::as_ref()));
+            wxs_printer.path_guid(self.path_guid.as_ref().map(String::as_ref));
             wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(self.upgrade_guid.as_ref().map(String::as_ref));
