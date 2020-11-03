@@ -520,6 +520,8 @@ mod tests {
     mod builder {
         use super::*;
 
+        const UPGRADE_CODE: &str = "0631BBDF-4079-4C20-823F-7EA8DE40BF08";
+
         #[test]
         fn defaults_are_correct() {
             let actual = Builder::new();
@@ -538,6 +540,7 @@ mod tests {
             assert!(actual.output.is_none());
             assert!(actual.product_icon.is_none());
             assert!(actual.product_name.is_none());
+            assert!(actual.upgrade_code.is_none());
         }
 
         #[test]
@@ -660,6 +663,13 @@ mod tests {
         }
 
         #[test]
+        fn upgrade_code_works() {
+            let mut actual = Builder::new();
+            actual.upgrade_code(Some(UPGRADE_CODE));
+            assert_eq!(actual.upgrade_code, Some(UPGRADE_CODE));
+        }
+
+        #[test]
         fn build_with_defaults_works() {
             let mut b = Builder::new();
             let default_execution = b.build();
@@ -676,6 +686,7 @@ mod tests {
             assert!(default_execution.output.is_none());
             assert!(default_execution.product_icon.is_none());
             assert!(default_execution.product_name.is_none());
+            assert!(default_execution.upgrade_code.is_none());
         }
 
         #[test]
@@ -706,6 +717,7 @@ mod tests {
             b.output(Some(EXPECTED_OUTPUT));
             b.product_icon(Some(EXPECTED_PRODUCT_ICON));
             b.product_name(Some(EXPECTED_PRODUCT_NAME));
+            b.upgrade_code(Some(UPGRADE_CODE));
             let execution = b.build();
             assert_eq!(
                 execution.binaries,
@@ -740,6 +752,10 @@ mod tests {
             assert_eq!(
                 execution.product_name,
                 Some(EXPECTED_PRODUCT_NAME).map(String::from)
+            );
+            assert_eq!(
+                execution.upgrade_code,
+                Some(UPGRADE_CODE).map(String::from)
             );
         }
     }
