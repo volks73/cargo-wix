@@ -1203,17 +1203,30 @@ fn main() {
         .long("owner")
         .short("O")
         .takes_value(true);
-    // The package option for the `create` subcommand
+    // The package option for the `create`, `init`, and `print` subcommands
     let package = Arg::with_name("package")
-        .help("The name of the package in the current workspace to create an installer")
+        .help("The name of the package in the current workspace")
         .long_help(
-            "Selects the package to build an installer from within a project \
-             organized with a workspace. Workspaces have one or more members, \
-             where each member is a package. This option selects the package by \
-             name.",
+            "Selects the package within a project organized as a workspace. \
+             Workspaces have one or more members, where each member is a package. \
+             This option selects the package by name."
         )
         .long("package")
         .short("p")
+        .takes_value(true);
+    // The path guid option for the `init` and `print` subcommands
+    let path_guid = Arg::with_name("path-guid")
+        .help("A string formatted as a v4 hyphenated, uppercase UUID for the path component")
+        .long_help(
+            "Overrides the automatically generated GUID for the path component. \
+             The path component needs a constant GUID so that the PATH \
+             environment variable can be updated properly during uninstall and \
+             upgrading. Generally, the GUID is generated once at the start \
+             of a product/project and stored in the WiX Source (WXS) file. Using \
+             a different GUID for each installer creation will leave artifacts \
+             after uninstallation."
+        )
+        .long("path-guid")
         .takes_value(true);
     // The product icon option for the `init` and `print` subcommands
     let product_icon = Arg::with_name("product-icon")
@@ -1243,15 +1256,14 @@ fn main() {
         .help("A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code")
         .long_help(
             "Overrides the automatically generated GUID for the product's \
-            upgrade code. The upgrade code is used to determine if the installer \
-            is for a different product or the same product but should be \
-            upgraded instead of a new install. Generally, the upgrade code is \
-            generated once at the start of a product/project and stored in the \
-            WiX Source (WXS) file. Using a different GUID for each installer \
-            creation will install separate versions of a product."
+             upgrade code. The upgrade code is used to determine if the installer \
+             is for a different product or the same product but should be \
+             upgraded instead of a new install. Generally, the upgrade code is \
+             generated once at the start of a product/project and stored in the \
+             WiX Source (WXS) file. Using a different GUID for each installer \
+             creation will install separate versions of a product."
         )
         .long("upgrade-guid")
-        .short("U")
         .takes_value(true);
     // The "global" verbose flag for all subcommands.
     let verbose = Arg::with_name("verbose")
@@ -1405,6 +1417,8 @@ fn main() {
                         .short("o")
                         .takes_value(true))
                     .arg(owner.clone())
+                    .arg(package.clone())
+                    .arg(path_guid.clone())
                     .arg(product_icon.clone())
                     .arg(product_name.clone())
                     .arg(upgrade_guid.clone())
@@ -1492,7 +1506,7 @@ fn main() {
                     .long("output")
                     .short("o")
                     .takes_value(true))
-                .arg(package)
+                .arg(package.clone())
                 .subcommand(SubCommand::with_name("print")
                     .version(crate_version!())
                     .about("Prints a template")
@@ -1527,6 +1541,8 @@ fn main() {
                         .short("o")
                         .takes_value(true))
                     .arg(owner)
+                    .arg(package)
+                    .arg(path_guid)
                     .arg(product_icon)
                     .arg(product_name.clone())
                     .arg(Arg::with_name("TEMPLATE")
@@ -1690,9 +1706,10 @@ fn main() {
             init.manufacturer(m.value_of("manufacturer"));
             init.output(m.value_of("output"));
             init.package(m.value_of("package"));
+            init.path_guid(m.value_of("path-guid"));
             init.product_icon(m.value_of("product-icon"));
             init.product_name(m.value_of("product-name"));
-            init.upgrade_guid(m.value_of("upgrade-code"));
+            init.upgrade_guid(m.value_of("upgrade-guid"));
             init.build().run()
         }
         ("print", Some(m)) => {
@@ -1711,9 +1728,10 @@ fn main() {
                     print.manufacturer(m.value_of("manufacturer"));
                     print.output(m.value_of("output"));
                     print.package(m.value_of("package"));
+                    print.path_guid(m.value_of("path-guid"));
                     print.product_icon(m.value_of("product-icon"));
                     print.product_name(m.value_of("product-name"));
-                    print.upgrade_guid(m.value_of("upgrade-code"));
+                    print.upgrade_guid(m.value_of("upgrade-guid"));
                     print.build().run()
                 }
                 t => {
