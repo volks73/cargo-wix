@@ -668,7 +668,8 @@ impl Execution {
     }
 
     fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
-        metadata
+        self.compiler_args.to_owned().or_else(|| {
+            metadata
             .get("wix")
             .and_then(|w| w.as_object())
             .and_then(|t| t.get("compiler-args"))
@@ -678,21 +679,22 @@ impl Execution {
                     .map(|s| s.as_str().map(String::from).unwrap())
                     .collect::<Vec<String>>()
             })
-            .or_else(|| self.compiler_args.to_owned())
+        })
     }
 
     fn linker_args(&self, metadata: &Value) -> Option<Vec<String>> {
-        metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("linker-args"))
-            .and_then(|i| i.as_array())
-            .map(|a| {
-                a.iter()
-                    .map(|s| s.as_str().map(String::from).unwrap())
-                    .collect::<Vec<String>>()
-            })
-            .or_else(|| self.linker_args.to_owned())
+        self.linker_args.to_owned().or_else(|| {
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("linker-args"))
+                .and_then(|i| i.as_array())
+                .map(|a| {
+                    a.iter()
+                        .map(|s| s.as_str().map(String::from).unwrap())
+                        .collect::<Vec<String>>()
+                })
+        })
     }
 
     fn culture(&self, metadata: &Value) -> Result<Cultures> {
@@ -1626,6 +1628,23 @@ mod tests {
         }
 
         #[test]
+        fn compiler_args_override_works() {
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "compiler-args": ["-nologo"]
+                }
+            }"#;
+            let mut builder = Builder::default();
+            builder.compiler_args(Some(vec!["-ws"]));
+            let execution = builder.build();
+            let args = execution.compiler_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(
+                args,
+                Some(vec![String::from("-ws")])
+            );
+        }
+
+        #[test]
         fn compiler_args_metadata_works() {
             const PKG_META_WIX: &str = r#"{
                 "wix": {
@@ -1637,6 +1656,23 @@ mod tests {
             assert_eq!(
                 args,
                 Some(vec![String::from("-nologo"), String::from("-ws")])
+            );
+        }
+
+        #[test]
+        fn linker_args_override_works() {
+            const PKG_META_WIX: &str = r#"{
+                "wix": {
+                    "linker-args": ["-nologo"]
+                }
+            }"#;
+            let mut builder = Builder::default();
+            builder.linker_args(Some(vec!["-ws"]));
+            let execution = builder.build();
+            let args = execution.linker_args(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(
+                args,
+                Some(vec![String::from("-ws")])
             );
         }
 
