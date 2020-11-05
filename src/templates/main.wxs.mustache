@@ -21,12 +21,16 @@
   destination for 32-bit versus 64-bit installers. Removal of these lines will
   cause installation errors.
 -->
-<?if $(var.Platform) = x64 ?>
-    <?define Win64 = "yes" ?>
+<?if $(sys.BUILDARCH) = x64 or $(sys.BUILDARCH) = arm64 ?>
     <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
 <?else ?>
-  <?define Win64 = "no" ?>
-  <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+<?endif ?>
+
+<?ifdef CargoTargetExplicit ?>
+    <?define CargoTargetPathName = "$(var.CargoTarget)" ?>
+<?else ?>
+    <?define CargoTargetPathName = "" ?>
 <?endif ?>
 
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
@@ -51,7 +55,7 @@
             Compressed='yes'
             InstallScope='perMachine'
             SummaryCodepage='1252'
-            Platform='$(var.Platform)'/>
+            />
 
         <MajorUpgrade
             Schedule='afterInstallInitialize'
@@ -71,7 +75,7 @@
                       2. Comment out or remove the `ComponentRef` tag with the "License" Id
                          attribute value further down in this file.
                     -->
-                    <Component Id='License' Guid='*' Win64='$(var.Win64)'>
+                    <Component Id='License' Guid='*'>
                         <File Id='LicenseFile'
                             {{#license-name}}
                             Name='{{license-name}}'
@@ -97,14 +101,14 @@
                          further down in this file.
                     -->
                     <!--
-                    <Component Id='License' Guid='*' Win64='$(var.Win64)'>
+                    <Component Id='License' Guid='*'>
                         <File Id='LicenseFile' Name='ChangeMe' DiskId='1' Source='C:\Path\To\File' KeyPath='yes'/>
                     </Component>
                     -->
                     {{/license-source}}
 
                     <Directory Id='Bin' Name='bin'>
-                        <Component Id='Path' Guid='{{path-component-guid}}' Win64='$(var.Win64)' KeyPath='yes'>
+                        <Component Id='Path' Guid='{{path-component-guid}}' KeyPath='yes'>
                             <Environment
                                 Id='PATH'
                                 Name='PATH'
@@ -115,7 +119,7 @@
                                 System='yes'/>
                         </Component>
                         {{#binaries}}
-                        <Component Id='binary{{binary-index}}' Guid='*' Win64='$(var.Win64)'>
+                        <Component Id='binary{{binary-index}}' Guid='*'>
                             <File
                                 Id='exe{{binary-index}}'
                                 Name='{{binary-name}}.exe'

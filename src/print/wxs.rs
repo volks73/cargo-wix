@@ -475,8 +475,8 @@ impl Execution {
     }
 
     fn default_binary_path(name: &str) -> String {
-        // TODO: Handle cross-compilation?
         let mut path = Path::new("$(var.CargoTargetDir)")
+            .join("$(var.CargoTargetPathName)")
             .join("$(var.Profile)")
             .join(name);
         path.set_extension(EXE_FILE_EXTENSION);
@@ -979,7 +979,7 @@ mod tests {
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Example"),
-                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\Example.exe")
+                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.CargoTargetPathName)\\$(var.Profile)\\Example.exe")
                 }]
             )
         }
@@ -996,7 +996,7 @@ mod tests {
                 vec![hashmap! {
                     "binary-index" => 0.to_string(),
                     "binary-name" => String::from("Different"),
-                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\Different.exe")
+                    "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.CargoTargetPathName)\\$(var.Profile)\\Different.exe")
                 }]
             )
         }
@@ -1014,17 +1014,17 @@ mod tests {
                     hashmap! {
                         "binary-index" => 0.to_string(),
                         "binary-name" => String::from("binary0"),
-                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary0.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.CargoTargetPathName)\\$(var.Profile)\\binary0.exe")
                     },
                     hashmap! {
                         "binary-index" => 1.to_string(),
                         "binary-name" => String::from("binary1"),
-                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary1.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.CargoTargetPathName)\\$(var.Profile)\\binary1.exe")
                     },
                     hashmap! {
                         "binary-index" => 2.to_string(),
                         "binary-name" => String::from("binary2"),
-                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.Profile)\\binary2.exe")
+                        "binary-source" => String::from("$(var.CargoTargetDir)\\$(var.CargoTargetPathName)\\$(var.Profile)\\binary2.exe")
                     }
                 ]
             )

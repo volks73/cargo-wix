@@ -1362,6 +1362,13 @@ fn main() {
                     .multiple(true)
                     .number_of_values(1)
                     .allow_hyphen_values(true))
+                .arg(Arg::with_name("target")
+                    .help("The cargo target to build the WiX installer for.")
+                    .long_help("Tells cargo to build the given target, and instructs \
+                        WiX to build an installer targeting the right architecture.")
+                    .long("target")
+                    .short("t")
+                    .takes_value(true))
                 .arg(Arg::with_name("debug-build")
                     .help("Builds the package using the Debug profile")
                     .long_help("Uses the Debug profile when building the package \
@@ -1788,6 +1795,7 @@ fn main() {
             create.output(matches.value_of("output"));
             create.version(matches.value_of("install-version"));
             create.package(matches.value_of("package"));
+            create.target(matches.value_of("target"));
             create.build().run()
         }
     };
