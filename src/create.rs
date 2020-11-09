@@ -921,8 +921,8 @@ impl Execution {
     /// Gets the target used to compile the binary. This will either return the
     /// target passed as an argument, or find it from rustc's HOST triple.
     // NOTE: This does not support default-target. Ideally we would use cargo
-    // --build-plan to figure this out without having to second-guess the
-    // compiler. Unfortunately, cargo build-plan is unstable.
+    // --unit-graph to figure this out without having to second-guess the
+    // compiler. Unfortunately, cargo --unit-graph is unstable.
     fn target(&self) -> Result<String> {
         match &self.target {
             Some(v) => Ok(v.clone()),
