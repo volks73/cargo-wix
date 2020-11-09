@@ -487,52 +487,62 @@ impl From<uuid::Error> for Error {
 }
 
 /// The different values for the `Platform` attribute of the `Package` element.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Platform {
-    /// The `x86` WiX Toolset value.
-    X86,
-    /// The `x64` WiX Toolset value.
-    X64,
+#[derive(Debug, Clone, PartialEq)]
+pub struct Platform {
+    target: String,
 }
 
 impl Platform {
+    /// Creates a new Platform element from the given target name.
+    pub fn new(target_name: &str) -> Platform {
+        Platform {
+            target: target_name.to_string(),
+        }
+    }
+
+    /// Gets the full target name as given to cargo.
+    pub fn target(&self) -> String {
+        self.target.clone()
+    }
+
     /// Gets the name of the platform as an architecture string as used in Rust toolchains.
     ///
     /// This is different from the string used in WiX Source (wxs) files. This is the string
     /// commonly used for the `target_arch` conditional compilation attribute. To get the string
-    /// recognized in wxs files, use `format!("{}", Platform::X86)`.
+    /// recognized in wxs files, use `platform.wix_arch()`.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use wix::Platform;
     ///
-    /// assert_eq!(Platform::X86.arch(), "i686");
-    /// assert_eq!(Platform::X64.arch(), "x86_64");
+    /// assert_eq!(Platform { target: "i686-pc-windows-msvc".into() }.arch(), "i686");
+    /// assert_eq!(Platform { target: "x86_64-pc-windows-msvc".into() }.arch(), "x86_64");
     /// ```
-    pub fn arch(self) -> &'static str {
-        match self {
-            Platform::X86 => "i686",
-            Platform::X64 => "x86_64",
-        }
+    pub fn arch(&self) -> String {
+        self.target.splitn(2, '-').next().unwrap().to_string()
     }
-}
 
-impl fmt::Display for Platform {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Platform::X86 => write!(f, "x86"),
-            Platform::X64 => write!(f, "x64"),
-        }
-    }
-}
-
-impl Default for Platform {
-    fn default() -> Self {
-        if cfg!(target_arch = "x86_64") {
-            Platform::X64
+    /// Gets the name of the platform as understood by the WiX -arch flag.
+    pub fn wix_arch(&self) -> Result<String> {
+        // Parsing the target name is messy and imprecise. Furthermore, it
+        // doesn't work with custom target specifications. Ideally, we would do
+        // the equivalent of `rustc -Z unstable-options --print target-spec-json
+        // | jq .llvm-target`, but this requires a nightly compiler.
+        let arch = self.target.splitn(2, '-').next().unwrap();
+        if arch == "i586" || arch == "i686" {
+            Ok("x86".to_string())
+        } else if arch == "x86_64" {
+            Ok("x64".to_string())
+        } else if arch.starts_with("arm") {
+            Ok("arm".to_string())
+        } else if arch == "aarch64" {
+            Ok("arm64".to_string())
         } else {
-            Platform::X86
+            Err(Error::Generic(format!(
+                "Unsupported target name {}",
+                self.target
+            )))
         }
     }
 }

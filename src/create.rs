@@ -69,6 +69,7 @@ pub struct Builder<'a> {
     output: Option<&'a str>,
     package: Option<&'a str>,
     version: Option<&'a str>,
+    target: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -90,6 +91,7 @@ impl<'a> Builder<'a> {
             output: None,
             package: None,
             version: None,
+            target: None,
         }
     }
 
@@ -297,6 +299,12 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the target architecture.
+    pub fn target(&mut self, v: Option<&'a str>) -> &mut Self {
+        self.target = v;
+        self
+    }
+
     /// Builds a context for creating, or building, the installer.
     pub fn build(&mut self) -> Execution {
         Execution {
@@ -324,6 +332,7 @@ impl<'a> Builder<'a> {
             output: self.output.map(String::from),
             package: self.package.map(String::from),
             version: self.version.map(String::from),
+            target: self.target.map(String::from),
         }
     }
 }
@@ -352,6 +361,7 @@ pub struct Execution {
     output: Option<String>,
     package: Option<String>,
     version: Option<String>,
+    target: Option<String>,
 }
 
 impl Execution {
@@ -394,10 +404,12 @@ impl Execution {
         debug!("linker_args = {:?}", linker_args);
         let locale = self.locale(&metadata)?;
         debug!("locale = {:?}", locale);
-        let platform = self.platform();
+        let platform = self.platform()?;
         debug!("platform = {:?}", platform);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
+        let profile = if debug_build { "debug" } else { "release" };
+        debug!("profile = {:?}", profile);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
@@ -423,6 +435,9 @@ impl Execution {
             if !debug_build {
                 builder.arg("--release");
             }
+            if let Some(target) = &self.target {
+                builder.arg(format!("--target={}", target));
+            }
             builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
             let status = builder.status()?;
@@ -443,19 +458,27 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        if debug_build {
-            compiler.arg("-dProfile=debug");
-        } else {
-            compiler.arg("-dProfile=release");
-        }
+        compiler.arg(format!("-dProfile={}", profile));
         compiler
             .arg(format!("-dVersion={}", version))
-            .arg(format!("-dPlatform={}", platform))
+            .arg(format!("-dPlatform={}", platform.wix_arch()?))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
                 s
             })
+            .arg({
+                let mut s = OsString::from("-dCargoTargetBinDir=");
+                let mut bin_path = manifest.target_directory.clone();
+                if let Some(target) = &self.target {
+                    bin_path.push(target);
+                }
+                bin_path.push(profile);
+                s.push(&bin_path);
+                s
+            })
+            .arg(format!("-dCargoTarget={}", platform.target()));
+        compiler
             .arg("-ext")
             .arg("WixUtilExtension")
             .arg("-o")
@@ -790,12 +813,8 @@ impl Execution {
         }
     }
 
-    fn platform(&self) -> Platform {
-        if cfg!(target_arch = "x86_64") {
-            Platform::X64
-        } else {
-            Platform::X86
-        }
+    fn platform(&self) -> Result<Platform> {
+        Ok(Platform::new(&self.target()?))
     }
 
     fn name(&self, package: &Package) -> Result<String> {
@@ -899,6 +918,18 @@ impl Execution {
             Err(Error::Generic(String::from("No WiX object files found.")))
         } else {
             Ok(wixobj_sources)
+        }
+    }
+
+    /// Gets the target used to compile the binary. This will either return the
+    /// target passed as an argument, or find it from rustc's HOST triple.
+    // NOTE: This does not support default-target. Ideally we would use cargo
+    // --unit-graph to figure this out without having to second-guess the
+    // compiler. Unfortunately, cargo --unit-graph is unstable.
+    fn target(&self) -> Result<String> {
+        match &self.target {
+            Some(v) => Ok(v.clone()),
+            None => get_host_triple(),
         }
     }
 
@@ -1011,6 +1042,29 @@ impl Execution {
             Ok(package.version.clone())
         }
     }
+}
+
+/// Gets the compiler's host triple, used to know what the default target is.
+fn get_host_triple() -> Result<String> {
+    let output = Command::new("rustc")
+        .args(&["--version", "--verbose"])
+        .output()?;
+    for line in output.stdout.split(|b| *b == b'\n') {
+        let mut line_elt = line.splitn(2, |b| *b == b':');
+        let first = line_elt.next();
+        let second = line_elt.next();
+        if let (Some(b"host"), Some(host_triple)) = (first, second) {
+            let s = String::from_utf8(host_triple.to_vec()).map_err(|_| {
+                Error::Generic(
+                    "Failed to parse output of rustc --verbose --version: invalid UTF8".to_string(),
+                )
+            });
+            return Ok(s?.trim().to_string());
+        }
+    }
+    Err(Error::Generic(
+        "Failed to parse output of rustc --verbose --version".to_string(),
+    ))
 }
 
 impl Default for Execution {
@@ -1591,7 +1645,9 @@ mod tests {
                 .installer_destination(
                     "Different",
                     &"2.1.0".parse::<Version>().unwrap(),
-                    Platform::X64,
+                    Platform {
+                        target: "x86_64-pc-windows-msvc".into(),
+                    },
                     false,
                     &InstallerKind::default(),
                     &serde_json::from_str(PKG_META_WIX).unwrap(),

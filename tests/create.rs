@@ -980,3 +980,22 @@ fn workspace_package_works() {
         .child(expected_msi_file)
         .assert(predicate::path::exists());
 }
+
+#[test]
+fn cross_compilation_works() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package();
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = run(&mut Builder::default().target(Some("x86_64-pc-windows-msvc")));
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
