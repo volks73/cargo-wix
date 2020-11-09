@@ -406,10 +406,10 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let platform = self.platform()?;
         debug!("platform = {:?}", platform);
-        let target_is_explicit = self.target.is_some();
-        debug!("target_is_explicit = {:?}", target_is_explicit);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
+        let profile = if debug_build { "debug" } else { "release" };
+        debug!("profile = {:?}", profile);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
@@ -458,11 +458,7 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        if debug_build {
-            compiler.arg("-dProfile=debug");
-        } else {
-            compiler.arg("-dProfile=release");
-        }
+        compiler.arg(format!("-dProfile={}", profile));
         compiler
             .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", platform.wix_arch()?))
@@ -471,10 +467,17 @@ impl Execution {
                 s.push(&manifest.target_directory);
                 s
             })
+            .arg({
+                let mut s = OsString::from("-dCargoTargetBinDir=");
+                let mut bin_path = manifest.target_directory.clone();
+                if let Some(target) = &self.target {
+                    bin_path.push(target);
+                }
+                bin_path.push(profile);
+                s.push(&bin_path);
+                s
+            })
             .arg(format!("-dCargoTarget={}", platform.target()));
-        if target_is_explicit {
-            compiler.arg("-dCargoTargetExplicit=true");
-        }
         compiler
             .arg("-ext")
             .arg("WixUtilExtension")

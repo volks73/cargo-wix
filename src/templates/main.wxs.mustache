@@ -27,12 +27,6 @@
     <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
 <?endif ?>
 
-<?ifdef CargoTargetExplicit ?>
-    <?define CargoTargetPathName = "$(var.CargoTarget)" ?>
-<?else ?>
-    <?define CargoTargetPathName = "" ?>
-<?endif ?>
-
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
     <Product
