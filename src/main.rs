@@ -29,6 +29,7 @@
 //! - [Features](#features)
 //!   - [Signing](#signing)
 //!   - [Templates](#templates)
+//!   - [Variables](#variables)
 //!   - [Extensions](#extensions)
 //!   - [Multiple WiX Sources](#multiple-wix-sources)
 //!   - [Bundles](#bundles)
@@ -361,6 +362,50 @@
 //! appears during installation. This default behavior can be overridden with
 //! the `-l,--license` and `-e,--eula` options for the `cargo wix init`
 //! subcommand.
+//!
+//! ### Variables
+//!
+//! The cargo-wix subcommand automatically passes some Cargo and build
+//! configuration-related values to the WiX Toolset compiler (candle.exe). These
+//! variables can be used within a WiX Source (WXS) file using the
+//! `$(var.<VARIABLE>)` notation, where `<VARIABLE>` is replaced with the name
+//! of variable passed from the cargo-wix subcommand to the WiX Toolset
+//! compiler using the `-DKEY=VALUE` option. Notable usage of these variables
+//! are in [WiX preprocessor] directives to dynamically change the installer
+//! creation at build time. Below is a current list of variables passed from the
+//! cargo-wix subcommand to a WXS file during installer creation.
+//!
+//! - `CargoTarget` = The rustc target triple as seen with the `rustc --print
+//! target-list` command
+//! - `CargoTargetBinDir` = The complete path to the binary (exe). The default
+//! would be `target\release\<BINARY_NAME>.exe` where `<BINARY_NAME>` is replaced
+//! with the name of each binary target defined in the package's manifest
+//! (Cargo.toml). If a different rustc target triple is used than the host, i.e.
+//! cross-compiling, then the default path would be
+//! `target\<CARGO_TARGET>\<CARGO_PROFILE>\<BINARY_NAME>.exe`, where
+//! `<CARGO_TARGET>` is replaced with the `CargoTarget` variable value and
+//! `<CARGO_PROFILE>` is replaced with the value from the `CargoProfile` variable.
+//! - `CargoTargetDir` = The path to the directory for the build artifacts, i.e.
+//! `target`.
+//! - `CargoProfile` = Either `debug` or `release` depending on the build
+//! profile. The default is `release`.
+//! - `Platform` = (Deprecated) Either `x86`, `x64`, `arm`, or `arm64`. See the
+//! documentation for the WiX Toolset compiler (candle.exe) `-arch` option.
+//! Note, this variable is deprecated and will eventually be removed because it is
+//! ultimately redundant to the `$(sys.BUILDARCH)` variable that is already provided
+//! by the WiX Toolset compiler. Existing projects should replace usage of
+//! `$(var.Platform)` with `$(sys.BUILDARCH)`. No action is needed for new projects.
+//! - `Profile` = (Deprecated) See `CargoProfile`.
+//! - `Version` = The version for the installer. The default is the
+//! `Major.Minor.Fix` semantic versioning number of the Rust package.
+//!
+//! Additional, user-defined variables for custom WXS files can be passed to the
+//! WiX Toolset compiler (candle.exe) using the cargo-wix subcommand
+//! `-C,--compiler-args` option. For example,
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix -C "-DUSER_KEY=USER_VALUE"
+//! ```
 //!
 //! ### Extensions
 //!
@@ -1059,6 +1104,7 @@
 //! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html
 //! [WixUtilExtension]: https://wixtoolset.org/documentation/manual/v3/xsd/util/
 //! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
+//! [WiX preprocessor]: https://wixtoolset.org/documentation/manual/v3/overview/preprocessor.html
 //! [WiX Toolset]: http://wixtoolset.org
 //! [WordPad]: https://en.wikipedia.org/wiki/WordPad
 //! [workspace]: https://doc.rust-lang.org/cargo/reference/workspaces.html
