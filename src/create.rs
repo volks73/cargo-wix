@@ -893,8 +893,6 @@ impl Execution {
         }
     }
 
-    /// Gets the target used to compile the binary. This will either return the
-    /// target passed as an argument, or find it from rustc's HOST triple.
     // NOTE: This does not support default-target. Ideally we would use cargo
     // --unit-graph to figure this out without having to second-guess the
     // compiler. Unfortunately, cargo --unit-graph is unstable.
