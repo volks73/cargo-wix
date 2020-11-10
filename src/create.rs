@@ -68,8 +68,8 @@ pub struct Builder<'a> {
     no_build: bool,
     output: Option<&'a str>,
     package: Option<&'a str>,
-    version: Option<&'a str>,
     target: Option<&'a str>,
+    version: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -90,8 +90,8 @@ impl<'a> Builder<'a> {
             no_build: false,
             output: None,
             package: None,
-            version: None,
             target: None,
+            version: None,
         }
     }
 
@@ -287,6 +287,12 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the target architecture.
+    pub fn target(&mut self, v: Option<&'a str>) -> &mut Self {
+        self.target = v;
+        self
+    }
+
     /// Sets the version.
     ///
     /// This overrides the `version` field of the package's manifest
@@ -296,12 +302,6 @@ impl<'a> Builder<'a> {
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn version(&mut self, v: Option<&'a str>) -> &mut Self {
         self.version = v;
-        self
-    }
-
-    /// Sets the target architecture.
-    pub fn target(&mut self, v: Option<&'a str>) -> &mut Self {
-        self.target = v;
         self
     }
 
