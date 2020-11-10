@@ -893,13 +893,36 @@ impl Execution {
         }
     }
 
-    // NOTE: This does not support default-target. Ideally we would use cargo
+    // TODO: Change to use --unit-graph feature of cargo once stable.
+    //
+    // This does not support default-target. Ideally we would use cargo
     // --unit-graph to figure this out without having to second-guess the
     // compiler. Unfortunately, cargo --unit-graph is unstable.
     fn target(&self) -> Result<String> {
-        match &self.target {
-            Some(v) => Ok(v.clone()),
-            None => get_host_triple(),
+        if let Some(ref t) = self.target {
+            Ok(t.to_owned())
+        } else {
+            let output = Command::new("rustc")
+                .args(&["--version", "--verbose"])
+                .output()?;
+            for line in output.stdout.split(|b| *b == b'\n') {
+                let mut line_elt = line.splitn(2, |b| *b == b':');
+                let first = line_elt.next();
+                let second = line_elt.next();
+                if let (Some(b"host"), Some(host_triple)) = (first, second) {
+                    let s = String::from_utf8(host_triple.to_vec()).map_err(|_| {
+                        Error::Generic(
+                            "Failed to parse output of the 'rustc --verbose \
+                            --version' command: invalid UTF8".to_string(),
+                        )
+                    });
+                    return Ok(s?.trim().to_string());
+                }
+            }
+            Err(Error::Generic(
+                "Failed to parse output of the 'rustc --verbose --version' \
+                command".to_string(),
+            ))
         }
     }
 
@@ -1040,29 +1063,6 @@ impl Execution {
             Ok(package.version.clone())
         }
     }
-}
-
-/// Gets the compiler's host triple, used to know what the default target is.
-fn get_host_triple() -> Result<String> {
-    let output = Command::new("rustc")
-        .args(&["--version", "--verbose"])
-        .output()?;
-    for line in output.stdout.split(|b| *b == b'\n') {
-        let mut line_elt = line.splitn(2, |b| *b == b':');
-        let first = line_elt.next();
-        let second = line_elt.next();
-        if let (Some(b"host"), Some(host_triple)) = (first, second) {
-            let s = String::from_utf8(host_triple.to_vec()).map_err(|_| {
-                Error::Generic(
-                    "Failed to parse output of rustc --verbose --version: invalid UTF8".to_string(),
-                )
-            });
-            return Ok(s?.trim().to_string());
-        }
-    }
-    Err(Error::Generic(
-        "Failed to parse output of rustc --verbose --version".to_string(),
-    ))
 }
 
 impl Default for Execution {
