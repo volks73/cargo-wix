@@ -735,6 +735,65 @@ impl Execution {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn installer_destination(
+        &self,
+        name: &str,
+        version: &Version,
+        platform: Platform,
+        debug_name: bool,
+        installer_kind: &InstallerKind,
+        package: &Package,
+        target_directory: &Path,
+    ) -> Result<PathBuf> {
+        let filename = if debug_name {
+            format!(
+                "{}-{}-{}-debug.{}",
+                name,
+                version,
+                platform.arch(),
+                installer_kind
+            )
+        } else {
+            format!(
+                "{}-{}-{}.{}",
+                name,
+                version,
+                platform.arch(),
+                installer_kind
+            )
+        };
+        if let Some(ref path_str) = self.output {
+            trace!("Using the explicitly specified output path for the MSI destination");
+            let path = Path::new(path_str);
+            if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
+                Ok(path.join(filename))
+            } else {
+                Ok(path.to_owned())
+            }
+        } else if let Some(pkg_meta_wix_output) = package
+            .metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("output"))
+            .and_then(|o| o.as_str())
+        {
+            trace!("Using the output path in the package's metadata for the MSI destination");
+            let path = Path::new(pkg_meta_wix_output);
+            if pkg_meta_wix_output.ends_with('/')
+                || pkg_meta_wix_output.ends_with('\\')
+                || path.is_dir()
+            {
+                Ok(path.join(filename))
+            } else {
+                Ok(path.to_owned())
+            }
+        } else {
+            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
+            Ok(target_directory.join(WIX).join(filename))
+        }
+    }
+
     fn locale(&self, metadata: &Value) -> Result<Option<PathBuf>> {
         if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
             if locale.exists() {
@@ -834,62 +893,15 @@ impl Execution {
         }
     }
 
-    #[allow(clippy::too_many_arguments)]
-    fn installer_destination(
-        &self,
-        name: &str,
-        version: &Version,
-        platform: Platform,
-        debug_name: bool,
-        installer_kind: &InstallerKind,
-        package: &Package,
-        target_directory: &Path,
-    ) -> Result<PathBuf> {
-        let filename = if debug_name {
-            format!(
-                "{}-{}-{}-debug.{}",
-                name,
-                version,
-                platform.arch(),
-                installer_kind
-            )
-        } else {
-            format!(
-                "{}-{}-{}.{}",
-                name,
-                version,
-                platform.arch(),
-                installer_kind
-            )
-        };
-        if let Some(ref path_str) = self.output {
-            trace!("Using the explicitly specified output path for the MSI destination");
-            let path = Path::new(path_str);
-            if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
-                Ok(path.join(filename))
-            } else {
-                Ok(path.to_owned())
-            }
-        } else if let Some(pkg_meta_wix_output) = package
-            .metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("output"))
-            .and_then(|o| o.as_str())
-        {
-            trace!("Using the output path in the package's metadata for the MSI destination");
-            let path = Path::new(pkg_meta_wix_output);
-            if pkg_meta_wix_output.ends_with('/')
-                || pkg_meta_wix_output.ends_with('\\')
-                || path.is_dir()
-            {
-                Ok(path.join(filename))
-            } else {
-                Ok(path.to_owned())
-            }
-        } else {
-            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
-            Ok(target_directory.join(WIX).join(filename))
+    /// Gets the target used to compile the binary. This will either return the
+    /// target passed as an argument, or find it from rustc's HOST triple.
+    // NOTE: This does not support default-target. Ideally we would use cargo
+    // --unit-graph to figure this out without having to second-guess the
+    // compiler. Unfortunately, cargo --unit-graph is unstable.
+    fn target(&self) -> Result<String> {
+        match &self.target {
+            Some(v) => Ok(v.clone()),
+            None => get_host_triple(),
         }
     }
 
@@ -918,18 +930,6 @@ impl Execution {
             Err(Error::Generic(String::from("No WiX object files found.")))
         } else {
             Ok(wixobj_sources)
-        }
-    }
-
-    /// Gets the target used to compile the binary. This will either return the
-    /// target passed as an argument, or find it from rustc's HOST triple.
-    // NOTE: This does not support default-target. Ideally we would use cargo
-    // --unit-graph to figure this out without having to second-guess the
-    // compiler. Unfortunately, cargo --unit-graph is unstable.
-    fn target(&self) -> Result<String> {
-        match &self.target {
-            Some(v) => Ok(v.clone()),
-            None => get_host_triple(),
         }
     }
 
