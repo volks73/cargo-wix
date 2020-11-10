@@ -919,7 +919,8 @@ impl Execution {
                     let s = String::from_utf8(host_triple.to_vec()).map_err(|_| {
                         Error::Generic(
                             "Failed to parse output of the 'rustc --verbose \
-                            --version' command: invalid UTF8".to_string(),
+                            --version' command: invalid UTF8"
+                                .to_string(),
                         )
                     });
                     return Ok(s?.trim().to_string());
@@ -927,7 +928,8 @@ impl Execution {
             }
             Err(Error::Generic(
                 "Failed to parse output of the 'rustc --verbose --version' \
-                command".to_string(),
+                command"
+                    .to_string(),
             ))
         }
     }
