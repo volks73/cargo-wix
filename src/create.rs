@@ -287,7 +287,13 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the target architecture.
+    /// Sets the build target.
+    ///
+    /// The default is to use the default target for the environment. Use this
+    /// method to change the target for the build and installer creation. The
+    /// value should be a string from the `rustc --print target-list` command.
+    /// This enables "cross-compilation" of installers similar to the
+    /// cross-compilation of Rust code, but only for Windows targets.
     pub fn target(&mut self, v: Option<&'a str>) -> &mut Self {
         self.target = v;
         self
