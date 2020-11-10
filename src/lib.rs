@@ -509,7 +509,7 @@ impl Platform {
     ///
     /// This is different from the string used in WiX Source (wxs) files. This is the string
     /// commonly used for the `target_arch` conditional compilation attribute. To get the string
-    /// recognized in wxs files, use `platform.wix_arch()`.
+    /// recognized in WXS files, use `platform.wix_arch()`.
     ///
     /// # Examples
     ///
@@ -523,8 +523,16 @@ impl Platform {
         self.target.splitn(2, '-').next().unwrap().to_string()
     }
 
-    /// Gets the name of the platform as understood by the WiX -arch flag.
+    /// Gets the name of the platform as understood by the WiX Toolset's
+    /// compiler (candle.exe) `-arch` option.
     pub fn wix_arch(&self) -> Result<String> {
+        // TODO: Change to using the `rustc --print target-spec-json` command.
+        // Once the `--print target-spec-json` is stablized, this implementation
+        // should be refactored. See https://github.com/rust-lang/rust/issues/38338
+        // for tracking stablization. Maybe a
+        // [cargo-metadata](https://crates.io/crates/cargo_metadata)-like crate
+        // would eventually be available, too?
+        //
         // Parsing the target name is messy and imprecise. Furthermore, it
         // doesn't work with custom target specifications. Ideally, we would do
         // the equivalent of `rustc -Z unstable-options --print target-spec-json
