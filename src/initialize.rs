@@ -365,8 +365,6 @@ impl<'a> Builder<'a> {
 
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
-        // let mut wxs_printer = print::wxs::Builder::new();
-        // wxs_printer.binaries(self.binaries);
         Execution {
             banner: self.banner.map(PathBuf::from),
             binaries: self
