@@ -360,15 +360,14 @@ pub struct Execution {
     no_build: bool,
     output: Option<String>,
     package: Option<String>,
-    version: Option<String>,
     target: Option<String>,
+    version: Option<String>,
 }
 
 impl Execution {
     /// Creates, or builds, an installer within a built context.
     #[allow(clippy::cognitive_complexity)]
     pub fn run(self) -> Result<()> {
-        debug!("self.package = {:?}", self.package);
         debug!("self.bin_path = {:?}", self.bin_path);
         debug!("self.capture_output = {:?}", self.capture_output);
         debug!("self.compiler_args = {:?}", self.compiler_args);
