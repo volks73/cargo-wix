@@ -645,6 +645,36 @@ impl Execution {
         }
     }
 
+    fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
+        self.compiler_args.to_owned().or_else(|| {
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("compiler-args"))
+                .and_then(|i| i.as_array())
+                .map(|a| {
+                    a.iter()
+                        .map(|s| s.as_str().map(String::from).unwrap())
+                        .collect::<Vec<String>>()
+                })
+        })
+    }
+
+    fn culture(&self, metadata: &Value) -> Result<Cultures> {
+        if let Some(culture) = &self.culture {
+            Cultures::from_str(culture)
+        } else if let Some(pkg_meta_wix_culture) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("culture"))
+            .and_then(|c| c.as_str())
+        {
+            Cultures::from_str(pkg_meta_wix_culture)
+        } else {
+            Ok(Cultures::EnUs)
+        }
+    }
+
     fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
@@ -672,66 +702,6 @@ impl Execution {
             pkg_meta_wix_debug_name
         } else {
             false
-        }
-    }
-
-    fn no_build(&self, metadata: &Value) -> bool {
-        if self.no_build {
-            true
-        } else if let Some(pkg_meta_wix_no_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("no-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_no_build
-        } else {
-            false
-        }
-    }
-
-    fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
-        self.compiler_args.to_owned().or_else(|| {
-            metadata
-                .get("wix")
-                .and_then(|w| w.as_object())
-                .and_then(|t| t.get("compiler-args"))
-                .and_then(|i| i.as_array())
-                .map(|a| {
-                    a.iter()
-                        .map(|s| s.as_str().map(String::from).unwrap())
-                        .collect::<Vec<String>>()
-                })
-        })
-    }
-
-    fn linker_args(&self, metadata: &Value) -> Option<Vec<String>> {
-        self.linker_args.to_owned().or_else(|| {
-            metadata
-                .get("wix")
-                .and_then(|w| w.as_object())
-                .and_then(|t| t.get("linker-args"))
-                .and_then(|i| i.as_array())
-                .map(|a| {
-                    a.iter()
-                        .map(|s| s.as_str().map(String::from).unwrap())
-                        .collect::<Vec<String>>()
-                })
-        })
-    }
-
-    fn culture(&self, metadata: &Value) -> Result<Cultures> {
-        if let Some(culture) = &self.culture {
-            Cultures::from_str(culture)
-        } else if let Some(pkg_meta_wix_culture) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("culture"))
-            .and_then(|c| c.as_str())
-        {
-            Cultures::from_str(pkg_meta_wix_culture)
-        } else {
-            Ok(Cultures::EnUs)
         }
     }
 
@@ -794,30 +764,6 @@ impl Execution {
         }
     }
 
-    fn locale(&self, metadata: &Value) -> Result<Option<PathBuf>> {
-        if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
-            if locale.exists() {
-                Ok(Some(locale))
-            } else {
-                Err(Error::Generic(format!(
-                    "The '{}' WiX localization file could not be found, or it does not exist. \
-                     Please check the path is correct and the file exists.",
-                    locale.display()
-                )))
-            }
-        } else if let Some(pkg_meta_wix_locale) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("locale"))
-            .and_then(|l| l.as_str())
-            .map(PathBuf::from)
-        {
-            Ok(Some(pkg_meta_wix_locale))
-        } else {
-            Ok(None)
-        }
-    }
-
     fn linker(&self) -> Result<Command> {
         if let Some(mut path) = self.bin_path.as_ref().map(|s| {
             let mut p = PathBuf::from(s);
@@ -872,8 +818,43 @@ impl Execution {
         }
     }
 
-    fn platform(&self) -> Result<Platform> {
-        Ok(Platform::new(&self.target()?))
+    fn linker_args(&self, metadata: &Value) -> Option<Vec<String>> {
+        self.linker_args.to_owned().or_else(|| {
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("linker-args"))
+                .and_then(|i| i.as_array())
+                .map(|a| {
+                    a.iter()
+                        .map(|s| s.as_str().map(String::from).unwrap())
+                        .collect::<Vec<String>>()
+                })
+        })
+    }
+
+    fn locale(&self, metadata: &Value) -> Result<Option<PathBuf>> {
+        if let Some(locale) = self.locale.as_ref().map(PathBuf::from) {
+            if locale.exists() {
+                Ok(Some(locale))
+            } else {
+                Err(Error::Generic(format!(
+                    "The '{}' WiX localization file could not be found, or it does not exist. \
+                     Please check the path is correct and the file exists.",
+                    locale.display()
+                )))
+            }
+        } else if let Some(pkg_meta_wix_locale) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("locale"))
+            .and_then(|l| l.as_str())
+            .map(PathBuf::from)
+        {
+            Ok(Some(pkg_meta_wix_locale))
+        } else {
+            Ok(None)
+        }
     }
 
     fn name(&self, package: &Package) -> Result<String> {
@@ -893,7 +874,26 @@ impl Execution {
         }
     }
 
-    // TODO: Change to use --unit-graph feature of cargo once stable.
+    fn no_build(&self, metadata: &Value) -> bool {
+        if self.no_build {
+            true
+        } else if let Some(pkg_meta_wix_no_build) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("no-build"))
+            .and_then(|c| c.as_bool())
+        {
+            pkg_meta_wix_no_build
+        } else {
+            false
+        }
+    }
+
+    fn platform(&self) -> Result<Platform> {
+        Ok(Platform::new(&self.target()?))
+    }
+
+    // TODO: Change to use --unit-graph feature of cargo once stable. See #124.
     //
     // This does not support default-target. Ideally we would use cargo
     // --unit-graph to figure this out without having to second-guess the
