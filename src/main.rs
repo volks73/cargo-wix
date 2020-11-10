@@ -401,7 +401,7 @@
 //!
 //! Additional, user-defined variables for custom WXS files can be passed to the
 //! WiX Toolset compiler (candle.exe) using the cargo-wix subcommand
-//! `-C,--compiler-args` option. For example,
+//! `-C,--compiler-arg` option. For example,
 //!
 //! ```dos
 //! C:\Path\To\Project\>cargo wix -C "-DUSER_KEY=USER_VALUE"
