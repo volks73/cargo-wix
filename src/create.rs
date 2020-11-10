@@ -382,6 +382,7 @@ impl Execution {
         debug!("self.no_build = {:?}", self.no_build);
         debug!("self.output = {:?}", self.output);
         debug!("self.package = {:?}", self.package);
+        debug!("self.target = {:?}", self.target);
         debug!("self.version = {:?}", self.version);
         let manifest_path = super::cargo_toml_file(self.input.as_ref())?;
         debug!("manifest_path = {:?}", manifest_path);
