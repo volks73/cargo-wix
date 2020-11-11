@@ -483,7 +483,7 @@ impl Execution {
                 s.push(&bin_path);
                 s
             })
-            .arg(format!("-dCargoTarget={}", platform.target()));
+            .arg(format!("-dTargetTriple={}", platform.target()));
         compiler
             .arg("-ext")
             .arg("WixUtilExtension")

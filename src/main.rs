@@ -375,8 +375,8 @@
 //! creation at build time. Below is a current list of variables passed from the
 //! cargo-wix subcommand to a WXS file during installer creation.
 //!
-//! - `CargoTarget` = The rustc target triple as seen with the `rustc --print
-//! target-list` command
+//! - `TargetTriple` = The rustc target triple name as seen with the `rustc
+//!   --print target-list` command
 //! - `CargoTargetBinDir` = The complete path to the binary (exe). The default
 //! would be `target\release\<BINARY_NAME>.exe` where `<BINARY_NAME>` is replaced
 //! with the name of each binary target defined in the package's manifest
