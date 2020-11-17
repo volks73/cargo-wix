@@ -84,8 +84,8 @@
 //! installation on a clean Windows installation, i.e. the CRT has not already been
 //! installed. If the Rust compiler is installed and an `-msvc` toolchain is
 //! available, then the Rust binary will execute after installation without an
-//! issue. 
-//! 
+//! issue.
+//!
 //! **Note**, the Rust programming language does _not_ need to be installed
 //! to run an executable built using Cargo and Rust. Only a Microsoft provided CRT
 //! needs to be installed. These are often referred to as "redistributables". Rust
@@ -101,7 +101,7 @@
 //! provide the user with instructions for downloading and installing the CRT
 //! _before_ running the executable. The currently recommended option is to
 //! [statically link the CRT] when building the Rust binary. Rust v1.19 or newer is
-//! required, and the solution ultimately becomes adding the `-C target-feature=+crt-static` 
+//! required, and the solution ultimately becomes adding the `-C target-feature=+crt-static`
 //! option to the invocation of the Rust compiler (rustc). There are a variety
 //! of methods for adding the option to the invocation, including but not
 //! limited to adding a configuration directive to the pacakge's manifest, using the
