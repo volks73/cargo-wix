@@ -412,6 +412,8 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let platform = self.platform()?;
         debug!("platform = {:?}", platform);
+        let wix_arch = platform.wix_arch()?;
+        debug!("wix_arch = {:?}", wix_arch);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
         let profile = if debug_build { "debug" } else { "release" };
@@ -467,7 +469,8 @@ impl Execution {
         compiler.arg(format!("-dProfile={}", profile));
         compiler
             .arg(format!("-dVersion={}", version))
-            .arg(format!("-dPlatform={}", platform.wix_arch()?))
+            .args(&["-arch", &wix_arch])
+            .arg(format!("-dPlatform={}", wix_arch))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
