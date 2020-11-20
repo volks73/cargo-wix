@@ -24,7 +24,6 @@
 
 use crate::Cultures;
 use crate::Error;
-use crate::Platform;
 use crate::Result;
 use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
@@ -36,6 +35,7 @@ use crate::WIX_LINKER;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
 use crate::WIX_SOURCE_FILE_EXTENSION;
+use crate::WixArch;
 
 use semver::Version;
 
@@ -49,6 +49,9 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 use cargo_metadata::Package;
+
+use rustc_cfg::Cfg;
+
 use serde_json::Value;
 
 /// A builder for running the `cargo wix` subcommand.
@@ -400,6 +403,8 @@ impl Execution {
         debug!("metadata = {:?}", metadata);
         let name = self.name(&package)?;
         debug!("name = {:?}", name);
+        let target_triple = self.target()?;
+        debug!("target_triple = {:?}", target_triple);
         let version = self.version(&package)?;
         debug!("version = {:?}", version);
         let compiler_args = self.compiler_args(&metadata);
@@ -410,8 +415,6 @@ impl Execution {
         debug!("linker_args = {:?}", linker_args);
         let locale = self.locale(&metadata)?;
         debug!("locale = {:?}", locale);
-        let platform = self.platform()?;
-        debug!("platform = {:?}", platform);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
         let profile = if debug_build { "debug" } else { "release" };
@@ -424,6 +427,7 @@ impl Execution {
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
+        let cfg = Cfg::of(&target_triple).map_err(|e| Error::Generic(e.to_string()))?;
         if no_build {
             warn!("Skipped building the release binary");
         } else {
@@ -441,9 +445,7 @@ impl Execution {
             if !debug_build {
                 builder.arg("--release");
             }
-            if let Some(target) = &self.target {
-                builder.arg(format!("--target={}", target));
-            }
+            builder.arg(format!("--target={}", target_triple));
             builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
             let status = builder.status()?;
@@ -467,7 +469,7 @@ impl Execution {
         compiler.arg(format!("-dProfile={}", profile));
         compiler
             .arg(format!("-dVersion={}", version))
-            .arg(format!("-dPlatform={}", platform.wix_arch()?))
+            .arg(format!("-dPlatform={}", WixArch::try_from(&cfg)?))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -483,7 +485,7 @@ impl Execution {
                 s.push(&bin_path);
                 s
             })
-            .arg(format!("-dTargetTriple={}", platform.target()));
+            .arg(format!("-dTargetTriple={}", target_triple));
         compiler
             .arg("-ext")
             .arg("WixUtilExtension")
@@ -528,7 +530,7 @@ impl Execution {
         let installer_destination = self.installer_destination(
             &name,
             &version,
-            platform,
+            &cfg,
             debug_name,
             &installer_kind,
             &package,
@@ -716,7 +718,7 @@ impl Execution {
         &self,
         name: &str,
         version: &Version,
-        platform: Platform,
+        cfg: &Cfg,
         debug_name: bool,
         installer_kind: &InstallerKind,
         package: &Package,
@@ -727,7 +729,7 @@ impl Execution {
                 "{}-{}-{}-debug.{}",
                 name,
                 version,
-                platform.arch(),
+                cfg.target_arch,
                 installer_kind
             )
         } else {
@@ -735,7 +737,7 @@ impl Execution {
                 "{}-{}-{}.{}",
                 name,
                 version,
-                platform.arch(),
+                cfg.target_arch,
                 installer_kind
             )
         };
@@ -893,10 +895,6 @@ impl Execution {
         } else {
             false
         }
-    }
-
-    fn platform(&self) -> Result<Platform> {
-        Ok(Platform::new(&self.target()?))
     }
 
     // TODO: Change to use --unit-graph feature of cargo once stable. See #124.
@@ -1651,9 +1649,7 @@ mod tests {
                 .installer_destination(
                     "Different",
                     &"2.1.0".parse::<Version>().unwrap(),
-                    Platform {
-                        target: "x86_64-pc-windows-msvc".into(),
-                    },
+                    &Cfg::of("x86_64-pc-windows-msvc").unwrap(),
                     false,
                     &InstallerKind::default(),
                     &serde_json::from_str(PKG_META_WIX).unwrap(),

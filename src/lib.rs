@@ -69,6 +69,7 @@ extern crate log;
 extern crate maplit;
 extern crate mustache;
 extern crate regex;
+extern crate rustc_cfg;
 extern crate semver;
 extern crate sxd_document;
 extern crate sxd_xpath;
@@ -86,16 +87,20 @@ pub mod purge;
 pub mod sign;
 mod templates;
 
+use std::convert::TryFrom;
 use std::default::Default;
 use std::env;
 use std::error::Error as StdError;
 use std::ffi::OsStr;
 use std::fmt;
+use std::fmt::Display;
 use std::io::{self, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
 use cargo_metadata::{Metadata, MetadataCommand, Package};
+
+use rustc_cfg::Cfg;
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
@@ -486,71 +491,46 @@ impl From<uuid::Error> for Error {
     }
 }
 
-/// The different values for the `Platform` attribute of the `Package` element.
+/// The different architectures supported by the WiX Toolset.
+///
+/// These are also the valid values for the `-arch` option to the WiX compiler
+/// (candle.exe).
 #[derive(Debug, Clone, PartialEq)]
-pub struct Platform {
-    target: String,
+pub enum WixArch {
+    X86,
+    X64,
+    Arm,
+    Arm64
 }
 
-impl Platform {
-    /// Creates a new Platform element from the given target name.
-    pub fn new(target_name: &str) -> Platform {
-        Platform {
-            target: target_name.to_string(),
+impl Display for WixArch {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Self::X86 => write!(f, "x86"),
+            Self::X64 => write!(f, "x64"),
+            Self::Arm => write!(f, "arm"),
+            Self::Arm64 => write!(f, "arm64"),
         }
     }
+}
 
-    /// Gets the full target name as given to cargo.
-    pub fn target(&self) -> String {
-        self.target.clone()
-    }
+impl TryFrom<&Cfg> for WixArch {
+    type Error = crate::Error;
 
-    /// Gets the name of the platform as an architecture string as used in Rust toolchains.
-    ///
-    /// This is different from the string used in WiX Source (wxs) files. This is the string
-    /// commonly used for the `target_arch` conditional compilation attribute. To get the string
-    /// recognized in WXS files, use `platform.wix_arch()`.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use wix::Platform;
-    ///
-    /// assert_eq!(Platform { target: "i686-pc-windows-msvc".into() }.arch(), "i686");
-    /// assert_eq!(Platform { target: "x86_64-pc-windows-msvc".into() }.arch(), "x86_64");
-    /// ```
-    pub fn arch(&self) -> String {
-        self.target.splitn(2, '-').next().unwrap().to_string()
-    }
-
-    /// Gets the name of the platform as understood by the WiX Toolset's
-    /// compiler (candle.exe) `-arch` option.
-    pub fn wix_arch(&self) -> Result<String> {
-        // TODO: Change to using the `rustc --print target-spec-json` command.
-        // Once the `--print target-spec-json` is stablized, this implementation
-        // should be refactored. See https://github.com/rust-lang/rust/issues/38338
-        // for tracking stablization. Maybe a
-        // [cargo-metadata](https://crates.io/crates/cargo_metadata)-like crate
-        // would eventually be available, too?
-        //
-        // Parsing the target name is messy and imprecise. Furthermore, it
-        // doesn't work with custom target specifications. Ideally, we would do
-        // the equivalent of `rustc -Z unstable-options --print target-spec-json
-        // | jq .llvm-target`, but this requires a nightly compiler.
-        let arch = self.target.splitn(2, '-').next().unwrap();
-        if arch == "i586" || arch == "i686" {
-            Ok("x86".to_string())
-        } else if arch == "x86_64" {
-            Ok("x64".to_string())
-        } else if arch.starts_with("arm") {
-            Ok("arm".to_string())
-        } else if arch == "aarch64" {
-            Ok("arm64".to_string())
-        } else {
-            Err(Error::Generic(format!(
-                "Unsupported target name {}",
-                self.target
-            )))
+    fn try_from(c: &Cfg) -> std::result::Result<Self, Self::Error> {
+        match &*c.target_arch {
+            "x86" => Ok(Self::X86),
+            "x86_64" => Ok(Self::X64),
+            "aarch64" => Ok(Self::Arm64),
+            "thumbv7a" => Ok(Self::Arm),
+            a @ _ => {
+                if a.starts_with("arm") {
+                    Ok(Self::Arm)
+                } else {
+                    Err(Error::Generic(format!(
+                    "Unsupported target architecture: {}", a)))
+                }
+            }
         }
     }
 }
@@ -1023,6 +1003,88 @@ mod tests {
         #[test]
         fn display_is_correct_for_russian() {
             assert_eq!(format!("{}", Cultures::RuRu), String::from("ru-RU"));
+        }
+    }
+
+    mod wix_arch {
+        use super::*;
+
+        #[test]
+        fn try_from_x86_64_pc_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("x86_64-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X64);
+        }
+
+        #[test]
+        fn try_from_x86_64_pc_windows_gnu_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("x86_64-pc-windows-gnu").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X64);
+        }
+
+        #[test]
+        fn try_from_x86_64_uwp_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X64);
+        }
+
+        #[test]
+        fn try_from_x86_64_uwp_windows_gnu_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X64);
+        }
+
+        #[test]
+        fn try_from_i686_pc_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("i686-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X86);
+        }
+
+        #[test]
+        fn try_from_i686_pc_windows_gnu_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("i686-pc-windows-gnu").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X86);
+        }
+
+        #[test]
+        fn try_from_i686_uwp_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("i686-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X86);
+        }
+
+        #[test]
+        fn try_from_i686_uwp_windows_gnu_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("i686-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X86);
+        }
+
+        #[test]
+        fn try_from_i586_pc_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("i586-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::X86);
+        }
+
+        #[test]
+        fn try_from_aarch64_pc_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("aarch64-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::Arm64);
+        }
+
+        #[test]
+        fn try_from_aarch64_uwp_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("aarch64-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::Arm64);
+        }
+
+        #[test]
+        fn try_from_thumbv7a_pc_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("thumbv7a-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::Arm);
+        }
+
+        #[test]
+        fn try_from_thumbv7a_uwp_windows_msvc_is_correct() {
+            let arch = WixArch::try_from(&Cfg::of("thumbv7a-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::Arm);
         }
     }
 }
