@@ -445,7 +445,9 @@ impl Execution {
             if !debug_build {
                 builder.arg("--release");
             }
-            builder.arg(format!("--target={}", target_triple));
+            if self.target.is_some() {
+                builder.arg(format!("--target={}", target_triple));
+            }
             builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
             let status = builder.status()?;
