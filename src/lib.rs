@@ -535,6 +535,14 @@ impl TryFrom<&Cfg> for WixArch {
     }
 }
 
+impl FromStr for WixArch {
+    type Err = crate::Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        Self::try_from(&Cfg::of(s).map_err(|e| Error::Generic(e.to_string()))?)
+    }
+}
+
 /// The aliases for the URLs to different Microsoft Authenticode timestamp servers.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TimestampServer {
@@ -1084,6 +1092,12 @@ mod tests {
         #[test]
         fn try_from_thumbv7a_uwp_windows_msvc_is_correct() {
             let arch = WixArch::try_from(&Cfg::of("thumbv7a-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            assert_eq!(arch, WixArch::Arm);
+        }
+
+        #[test]
+        fn from_str_is_correct() {
+            let arch = WixArch::from_str("thumbv7a-uwp-windows-msvc").unwrap();
             assert_eq!(arch, WixArch::Arm);
         }
     }
