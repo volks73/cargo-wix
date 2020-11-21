@@ -470,11 +470,20 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        compiler.args(&["-arch", &wix_arch.to_string()]);
-        compiler.arg(format!("-dProfile={}", profile));
+        compiler
+            .arg("-arch")
+            .arg(&wix_arch.to_string())
+            .arg("-ext")
+            .arg("WixUtilExtension");
+        if let Some(vendor) = &cfg.target_vendor {
+            compiler.arg(format!("-dTargetVendor={}", vendor));
+        }
         compiler
             .arg(format!("-dVersion={}", version))
             .arg(format!("-dPlatform={}", wix_arch))
+            .arg(format!("-dProfile={}", profile))
+            .arg(format!("-dTargetEnv={}", cfg.target_env))
+            .arg(format!("-dTargetTriple={}", target_triple))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -490,10 +499,6 @@ impl Execution {
                 s.push(&bin_path);
                 s
             })
-            .arg(format!("-dTargetTriple={}", target_triple));
-        compiler
-            .arg("-ext")
-            .arg("WixUtilExtension")
             .arg("-o")
             .arg(&wixobj_destination);
         if let Some(args) = &compiler_args {
