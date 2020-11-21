@@ -413,6 +413,12 @@
 //!
 //! - `TargetTriple` = The rustc target triple name as seen with the `rustc
 //!   --print target-list` command
+//! - `TargetEnv` = The rustc target environment, as seen with the output from
+//! the `rustc --print cfg` command as `target_env`. On Windows, this typically
+//! - `TargetVendor` = The rustc target vendor, as seen with the output from the
+//! `rustc --print cfg` command as `target_vendor`. This is typically `pc`, but Rust
+//! does support other vendors, like `uwp`.
+//! either `msvc` or `gnu` depending on the toolchain downloaded and installed.
 //! - `CargoTargetBinDir` = The complete path to the binary (exe). The default
 //! would be `target\release\<BINARY_NAME>.exe` where `<BINARY_NAME>` is replaced
 //! with the name of each binary target defined in the package's manifest
