@@ -484,6 +484,7 @@ impl Execution {
             .arg(format!("-dProfile={}", profile))
             .arg(format!("-dTargetEnv={}", cfg.target_env))
             .arg(format!("-dTargetTriple={}", target_triple))
+            .arg(format!("-dCargoProfile={}", profile))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
