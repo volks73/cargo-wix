@@ -428,6 +428,8 @@ impl Execution {
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
         let cfg = Cfg::of(&target_triple).map_err(|e| Error::Generic(e.to_string()))?;
+        let wix_arch = WixArch::try_from(&cfg)?;
+        debug!("wix_arch = {:?}", wix_arch);
         if no_build {
             warn!("Skipped building the release binary");
         } else {
@@ -468,10 +470,11 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
+        compiler.args(&["-arch", &wix_arch.to_string()]);
         compiler.arg(format!("-dProfile={}", profile));
         compiler
             .arg(format!("-dVersion={}", version))
-            .arg(format!("-dPlatform={}", WixArch::try_from(&cfg)?))
+            .arg(format!("-dPlatform={}", wix_arch))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
