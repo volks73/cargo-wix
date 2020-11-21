@@ -431,11 +431,11 @@ impl Execution {
         let wix_arch = WixArch::try_from(&cfg)?;
         debug!("wix_arch = {:?}", wix_arch);
         if no_build {
-            warn!("Skipped building the release binary");
+            warn!("Skipped building the binary");
         } else {
             // Build the binary with the release profile. If a release binary
             // has already been built, then this will essentially do nothing.
-            info!("Building the release binary");
+            info!("Building the binary");
             let mut builder = Command::new(CARGO);
             debug!("builder = {:?}", builder);
             if self.capture_output {
