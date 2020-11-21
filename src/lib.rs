@@ -500,7 +500,7 @@ pub enum WixArch {
     X86,
     X64,
     Arm,
-    Arm64
+    Arm64,
 }
 
 impl Display for WixArch {
@@ -528,7 +528,9 @@ impl TryFrom<&Cfg> for WixArch {
                     Ok(Self::Arm)
                 } else {
                     Err(Error::Generic(format!(
-                    "Unsupported target architecture: {}", a)))
+                        "Unsupported target architecture: {}",
+                        a
+                    )))
                 }
             }
         }
@@ -1019,79 +1021,95 @@ mod tests {
 
         #[test]
         fn try_from_x86_64_pc_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("x86_64-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch = WixArch::try_from(&Cfg::of("x86_64-pc-windows-msvc").expect("Cfg parsing"))
+                .unwrap();
             assert_eq!(arch, WixArch::X64);
         }
 
         #[test]
         fn try_from_x86_64_pc_windows_gnu_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("x86_64-pc-windows-gnu").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("x86_64-pc-windows-gnu").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X64);
         }
 
         #[test]
         fn try_from_x86_64_uwp_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-msvc").expect("Cfg parsing"))
+                .unwrap();
             assert_eq!(arch, WixArch::X64);
         }
 
         #[test]
         fn try_from_x86_64_uwp_windows_gnu_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
+            let arch = WixArch::try_from(&Cfg::of("x86_64-uwp-windows-gnu").expect("Cfg parsing"))
+                .unwrap();
             assert_eq!(arch, WixArch::X64);
         }
 
         #[test]
         fn try_from_i686_pc_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("i686-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("i686-pc-windows-msvc").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 
         #[test]
         fn try_from_i686_pc_windows_gnu_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("i686-pc-windows-gnu").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("i686-pc-windows-gnu").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 
         #[test]
         fn try_from_i686_uwp_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("i686-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("i686-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 
         #[test]
         fn try_from_i686_uwp_windows_gnu_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("i686-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("i686-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 
         #[test]
         fn try_from_i586_pc_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("i586-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("i586-pc-windows-msvc").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 
         #[test]
         fn try_from_aarch64_pc_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("aarch64-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch = WixArch::try_from(&Cfg::of("aarch64-pc-windows-msvc").expect("Cfg parsing"))
+                .unwrap();
             assert_eq!(arch, WixArch::Arm64);
         }
 
         #[test]
         fn try_from_aarch64_uwp_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("aarch64-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("aarch64-uwp-windows-msvc").expect("Cfg parsing"))
+                    .unwrap();
             assert_eq!(arch, WixArch::Arm64);
         }
 
         #[test]
         fn try_from_thumbv7a_pc_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("thumbv7a-pc-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("thumbv7a-pc-windows-msvc").expect("Cfg parsing"))
+                    .unwrap();
             assert_eq!(arch, WixArch::Arm);
         }
 
         #[test]
         fn try_from_thumbv7a_uwp_windows_msvc_is_correct() {
-            let arch = WixArch::try_from(&Cfg::of("thumbv7a-uwp-windows-msvc").expect("Cfg parsing")).unwrap();
+            let arch =
+                WixArch::try_from(&Cfg::of("thumbv7a-uwp-windows-msvc").expect("Cfg parsing"))
+                    .unwrap();
             assert_eq!(arch, WixArch::Arm);
         }
 

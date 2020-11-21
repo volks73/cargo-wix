@@ -25,6 +25,7 @@
 use crate::Cultures;
 use crate::Error;
 use crate::Result;
+use crate::WixArch;
 use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
 use crate::EXE_FILE_EXTENSION;
@@ -35,7 +36,6 @@ use crate::WIX_LINKER;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
 use crate::WIX_SOURCE_FILE_EXTENSION;
-use crate::WixArch;
 
 use semver::Version;
 
@@ -732,18 +732,12 @@ impl Execution {
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
-                name,
-                version,
-                cfg.target_arch,
-                installer_kind
+                name, version, cfg.target_arch, installer_kind
             )
         } else {
             format!(
                 "{}-{}-{}.{}",
-                name,
-                version,
-                cfg.target_arch,
-                installer_kind
+                name, version, cfg.target_arch, installer_kind
             )
         };
         if let Some(ref path_str) = self.output {
