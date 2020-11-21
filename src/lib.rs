@@ -523,7 +523,7 @@ impl TryFrom<&Cfg> for WixArch {
             "x86_64" => Ok(Self::X64),
             "aarch64" => Ok(Self::Arm64),
             "thumbv7a" => Ok(Self::Arm),
-            a @ _ => {
+            a => {
                 if a.starts_with("arm") {
                     Ok(Self::Arm)
                 } else {
