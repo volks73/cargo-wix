@@ -35,7 +35,8 @@
 //! wix = "0.1"
 //! ```
 //!
-//! Next, add this to the `lib.rs` or `main.rs` file for your project:
+//! Next, if not using Rust 2018 edition, then add this to the `lib.rs` or
+//! `main.rs` file for your project:
 //!
 //! ```ignore
 //! extern crate wix;
