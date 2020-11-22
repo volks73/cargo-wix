@@ -620,6 +620,8 @@ impl Default for Execution {
 mod tests {
     use super::*;
 
+    use maplit::hashmap;
+
     mod builder {
         use super::*;
 
