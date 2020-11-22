@@ -225,6 +225,7 @@ fn output_works() {
 }
 
 #[test]
+#[serial]
 fn input_with_output_works() {
     let package = common::create_test_package();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);

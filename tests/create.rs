@@ -779,6 +779,7 @@ fn input_works_inside_cwd() {
 }
 
 #[test]
+#[serial]
 fn input_works_outside_cwd() {
     init_logging();
     let package = common::create_test_package();
