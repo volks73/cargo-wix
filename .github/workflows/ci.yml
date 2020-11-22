@@ -9,7 +9,7 @@ jobs:
         with:
           toolchain: '1.47.0'
           override: true
-      - run: cargo test --all-targets -- --test-threads=1
+      - run: cargo test --all-targets
   rustfmt:
     runs-on: windows-latest
     steps:
