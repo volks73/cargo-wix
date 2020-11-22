@@ -1155,7 +1155,7 @@
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
-use clap::{crate_description, crate_name, crate_version, App, Arg, SubCommand, value_t};
+use clap::{crate_description, crate_name, crate_version, value_t, App, Arg, SubCommand};
 
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;

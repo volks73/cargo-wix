@@ -61,9 +61,6 @@
 //! [`cargo wix`]: ../cargo_wix/index.html
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 
-#[cfg_attr(test, macro_use)]
-extern crate maplit;
-
 pub use crate::templates::Template;
 
 pub mod clean;
@@ -487,9 +484,13 @@ impl From<uuid::Error> for Error {
 /// (candle.exe).
 #[derive(Debug, Clone, PartialEq)]
 pub enum WixArch {
+    /// The x86 32-bit architecture.
     X86,
+    /// The x86_64 or AMD64 64-bit architecture.
     X64,
+    /// The ARM 32-bit architecture.
     Arm,
+    /// The ARM 64-bit architecture.
     Arm64,
 }
 
