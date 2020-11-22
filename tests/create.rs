@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate assert_fs;
-#[macro_use]
-extern crate lazy_static;
-extern crate predicates;
-extern crate toml;
-extern crate wix;
-
 mod common;
 
 use assert_fs::prelude::*;
@@ -31,6 +24,10 @@ use crate::common::{
 };
 
 use assert_fs::TempDir;
+
+use lazy_static::lazy_static;
+
+use serial_test::serial;
 
 use std::env;
 use std::fs::{self, File};
@@ -73,6 +70,7 @@ fn run_with_package(b: &mut Builder, package_path: &Path) -> Result<()> {
 }
 
 #[test]
+#[serial]
 fn default_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -92,6 +90,7 @@ fn default_works() {
 }
 
 #[test]
+#[serial]
 fn russian_culture_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -111,6 +110,7 @@ fn russian_culture_works() {
 }
 
 #[test]
+#[serial]
 fn debug_build_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -130,6 +130,7 @@ fn debug_build_works() {
 }
 
 #[test]
+#[serial]
 fn debug_name_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -149,6 +150,7 @@ fn debug_name_works() {
 }
 
 #[test]
+#[serial]
 fn metadata_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -168,6 +170,7 @@ fn metadata_works() {
 }
 
 #[test]
+#[serial]
 fn output_trailing_forwardslash_works() {
     init_logging();
     let output_dir = TARGET_NAME.join("output_dir");
@@ -189,6 +192,7 @@ fn output_trailing_forwardslash_works() {
 }
 
 #[test]
+#[serial]
 fn output_trailing_backslash_works() {
     init_logging();
     let output_dir = TARGET_NAME.join("output_dir");
@@ -210,6 +214,7 @@ fn output_trailing_backslash_works() {
 }
 
 #[test]
+#[serial]
 fn output_existing_dir_works() {
     init_logging();
     let output_dir = PathBuf::from("output_dir");
@@ -231,6 +236,7 @@ fn output_existing_dir_works() {
 }
 
 #[test]
+#[serial]
 fn output_file_without_extension_works() {
     init_logging();
     let output_dir = TARGET_NAME.join("output_dir");
@@ -252,6 +258,7 @@ fn output_file_without_extension_works() {
 }
 
 #[test]
+#[serial]
 fn output_file_with_extension_works() {
     init_logging();
     let output_dir = TARGET_NAME.join("output_dir");
@@ -272,6 +279,7 @@ fn output_file_with_extension_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_package_section_fields_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -332,6 +340,7 @@ fn init_with_package_section_fields_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_all_options_works() {
     init_logging();
     const LICENSE_FILE: &str = "License_Example.txt";
@@ -392,6 +401,7 @@ fn init_with_all_options_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_banner_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -420,6 +430,7 @@ fn init_with_banner_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_binaries_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -448,6 +459,7 @@ fn init_with_binaries_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_multiple_binaries_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -467,6 +479,7 @@ fn init_with_multiple_binaries_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_description_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -490,6 +503,7 @@ fn init_with_description_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_dialog_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -518,6 +532,7 @@ fn init_with_dialog_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_eula_in_cwd_works() {
     init_logging();
     const EULA_FILE: &str = "Eula_Example.rtf";
@@ -546,6 +561,7 @@ fn init_with_eula_in_cwd_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_eula_in_docs_works() {
     init_logging();
     const EULA_FILE: &str = "Eula_Example.rtf";
@@ -576,6 +592,7 @@ fn init_with_eula_in_docs_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_help_url_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -599,6 +616,7 @@ fn init_with_help_url_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_license_in_cwd_works() {
     init_logging();
     const LICENSE_FILE: &str = "License_Example.txt";
@@ -627,6 +645,7 @@ fn init_with_license_in_cwd_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_license_in_docs_works() {
     init_logging();
     const EULA_FILE: &str = "License_Example.txt";
@@ -657,6 +676,7 @@ fn init_with_license_in_docs_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_manufacturer_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -680,6 +700,7 @@ fn init_with_manufacturer_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_product_icon_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -708,6 +729,7 @@ fn init_with_product_icon_option_works() {
 }
 
 #[test]
+#[serial]
 fn init_with_product_name_option_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -736,6 +758,7 @@ fn init_with_product_name_option_works() {
 }
 
 #[test]
+#[serial]
 fn input_works_inside_cwd() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -781,6 +804,7 @@ fn input_works_outside_cwd() {
 }
 
 #[test]
+#[serial]
 fn includes_works_with_wix_dir() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -805,6 +829,7 @@ fn includes_works_with_wix_dir() {
 }
 
 #[test]
+#[serial]
 fn includes_works_without_wix_dir() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -828,6 +853,7 @@ fn includes_works_without_wix_dir() {
 }
 
 #[test]
+#[serial]
 fn includes_works_with_input_outside_cwd() {
     init_logging();
     let package = common::create_test_package_multiple_wxs_sources();
@@ -858,6 +884,7 @@ fn includes_works_with_input_outside_cwd() {
 }
 
 #[test]
+#[serial]
 fn compiler_args_flags_only_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -877,6 +904,7 @@ fn compiler_args_flags_only_works() {
 }
 
 #[test]
+#[serial]
 fn compiler_args_options_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -896,6 +924,7 @@ fn compiler_args_options_works() {
 }
 
 #[test]
+#[serial]
 fn linker_args_flags_only_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -915,6 +944,7 @@ fn linker_args_flags_only_works() {
 }
 
 #[test]
+#[serial]
 fn compiler_and_linker_args_works_with_metadata() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -934,6 +964,7 @@ fn compiler_and_linker_args_works_with_metadata() {
 }
 
 #[test]
+#[serial]
 fn custom_target_dir_works() {
     init_logging();
     let target_tmpdir = TempDir::new()
@@ -959,6 +990,7 @@ fn custom_target_dir_works() {
 }
 
 #[test]
+#[serial]
 fn workspace_package_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -982,6 +1014,7 @@ fn workspace_package_works() {
 }
 
 #[test]
+#[serial]
 fn cross_compilation_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();

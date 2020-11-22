@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate assert_fs;
-#[macro_use]
-extern crate lazy_static;
-extern crate predicates;
-extern crate toml;
-extern crate wix;
-
 mod common;
 
 use assert_fs::prelude::*;
 use predicates::prelude::*;
 
 use assert_fs::TempDir;
+
+use lazy_static::lazy_static;
+
+use serial_test::serial;
+
 use std::env;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
+
 use toml::Value;
+
 use wix::initialize::{Builder, Execution};
 use wix::{
     CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
@@ -47,6 +47,7 @@ lazy_static! {
 }
 
 #[test]
+#[serial]
 fn default_works() {
     // Save the current working directory so that we can change back to it at
     // the end of the test. This avoids polluting the `tests` folder for the
@@ -70,6 +71,7 @@ fn default_works() {
 }
 
 #[test]
+#[serial]
 fn description_works() {
     const EXPECTED: &str = "This is a description";
     let original_working_directory = env::current_dir().unwrap();
@@ -86,6 +88,7 @@ fn description_works() {
 }
 
 #[test]
+#[serial]
 fn help_url_works() {
     const EXPECTED: &str = "http://www.example.com";
     let original_working_directory = env::current_dir().unwrap();
@@ -102,6 +105,7 @@ fn help_url_works() {
 }
 
 #[test]
+#[serial]
 fn manufacturer_works() {
     const EXPECTED: &str = "Example Manufacturer";
     let original_working_directory = env::current_dir().unwrap();
@@ -121,6 +125,7 @@ fn manufacturer_works() {
 }
 
 #[test]
+#[serial]
 fn product_name_works() {
     const EXPECTED: &str = "Example Product Name";
     let original_working_directory = env::current_dir().unwrap();
@@ -156,6 +161,7 @@ fn product_name_works() {
 }
 
 #[test]
+#[serial]
 fn binaries_works() {
     const EXPECTED: &str = "bin\\Example.exe";
     let original_working_directory = env::current_dir().unwrap();
@@ -201,6 +207,7 @@ fn input_works() {
 }
 
 #[test]
+#[serial]
 fn output_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -259,6 +266,7 @@ fn input_with_output_works() {
 }
 
 #[test]
+#[serial]
 fn license_with_txt_file_works() {
     const EXPECTED: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
@@ -289,6 +297,7 @@ fn license_with_txt_file_works() {
 }
 
 #[test]
+#[serial]
 fn license_with_rtf_file_works() {
     const EXPECTED: &str = "License_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -326,6 +335,7 @@ fn license_with_rtf_file_works() {
 }
 
 #[test]
+#[serial]
 fn eula_works() {
     const EXPECTED: &str = "EULA_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -349,6 +359,7 @@ fn eula_works() {
 }
 
 #[test]
+#[serial]
 fn mit_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -414,6 +425,7 @@ fn mit_license_id_works() {
 }
 
 #[test]
+#[serial]
 fn apache2_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -479,6 +491,7 @@ fn apache2_license_id_works() {
 }
 
 #[test]
+#[serial]
 fn gpl3_license_id_works() {
     let original_working_directory = env::current_dir().unwrap();
     let package = common::create_test_package();
@@ -544,6 +557,7 @@ fn gpl3_license_id_works() {
 }
 
 #[test]
+#[serial]
 fn license_file_field_with_rtf_file_works() {
     const EXPECTED: &str = "License_Example.rtf";
     let original_working_directory = env::current_dir().unwrap();
@@ -604,6 +618,7 @@ fn license_file_field_with_rtf_file_works() {
 }
 
 #[test]
+#[serial]
 fn license_file_field_with_txt_file_works() {
     const EXPECTED: &str = "License_Example.txt";
     let original_working_directory = env::current_dir().unwrap();
@@ -657,6 +672,7 @@ fn license_file_field_with_txt_file_works() {
 }
 
 #[test]
+#[serial]
 fn banner_works() {
     const EXPECTED: &str = "img\\Banner.bmp";
     let original_working_directory = env::current_dir().unwrap();
@@ -681,6 +697,7 @@ fn banner_works() {
 }
 
 #[test]
+#[serial]
 fn dialog_works() {
     const EXPECTED: &str = "img\\Dialog.bmp";
     let original_working_directory = env::current_dir().unwrap();
@@ -705,6 +722,7 @@ fn dialog_works() {
 }
 
 #[test]
+#[serial]
 fn product_icon_works() {
     const EXPECTED: &str = "img\\Product.ico";
     let original_working_directory = env::current_dir().unwrap();
@@ -729,6 +747,7 @@ fn product_icon_works() {
 }
 
 #[test]
+#[serial]
 fn multiple_binaries_works() {
     const EXPECTED_NAME_1: &str = "main1";
     const EXPECTED_SOURCE_1: &str = "$(var.CargoTargetBinDir)\\main1.exe";
@@ -787,6 +806,7 @@ fn multiple_binaries_works() {
 }
 
 #[test]
+#[serial]
 fn workspace_no_package_fails() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -798,6 +818,7 @@ fn workspace_no_package_fails() {
 }
 
 #[test]
+#[serial]
 fn workspace_package_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
