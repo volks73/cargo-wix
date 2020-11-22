@@ -21,6 +21,8 @@ use crate::Result;
 use crate::CARGO_MANIFEST_FILE;
 use crate::WIX;
 
+use log::{debug, info, trace, warn};
+
 use std::env;
 use std::ffi::OsStr;
 use std::fs;

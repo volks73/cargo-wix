@@ -22,6 +22,8 @@ pub mod wxs;
 use crate::Error;
 use crate::Result;
 
+use log::trace;
+
 use regex::Regex;
 
 use std::fs::File;

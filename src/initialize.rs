@@ -34,6 +34,8 @@ use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
 
+use log::{debug, info, trace};
+
 use std::fs;
 use std::path::{Path, PathBuf};
 

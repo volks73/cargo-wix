@@ -22,6 +22,8 @@ use crate::Error;
 use crate::Result;
 use crate::Template;
 
+use log::debug;
+
 use mustache::{self, MapBuilder};
 
 use std::path::PathBuf;

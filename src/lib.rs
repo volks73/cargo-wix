@@ -61,20 +61,8 @@
 //! [`cargo wix`]: ../cargo_wix/index.html
 //! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html
 
-extern crate chrono;
-extern crate encoding_rs_io;
-#[macro_use]
-extern crate log;
 #[cfg_attr(test, macro_use)]
 extern crate maplit;
-extern crate mustache;
-extern crate regex;
-extern crate rustc_cfg;
-extern crate semver;
-extern crate sxd_document;
-extern crate sxd_xpath;
-extern crate toml;
-extern crate uuid;
 
 pub use crate::templates::Template;
 
@@ -86,6 +74,8 @@ pub mod print;
 pub mod purge;
 pub mod sign;
 mod templates;
+
+use log::debug;
 
 use std::convert::TryFrom;
 use std::default::Default;

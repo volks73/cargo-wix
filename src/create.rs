@@ -37,6 +37,8 @@ use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 
+use log::{debug, info, trace, warn};
+
 use semver::Version;
 
 use std::convert::TryFrom;

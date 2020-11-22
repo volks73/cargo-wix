@@ -1155,14 +1155,7 @@
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
-#[macro_use]
-extern crate clap;
-extern crate env_logger;
-extern crate log;
-extern crate termcolor;
-extern crate wix;
-
-use clap::{App, Arg, SubCommand};
+use clap::{crate_description, crate_name, crate_version, App, Arg, SubCommand, value_t};
 
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;

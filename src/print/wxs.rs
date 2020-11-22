@@ -26,6 +26,8 @@ use crate::EXE_FILE_EXTENSION;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
 
+use log::{debug, trace, warn};
+
 use mustache::{self, MapBuilder};
 
 use std::path::{Path, PathBuf};

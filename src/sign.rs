@@ -25,6 +25,8 @@ use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
 use crate::WIX;
 
+use log::{debug, info, trace};
+
 use std::env;
 use std::ffi::OsStr;
 use std::fs;

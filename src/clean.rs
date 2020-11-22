@@ -18,6 +18,8 @@
 use crate::Result;
 use crate::WIX;
 
+use log::{debug, info, trace, warn};
+
 use std::fs;
 use std::path::{Path, PathBuf};
 

@@ -18,6 +18,8 @@ use crate::Template;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
 
+use log::{debug, trace};
+
 use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
