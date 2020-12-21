@@ -438,7 +438,12 @@ impl Execution {
             // Build the binary with the release profile. If a release binary
             // has already been built, then this will essentially do nothing.
             info!("Building the binary");
-            let mut builder = Command::new(CARGO);
+            let mut builder = Command::new(
+                env::var("CARGO")
+                    .map(PathBuf::from)
+                    .ok()
+                    .unwrap_or_else(|| PathBuf::from(CARGO)),
+            );
             debug!("builder = {:?}", builder);
             if self.capture_output {
                 trace!("Capturing the '{}' output", CARGO);
