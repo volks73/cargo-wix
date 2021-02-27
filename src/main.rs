@@ -79,35 +79,48 @@
 //! If using the `x86_64-pc-windows-msvc` or the `i686-pc-windows-msvc`
 //! toolchain, then an appropriate C RunTime (CRT) must be available on the host
 //! system _or_ the CRT must be statically compiled with the Rust binary
-//! (executable). By default, the CRT is dynamically linked to a Rust binary. This
-//! may cause issues and errors when running the Rust binary immediately after
-//! installation on a clean Windows installation, i.e. the CRT has not already been
-//! installed. If the Rust compiler is installed and an `-msvc` toolchain is
-//! available, then the Rust binary will execute after installation without an
-//! issue.
+//! (executable). By default, the CRT is dynamically linked to a Rust binary if
+//! using Microsoft Visual C compiler (MSVC). This may cause issues and errors
+//! when running the Rust binary immediately after installation on a clean
+//! Windows installation, i.e. the CRT has not already been installed. If the
+//! Rust compiler is installed and an `-msvc` toolchain is available, then the
+//! Rust binary will execute after installation without an issue.
 //!
 //! **Note**, the Rust programming language does _not_ need to be installed
-//! to run an executable built using Cargo and Rust. Only a Microsoft provided CRT
+//! to run an executable built using Cargo and Rust. Only a Microsoft-provided CRT
 //! needs to be installed. These are often referred to as "redistributables". Rust
-//! with either of the `-msvc` toolchains currently dynamically links against the
+//! with either of the `-msvc` toolchains will dynamically link against the
 //! `vcruntime140.dll`, which is part of the Visual C++ 2015 redistributable and
 //! freely provided by Microsoft.
 //!
-//! For developers using the `cargo-wix` subcommand to create an installer, this
-//! dependency on the present of an appropriate C runtime can lead to a sub-optimal
+//! For developers using the `cargo wix` subcommand to create an installer, this
+//! dependency on the presence of an appropriate C runtime can lead to a sub-optimal
 //! user experience. There are three options: (i) statically link the C runtime
 //! within the Rust binary (recommended), (ii) add the Visual C++ redistributable to
 //! the installer via the [Merge module] method for the WiX Toolset, or (iii)
 //! provide the user with instructions for downloading and installing the CRT
-//! _before_ running the executable. The currently recommended option is to
-//! [statically link the CRT] when building the Rust binary. Rust v1.19 or newer is
-//! required, and the solution ultimately becomes adding the `-C target-feature=+crt-static`
-//! option to the invocation of the Rust compiler (rustc). There are a variety
-//! of methods for adding the option to the invocation, including but not
-//! limited to adding a configuration directive to the pacakge's manifest, using the
-//! `RUSTFLAGS` environment variable, or adding to the user's Cargo
-//! configuration. Please see the Rust compiler documentation on static linking
-//! for more information and details.
+//! _before_ running the executable.
+//!
+//! The current recommended option is to [statically link the CRT] when building
+//! the Rust binary. Rust v1.19 or newer is required, and the solution
+//! ultimately becomes adding the `-C target-feature=+crt-static` option to the
+//! invocation of the Rust compiler (rustc). There are a variety of methods for
+//! adding the option to the invocation, including but not limited to: (i)
+//! creating a Cargo configuration file for the user or project, i.e.
+//! `.cargo/config.toml`, and adding the following:
+//!
+//! ```
+//! [target.x86_64-pc-windows-msvc]
+//! rustflags = ["-C", "target-feature=+crt-static"]
+//!
+//! [target.i686-pc-windows-msvc]
+//! rustflags = ["-C", "target-feature=+crt-static"]
+//! ```
+//!
+//! to the `config.toml` file or (ii) creating the `RUSTFLAGS` environment
+//! variable and setting its value to `"-C target-feature=+crt-static"`. Please
+//! see the Rust compiler documentation on static linking for more information
+//! and details.
 //!
 //! ## Examples
 //!
