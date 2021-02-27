@@ -36,7 +36,9 @@ fn main() -> Result<()> {
                     .collect::<Vec<PathBuf>>(),
                 &env::current_dir()?,
                 &CopyOptions {
+                    overwrite: true,
                     skip_exist: true,
+                    copy_inside: true,
                     ..CopyOptions::new()
                 }
             )?;
