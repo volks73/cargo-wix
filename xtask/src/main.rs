@@ -26,6 +26,16 @@ fn main() -> Result<()> {
             if !status.success() {
                 bail!("The 'git checkout gh-pages' command failed");
             }
+            let mut target_doc_dir = PathBuf::from("target");
+            target_doc_dir.push("doc");
+            fs_extra::copy_items(
+                &target_doc_dir
+                    .read_dir()?
+                    .map(|entry| entry.unwrap().path())
+                    .collect::<Vec<PathBuf>>(),
+                &env::current_dir()?,
+                &fs_extra::dir::CopyOptions::new()
+            )?;
             let status = Command::new("git").arg("checkout").arg("main").status()?;
             if !status.success() {
                 bail!("The 'git checkout main' command failed");
