@@ -27,7 +27,6 @@ fn main() -> Result<()> {
             if !status.success() {
                 bail!("The 'git checkout gh-pages' command failed");
             }
-            let mut last_progress = 0;
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
             fs_extra::copy_items_with_progress(
@@ -43,14 +42,7 @@ fn main() -> Result<()> {
                     ..CopyOptions::new()
                 },
                 |info| {
-                    if info.copied_bytes >> 20 > last_progress {
-                        last_progress = info.copied_bytes >> 20;
-                        eprintln!(
-                            "~ {}/{} MiB",
-                            info.copied_bytes >> 20,
-                            info.total_bytes >> 20
-                        );
-                    }
+                    println!("{} in {}: {}", info.file_name, info.dir_name, info.total_bytes);
                     fs_extra::dir::TransitProcessResult::ContinueOrAbort
                 }
             )?;
