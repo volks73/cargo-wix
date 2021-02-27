@@ -184,7 +184,7 @@ impl Execution {
         let manifest = super::manifest(self.input.as_ref())?;
         debug!("target_directory = {:?}", manifest.target_directory);
         let package = super::package(&manifest, self.package.as_deref())?;
-        let product_name = super::product_name(self.product_name.as_ref(), &package)?;
+        let product_name = super::product_name(self.product_name.as_ref(), &package);
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
             format!("{} - {}", product_name, d)

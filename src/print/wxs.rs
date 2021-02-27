@@ -373,7 +373,7 @@ impl Execution {
             })
             .insert_str(
                 "product-name",
-                product_name(self.product_name.as_ref(), &package)?,
+                product_name(self.product_name.as_ref(), &package),
             )
             .insert_str("manufacturer", self.manufacturer(&package)?)
             .insert_str("upgrade-code-guid", self.upgrade_guid(&package)?)
@@ -419,7 +419,7 @@ impl Execution {
         if let Some(name) = self.license_name(&package) {
             map = map.insert_str("license-name", name);
         }
-        if let Some(source) = self.license_source(&package)? {
+        if let Some(source) = self.license_source(&package) {
             map = map.insert_str("license-source", source);
         } else {
             warn!(
@@ -521,11 +521,11 @@ impl Execution {
         }
     }
 
-    fn license_source(&self, manifest: &Package) -> Result<Option<String>> {
+    fn license_source(&self, manifest: &Package) -> Option<String> {
         if let Some(ref path) = self.license.clone().map(PathBuf::from) {
-            Ok(path.to_str().map(String::from))
+            path.to_str().map(String::from)
         } else {
-            Ok(manifest
+            manifest
                 .license
                 .as_ref()
                 .filter(|l| Template::license_ids().contains(&l))
@@ -543,7 +543,7 @@ impl Execution {
                             None
                         }
                     })
-                }))
+                })
         }
     }
 
@@ -903,9 +903,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
-                .license_source(&package)
-                .expect("License source");
+            let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
                 Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
@@ -918,9 +916,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
-                .license_source(&package)
-                .expect("License source");
+            let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
                 Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
@@ -933,9 +929,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
-                .license_source(&package)
-                .expect("License source");
+            let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
                 Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
@@ -948,7 +942,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_source(&package).unwrap();
+            let actual = Execution::default().license_source(&package);
             assert!(actual.is_none());
         }
 

@@ -209,11 +209,11 @@ fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
     })
 }
 
-fn product_name(product_name: Option<&String>, manifest: &Package) -> Result<String> {
+fn product_name(product_name: Option<&String>, manifest: &Package) -> String {
     if let Some(p) = product_name {
-        Ok(p.to_owned())
+        p.to_owned()
     } else {
-        Ok(manifest.name.clone())
+        manifest.name.clone()
     }
 }
 

@@ -403,7 +403,7 @@ impl Execution {
         debug!("package = {:?}", package);
         let metadata = package.metadata.clone();
         debug!("metadata = {:?}", metadata);
-        let name = self.name(&package)?;
+        let name = self.name(&package);
         debug!("name = {:?}", name);
         let target_triple = self.target()?;
         debug!("target_triple = {:?}", target_triple);
@@ -425,7 +425,7 @@ impl Execution {
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
         debug!("wxs_sources = {:?}", wxs_sources);
-        let wixobj_destination = self.wixobj_destination(&manifest.target_directory)?;
+        let wixobj_destination = self.wixobj_destination(&manifest.target_directory);
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
@@ -553,7 +553,7 @@ impl Execution {
             &installer_kind,
             &package,
             &manifest.target_directory,
-        )?;
+        );
         debug!("installer_destination = {:?}", installer_destination);
         // Link the installer
         info!("Linking the installer");
@@ -741,7 +741,7 @@ impl Execution {
         installer_kind: &InstallerKind,
         package: &Package,
         target_directory: &Path,
-    ) -> Result<PathBuf> {
+    ) -> PathBuf {
         let filename = if debug_name {
             format!(
                 "{}-{}-{}-debug.{}",
@@ -757,9 +757,9 @@ impl Execution {
             trace!("Using the explicitly specified output path for the MSI destination");
             let path = Path::new(path_str);
             if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
-                Ok(path.join(filename))
+                path.join(filename)
             } else {
-                Ok(path.to_owned())
+                path.to_owned()
             }
         } else if let Some(pkg_meta_wix_output) = package
             .metadata
@@ -774,13 +774,13 @@ impl Execution {
                 || pkg_meta_wix_output.ends_with('\\')
                 || path.is_dir()
             {
-                Ok(path.join(filename))
+                path.join(filename)
             } else {
-                Ok(path.to_owned())
+                path.to_owned()
             }
         } else {
             trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
-            Ok(target_directory.join(WIX).join(filename))
+            target_directory.join(WIX).join(filename)
         }
     }
 
@@ -877,9 +877,9 @@ impl Execution {
         }
     }
 
-    fn name(&self, package: &Package) -> Result<String> {
+    fn name(&self, package: &Package) -> String {
         if let Some(ref p) = self.name {
-            Ok(p.to_owned())
+            p.to_owned()
         } else if let Some(pkg_meta_wix_name) = package
             .metadata
             .get("wix")
@@ -888,9 +888,9 @@ impl Execution {
             .and_then(|n| n.as_str())
             .map(String::from)
         {
-            Ok(pkg_meta_wix_name)
+            pkg_meta_wix_name
         } else {
-            Ok(package.name.clone())
+            package.name.clone()
         }
     }
 
@@ -944,7 +944,7 @@ impl Execution {
         }
     }
 
-    fn wixobj_destination(&self, target_directory: &Path) -> Result<PathBuf> {
+    fn wixobj_destination(&self, target_directory: &Path) -> PathBuf {
         // A trailing slash is needed; otherwise, candle tries to dump the
         // object files to a `target\wix` file instead of dumping the object
         // files in the `target\wix\` folder for the `-out` option. The trailing
@@ -955,8 +955,7 @@ impl Execution {
         // for PathBuf, but it was unexpected and kind of annoying because I am
         // not sure how to add a trailing slash in a cross-platform way with
         // PathBuf, not that cargo-wix needs to be cross-platform.
-        let dst = target_directory.join(WIX).join("");
-        Ok(dst)
+        target_directory.join(WIX).join("")
     }
 
     fn wixobj_sources(&self, wixobj_dst: &Path) -> Result<Vec<PathBuf>> {
@@ -1591,9 +1590,7 @@ mod tests {
                 "manifest_path": ""
             }"#;
             let execution = Execution::default();
-            let name = execution
-                .name(&serde_json::from_str(PKG_META_WIX).unwrap())
-                .unwrap();
+            let name = execution.name(&serde_json::from_str(PKG_META_WIX).unwrap());
             assert_eq!(name, "Metadata".to_owned());
         }
 
@@ -1657,17 +1654,15 @@ mod tests {
                 }
             }"#;
             let execution = Execution::default();
-            let output = execution
-                .installer_destination(
-                    "Different",
-                    &"2.1.0".parse::<Version>().unwrap(),
-                    &Cfg::of("x86_64-pc-windows-msvc").unwrap(),
-                    false,
-                    &InstallerKind::default(),
-                    &serde_json::from_str(PKG_META_WIX).unwrap(),
-                    Path::new("target/"),
-                )
-                .unwrap();
+            let output = execution.installer_destination(
+                "Different",
+                &"2.1.0".parse::<Version>().unwrap(),
+                &Cfg::of("x86_64-pc-windows-msvc").unwrap(),
+                false,
+                &InstallerKind::default(),
+                &serde_json::from_str(PKG_META_WIX).unwrap(),
+                Path::new("target/"),
+            );
             assert_eq!(output, PathBuf::from("target/wix/test.msi"));
         }
 
@@ -1804,7 +1799,7 @@ mod tests {
         fn wixobj_destination_works() {
             let execution = Execution::default();
             assert_eq!(
-                execution.wixobj_destination(Path::new("target")).unwrap(),
+                execution.wixobj_destination(Path::new("target")),
                 PathBuf::from("target").join("wix")
             )
         }

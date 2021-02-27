@@ -74,7 +74,7 @@ impl Execution {
         debug!("input = {:?}", self.input);
         let manifest = super::manifest(self.input.as_ref())?;
         debug!("target_directory = {:?}", manifest.target_directory);
-        let target_wix = self.target_wix(&manifest.target_directory)?;
+        let target_wix = self.target_wix(&manifest.target_directory);
         debug!("target_wix = {:?}", target_wix);
         if target_wix.exists() {
             trace!("The 'target\\wix' folder exists");
@@ -87,8 +87,8 @@ impl Execution {
         Ok(())
     }
 
-    fn target_wix(&self, target_directory: &Path) -> Result<PathBuf> {
-        Ok(target_directory.join(WIX))
+    fn target_wix(&self, target_directory: &Path) -> PathBuf {
+        target_directory.join(WIX)
     }
 }
 
@@ -124,24 +124,10 @@ mod tests {
         #[test]
         fn target_wix_works() {
             let mut cwd = env::current_dir().expect("Current Working Directory");
-            let actual = Execution::default()
-                .target_wix(&cwd.join("target"))
-                .unwrap();
+            let actual = Execution::default().target_wix(&cwd.join("target"));
             cwd.push("target");
             cwd.push(WIX);
             assert_eq!(actual, cwd);
-        }
-
-        // This will blow up in run(), when trying to acquire the manifest.
-        // Target_wix can't fail anymore.
-        #[test]
-        #[ignore]
-        fn target_wix_with_nonexistent_manifest_fails() {
-            let result = Builder::new()
-                .input(Some("C:\\Cargo.toml"))
-                .build()
-                .target_wix(Path::new("C:\\target"));
-            assert!(result.is_err());
         }
 
         #[test]
@@ -154,8 +140,7 @@ mod tests {
             let actual = Builder::new()
                 .input(cargo_toml_path.to_str())
                 .build()
-                .target_wix(&target)
-                .unwrap();
+                .target_wix(&target);
             assert_eq!(actual, expected);
         }
     }

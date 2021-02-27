@@ -446,7 +446,7 @@ impl Execution {
         debug!("upgrade_guid = {:?}", self.upgrade_guid);
         let manifest = super::manifest(self.input.as_ref())?;
         let package = super::package(&manifest, self.package.as_deref())?;
-        let mut destination = self.destination(&package)?;
+        let mut destination = self.destination(&package);
         debug!("destination = {:?}", destination);
         if !destination.exists() {
             info!("Creating the '{}' directory", destination.display());
@@ -513,13 +513,13 @@ impl Execution {
         Ok(())
     }
 
-    fn destination(&self, package: &Package) -> Result<PathBuf> {
+    fn destination(&self, package: &Package) -> PathBuf {
         if let Some(ref output) = self.output {
             trace!("An output path has been explicitly specified");
-            Ok(output.to_owned())
+            output.to_owned()
         } else {
             trace!("An output path has NOT been explicitly specified. Implicitly determine output from manifest location.");
-            Ok(package
+            package
                 .manifest_path
                 .parent()
                 .map(|p| p.to_path_buf())
@@ -527,7 +527,7 @@ impl Execution {
                     p.push(WIX);
                     p
                 })
-                .unwrap())
+                .unwrap()
         }
     }
 }
@@ -815,7 +815,7 @@ mod tests {
 
             let result = crate::manifest(None)
                 .and_then(|manifest| crate::package(&manifest, None))
-                .and_then(|package| e.destination(&package));
+                .map(|package| e.destination(&package));
 
             env::set_current_dir(original).unwrap();
             let actual = result.unwrap();
@@ -833,7 +833,7 @@ mod tests {
 
             let actual = crate::manifest(Some(&temp_dir.path().join("Cargo.toml")))
                 .and_then(|manifest| crate::package(&manifest, None))
-                .and_then(|package| e.destination(&package))
+                .and_then(|package| Ok(e.destination(&package)))
                 .unwrap();
 
             assert_eq!(actual, expected);
