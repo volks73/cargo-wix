@@ -41,6 +41,7 @@ lazy_static = "1"
 maplit = "1"
 predicates = "1.0"
 serial_test = "0.5"
+toml = "0.5"
 
 [dependencies.clap]
 version = "2"
