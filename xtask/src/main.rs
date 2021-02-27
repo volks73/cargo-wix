@@ -37,7 +37,7 @@ fn main() -> Result<()> {
                 &env::current_dir()?,
                 &CopyOptions {
                     overwrite: true,
-                    skip_exist: true,
+                    skip_exist: false,
                     copy_inside: true,
                     ..CopyOptions::new()
                 }
