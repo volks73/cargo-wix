@@ -43,7 +43,7 @@ fn main() -> Result<()> {
                 //     ..CopyOptions::new()
                 // },
                 |info| {
-                    println!("{} in {}: {}", info.file_name, info.dir, info.total_bytes);
+                    println!("{} in {}: {}", info.file_name, info.dir_name, info.total_bytes);
                     fs_extra::dir::TransitProcessResult::ContinueOrAbort
                 }
             )?;
