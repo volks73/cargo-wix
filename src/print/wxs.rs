@@ -481,7 +481,8 @@ impl Execution {
     }
 
     fn help_url(&self, manifest: &Package) -> Option<String> {
-        self.help_url.as_ref()
+        self.help_url
+            .as_ref()
             .map(String::from)
             .or_else(|| manifest.documentation.clone())
             .or_else(|| manifest.homepage.clone())

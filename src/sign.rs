@@ -238,19 +238,11 @@ impl Execution {
         Ok(())
     }
 
-    fn homepage(&self, package: &Package) -> Option<String> {
-        self.homepage.clone().or_else(|| {
-            let manifest = fs::read_to_string(&package.manifest_path)
-                .ok()
-                .and_then(|v| toml::Value::from_str(&v).ok());
-            manifest
-                .as_ref()
-                .and_then(|v| v.get("package"))
-                .and_then(|p| p.as_table())
-                .and_then(|t| t.get("homepage"))
-                .and_then(|d| d.as_str())
-                .map(String::from)
-        })
+    fn homepage(&self, manifest: &Package) -> Option<String> {
+        self.homepage
+            .as_ref()
+            .map(String::from)
+            .or_else(|| manifest.homepage.clone())
     }
 
     fn msi(&self, target_directory: &Path) -> Result<PathBuf> {
