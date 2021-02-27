@@ -35,14 +35,15 @@ fn main() -> Result<()> {
                     .map(|entry| entry.unwrap().path())
                     .collect::<Vec<PathBuf>>(),
                 &env::current_dir()?,
-                &CopyOptions {
-                    overwrite: true,
-                    skip_exist: false,
-                    copy_inside: true,
-                    ..CopyOptions::new()
-                },
+                &CopyOptions::new(),
+                // &CopyOptions {
+                //     overwrite: true,
+                //     skip_exist: false,
+                //     copy_inside: true,
+                //     ..CopyOptions::new()
+                // },
                 |info| {
-                    println!("{} in {}: {}", info.file_name, info.dir_name, info.total_bytes);
+                    println!("{} in {}: {}", info.file_name, info.dir, info.total_bytes);
                     fs_extra::dir::TransitProcessResult::ContinueOrAbort
                 }
             )?;
