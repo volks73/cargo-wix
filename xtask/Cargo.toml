@@ -7,5 +7,4 @@ publish = false
 
 [dependencies]
 anyhow = "1"
-fs_extra = "1"
 structopt = "0.3"
