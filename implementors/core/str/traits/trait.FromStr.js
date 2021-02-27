@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["wix"] = [{"text":"impl FromStr for WixObjKind","synthetic":false,"types":[]},{"text":"impl FromStr for InstallerKind","synthetic":false,"types":[]},{"text":"impl FromStr for Template","synthetic":false,"types":[]},{"text":"impl FromStr for WixArch","synthetic":false,"types":[]},{"text":"impl FromStr for TimestampServer","synthetic":false,"types":[]},{"text":"impl FromStr for Cultures","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

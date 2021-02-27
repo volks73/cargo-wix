@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\create.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\create.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1922,6 +1925,100 @@
 <span id="1922">1922</span>
 <span id="1923">1923</span>
 <span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+<span id="1950">1950</span>
+<span id="1951">1951</span>
+<span id="1952">1952</span>
+<span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
+<span id="1956">1956</span>
+<span id="1957">1957</span>
+<span id="1958">1958</span>
+<span id="1959">1959</span>
+<span id="1960">1960</span>
+<span id="1961">1961</span>
+<span id="1962">1962</span>
+<span id="1963">1963</span>
+<span id="1964">1964</span>
+<span id="1965">1965</span>
+<span id="1966">1966</span>
+<span id="1967">1967</span>
+<span id="1968">1968</span>
+<span id="1969">1969</span>
+<span id="1970">1970</span>
+<span id="1971">1971</span>
+<span id="1972">1972</span>
+<span id="1973">1973</span>
+<span id="1974">1974</span>
+<span id="1975">1975</span>
+<span id="1976">1976</span>
+<span id="1977">1977</span>
+<span id="1978">1978</span>
+<span id="1979">1979</span>
+<span id="1980">1980</span>
+<span id="1981">1981</span>
+<span id="1982">1982</span>
+<span id="1983">1983</span>
+<span id="1984">1984</span>
+<span id="1985">1985</span>
+<span id="1986">1986</span>
+<span id="1987">1987</span>
+<span id="1988">1988</span>
+<span id="1989">1989</span>
+<span id="1990">1990</span>
+<span id="1991">1991</span>
+<span id="1992">1992</span>
+<span id="1993">1993</span>
+<span id="1994">1994</span>
+<span id="1995">1995</span>
+<span id="1996">1996</span>
+<span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -1949,13 +2046,12 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Cultures</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Platform</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="prelude-ty">Result</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WixArch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">BINARY_FOLDER_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CARGO</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">EXE_FILE_EXTENSION</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">MSI_FILE_EXTENSION</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">TARGET_FOLDER_NAME</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX_COMPILER</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX_LINKER</span>;
@@ -1963,17 +2059,24 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX_PATH_KEY</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WIX_SOURCE_FILE_EXTENSION</span>;
 
+<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
+
 <span class="kw">use</span> <span class="ident">semver</span>::<span class="ident">Version</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsString</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">ErrorKind</span>, <span class="ident">Read</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::{<span class="ident">Command</span>, <span class="ident">Stdio</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 
-<span class="kw">use</span> <span class="ident">toml</span>::<span class="ident">Value</span>;
+<span class="kw">use</span> <span class="ident">cargo_metadata</span>::<span class="ident">Package</span>;
+
+<span class="kw">use</span> <span class="ident">rustc_cfg</span>::<span class="ident">Cfg</span>;
+
+<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
 
 <span class="doccomment">/// A builder for running the `cargo wix` subcommand.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -1991,6 +2094,8 @@
     <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">no_build</span>: <span class="ident">bool</span>,
     <span class="ident">output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">package</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
 }
 
@@ -2011,6 +2116,8 @@
             <span class="ident">name</span>: <span class="prelude-val">None</span>,
             <span class="ident">no_build</span>: <span class="bool-val">false</span>,
             <span class="ident">output</span>: <span class="prelude-val">None</span>,
+            <span class="ident">package</span>: <span class="prelude-val">None</span>,
+            <span class="ident">target</span>: <span class="prelude-val">None</span>,
             <span class="ident">version</span>: <span class="prelude-val">None</span>,
         }
     }
@@ -2197,6 +2304,28 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Sets the package.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the project is organized using a workspace, this selects the package</span>
+    <span class="doccomment">/// by name to create an installer. If a workspace is not used, then this</span>
+    <span class="doccomment">/// has no effect.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">package</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">p</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">package</span> <span class="op">=</span> <span class="ident">p</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the build target.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default is to use the default target for the environment. Use this</span>
+    <span class="doccomment">/// method to change the target for the build and installer creation. The</span>
+    <span class="doccomment">/// value should be a string from the `rustc --print target-list` command.</span>
+    <span class="doccomment">/// This enables &quot;cross-compilation&quot; of installers similar to the</span>
+    <span class="doccomment">/// cross-compilation of Rust code, but only for Windows targets.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">target</span> <span class="op">=</span> <span class="ident">v</span>;
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Sets the version.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This overrides the `version` field of the package&#39;s manifest</span>
@@ -2234,7 +2363,9 @@
             <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
             <span class="ident">no_build</span>: <span class="self">self</span>.<span class="ident">no_build</span>,
             <span class="ident">output</span>: <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
+            <span class="ident">package</span>: <span class="self">self</span>.<span class="ident">package</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
             <span class="ident">version</span>: <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
+            <span class="ident">target</span>: <span class="self">self</span>.<span class="ident">target</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
         }
     }
 }
@@ -2261,6 +2392,8 @@
     <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">no_build</span>: <span class="ident">bool</span>,
     <span class="ident">output</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">package</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
@@ -2281,41 +2414,58 @@
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.name = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.no_build = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">no_build</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.output = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">output</span>);
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.package = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">package</span>);
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.target = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">target</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;self.version = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">version</span>);
         <span class="kw">let</span> <span class="ident">manifest_path</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">cargo_toml_file</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;manifest_path = {:?}&quot;</span>, <span class="ident">manifest_path</span>);
         <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">manifest</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)<span class="question-mark">?</span>;
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;target_directory = {:?}&quot;</span>, <span class="ident">manifest</span>.<span class="ident">target_directory</span>);
+        <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">package</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>, <span class="self">self</span>.<span class="ident">package</span>.<span class="ident">as_deref</span>())<span class="question-mark">?</span>;
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;package = {:?}&quot;</span>, <span class="ident">package</span>);
+        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">package</span>.<span class="ident">metadata</span>.<span class="ident">clone</span>();
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;metadata = {:?}&quot;</span>, <span class="ident">metadata</span>);
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="ident">package</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;name = {:?}&quot;</span>, <span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">target_triple</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span>()<span class="question-mark">?</span>;
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;target_triple = {:?}&quot;</span>, <span class="ident">target_triple</span>);
+        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="ident">package</span>)<span class="question-mark">?</span>;
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;version = {:?}&quot;</span>, <span class="ident">version</span>);
-        <span class="kw">let</span> <span class="ident">compiler_args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>);
+        <span class="kw">let</span> <span class="ident">compiler_args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;compiler_args = {:?}&quot;</span>, <span class="ident">compiler_args</span>);
-        <span class="kw">let</span> <span class="ident">culture</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">culture</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">culture</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">culture</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>)<span class="question-mark">?</span>;
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;culture = {:?}&quot;</span>, <span class="ident">culture</span>);
-        <span class="kw">let</span> <span class="ident">linker_args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>);
+        <span class="kw">let</span> <span class="ident">linker_args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;linker_args = {:?}&quot;</span>, <span class="ident">linker_args</span>);
-        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">locale</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">locale</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>)<span class="question-mark">?</span>;
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;locale = {:?}&quot;</span>, <span class="ident">locale</span>);
-        <span class="kw">let</span> <span class="ident">platform</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">platform</span>();
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;platform = {:?}&quot;</span>, <span class="ident">platform</span>);
-        <span class="kw">let</span> <span class="ident">debug_build</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">debug_build</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>);
+        <span class="kw">let</span> <span class="ident">debug_build</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">debug_build</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;debug_build = {:?}&quot;</span>, <span class="ident">debug_build</span>);
-        <span class="kw">let</span> <span class="ident">debug_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">debug_name</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>);
+        <span class="kw">let</span> <span class="ident">profile</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">debug_build</span> { <span class="string">&quot;debug&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;release&quot;</span> };
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;profile = {:?}&quot;</span>, <span class="ident">profile</span>);
+        <span class="kw">let</span> <span class="ident">debug_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">debug_name</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;debug_name = {:?}&quot;</span>, <span class="ident">debug_name</span>);
-        <span class="kw">let</span> <span class="ident">wxs_sources</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">wxs_sources</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="ident">package</span>)<span class="question-mark">?</span>;
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;wxs_sources = {:?}&quot;</span>, <span class="ident">wxs_sources</span>);
-        <span class="kw">let</span> <span class="ident">wixobj_destination</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">wixobj_destination</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">wixobj_destination</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">wixobj_destination</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>.<span class="ident">target_directory</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;wixobj_destination = {:?}&quot;</span>, <span class="ident">wixobj_destination</span>);
-        <span class="kw">let</span> <span class="ident">no_build</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">no_build</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>);
+        <span class="kw">let</span> <span class="ident">no_build</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">no_build</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>);
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;no_build = {:?}&quot;</span>, <span class="ident">no_build</span>);
+        <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="kw-2">&amp;</span><span class="ident">target_triple</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">wix_arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">cfg</span>)<span class="question-mark">?</span>;
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;wix_arch = {:?}&quot;</span>, <span class="ident">wix_arch</span>);
         <span class="kw">if</span> <span class="ident">no_build</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skipped building the release binary&quot;</span>);
+            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Skipped building the binary&quot;</span>);
         } <span class="kw">else</span> {
             <span class="comment">// Build the binary with the release profile. If a release binary</span>
             <span class="comment">// has already been built, then this will essentially do nothing.</span>
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Building the release binary&quot;</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="ident">CARGO</span>);
+            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Building the binary&quot;</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(
+                <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;CARGO&quot;</span>)
+                    .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>)
+                    .<span class="ident">ok</span>()
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">CARGO</span>)),
+            );
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;builder = {:?}&quot;</span>, <span class="ident">builder</span>);
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">capture_output</span> {
                 <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Capturing the &#39;{}&#39; output&quot;</span>, <span class="ident">CARGO</span>);
@@ -2325,6 +2475,9 @@
             <span class="ident">builder</span>.<span class="ident">arg</span>(<span class="string">&quot;build&quot;</span>);
             <span class="kw">if</span> <span class="op">!</span><span class="ident">debug_build</span> {
                 <span class="ident">builder</span>.<span class="ident">arg</span>(<span class="string">&quot;--release&quot;</span>);
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target</span>.<span class="ident">is_some</span>() {
+                <span class="ident">builder</span>.<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;--target={}&quot;</span>, <span class="ident">target_triple</span>));
             }
             <span class="ident">builder</span>.<span class="ident">arg</span>(<span class="string">&quot;--manifest-path&quot;</span>).<span class="ident">arg</span>(<span class="kw-2">&amp;</span><span class="ident">manifest_path</span>);
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;command = {:?}&quot;</span>, <span class="ident">builder</span>);
@@ -2346,16 +2499,36 @@
             <span class="ident">compiler</span>.<span class="ident">stdout</span>(<span class="ident">Stdio</span>::<span class="ident">null</span>());
             <span class="ident">compiler</span>.<span class="ident">stderr</span>(<span class="ident">Stdio</span>::<span class="ident">null</span>());
         }
-        <span class="kw">if</span> <span class="ident">debug_build</span> {
-            <span class="ident">compiler</span>.<span class="ident">arg</span>(<span class="string">&quot;-dProfile=debug&quot;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">compiler</span>.<span class="ident">arg</span>(<span class="string">&quot;-dProfile=release&quot;</span>);
+        <span class="ident">compiler</span>
+            .<span class="ident">arg</span>(<span class="string">&quot;-arch&quot;</span>)
+            .<span class="ident">arg</span>(<span class="kw-2">&amp;</span><span class="ident">wix_arch</span>.<span class="ident">to_string</span>())
+            .<span class="ident">arg</span>(<span class="string">&quot;-ext&quot;</span>)
+            .<span class="ident">arg</span>(<span class="string">&quot;WixUtilExtension&quot;</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">vendor</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cfg</span>.<span class="ident">target_vendor</span> {
+            <span class="ident">compiler</span>.<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dTargetVendor={}&quot;</span>, <span class="ident">vendor</span>));
         }
         <span class="ident">compiler</span>
             .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dVersion={}&quot;</span>, <span class="ident">version</span>))
-            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dPlatform={}&quot;</span>, <span class="ident">platform</span>))
-            .<span class="ident">arg</span>(<span class="string">&quot;-ext&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;WixUtilExtension&quot;</span>)
+            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dPlatform={}&quot;</span>, <span class="ident">wix_arch</span>))
+            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dProfile={}&quot;</span>, <span class="ident">profile</span>))
+            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dTargetEnv={}&quot;</span>, <span class="ident">cfg</span>.<span class="ident">target_env</span>))
+            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dTargetTriple={}&quot;</span>, <span class="ident">target_triple</span>))
+            .<span class="ident">arg</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;-dCargoProfile={}&quot;</span>, <span class="ident">profile</span>))
+            .<span class="ident">arg</span>({
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OsString</span>::<span class="ident">from</span>(<span class="string">&quot;-dCargoTargetDir=&quot;</span>);
+                <span class="ident">s</span>.<span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>.<span class="ident">target_directory</span>);
+                <span class="ident">s</span>
+            })
+            .<span class="ident">arg</span>({
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OsString</span>::<span class="ident">from</span>(<span class="string">&quot;-dCargoTargetBinDir=&quot;</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bin_path</span> <span class="op">=</span> <span class="ident">manifest</span>.<span class="ident">target_directory</span>.<span class="ident">clone</span>();
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">target</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span> {
+                    <span class="ident">bin_path</span>.<span class="ident">push</span>(<span class="ident">target</span>);
+                }
+                <span class="ident">bin_path</span>.<span class="ident">push</span>(<span class="ident">profile</span>);
+                <span class="ident">s</span>.<span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="ident">bin_path</span>);
+                <span class="ident">s</span>
+            })
             .<span class="ident">arg</span>(<span class="string">&quot;-o&quot;</span>)
             .<span class="ident">arg</span>(<span class="kw-2">&amp;</span><span class="ident">wixobj_destination</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">args</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">compiler_args</span> {
@@ -2397,11 +2570,12 @@
         <span class="kw">let</span> <span class="ident">installer_destination</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">installer_destination</span>(
             <span class="kw-2">&amp;</span><span class="ident">name</span>,
             <span class="kw-2">&amp;</span><span class="ident">version</span>,
-            <span class="ident">platform</span>,
+            <span class="kw-2">&amp;</span><span class="ident">cfg</span>,
             <span class="ident">debug_name</span>,
             <span class="kw-2">&amp;</span><span class="ident">installer_kind</span>,
-            <span class="kw-2">&amp;</span><span class="ident">manifest</span>,
-        )<span class="question-mark">?</span>;
+            <span class="kw-2">&amp;</span><span class="ident">package</span>,
+            <span class="kw-2">&amp;</span><span class="ident">manifest</span>.<span class="ident">target_directory</span>,
+        );
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;installer_destination = {:?}&quot;</span>, <span class="ident">installer_destination</span>);
         <span class="comment">// Link the installer</span>
         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Linking the installer&quot;</span>);
@@ -2519,109 +2693,27 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">debug_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">debug_build</span> {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_debug_build</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;dbg-build&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
-        {
-            <span class="ident">pkg_meta_wix_debug_build</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+    <span class="kw">fn</span> <span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">compiler_args</span>.<span class="ident">to_owned</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">metadata</span>
+                .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;compiler-args&quot;</span>))
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">as_array</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
+                    <span class="ident">a</span>.<span class="ident">iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>).<span class="ident">unwrap</span>())
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                })
+        })
     }
 
-    <span class="kw">fn</span> <span class="ident">debug_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">debug_name</span> {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_debug_name</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;dbg-name&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
-        {
-            <span class="ident">pkg_meta_wix_debug_name</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">no_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_build</span> {
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_no_build</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;no-build&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
-        {
-            <span class="ident">pkg_meta_wix_no_build</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;compiler-args&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">as_array</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
-                <span class="ident">a</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>).<span class="ident">unwrap</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            })
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">compiler_args</span>.<span class="ident">to_owned</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;linker-args&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">as_array</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
-                <span class="ident">a</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>).<span class="ident">unwrap</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            })
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">linker_args</span>.<span class="ident">to_owned</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">culture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cultures</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">culture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cultures</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">culture</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">culture</span> {
             <span class="ident">Cultures</span>::<span class="ident">from_str</span>(<span class="ident">culture</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_culture</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_culture</span>) <span class="op">=</span> <span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;culture&quot;</span>))
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_str</span>())
         {
@@ -2631,31 +2723,86 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">locale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">locale</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">locale</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>) {
-            <span class="kw">if</span> <span class="ident">locale</span>.<span class="ident">exists</span>() {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">locale</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
-                    <span class="string">&quot;The &#39;{}&#39; WiX localization file could not be found, or it does not exist. \
-                     Please check the path is correct and the file exists.&quot;</span>,
-                    <span class="ident">locale</span>.<span class="ident">display</span>()
-                )))
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_locale</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;locale&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">as_str</span>())
-            .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>)
+    <span class="kw">fn</span> <span class="ident">debug_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">debug_build</span> {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_debug_build</span>) <span class="op">=</span> <span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;dbg-build&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
         {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_locale</span>))
+            <span class="ident">pkg_meta_wix_debug_build</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+            <span class="bool-val">false</span>
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">debug_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">debug_name</span> {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_debug_name</span>) <span class="op">=</span> <span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;dbg-name&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
+        {
+            <span class="ident">pkg_meta_wix_debug_name</span>
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">installer_destination</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">Version</span>,
+        <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="ident">Cfg</span>,
+        <span class="ident">debug_name</span>: <span class="ident">bool</span>,
+        <span class="ident">installer_kind</span>: <span class="kw-2">&amp;</span><span class="ident">InstallerKind</span>,
+        <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>,
+        <span class="ident">target_directory</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
+        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">debug_name</span> {
+            <span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">&quot;{}-{}-{}-debug.{}&quot;</span>,
+                <span class="ident">name</span>, <span class="ident">version</span>, <span class="ident">cfg</span>.<span class="ident">target_arch</span>, <span class="ident">installer_kind</span>
+            )
+        } <span class="kw">else</span> {
+            <span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">&quot;{}-{}-{}.{}&quot;</span>,
+                <span class="ident">name</span>, <span class="ident">version</span>, <span class="ident">cfg</span>.<span class="ident">target_arch</span>, <span class="ident">installer_kind</span>
+            )
+        };
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">path_str</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">output</span> {
+            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the explicitly specified output path for the MSI destination&quot;</span>);
+            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">path_str</span>);
+            <span class="kw">if</span> <span class="ident">path_str</span>.<span class="ident">ends_with</span>(<span class="string">&#39;/&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">path_str</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\\&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">is_dir</span>() {
+                <span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">filename</span>)
+            } <span class="kw">else</span> {
+                <span class="ident">path</span>.<span class="ident">to_owned</span>()
+            }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_output</span>) <span class="op">=</span> <span class="ident">package</span>
+            .<span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;output&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">as_str</span>())
+        {
+            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the output path in the package&#39;s metadata for the MSI destination&quot;</span>);
+            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">pkg_meta_wix_output</span>);
+            <span class="kw">if</span> <span class="ident">pkg_meta_wix_output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;/&#39;</span>)
+                <span class="op">|</span><span class="op">|</span> <span class="ident">pkg_meta_wix_output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\\&#39;</span>)
+                <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">is_dir</span>()
+            {
+                <span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">filename</span>)
+            } <span class="kw">else</span> {
+                <span class="ident">path</span>.<span class="ident">to_owned</span>()
+            }
+        } <span class="kw">else</span> {
+            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the package&#39;s manifest (Cargo.toml) file path to specify the MSI destination&quot;</span>);
+            <span class="ident">target_directory</span>.<span class="ident">join</span>(<span class="ident">WIX</span>).<span class="ident">join</span>(<span class="ident">filename</span>)
         }
     }
 
@@ -2713,137 +2860,113 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">platform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Platform</span> {
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) {
-            <span class="ident">Platform</span>::<span class="ident">X64</span>
+    <span class="kw">fn</span> <span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">linker_args</span>.<span class="ident">to_owned</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">metadata</span>
+                .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;linker-args&quot;</span>))
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">as_array</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
+                    <span class="ident">a</span>.<span class="ident">iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>).<span class="ident">unwrap</span>())
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                })
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">locale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">locale</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">locale</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>) {
+            <span class="kw">if</span> <span class="ident">locale</span>.<span class="ident">exists</span>() {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">locale</span>))
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
+                    <span class="string">&quot;The &#39;{}&#39; WiX localization file could not be found, or it does not exist. \
+                     Please check the path is correct and the file exists.&quot;</span>,
+                    <span class="ident">locale</span>.<span class="ident">display</span>()
+                )))
+            }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_locale</span>) <span class="op">=</span> <span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;locale&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">as_str</span>())
+            .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>)
+        {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_locale</span>))
         } <span class="kw">else</span> {
-            <span class="ident">Platform</span>::<span class="ident">X86</span>
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">to_owned</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_name</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
+            <span class="ident">p</span>.<span class="ident">to_owned</span>()
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_name</span>) <span class="op">=</span> <span class="ident">package</span>
+            .<span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>))
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">as_str</span>())
             .<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>)
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">pkg_meta_wix_name</span>)
+            <span class="ident">pkg_meta_wix_name</span>
         } <span class="kw">else</span> {
-            <span class="ident">manifest</span>
-                .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">as_str</span>())
-                .<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">Manifest</span>(<span class="string">&quot;name&quot;</span>))
+            <span class="ident">package</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">installer_destination</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">Version</span>,
-        <span class="ident">platform</span>: <span class="ident">Platform</span>,
-        <span class="ident">debug_name</span>: <span class="ident">bool</span>,
-        <span class="ident">installer_kind</span>: <span class="kw-2">&amp;</span><span class="ident">InstallerKind</span>,
-        <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">debug_name</span> {
-            <span class="macro">format</span><span class="macro">!</span>(
-                <span class="string">&quot;{}-{}-{}-debug.{}&quot;</span>,
-                <span class="ident">name</span>,
-                <span class="ident">version</span>,
-                <span class="ident">platform</span>.<span class="ident">arch</span>(),
-                <span class="ident">installer_kind</span>
-            )
-        } <span class="kw">else</span> {
-            <span class="macro">format</span><span class="macro">!</span>(
-                <span class="string">&quot;{}-{}-{}.{}&quot;</span>,
-                <span class="ident">name</span>,
-                <span class="ident">version</span>,
-                <span class="ident">platform</span>.<span class="ident">arch</span>(),
-                <span class="ident">installer_kind</span>
-            )
-        };
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">path_str</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">output</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the explicitly specified output path for the MSI destination&quot;</span>);
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">path_str</span>);
-            <span class="kw">if</span> <span class="ident">path_str</span>.<span class="ident">ends_with</span>(<span class="string">&#39;/&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">path_str</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\\&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">is_dir</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">filename</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">to_owned</span>())
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_output</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;output&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">as_str</span>())
+    <span class="kw">fn</span> <span class="ident">no_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_build</span> {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_no_build</span>) <span class="op">=</span> <span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;no-build&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_bool</span>())
         {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the output path in the package&#39;s metadata for the MSI destination&quot;</span>);
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">pkg_meta_wix_output</span>);
-            <span class="kw">if</span> <span class="ident">pkg_meta_wix_output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;/&#39;</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="ident">pkg_meta_wix_output</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\\&#39;</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">is_dir</span>()
-            {
-                <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">filename</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">to_owned</span>())
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">manifest_path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the package&#39;s manifest (Cargo.toml) file path to specify the MSI destination&quot;</span>);
-            <span class="comment">// Remove the `Cargo.toml` file from the path</span>
-            <span class="ident">manifest_path</span>
-                .<span class="ident">parent</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
-                        <span class="string">&quot;The &#39;{}&#39; path for the package&#39;s manifest file is invalid&quot;</span>,
-                        <span class="ident">manifest_path</span>.<span class="ident">display</span>()
-                    ))
-                })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                    <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">d</span>)
-                        .<span class="ident">join</span>(<span class="ident">TARGET_FOLDER_NAME</span>)
-                        .<span class="ident">join</span>(<span class="ident">WIX</span>)
-                        .<span class="ident">join</span>(<span class="ident">filename</span>)
-                })
+            <span class="ident">pkg_meta_wix_no_build</span>
         } <span class="kw">else</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the current working directory (CWD) to build the WiX object files destination&quot;</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">TARGET_FOLDER_NAME</span>).<span class="ident">join</span>(<span class="ident">WIX</span>).<span class="ident">join</span>(<span class="ident">filename</span>))
+            <span class="bool-val">false</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wixobj_destination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">manifest_path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(
-                <span class="string">&quot;Using the package&#39;s manifest (Cargo.toml) file path to build \
-                 the Wix object files destination&quot;</span>
-            );
-            <span class="comment">// Remove the `Cargo.toml` file from the path</span>
-            <span class="ident">manifest_path</span>
-                .<span class="ident">parent</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
-                        <span class="string">&quot;The &#39;{}&#39; path for the package&#39;s manifest file is invalid&quot;</span>,
-                        <span class="ident">manifest_path</span>.<span class="ident">display</span>()
-                    ))
-                })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">d</span>).<span class="ident">join</span>(<span class="ident">TARGET_FOLDER_NAME</span>))
+    <span class="comment">// TODO: Change to use --unit-graph feature of cargo once stable. See #124.</span>
+    <span class="comment">//</span>
+    <span class="comment">// This does not support default-target. Ideally we would use cargo</span>
+    <span class="comment">// --unit-graph to figure this out without having to second-guess the</span>
+    <span class="comment">// compiler. Unfortunately, cargo --unit-graph is unstable.</span>
+    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">t</span>.<span class="ident">to_owned</span>())
         } <span class="kw">else</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the current working directory (CWD) to build the WiX object files destination&quot;</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">TARGET_FOLDER_NAME</span>))
-        }<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="string">&quot;rustc&quot;</span>)
+                .<span class="ident">args</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;--version&quot;</span>, <span class="string">&quot;--verbose&quot;</span>])
+                .<span class="ident">output</span>()<span class="question-mark">?</span>;
+            <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">output</span>.<span class="ident">stdout</span>.<span class="ident">split</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>) {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_elt</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;:&#39;</span>);
+                <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">line_elt</span>.<span class="ident">next</span>();
+                <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">line_elt</span>.<span class="ident">next</span>();
+                <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="string">b&quot;host&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">host_triple</span>)) <span class="op">=</span> (<span class="ident">first</span>, <span class="ident">second</span>) {
+                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">host_triple</span>.<span class="ident">to_vec</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+                        <span class="ident">Error</span>::<span class="ident">Generic</span>(
+                            <span class="string">&quot;Failed to parse output of the &#39;rustc --verbose \
+                            --version&#39; command: invalid UTF8&quot;</span>
+                                .<span class="ident">to_string</span>(),
+                        )
+                    });
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span><span class="question-mark">?</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>());
+                }
+            }
+            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(
+                <span class="string">&quot;Failed to parse output of the &#39;rustc --verbose --version&#39; \
+                command&quot;</span>
+                    .<span class="ident">to_string</span>(),
+            ))
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">wixobj_destination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target_directory</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
         <span class="comment">// A trailing slash is needed; otherwise, candle tries to dump the</span>
         <span class="comment">// object files to a `target\wix` file instead of dumping the object</span>
         <span class="comment">// files in the `target\wix\` folder for the `-out` option. The trailing</span>
@@ -2854,8 +2977,7 @@
         <span class="comment">// for PathBuf, but it was unexpected and kind of annoying because I am</span>
         <span class="comment">// not sure how to add a trailing slash in a cross-platform way with</span>
         <span class="comment">// PathBuf, not that cargo-wix needs to be cross-platform.</span>
-        <span class="ident">dst</span>.<span class="ident">push</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}\\&quot;</span>, <span class="ident">WIX</span>));
-        <span class="prelude-val">Ok</span>(<span class="ident">dst</span>)
+        <span class="ident">target_directory</span>.<span class="ident">join</span>(<span class="ident">WIX</span>).<span class="ident">join</span>(<span class="string">&quot;&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">wixobj_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wixobj_dst</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2871,22 +2993,17 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">project_wix_dir</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">manifest_path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the package&#39;s manifest (Cargo.toml) file path to obtain all WXS files&quot;</span>);
-            <span class="ident">manifest_path</span>
-                .<span class="ident">parent</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
-                        <span class="string">&quot;The &#39;{}&#39; path for the package&#39;s manifest file is invalid&quot;</span>,
-                        <span class="ident">manifest_path</span>.<span class="ident">display</span>()
-                    ))
-                })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">d</span>).<span class="ident">join</span>(<span class="ident">WIX</span>))
-        } <span class="kw">else</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Using the current working directory (CWD) to obtain all WXS files&quot;</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">WIX</span>))
-        }<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">project_wix_dir</span> <span class="op">=</span> <span class="ident">package</span>
+            .<span class="ident">manifest_path</span>
+            .<span class="ident">parent</span>()
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
+                    <span class="string">&quot;The &#39;{}&#39; path for the package&#39;s manifest file is invalid&quot;</span>,
+                    <span class="ident">package</span>.<span class="ident">manifest_path</span>.<span class="ident">display</span>()
+                ))
+            })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">d</span>).<span class="ident">join</span>(<span class="ident">WIX</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wix_sources</span> <span class="op">=</span> {
             <span class="kw">if</span> <span class="ident">project_wix_dir</span>.<span class="ident">exists</span>() {
                 <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">read_dir</span>(<span class="ident">project_wix_dir</span>)<span class="question-mark">?</span>
@@ -2921,13 +3038,10 @@
                 }
             }
             <span class="ident">wix_sources</span>.<span class="ident">extend</span>(<span class="ident">paths</span>.<span class="ident">clone</span>());
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_sources</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_sources</span>) <span class="op">=</span> <span class="ident">package</span>
+            .<span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;include&quot;</span>))
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">as_array</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
@@ -2973,28 +3087,19 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">package</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span> {
             <span class="ident">Version</span>::<span class="ident">parse</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_version</span>) <span class="op">=</span> <span class="ident">manifest</span>
-            .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;metadata&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_table</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_table</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_meta_wix_version</span>) <span class="op">=</span> <span class="ident">package</span>
+            .<span class="ident">metadata</span>
+            .<span class="ident">get</span>(<span class="string">&quot;wix&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">as_object</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;version&quot;</span>))
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>())
         {
             <span class="ident">Version</span>::<span class="ident">parse</span>(<span class="ident">pkg_meta_wix_version</span>).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>)
         } <span class="kw">else</span> {
-            <span class="ident">manifest</span>
-                .<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_table</span>())
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;version&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_str</span>())
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">Manifest</span>(<span class="string">&quot;version&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Version</span>::<span class="ident">parse</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>))
+            <span class="prelude-val">Ok</span>(<span class="ident">package</span>.<span class="ident">version</span>.<span class="ident">clone</span>())
         }
     }
 }
@@ -3180,7 +3285,7 @@
         <span class="ident">v</span>.<span class="ident">iter</span>()
             .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span> {
                 <span class="ident">WixObjKind</span>::<span class="ident">Bundle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">Exe</span>),
-                <span class="ident">WixObjKind</span>::<span class="ident">Product</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">Msi</span>)),
+                <span class="ident">WixObjKind</span>::<span class="ident">Product</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">Msi</span>)),
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>,
             })
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
@@ -3259,6 +3364,14 @@
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">culture_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;FrFr&quot;</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+            <span class="ident">actual</span>.<span class="ident">culture</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">culture</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+        }
+
+        <span class="attribute">#[<span class="ident">test</span>]</span>
+        <span class="kw">fn</span> <span class="ident">russian_culture_works</span>() {
+            <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;RuRu&quot;</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
             <span class="ident">actual</span>.<span class="ident">culture</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">culture</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
@@ -3431,10 +3544,11 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">debug_build_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                dbg-build = true
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;dbg-build&quot;: true
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">debug_build</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">debug_build</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">debug_build</span>);
@@ -3442,10 +3556,11 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">debug_name_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                dbg-name = true
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;dbg-name&quot;: true
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">debug_name</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">debug_name</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">debug_name</span>);
@@ -3454,41 +3569,60 @@
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">version_metadata_works</span>() {
             <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package]
-                version = &quot;0.1.0&quot;
+            {
+                &quot;name&quot;: &quot;Example&quot;,
+                &quot;version&quot;: &quot;0.1.0&quot;,
+                &quot;authors&quot;: [&quot;First Last &lt;first.last@example.com&gt;&quot;],
+                &quot;license&quot;: &quot;Apache-2.0&quot;,
 
-                [package.metadata.wix]
-                version = &quot;2.1.0&quot;
-            &quot;#</span>;
+                &quot;id&quot;: &quot;&quot;,
+                &quot;dependencies&quot;: [],
+                &quot;targets&quot;: [],
+                &quot;features&quot;: {},
+                &quot;manifest_path&quot;: &quot;&quot;,
+
+                &quot;metadata&quot;: {
+                    &quot;wix&quot;: {
+                        &quot;version&quot;: &quot;2.1.0&quot;
+                    }
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">execution</span>
-                .<span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
+                .<span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">PKG_META_WIX</span>).<span class="ident">unwrap</span>())
                 .<span class="ident">unwrap</span>();
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">version</span>, <span class="ident">Version</span>::<span class="ident">parse</span>(<span class="string">&quot;2.1.0&quot;</span>).<span class="ident">unwrap</span>());
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">name_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package]
-                name = &quot;example&quot;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;name&quot;: &quot;Example&quot;,
+                &quot;version&quot;: &quot;0.1.0&quot;,
+                &quot;metadata&quot;: {
+                    &quot;wix&quot;: {
+                        &quot;name&quot;: &quot;Metadata&quot;
+                    }
+                },
 
-                [package.metadata.wix]
-                name = &quot;Metadata&quot;
-            &quot;#</span>;
+                &quot;id&quot;: &quot;&quot;,
+                &quot;dependencies&quot;: [],
+                &quot;targets&quot;: [],
+                &quot;features&quot;: {},
+                &quot;manifest_path&quot;: &quot;&quot;
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">execution</span>
-                .<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
-                .<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">PKG_META_WIX</span>).<span class="ident">unwrap</span>());
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">name</span>, <span class="string">&quot;Metadata&quot;</span>.<span class="ident">to_owned</span>());
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">no_build_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                no-build = true
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;no-build&quot;: true
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">no_build</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">no_build</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
             <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">no_build</span>);
@@ -3496,10 +3630,11 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">culture_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                culture = &quot;Fr-Fr&quot;
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;culture&quot;: &quot;Fr-Fr&quot;
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">culture</span> <span class="op">=</span> <span class="ident">execution</span>
                 .<span class="ident">culture</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
@@ -3509,10 +3644,11 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">locale_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                locale = &quot;wix/French.wxl&quot;
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;locale&quot;: &quot;wix/French.wxl&quot;
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">execution</span>
                 .<span class="ident">locale</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
@@ -3522,43 +3658,83 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">output_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                output = &quot;target/wix/test.msi&quot;
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;name&quot;: &quot;Example&quot;,
+                &quot;version&quot;: &quot;0.1.0&quot;,
+                &quot;authors&quot;: [&quot;First Last &lt;first.last@example.com&gt;&quot;],
+                &quot;license&quot;: &quot;XYZ&quot;,
+
+                &quot;id&quot;: &quot;&quot;,
+                &quot;dependencies&quot;: [],
+                &quot;targets&quot;: [],
+                &quot;features&quot;: {},
+                &quot;manifest_path&quot;: &quot;&quot;,
+                &quot;metadata&quot;: {
+                    &quot;wix&quot;: {
+                        &quot;output&quot;: &quot;target/wix/test.msi&quot;
+                    }
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">execution</span>
-                .<span class="ident">installer_destination</span>(
-                    <span class="string">&quot;Different&quot;</span>,
-                    <span class="kw-2">&amp;</span><span class="string">&quot;2.1.0&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-                    <span class="ident">Platform</span>::<span class="ident">X64</span>,
-                    <span class="bool-val">false</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">InstallerKind</span>::<span class="ident">default</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-                )
-                .<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">installer_destination</span>(
+                <span class="string">&quot;Different&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="string">&quot;2.1.0&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;x86_64-pc-windows-msvc&quot;</span>).<span class="ident">unwrap</span>(),
+                <span class="bool-val">false</span>,
+                <span class="kw-2">&amp;</span><span class="ident">InstallerKind</span>::<span class="ident">default</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">PKG_META_WIX</span>).<span class="ident">unwrap</span>(),
+                <span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;target/&quot;</span>),
+            );
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">output</span>, <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;target/wix/test.msi&quot;</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">include_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                include = [&quot;Cargo.toml&quot;]
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;name&quot;: &quot;Example&quot;,
+                &quot;version&quot;: &quot;0.1.0&quot;,
+                &quot;authors&quot;: [&quot;First Last &lt;first.last@example.com&gt;&quot;],
+                &quot;license&quot;: &quot;XYZ&quot;,
+
+                &quot;id&quot;: &quot;&quot;,
+                &quot;dependencies&quot;: [],
+                &quot;targets&quot;: [],
+                &quot;features&quot;: {},
+                &quot;manifest_path&quot;: &quot;C:\\Cargo.toml&quot;,
+                &quot;metadata&quot;: {
+                    &quot;wix&quot;: {
+                        &quot;include&quot;: [&quot;Cargo.toml&quot;]
+                    }
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">sources</span> <span class="op">=</span> <span class="ident">execution</span>
-                .<span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
+                .<span class="ident">wxs_sources</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">PKG_META_WIX</span>).<span class="ident">unwrap</span>())
                 .<span class="ident">unwrap</span>();
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sources</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;Cargo.toml&quot;</span>)]);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
+        <span class="kw">fn</span> <span class="ident">compiler_args_override_works</span>() {
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;compiler-args&quot;: [&quot;-nologo&quot;]
+                }
+            }&quot;#</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">default</span>();
+            <span class="ident">builder</span>.<span class="ident">compiler_args</span>(<span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;-ws&quot;</span>]));
+            <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>();
+            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">args</span>, <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;-ws&quot;</span>)]));
+        }
+
+        <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">compiler_args_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                compiler-args = [&quot;-nologo&quot;, &quot;-ws&quot;]
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;compiler-args&quot;: [&quot;-nologo&quot;, &quot;-ws&quot;]
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">compiler_args</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
             <span class="macro">assert_eq</span><span class="macro">!</span>(
@@ -3568,11 +3744,26 @@
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
+        <span class="kw">fn</span> <span class="ident">linker_args_override_works</span>() {
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;linker-args&quot;: [&quot;-nologo&quot;]
+                }
+            }&quot;#</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">default</span>();
+            <span class="ident">builder</span>.<span class="ident">linker_args</span>(<span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;-ws&quot;</span>]));
+            <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>();
+            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">args</span>, <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;-ws&quot;</span>)]));
+        }
+
+        <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">linker_args_metadata_works</span>() {
-            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
-                [package.metadata.wix]
-                linker-args = [&quot;-nologo&quot;, &quot;-ws&quot;]
-            &quot;#</span>;
+            <span class="kw">const</span> <span class="ident">PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{
+                &quot;wix&quot;: {
+                    &quot;linker-args&quot;: [&quot;-nologo&quot;, &quot;-ws&quot;]
+                }
+            }&quot;#</span>;
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">execution</span>.<span class="ident">linker_args</span>(<span class="kw-2">&amp;</span><span class="ident">PKG_META_WIX</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>());
             <span class="macro">assert_eq</span><span class="macro">!</span>(
@@ -3581,7 +3772,7 @@
             );
         }
 
-        <span class="kw">const</span> <span class="ident">EMPTY_PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;[package.metadata.wix]&quot;#</span>;
+        <span class="kw">const</span> <span class="ident">EMPTY_PKG_META_WIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;wix&quot;: {}}&quot;#</span>;
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">culture_works</span>() {
@@ -3630,8 +3821,8 @@
         <span class="kw">fn</span> <span class="ident">wixobj_destination_works</span>() {
             <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>();
             <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">execution</span>.<span class="ident">wixobj_destination</span>().<span class="ident">unwrap</span>(),
-                <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;target\\wix\\&quot;</span>)
+                <span class="ident">execution</span>.<span class="ident">wixobj_destination</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;target&quot;</span>)),
+                <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;target&quot;</span>).<span class="ident">join</span>(<span class="string">&quot;wix&quot;</span>)
             )
         }
     }
@@ -3848,4 +4039,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wix";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

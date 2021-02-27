@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1733,6 +1736,208 @@
 <span id="1733">1733</span>
 <span id="1734">1734</span>
 <span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
+<span id="1778">1778</span>
+<span id="1779">1779</span>
+<span id="1780">1780</span>
+<span id="1781">1781</span>
+<span id="1782">1782</span>
+<span id="1783">1783</span>
+<span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
+<span id="1799">1799</span>
+<span id="1800">1800</span>
+<span id="1801">1801</span>
+<span id="1802">1802</span>
+<span id="1803">1803</span>
+<span id="1804">1804</span>
+<span id="1805">1805</span>
+<span id="1806">1806</span>
+<span id="1807">1807</span>
+<span id="1808">1808</span>
+<span id="1809">1809</span>
+<span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
+<span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
@@ -1761,10 +1966,12 @@
 <span class="doccomment">//! ## Table of Contents</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - [Quick Start](#quick-start)</span>
+<span class="doccomment">//! - [C Runtime](#c-runtime)</span>
 <span class="doccomment">//! - [Examples](#examples)</span>
 <span class="doccomment">//! - [Features](#features)</span>
 <span class="doccomment">//!   - [Signing](#signing)</span>
 <span class="doccomment">//!   - [Templates](#templates)</span>
+<span class="doccomment">//!   - [Variables](#variables)</span>
 <span class="doccomment">//!   - [Extensions](#extensions)</span>
 <span class="doccomment">//!   - [Multiple WiX Sources](#multiple-wix-sources)</span>
 <span class="doccomment">//!   - [Bundles](#bundles)</span>
@@ -1807,6 +2014,54 @@
 <span class="doccomment">//! behaviors can be adjusted during the installation process. The default</span>
 <span class="doccomment">//! installation destination is `C:\Program Files\&lt;project name&gt;`, where</span>
 <span class="doccomment">//! `&lt;project name&gt;` is replaced with the name of the project.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## C Runtime</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! If using the `x86_64-pc-windows-msvc` or the `i686-pc-windows-msvc`</span>
+<span class="doccomment">//! toolchain, then an appropriate C RunTime (CRT) must be available on the host</span>
+<span class="doccomment">//! system _or_ the CRT must be statically compiled with the Rust binary</span>
+<span class="doccomment">//! (executable). By default, the CRT is dynamically linked to a Rust binary if</span>
+<span class="doccomment">//! using Microsoft Visual C compiler (MSVC). This may cause issues and errors</span>
+<span class="doccomment">//! when running the Rust binary immediately after installation on a clean</span>
+<span class="doccomment">//! Windows installation, i.e. the CRT has not already been installed. If the</span>
+<span class="doccomment">//! Rust compiler is installed and an `-msvc` toolchain is available, then the</span>
+<span class="doccomment">//! Rust binary will execute after installation without an issue.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! **Note**, the Rust programming language does _not_ need to be installed</span>
+<span class="doccomment">//! to run an executable built using Cargo and Rust. Only a Microsoft-provided CRT</span>
+<span class="doccomment">//! needs to be installed. These are often referred to as &quot;redistributables&quot;. Rust</span>
+<span class="doccomment">//! with either of the `-msvc` toolchains will dynamically link against the</span>
+<span class="doccomment">//! `vcruntime140.dll`, which is part of the Visual C++ 2015 redistributable and</span>
+<span class="doccomment">//! freely provided by Microsoft.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For developers using the `cargo wix` subcommand to create an installer, this</span>
+<span class="doccomment">//! dependency on the presence of an appropriate C runtime can lead to a sub-optimal</span>
+<span class="doccomment">//! user experience. There are three options: (i) statically link the C runtime</span>
+<span class="doccomment">//! within the Rust binary (recommended), (ii) add the Visual C++ redistributable to</span>
+<span class="doccomment">//! the installer via the [Merge module] method for the WiX Toolset, or (iii)</span>
+<span class="doccomment">//! provide the user with instructions for downloading and installing the CRT</span>
+<span class="doccomment">//! _before_ running the executable.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The current recommended option is to [statically link the CRT] when building</span>
+<span class="doccomment">//! the Rust binary. Rust v1.19 or newer is required, and the solution</span>
+<span class="doccomment">//! ultimately becomes adding the `-C target-feature=+crt-static` option to the</span>
+<span class="doccomment">//! invocation of the Rust compiler (rustc). There are a variety of methods for</span>
+<span class="doccomment">//! adding the option to the invocation, including but not limited to: (i)</span>
+<span class="doccomment">//! creating a Cargo configuration file for the user or project, i.e.</span>
+<span class="doccomment">//! `.cargo/config.toml`, and adding the following:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! [target.x86_64-pc-windows-msvc]</span>
+<span class="doccomment">//! rustflags = [&quot;-C&quot;, &quot;target-feature=+crt-static&quot;]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [target.i686-pc-windows-msvc]</span>
+<span class="doccomment">//! rustflags = [&quot;-C&quot;, &quot;target-feature=+crt-static&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! to the `config.toml` file or (ii) creating the `RUSTFLAGS` environment</span>
+<span class="doccomment">//! variable and setting its value to `&quot;-C target-feature=+crt-static&quot;`. Please</span>
+<span class="doccomment">//! see the Rust compiler documentation on static linking for more information</span>
+<span class="doccomment">//! and details.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Examples</span>
 <span class="doccomment">//!</span>
@@ -2097,6 +2352,56 @@
 <span class="doccomment">//! appears during installation. This default behavior can be overridden with</span>
 <span class="doccomment">//! the `-l,--license` and `-e,--eula` options for the `cargo wix init`</span>
 <span class="doccomment">//! subcommand.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Variables</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The cargo-wix subcommand automatically passes some Cargo and build</span>
+<span class="doccomment">//! configuration-related values to the WiX Toolset compiler (candle.exe). These</span>
+<span class="doccomment">//! variables can be used within a WiX Source (WXS) file using the</span>
+<span class="doccomment">//! `$(var.&lt;VARIABLE&gt;)` notation, where `&lt;VARIABLE&gt;` is replaced with the name</span>
+<span class="doccomment">//! of variable passed from the cargo-wix subcommand to the WiX Toolset</span>
+<span class="doccomment">//! compiler using the `-DKEY=VALUE` option. Notable usage of these variables</span>
+<span class="doccomment">//! are in [WiX preprocessor] directives to dynamically change the installer</span>
+<span class="doccomment">//! creation at build time. Below is a current list of variables passed from the</span>
+<span class="doccomment">//! cargo-wix subcommand to a WXS file during installer creation.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `TargetTriple` = The rustc target triple name as seen with the `rustc</span>
+<span class="doccomment">//!   --print target-list` command</span>
+<span class="doccomment">//! - `TargetEnv` = The rustc target environment, as seen with the output from</span>
+<span class="doccomment">//! the `rustc --print cfg` command as `target_env`. On Windows, this typically</span>
+<span class="doccomment">//! either `msvc` or `gnu` depending on the toolchain downloaded and installed.</span>
+<span class="doccomment">//! - `TargetVendor` = The rustc target vendor, as seen with the output from the</span>
+<span class="doccomment">//! `rustc --print cfg` command as `target_vendor`. This is typically `pc`, but Rust</span>
+<span class="doccomment">//! does support other vendors, like `uwp`.</span>
+<span class="doccomment">//! - `CargoTargetBinDir` = The complete path to the binary (exe). The default</span>
+<span class="doccomment">//! would be `target\release\&lt;BINARY_NAME&gt;.exe` where `&lt;BINARY_NAME&gt;` is replaced</span>
+<span class="doccomment">//! with the name of each binary target defined in the package&#39;s manifest</span>
+<span class="doccomment">//! (Cargo.toml). If a different rustc target triple is used than the host, i.e.</span>
+<span class="doccomment">//! cross-compiling, then the default path would be</span>
+<span class="doccomment">//! `target\&lt;CARGO_TARGET&gt;\&lt;CARGO_PROFILE&gt;\&lt;BINARY_NAME&gt;.exe`, where</span>
+<span class="doccomment">//! `&lt;CARGO_TARGET&gt;` is replaced with the `CargoTarget` variable value and</span>
+<span class="doccomment">//! `&lt;CARGO_PROFILE&gt;` is replaced with the value from the `CargoProfile` variable.</span>
+<span class="doccomment">//! - `CargoTargetDir` = The path to the directory for the build artifacts, i.e.</span>
+<span class="doccomment">//! `target`.</span>
+<span class="doccomment">//! - `CargoProfile` = Either `debug` or `release` depending on the build</span>
+<span class="doccomment">//! profile. The default is `release`.</span>
+<span class="doccomment">//! - `Platform` = (Deprecated) Either `x86`, `x64`, `arm`, or `arm64`. See the</span>
+<span class="doccomment">//! documentation for the WiX Toolset compiler (candle.exe) `-arch` option.</span>
+<span class="doccomment">//! Note, this variable is deprecated and will eventually be removed because it is</span>
+<span class="doccomment">//! ultimately redundant to the `$(sys.BUILDARCH)` variable that is already provided</span>
+<span class="doccomment">//! by the WiX Toolset compiler. Existing projects should replace usage of</span>
+<span class="doccomment">//! `$(var.Platform)` with `$(sys.BUILDARCH)`. No action is needed for new projects.</span>
+<span class="doccomment">//! - `Profile` = (Deprecated) See `CargoProfile`.</span>
+<span class="doccomment">//! - `Version` = The version for the installer. The default is the</span>
+<span class="doccomment">//! `Major.Minor.Fix` semantic versioning number of the Rust package.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Additional, user-defined variables for custom WXS files can be passed to the</span>
+<span class="doccomment">//! WiX Toolset compiler (candle.exe) using the cargo-wix subcommand</span>
+<span class="doccomment">//! `-C,--compiler-arg` option. For example,</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```dos</span>
+<span class="doccomment">//! C:\Path\To\Project\&gt;cargo wix -C &quot;-DUSER_KEY=USER_VALUE&quot;</span>
+<span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Extensions</span>
 <span class="doccomment">//!</span>
@@ -2460,11 +2765,13 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Appends an argument to the WiX compiler (candle.exe) invocation. This</span>
 <span class="doccomment">//! provides a mechanism for &quot;passing&quot; arguments to the compiler. This can be called</span>
-<span class="doccomment">//! multiple times to pass multiple arguments (flags or options). Note, if it is an</span>
-<span class="doccomment">//! option, i.e. argument with an accompanying value, then the value must be passed</span>
-<span class="doccomment">//! as a separate usage of this option. For example, adding an user-defined compiler</span>
-<span class="doccomment">//! extension would require the following command `cargo wix -C -ext -C</span>
-<span class="doccomment">//! UserDefinedExtension` to yield a `candle -ext UserDefinedExtension` invocation.</span>
+<span class="doccomment">//! multiple times to pass multiple arguments (flags or options), but only one</span>
+<span class="doccomment">//! value per occurrance is allowed to avoid ambiguity during argument parsing.</span>
+<span class="doccomment">//! Note, if it is an option, i.e. argument with an accompanying value, then the</span>
+<span class="doccomment">//! value must be passed as a separate usage of this option. For example, adding</span>
+<span class="doccomment">//! an user-defined compiler extension would require the following command</span>
+<span class="doccomment">//! `cargo wix -C -ext -C UserDefinedExtension` to yield a `candle -ext</span>
+<span class="doccomment">//! UserDefinedExtension` invocation.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### `-c,--culture`</span>
 <span class="doccomment">//!</span>
@@ -2590,9 +2897,10 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Appends an argument to the WiX linker (light.exe) invocation. This provides</span>
 <span class="doccomment">//! a mechanism for &quot;passing&quot; arguments to the linker. This can be called</span>
-<span class="doccomment">//! multiple times to pass multiple arguments (flags or options). Note, if it is</span>
-<span class="doccomment">//! an option, i.e. argument with an accompanying value, then the value must be</span>
-<span class="doccomment">//! passed as a separate usage of this option. For example, adding an</span>
+<span class="doccomment">//! multiple times to pass multiple arguments (flags or options). Only one value</span>
+<span class="doccomment">//! per occurrance is allowed to avoid ambiguity during argument parsing. Note,</span>
+<span class="doccomment">//! if it is an option, i.e. argument with an accompanying value, then the value</span>
+<span class="doccomment">//! must be passed as a separate usage of this option. For example, adding an</span>
 <span class="doccomment">//! user-defined linker extension would require the following command `cargo wix</span>
 <span class="doccomment">//! -L -ext -L UserDefinedExtension` to yield a `light -ext</span>
 <span class="doccomment">//! UserDefinedExtension` invocation.</span>
@@ -2661,7 +2969,28 @@
 <span class="doccomment">//! (Cargo.toml). This is only used when generating a license based on the value</span>
 <span class="doccomment">//! of the `license` field in the package&#39;s manifest.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### `-p,--product-icon`</span>
+<span class="doccomment">//! ### `-p,--package`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Available for the _create_ (`cargo wix`), _init_ (`cargo wix init`), and</span>
+<span class="doccomment">//! _print_ (`cargo wix print`) subcommands.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Selects the package within a workspace. This is required if a project</span>
+<span class="doccomment">//! organized with a workspace. A workspace can have one or more members, where</span>
+<span class="doccomment">//! each member may have a separate installer. This option has no effect if the</span>
+<span class="doccomment">//! project does not use a workspace.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### `--path-guid`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)</span>
+<span class="doccomment">//! subcommands.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Overrides the automatically generated GUID for the path component with an</span>
+<span class="doccomment">//! existing GUID in the hyphenated, uppercase format. The path GUID should only</span>
+<span class="doccomment">//! be generated once for a product/project. The same GUID should be used for</span>
+<span class="doccomment">//! all installer creations to ensure no artifacts are left after uninstalling</span>
+<span class="doccomment">//! and proper modification of the `PATH` environment variable.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### `--product-icon`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)</span>
 <span class="doccomment">//! subcommands.</span>
@@ -2669,7 +2998,7 @@
 <span class="doccomment">//! Sets the path to an image file that will be display as an icon in the</span>
 <span class="doccomment">//! Add/Remove Programs (ARP) control panel for the installed application.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ### `-P,--product-name`</span>
+<span class="doccomment">//! ### `--product-name`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Available for the _init_ (`cargo wix init`), _print_ (`cargo wix print`),</span>
 <span class="doccomment">//! and _sign_ (`cargo wix sign`) subcommands.</span>
@@ -2686,6 +3015,18 @@
 <span class="doccomment">//! An alias or URL to a timestamp server when signing an installer with a</span>
 <span class="doccomment">//! certificate. Valid aliases are: `Comodo` and `Versign`, which are case</span>
 <span class="doccomment">//! insenstive.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### `--upgrade-guid`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)</span>
+<span class="doccomment">//! subcommands.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Overrides the automatically generated GUID for the product&#39;s upgrade code</span>
+<span class="doccomment">//! with an existing GUID in the hyphenated, uppercase format. The upgrade code</span>
+<span class="doccomment">//! should only be generated once for a product/project. The same upgrade code</span>
+<span class="doccomment">//! should then be used for all installer creations of the same product/project. If</span>
+<span class="doccomment">//! a new GUID is used every time an installer is created, then each installer will</span>
+<span class="doccomment">//! be installing the same product but as separate installations.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### `-u,--url`</span>
 <span class="doccomment">//!</span>
@@ -2740,6 +3081,7 @@
 <span class="doccomment">//! [LibreOffice]: https://www.libreoffice.org/</span>
 <span class="doccomment">//! [`license`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata</span>
 <span class="doccomment">//! [`license-file`]: https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata</span>
+<span class="doccomment">//! [Merge module]: https://wixtoolset.org/documentation/manual/v3/howtos/redistributables_and_install_checks/install_vcredist.html</span>
 <span class="doccomment">//! [Microsoft Office]: https://products.office.com/en-us/home</span>
 <span class="doccomment">//! [Microsoft Notepad]: https://en.wikipedia.org/wiki/Microsoft_Notepad</span>
 <span class="doccomment">//! [PowerShell]: https://github.com/PowerShell/PowerShell</span>
@@ -2748,6 +3090,7 @@
 <span class="doccomment">//! [Rust]: https://www.rust-lang.org</span>
 <span class="doccomment">//! [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file</span>
 <span class="doccomment">//! [SignTool]: https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx</span>
+<span class="doccomment">//! [statically link the CRT]: https://doc.rust-lang.org/reference/linkage.html#static-and-dynamic-c-runtimes</span>
 <span class="doccomment">//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html</span>
 <span class="doccomment">//! [`std::process::Command::status`]: https://doc.rust-lang.org/std/process/struct.Command.html#method.status</span>
 <span class="doccomment">//! [TOML array]: https://github.com/toml-lang/toml#user-content-array</span>
@@ -2759,20 +3102,14 @@
 <span class="doccomment">//! [WixUIExtension]: https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html</span>
 <span class="doccomment">//! [WixUtilExtension]: https://wixtoolset.org/documentation/manual/v3/xsd/util/</span>
 <span class="doccomment">//! [WixUI localization documentation]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html</span>
+<span class="doccomment">//! [WiX preprocessor]: https://wixtoolset.org/documentation/manual/v3/overview/preprocessor.html</span>
 <span class="doccomment">//! [WiX Toolset]: http://wixtoolset.org</span>
 <span class="doccomment">//! [WordPad]: https://en.wikipedia.org/wiki/WordPad</span>
 <span class="doccomment">//! [workspace]: https://doc.rust-lang.org/cargo/reference/workspaces.html</span>
 <span class="doccomment">//! [WXS]: ../wix/enum.Template.html</span>
 <span class="doccomment">//! [XML]: https://en.wikipedia.org/wiki/XML</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">clap</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">env_logger</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">termcolor</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wix</span>;
-
-<span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">App</span>, <span class="ident">Arg</span>, <span class="ident">SubCommand</span>};
+<span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">crate_description</span>, <span class="ident">crate_name</span>, <span class="ident">crate_version</span>, <span class="ident">value_t</span>, <span class="ident">App</span>, <span class="ident">Arg</span>, <span class="ident">SubCommand</span>};
 
 <span class="kw">use</span> <span class="ident">env_logger</span>::<span class="ident">fmt</span>::<span class="ident">Color</span> <span class="kw">as</span> <span class="ident">LogColor</span>;
 <span class="kw">use</span> <span class="ident">env_logger</span>::<span class="ident">Builder</span>;
@@ -2915,6 +3252,31 @@
         .<span class="ident">long</span>(<span class="string">&quot;owner&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;O&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
+    <span class="comment">// The package option for the `create`, `init`, and `print` subcommands</span>
+    <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;package&quot;</span>)
+        .<span class="ident">help</span>(<span class="string">&quot;The name of the package in the current workspace&quot;</span>)
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Selects the package within a project organized as a workspace. \
+             Workspaces have one or more members, where each member is a package. \
+             This option selects the package by name.&quot;</span>,
+        )
+        .<span class="ident">long</span>(<span class="string">&quot;package&quot;</span>)
+        .<span class="ident">short</span>(<span class="string">&quot;p&quot;</span>)
+        .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
+    <span class="comment">// The path guid option for the `init` and `print` subcommands</span>
+    <span class="kw">let</span> <span class="ident">path_guid</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;path-guid&quot;</span>)
+        .<span class="ident">help</span>(<span class="string">&quot;A string formatted as a v4 hyphenated, uppercase UUID for the path component&quot;</span>)
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the automatically generated GUID for the path component. \
+             The path component needs a constant GUID so that the PATH \
+             environment variable can be updated properly during uninstall and \
+             upgrading. Generally, the GUID is generated once at the start \
+             of a product/project and stored in the WiX Source (WXS) file. Using \
+             a different GUID for each installer creation will leave artifacts \
+             after uninstallation.&quot;</span>,
+        )
+        .<span class="ident">long</span>(<span class="string">&quot;path-guid&quot;</span>)
+        .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The product icon option for the `init` and `print` subcommands</span>
     <span class="kw">let</span> <span class="ident">product_icon</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-icon&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.ico) for the Add/Remove Programs control panel&quot;</span>)
@@ -2924,9 +3286,8 @@
              application.&quot;</span>,
         )
         .<span class="ident">long</span>(<span class="string">&quot;product-icon&quot;</span>)
-        .<span class="ident">short</span>(<span class="string">&quot;p&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
-    <span class="comment">// The product name option for the `init`, `print`, and `sign` subcommands</span>
+    <span class="comment">// The product name option for the `init`, `print`, and `sign` subcommands.</span>
     <span class="kw">let</span> <span class="ident">product_name</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-name&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s Name&quot;</span>)
         .<span class="ident">long_help</span>(
@@ -2936,7 +3297,20 @@
              file (wxs) with a text editor.&quot;</span>,
         )
         .<span class="ident">long</span>(<span class="string">&quot;product-name&quot;</span>)
-        .<span class="ident">short</span>(<span class="string">&quot;P&quot;</span>)
+        .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
+    <span class="comment">// The upgrade guid option for the `init` and `print` subcommands.</span>
+    <span class="kw">let</span> <span class="ident">upgrade_guid</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;upgrade-guid&quot;</span>)
+        .<span class="ident">help</span>(<span class="string">&quot;A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code&quot;</span>)
+        .<span class="ident">long_help</span>(
+            <span class="string">&quot;Overrides the automatically generated GUID for the product&#39;s \
+             upgrade code. The upgrade code is used to determine if the installer \
+             is for a different product or the same product but should be \
+             upgraded instead of a new install. Generally, the upgrade code is \
+             generated once at the start of a product/project and stored in the \
+             WiX Source (WXS) file. Using a different GUID for each installer \
+             creation will install separate versions of a product.&quot;</span>
+        )
+        .<span class="ident">long</span>(<span class="string">&quot;upgrade-guid&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The &quot;global&quot; verbose flag for all subcommands.</span>
     <span class="kw">let</span> <span class="ident">verbose</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;verbose&quot;</span>)
@@ -3011,15 +3385,27 @@
                 .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;compiler-arg&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Send an argument to the WiX compiler (candle.exe)&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Appends the argument to the command that is \
-                        invoked when linking an installer. This is the same as \
-                        manually typing the option or flag for the linker at the \
+                        invoked when compiling an installer. This is the same as \
+                        manually typing the option or flag for the compiler at the \
                         command line. If the argument is for an option with a value, \
                         the option&#39;s value must be passed as a separate call of this \
-                        option. For example, &#39;-C -ext -C WixUtilExtension&#39;.&quot;</span>)
+                        option. Multiple occurrances are possible, but only one \
+                        value per occurrance is allowed to avoid ambiguity in \
+                        argument parsing. For example, &#39;-C -ext -C \
+                        WixUtilExtension&#39;.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;compiler-arg&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;C&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>)
-                    .<span class="ident">multiple</span>(<span class="bool-val">true</span>))
+                    .<span class="ident">multiple</span>(<span class="bool-val">true</span>)
+                    .<span class="ident">number_of_values</span>(<span class="number">1</span>)
+                    .<span class="ident">allow_hyphen_values</span>(<span class="bool-val">true</span>))
+                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;target&quot;</span>)
+                    .<span class="ident">help</span>(<span class="string">&quot;The cargo target to build the WiX installer for.&quot;</span>)
+                    .<span class="ident">long_help</span>(<span class="string">&quot;Tells cargo to build the given target, and instructs \
+                        WiX to build an installer targeting the right architecture.&quot;</span>)
+                    .<span class="ident">long</span>(<span class="string">&quot;target&quot;</span>)
+                    .<span class="ident">short</span>(<span class="string">&quot;t&quot;</span>)
+                    .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
                 .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;debug-build&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Builds the package using the Debug profile&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Uses the Debug profile when building the package \
@@ -3085,8 +3471,11 @@
                         .<span class="ident">short</span>(<span class="string">&quot;o&quot;</span>)
                         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
                     .<span class="ident">arg</span>(<span class="ident">owner</span>.<span class="ident">clone</span>())
+                    .<span class="ident">arg</span>(<span class="ident">package</span>.<span class="ident">clone</span>())
+                    .<span class="ident">arg</span>(<span class="ident">path_guid</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">product_icon</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">product_name</span>.<span class="ident">clone</span>())
+                    .<span class="ident">arg</span>(<span class="ident">upgrade_guid</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">url</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">verbose</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">year</span>.<span class="ident">clone</span>()))
@@ -3116,11 +3505,16 @@
                         manually typing the option or flag for the linker at the \
                         command line. If the argument is for an option with a value, \
                         the option&#39;s value must be passed as a separate call of this \
-                        option. For example, &#39;-L -ext -L WixUIExtension&#39;.&quot;</span>)
+                        option. Multiple occurrances are possible, but only one \
+                        value per occurrance is allowed to avoid ambiguity in \
+                        argument parsing. For example, &#39;-L -ext -L \
+                        WixUIExtension&#39;.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;linker-arg&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;L&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>)
-                    .<span class="ident">multiple</span>(<span class="bool-val">true</span>))
+                    .<span class="ident">multiple</span>(<span class="bool-val">true</span>)
+                    .<span class="ident">number_of_values</span>(<span class="number">1</span>)
+                    .<span class="ident">allow_hyphen_values</span>(<span class="bool-val">true</span>))
                 .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;locale&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;A path to a WiX localization file (.wxl)&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to a WiX localization file (wxl) \
@@ -3166,6 +3560,7 @@
                     .<span class="ident">long</span>(<span class="string">&quot;output&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;o&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
+                .<span class="ident">arg</span>(<span class="ident">package</span>.<span class="ident">clone</span>())
                 .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;print&quot;</span>)
                     .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Prints a template&quot;</span>)
@@ -3200,6 +3595,8 @@
                         .<span class="ident">short</span>(<span class="string">&quot;o&quot;</span>)
                         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
                     .<span class="ident">arg</span>(<span class="ident">owner</span>)
+                    .<span class="ident">arg</span>(<span class="ident">package</span>)
+                    .<span class="ident">arg</span>(<span class="ident">path_guid</span>)
                     .<span class="ident">arg</span>(<span class="ident">product_icon</span>)
                     .<span class="ident">arg</span>(<span class="ident">product_name</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;TEMPLATE&quot;</span>)
@@ -3213,6 +3610,7 @@
                             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>())
                         .<span class="ident">required</span>(<span class="bool-val">true</span>)
                         .<span class="ident">index</span>(<span class="number">1</span>))
+                    .<span class="ident">arg</span>(<span class="ident">upgrade_guid</span>)
                     .<span class="ident">arg</span>(<span class="ident">url</span>)
                     .<span class="ident">arg</span>(<span class="ident">year</span>)
                     .<span class="ident">arg</span>(<span class="ident">verbose</span>.<span class="ident">clone</span>()))
@@ -3361,8 +3759,11 @@
             <span class="ident">init</span>.<span class="ident">license</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;license&quot;</span>));
             <span class="ident">init</span>.<span class="ident">manufacturer</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;manufacturer&quot;</span>));
             <span class="ident">init</span>.<span class="ident">output</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;output&quot;</span>));
+            <span class="ident">init</span>.<span class="ident">package</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;package&quot;</span>));
+            <span class="ident">init</span>.<span class="ident">path_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;path-guid&quot;</span>));
             <span class="ident">init</span>.<span class="ident">product_icon</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-icon&quot;</span>));
             <span class="ident">init</span>.<span class="ident">product_name</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-name&quot;</span>));
+            <span class="ident">init</span>.<span class="ident">upgrade_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;upgrade-guid&quot;</span>));
             <span class="ident">init</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
         (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
@@ -3380,8 +3781,11 @@
                     <span class="ident">print</span>.<span class="ident">license</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;license&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">manufacturer</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;manufacturer&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">output</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;output&quot;</span>));
+                    <span class="ident">print</span>.<span class="ident">package</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;package&quot;</span>));
+                    <span class="ident">print</span>.<span class="ident">path_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;path-guid&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">product_icon</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-icon&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">product_name</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-name&quot;</span>));
+                    <span class="ident">print</span>.<span class="ident">upgrade_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;upgrade-guid&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">build</span>().<span class="ident">run</span>()
                 }
                 <span class="ident">t</span> <span class="op">=</span><span class="op">&gt;</span> {
@@ -3406,6 +3810,7 @@
             <span class="ident">sign</span>.<span class="ident">description</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;description&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">homepage</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;homepage&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
+            <span class="ident">sign</span>.<span class="ident">package</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;package&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">product_name</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;product-name&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">timestamp</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;timestamp&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">build</span>().<span class="ident">run</span>()
@@ -3426,6 +3831,8 @@
             <span class="ident">create</span>.<span class="ident">no_build</span>(<span class="ident">matches</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-build&quot;</span>));
             <span class="ident">create</span>.<span class="ident">output</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;output&quot;</span>));
             <span class="ident">create</span>.<span class="ident">version</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;install-version&quot;</span>));
+            <span class="ident">create</span>.<span class="ident">package</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;package&quot;</span>));
+            <span class="ident">create</span>.<span class="ident">target</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;target&quot;</span>));
             <span class="ident">create</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
     };
@@ -3470,4 +3877,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

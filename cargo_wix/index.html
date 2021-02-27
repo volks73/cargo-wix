@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate cargo_wix</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all cargo_wix's items</p></a><div class="block items"><ul><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'cargo_wix', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/cargo_wix/main.rs.html#15-1735' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>cargo_wix</a></span></h1><div class='docblock'><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `cargo_wix` crate."><meta name="keywords" content="rust, rustlang, rust-lang, cargo_wix"><title>cargo_wix - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../cargo_wix/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate cargo_wix</p><div class="block version"><p>Version 0.3.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all cargo_wix's items</p></a><div class="block items"><ul><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><script>window.sidebarCurrent = {name: "cargo_wix", ty: "mod", relpath: "../"};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/cargo_wix/main.rs.html#15-1937" title="goto source code">[src]</a></span><span class="in-band">Crate <a class="mod" href="">cargo_wix</a></span></h1><div class="docblock"><h1 id="cargo-wix-binary-and-subcommand" class="section-header"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h1>
 <p>The goal of the cargo-wix project and the <code>cargo wix</code> subcommand is to make
 it easy to create a Windows installer (msi) for any Rust project. The
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but the core
@@ -9,11 +12,13 @@ focuses on the usage and features of the <code>cargo wix</code> subcommand.</p>
 <h2 id="table-of-contents" class="section-header"><a href="#table-of-contents">Table of Contents</a></h2>
 <ul>
 <li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#c-runtime">C Runtime</a></li>
 <li><a href="#examples">Examples</a></li>
 <li><a href="#features">Features</a>
 <ul>
 <li><a href="#signing">Signing</a></li>
 <li><a href="#templates">Templates</a></li>
+<li><a href="#variables">Variables</a></li>
 <li><a href="#extensions">Extensions</a></li>
 <li><a href="#multiple-wix-sources">Multiple WiX Sources</a></li>
 <li><a href="#bundles">Bundles</a></li>
@@ -52,6 +57,47 @@ executable can be called from anywhere with a command prompt. Most of these
 behaviors can be adjusted during the installation process. The default
 installation destination is <code>C:\Program Files\&lt;project name&gt;</code>, where
 <code>&lt;project name&gt;</code> is replaced with the name of the project.</p>
+<h2 id="c-runtime" class="section-header"><a href="#c-runtime">C Runtime</a></h2>
+<p>If using the <code>x86_64-pc-windows-msvc</code> or the <code>i686-pc-windows-msvc</code>
+toolchain, then an appropriate C RunTime (CRT) must be available on the host
+system <em>or</em> the CRT must be statically compiled with the Rust binary
+(executable). By default, the CRT is dynamically linked to a Rust binary if
+using Microsoft Visual C compiler (MSVC). This may cause issues and errors
+when running the Rust binary immediately after installation on a clean
+Windows installation, i.e. the CRT has not already been installed. If the
+Rust compiler is installed and an <code>-msvc</code> toolchain is available, then the
+Rust binary will execute after installation without an issue.</p>
+<p><strong>Note</strong>, the Rust programming language does <em>not</em> need to be installed
+to run an executable built using Cargo and Rust. Only a Microsoft-provided CRT
+needs to be installed. These are often referred to as &quot;redistributables&quot;. Rust
+with either of the <code>-msvc</code> toolchains will dynamically link against the
+<code>vcruntime140.dll</code>, which is part of the Visual C++ 2015 redistributable and
+freely provided by Microsoft.</p>
+<p>For developers using the <code>cargo wix</code> subcommand to create an installer, this
+dependency on the presence of an appropriate C runtime can lead to a sub-optimal
+user experience. There are three options: (i) statically link the C runtime
+within the Rust binary (recommended), (ii) add the Visual C++ redistributable to
+the installer via the <a href="https://wixtoolset.org/documentation/manual/v3/howtos/redistributables_and_install_checks/install_vcredist.html">Merge module</a> method for the WiX Toolset, or (iii)
+provide the user with instructions for downloading and installing the CRT
+<em>before</em> running the executable.</p>
+<p>The current recommended option is to <a href="https://doc.rust-lang.org/reference/linkage.html#static-and-dynamic-c-runtimes">statically link the CRT</a> when building
+the Rust binary. Rust v1.19 or newer is required, and the solution
+ultimately becomes adding the <code>-C target-feature=+crt-static</code> option to the
+invocation of the Rust compiler (rustc). There are a variety of methods for
+adding the option to the invocation, including but not limited to: (i)
+creating a Cargo configuration file for the user or project, i.e.
+<code>.cargo/config.toml</code>, and adding the following:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+[<span class="ident">target</span>.<span class="ident">x86_64</span><span class="op">-</span><span class="ident">pc</span><span class="op">-</span><span class="ident">windows</span><span class="op">-</span><span class="ident">msvc</span>]
+<span class="ident">rustflags</span> <span class="op">=</span> [<span class="string">&quot;-C&quot;</span>, <span class="string">&quot;target-feature=+crt-static&quot;</span>]
+
+[<span class="ident">target</span>.<span class="ident">i686</span><span class="op">-</span><span class="ident">pc</span><span class="op">-</span><span class="ident">windows</span><span class="op">-</span><span class="ident">msvc</span>]
+<span class="ident">rustflags</span> <span class="op">=</span> [<span class="string">&quot;-C&quot;</span>, <span class="string">&quot;target-feature=+crt-static&quot;</span>]</pre></div>
+<p>to the <code>config.toml</code> file or (ii) creating the <code>RUSTFLAGS</code> environment
+variable and setting its value to <code>&quot;-C target-feature=+crt-static&quot;</code>. Please
+see the Rust compiler documentation on static linking for more information
+and details.</p>
 <h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>All of the following examples use the native Command Prompt (cmd.exe) for
 the Windows OS; however, the <a href="https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx">Developer Prompt</a> installed with the <a href="https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017">VC Build
@@ -282,6 +328,51 @@ sidecar file is included in the installation and no license agreement dialog
 appears during installation. This default behavior can be overridden with
 the <code>-l,--license</code> and <code>-e,--eula</code> options for the <code>cargo wix init</code>
 subcommand.</p>
+<h3 id="variables" class="section-header"><a href="#variables">Variables</a></h3>
+<p>The cargo-wix subcommand automatically passes some Cargo and build
+configuration-related values to the WiX Toolset compiler (candle.exe). These
+variables can be used within a WiX Source (WXS) file using the
+<code>$(var.&lt;VARIABLE&gt;)</code> notation, where <code>&lt;VARIABLE&gt;</code> is replaced with the name
+of variable passed from the cargo-wix subcommand to the WiX Toolset
+compiler using the <code>-DKEY=VALUE</code> option. Notable usage of these variables
+are in <a href="https://wixtoolset.org/documentation/manual/v3/overview/preprocessor.html">WiX preprocessor</a> directives to dynamically change the installer
+creation at build time. Below is a current list of variables passed from the
+cargo-wix subcommand to a WXS file during installer creation.</p>
+<ul>
+<li><code>TargetTriple</code> = The rustc target triple name as seen with the <code>rustc --print target-list</code> command</li>
+<li><code>TargetEnv</code> = The rustc target environment, as seen with the output from
+the <code>rustc --print cfg</code> command as <code>target_env</code>. On Windows, this typically
+either <code>msvc</code> or <code>gnu</code> depending on the toolchain downloaded and installed.</li>
+<li><code>TargetVendor</code> = The rustc target vendor, as seen with the output from the
+<code>rustc --print cfg</code> command as <code>target_vendor</code>. This is typically <code>pc</code>, but Rust
+does support other vendors, like <code>uwp</code>.</li>
+<li><code>CargoTargetBinDir</code> = The complete path to the binary (exe). The default
+would be <code>target\release\&lt;BINARY_NAME&gt;.exe</code> where <code>&lt;BINARY_NAME&gt;</code> is replaced
+with the name of each binary target defined in the package's manifest
+(Cargo.toml). If a different rustc target triple is used than the host, i.e.
+cross-compiling, then the default path would be
+<code>target\&lt;CARGO_TARGET&gt;\&lt;CARGO_PROFILE&gt;\&lt;BINARY_NAME&gt;.exe</code>, where
+<code>&lt;CARGO_TARGET&gt;</code> is replaced with the <code>CargoTarget</code> variable value and
+<code>&lt;CARGO_PROFILE&gt;</code> is replaced with the value from the <code>CargoProfile</code> variable.</li>
+<li><code>CargoTargetDir</code> = The path to the directory for the build artifacts, i.e.
+<code>target</code>.</li>
+<li><code>CargoProfile</code> = Either <code>debug</code> or <code>release</code> depending on the build
+profile. The default is <code>release</code>.</li>
+<li><code>Platform</code> = (Deprecated) Either <code>x86</code>, <code>x64</code>, <code>arm</code>, or <code>arm64</code>. See the
+documentation for the WiX Toolset compiler (candle.exe) <code>-arch</code> option.
+Note, this variable is deprecated and will eventually be removed because it is
+ultimately redundant to the <code>$(sys.BUILDARCH)</code> variable that is already provided
+by the WiX Toolset compiler. Existing projects should replace usage of
+<code>$(var.Platform)</code> with <code>$(sys.BUILDARCH)</code>. No action is needed for new projects.</li>
+<li><code>Profile</code> = (Deprecated) See <code>CargoProfile</code>.</li>
+<li><code>Version</code> = The version for the installer. The default is the
+<code>Major.Minor.Fix</code> semantic versioning number of the Rust package.</li>
+</ul>
+<p>Additional, user-defined variables for custom WXS files can be passed to the
+WiX Toolset compiler (candle.exe) using the cargo-wix subcommand
+<code>-C,--compiler-arg</code> option. For example,</p>
+<pre><code class="language-dos">C:\Path\To\Project\&gt;cargo wix -C &quot;-DUSER_KEY=USER_VALUE&quot;
+</code></pre>
 <h3 id="extensions" class="section-header"><a href="#extensions">Extensions</a></h3>
 <p>The <a href="https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html">WixUIExtension</a> and <a href="https://wixtoolset.org/documentation/manual/v3/xsd/util/">WixUtilExtension</a> are included in every execution
 of the default <em>create</em> cargo-wix subcommand, i.e. <code>cargo wix</code>. This is the
@@ -571,10 +662,12 @@ file. A relative or absolute path is acceptable.</p>
 <p>Available for the default _create (<code>cargo wix</code>) subcommand.</p>
 <p>Appends an argument to the WiX compiler (candle.exe) invocation. This
 provides a mechanism for &quot;passing&quot; arguments to the compiler. This can be called
-multiple times to pass multiple arguments (flags or options). Note, if it is an
-option, i.e. argument with an accompanying value, then the value must be passed
-as a separate usage of this option. For example, adding an user-defined compiler
-extension would require the following command <code>cargo wix -C -ext -C UserDefinedExtension</code> to yield a <code>candle -ext UserDefinedExtension</code> invocation.</p>
+multiple times to pass multiple arguments (flags or options), but only one
+value per occurrance is allowed to avoid ambiguity during argument parsing.
+Note, if it is an option, i.e. argument with an accompanying value, then the
+value must be passed as a separate usage of this option. For example, adding
+an user-defined compiler extension would require the following command
+<code>cargo wix -C -ext -C UserDefinedExtension</code> to yield a <code>candle -ext UserDefinedExtension</code> invocation.</p>
 <h3 id="-c--culture" class="section-header"><a href="#-c--culture"><code>-c,--culture</code></a></h3>
 <p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
 <p>Sets the culture for localization. Use with the [<code>-l,--locale</code>] option. See
@@ -661,9 +754,10 @@ Source file (WXS) in a text editor.</p>
 <p>Available for the default _create (<code>cargo wix</code>) subcommand.</p>
 <p>Appends an argument to the WiX linker (light.exe) invocation. This provides
 a mechanism for &quot;passing&quot; arguments to the linker. This can be called
-multiple times to pass multiple arguments (flags or options). Note, if it is
-an option, i.e. argument with an accompanying value, then the value must be
-passed as a separate usage of this option. For example, adding an
+multiple times to pass multiple arguments (flags or options). Only one value
+per occurrance is allowed to avoid ambiguity during argument parsing. Note,
+if it is an option, i.e. argument with an accompanying value, then the value
+must be passed as a separate usage of this option. For example, adding an
 user-defined linker extension would require the following command <code>cargo wix -L -ext -L UserDefinedExtension</code> to yield a <code>light -ext UserDefinedExtension</code> invocation.</p>
 <h3 id="-l--locale" class="section-header"><a href="#-l--locale"><code>-l,--locale</code></a></h3>
 <p>Available for the default <em>create</em> (<code>cargo wix</code>) subcommand.</p>
@@ -707,12 +801,27 @@ subcommands.</p>
 The default is to use the first author from the package's manifest
 (Cargo.toml). This is only used when generating a license based on the value
 of the <code>license</code> field in the package's manifest.</p>
-<h3 id="-p--product-icon" class="section-header"><a href="#-p--product-icon"><code>-p,--product-icon</code></a></h3>
+<h3 id="-p--package" class="section-header"><a href="#-p--package"><code>-p,--package</code></a></h3>
+<p>Available for the <em>create</em> (<code>cargo wix</code>), <em>init</em> (<code>cargo wix init</code>), and
+<em>print</em> (<code>cargo wix print</code>) subcommands.</p>
+<p>Selects the package within a workspace. This is required if a project
+organized with a workspace. A workspace can have one or more members, where
+each member may have a separate installer. This option has no effect if the
+project does not use a workspace.</p>
+<h3 id="--path-guid" class="section-header"><a href="#--path-guid"><code>--path-guid</code></a></h3>
+<p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
+subcommands.</p>
+<p>Overrides the automatically generated GUID for the path component with an
+existing GUID in the hyphenated, uppercase format. The path GUID should only
+be generated once for a product/project. The same GUID should be used for
+all installer creations to ensure no artifacts are left after uninstalling
+and proper modification of the <code>PATH</code> environment variable.</p>
+<h3 id="--product-icon" class="section-header"><a href="#--product-icon"><code>--product-icon</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
 <p>Sets the path to an image file that will be display as an icon in the
 Add/Remove Programs (ARP) control panel for the installed application.</p>
-<h3 id="-p--product-name" class="section-header"><a href="#-p--product-name"><code>-P,--product-name</code></a></h3>
+<h3 id="--product-name" class="section-header"><a href="#--product-name"><code>--product-name</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>), <em>print</em> (<code>cargo wix print</code>),
 and <em>sign</em> (<code>cargo wix sign</code>) subcommands.</p>
 <p>Overrides the <code>name</code> field of the package's manifest (Cargo.toml) as the
@@ -724,6 +833,15 @@ with a text editor.</p>
 <p>An alias or URL to a timestamp server when signing an installer with a
 certificate. Valid aliases are: <code>Comodo</code> and <code>Versign</code>, which are case
 insenstive.</p>
+<h3 id="--upgrade-guid" class="section-header"><a href="#--upgrade-guid"><code>--upgrade-guid</code></a></h3>
+<p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
+subcommands.</p>
+<p>Overrides the automatically generated GUID for the product's upgrade code
+with an existing GUID in the hyphenated, uppercase format. The upgrade code
+should only be generated once for a product/project. The same upgrade code
+should then be used for all installer creations of the same product/project. If
+a new GUID is used every time an installer is created, then each installer will
+be installing the same product but as separate installations.</p>
 <h3 id="-u--url" class="section-header"><a href="#-u--url"><code>-u,--url</code></a></h3>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
@@ -749,6 +867,6 @@ subcommands.</p>
 is to use the current year. This is only used if a license is generated from
 one of the supported licenses based on the value of the <code>license</code> field in
 the package's manifest (Cargo.toml).</p>
-</div><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
-<table><tr class='module-item'><td><a class="constant" href="constant.SUBCOMMAND_NAME.html" title='cargo_wix::SUBCOMMAND_NAME constant'>SUBCOMMAND_NAME</a></td><td class='docblock-short'></td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table><tr class='module-item'><td><a class="fn" href="fn.main.html" title='cargo_wix::main fn'>main</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "cargo_wix";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
+</div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
+<table><tr class="module-item"><td><a class="constant" href="constant.SUBCOMMAND_NAME.html" title="cargo_wix::SUBCOMMAND_NAME constant">SUBCOMMAND_NAME</a></td><td class="docblock-short"></td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.main.html" title="cargo_wix::main fn">main</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "cargo_wix";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
