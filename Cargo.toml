@@ -48,6 +48,11 @@ version = "2"
 default-features = false
 features = ["suggestions", "vec_map"]
 
+[workspace]
+members = [
+    "xtask"
+]
+
 [badges]
 is-it-maintained-issue-resolution = { repository = "volks73/cargo-wix" }
 is-it-maintained-open-issues = { repository = "volks73/cargo-wix" }
