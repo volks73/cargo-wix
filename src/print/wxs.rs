@@ -31,7 +31,7 @@ use log::{debug, trace, warn};
 use mustache::{self, MapBuilder};
 
 use std::path::{Path, PathBuf};
-use std::{collections::HashMap, fs, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 use cargo_metadata::Package;
 
@@ -407,11 +407,7 @@ impl Execution {
             }
             e => map = map.insert_str("eula", e.to_string()),
         }
-        if let Some(url) = self
-            .help_url
-            .to_owned()
-            .or_else(|| Execution::help_url(&package))
-        {
+        if let Some(url) = self.help_url(&package) {
             map = map.insert_str("help-url", url);
         } else {
             warn!(
@@ -484,25 +480,12 @@ impl Execution {
             .expect("Path to string conversion")
     }
 
-    fn help_url(package: &Package) -> Option<String> {
-        let manifest = fs::read_to_string(&package.manifest_path)
-            .ok()
-            .and_then(|v| toml::Value::from_str(&v).ok());
-
-        manifest
-            .as_ref()
-            .and_then(|v| v.get("package"))
-            .and_then(|p| p.as_table())
-            .and_then(|t| {
-                t.get("documentation")
-                    .or_else(|| t.get("homepage"))
-                    .or_else(|| t.get("repository"))
-            })
-            .and_then(|h| h.as_str())
-            .map(|s| {
-                trace!("Using '{}' for the help URL", s);
-                String::from(s)
-            })
+    fn help_url(&self, manifest: &Package) -> Option<String> {
+        self.help_url.as_ref()
+            .map(String::from)
+            .or_else(|| manifest.documentation.clone())
+            .or_else(|| manifest.homepage.clone())
+            .or_else(|| manifest.repository.clone())
     }
 
     fn eula(&self, manifest: &Package) -> Result<Eula> {
@@ -1065,7 +1048,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::help_url(&package);
+            let actual = Builder::default().build().help_url(&package);
             assert!(actual.is_none());
         }
 
@@ -1077,7 +1060,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::help_url(&package);
+            let actual = Builder::default().build().help_url(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
@@ -1089,7 +1072,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::help_url(&package);
+            let actual = Builder::default().build().help_url(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
@@ -1101,7 +1084,7 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::help_url(&package);
+            let actual = Builder::default().build().help_url(&package);
             assert_eq!(actual, Some(String::from(EXPECTED)));
         }
 
