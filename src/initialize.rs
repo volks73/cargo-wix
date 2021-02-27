@@ -141,7 +141,7 @@ impl<'a> Builder<'a> {
     /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package's manifest (Cargo.toml).
     ///
-    /// ['eula']: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
+    /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
     pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
         self.copyright_holder = h;
         self
@@ -159,7 +159,7 @@ impl<'a> Builder<'a> {
     /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package's manifest (Cargo.toml).
     ///
-    /// ['eula']: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
+    /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
     pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
         self.copyright_year = y;
         self
@@ -209,6 +209,8 @@ impl<'a> Builder<'a> {
     /// the `.rtf` extension, then the license agreement dialog is skipped and
     /// there is no EULA for the installer. This would override the default
     /// behavior and ensure the license agreement dialog is used.
+    ///
+    /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
     pub fn eula(&mut self, e: Option<&'a str>) -> &mut Self {
         self.eula = e;
         self
@@ -825,15 +827,14 @@ mod tests {
         #[test]
         fn destination_is_correct_with_output() {
             let expected = PathBuf::from("output");
-
             let temp_dir = crate::tests::setup_project(MIN_PACKAGE);
-
-            let mut e = Execution::default();
-            e.output = Some(expected.clone());
-
+            let e = Execution {
+                output: Some(expected.clone()),
+                ..Default::default()
+            };
             let actual = crate::manifest(Some(&temp_dir.path().join("Cargo.toml")))
                 .and_then(|manifest| crate::package(&manifest, None))
-                .and_then(|package| Ok(e.destination(&package)))
+                .map(|package| e.destination(&package))
                 .unwrap();
 
             assert_eq!(actual, expected);
