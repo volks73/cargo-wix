@@ -1,5 +1,6 @@
 use anyhow::{bail, Result};
 use structopt::StructOpt;
+use fs_extra::dir::CopyOptions;
 
 use std::env;
 use std::path::PathBuf;
@@ -34,7 +35,10 @@ fn main() -> Result<()> {
                     .map(|entry| entry.unwrap().path())
                     .collect::<Vec<PathBuf>>(),
                 &env::current_dir()?,
-                &fs_extra::dir::CopyOptions::new()
+                &CopyOptions {
+                    skip_exist: true,
+                    ..CopyOptions::new()
+                }
             )?;
             let status = Command::new("git").arg("checkout").arg("main").status()?;
             if !status.success() {
