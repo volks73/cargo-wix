@@ -27,9 +27,10 @@ fn main() -> Result<()> {
             if !status.success() {
                 bail!("The 'git checkout gh-pages' command failed");
             }
+            let mut last_progress = 0;
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
-            fs_extra::copy_items(
+            fs_extra::copy_items_with_progress(
                 &target_doc_dir
                     .read_dir()?
                     .map(|entry| entry.unwrap().path())
@@ -40,6 +41,17 @@ fn main() -> Result<()> {
                     skip_exist: false,
                     copy_inside: true,
                     ..CopyOptions::new()
+                },
+                |info| {
+                    if info.copied_bytes >> 20 > last_progress {
+                        last_progress = info.copied_bytes >> 20;
+                        eprintln!(
+                            "~ {}/{} MiB",
+                            info.copied_bytes >> 20,
+                            info.total_bytes >> 20
+                        );
+                    }
+                    fs_extra::dir::TransitProcessResult::ContinueOrAbort
                 }
             )?;
             let status = Command::new("git").arg("checkout").arg("main").status()?;
