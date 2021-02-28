@@ -77,8 +77,8 @@ fn main() -> Result<()> {
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
             copy(target_doc_dir, env::current_dir()?)?;
-            // TODO: Add committing changes
-            // TODO: Add pushing changes to repository
+            // TODO: Add committing changes, "git commit -m 'Change content to match latest revision'"
+            // TODO: Add pushing changes to repository, "git push"
             let status = Command::new("git").arg("checkout").arg("main").status()?;
             if !status.success() {
                 bail!("The 'git checkout main' command failed");
