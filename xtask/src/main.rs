@@ -1,8 +1,8 @@
 use anyhow::{bail, Result};
 use structopt::StructOpt;
 
-use std::fs;
 use std::env;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -66,21 +66,45 @@ fn main() -> Result<()> {
                 .map(PathBuf::from)
                 .ok()
                 .unwrap_or_else(|| PathBuf::from("cargo"));
-            let status = Command::new(cargo).arg("doc").arg("--no-deps").status()?;
-            if !status.success() {
+            if !Command::new(cargo)
+                .arg("doc")
+                .arg("--no-deps")
+                .status()?
+                .success()
+            {
                 bail!("The 'cargo doc' command failed");
             }
-            let status = Command::new("git").arg("checkout").arg("gh-pages").status()?;
-            if !status.success() {
+            if !Command::new("git")
+                .arg("checkout")
+                .arg("gh-pages")
+                .status()?
+                .success()
+            {
                 bail!("The 'git checkout gh-pages' command failed");
             }
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
             copy(target_doc_dir, env::current_dir()?)?;
-            // TODO: Add committing changes, "git commit -m 'Change content to match latest revision'"
-            // TODO: Add pushing changes to repository, "git push"
-            let status = Command::new("git").arg("checkout").arg("main").status()?;
-            if !status.success() {
+            if !Command::new("git")
+                .arg("commit")
+                .arg("-m")
+                .arg("Change content to match latest revision")
+                .status()?
+                .success()
+            {
+                bail!(
+                    "The 'git commit -m 'Change content to match latest revision' command failed"
+                );
+            }
+            if !Command::new("git").arg("push").status()?.success() {
+                bail!("The 'git push' command failed");
+            }
+            if !Command::new("git")
+                .arg("checkout")
+                .arg("main")
+                .status()?
+                .success()
+            {
                 bail!("The 'git checkout main' command failed");
             }
         }
