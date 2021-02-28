@@ -72,7 +72,7 @@ fn main() -> Result<()> {
                 .status()?
                 .success()
             {
-                bail!("The 'cargo doc' command failed");
+                bail!("The 'cargo doc --no-deps' command failed");
             }
             if !Command::new("git")
                 .arg("checkout")
@@ -85,22 +85,26 @@ fn main() -> Result<()> {
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
             copy(target_doc_dir, env::current_dir()?)?;
-            if !Command::new("git").arg("add").arg("-A").status()?.success() {
-                bail!("The 'git add -A' command failed")
-            }
             if !Command::new("git")
+                .arg("add")
+                .arg("--verbose")
+                .arg("--all")
+                .status()?
+                .success()
+            {
+                bail!("The 'git add --verbose --all' command failed")
+            }
+            if Command::new("git")
                 .arg("commit")
+                .arg("--verbose")
                 .arg("-m")
                 .arg("Change content to match latest revision")
                 .status()?
                 .success()
             {
-                bail!(
-                    "The 'git commit -m 'Change content to match latest revision' command failed"
-                );
-            }
-            if !Command::new("git").arg("push").status()?.success() {
-                bail!("The 'git push' command failed");
+                if !Command::new("git").arg("push").status()?.success() {
+                    bail!("The 'git push' command failed");
+                }
             }
             if !Command::new("git")
                 .arg("checkout")
