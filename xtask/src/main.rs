@@ -85,6 +85,9 @@ fn main() -> Result<()> {
             let mut target_doc_dir = PathBuf::from("target");
             target_doc_dir.push("doc");
             copy(target_doc_dir, env::current_dir()?)?;
+            if !Command::new("git").arg("add").arg("-A").status()?.success() {
+                bail!("The 'git add -A' command failed")
+            }
             if !Command::new("git")
                 .arg("commit")
                 .arg("-m")
@@ -101,7 +104,7 @@ fn main() -> Result<()> {
             }
             if !Command::new("git")
                 .arg("checkout")
-                .arg("main")
+                .arg("-")
                 .status()?
                 .success()
             {
