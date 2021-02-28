@@ -8,6 +8,7 @@ use std::process::Command;
 
 #[derive(Debug, StructOpt)]
 enum XTask {
+    /// Upload documentation to Github Pages (ghp) via the `gh-pages` branch.
     Ghp,
 }
 
