@@ -19,7 +19,7 @@ fn copy<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<()> {
     let input_root = PathBuf::from(from.as_ref()).components().count();
 
     while let Some(working_path) = stack.pop() {
-        println!("process: {:?}", &working_path);
+        println!("process: {}", &working_path.display());
 
         // Generate a relative path
         let src: PathBuf = working_path.components().skip(input_root).collect();
@@ -31,7 +31,7 @@ fn copy<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<()> {
             output_root.join(&src)
         };
         if fs::metadata(&dest).is_err() {
-            println!("mkdir: {:?}", dest);
+            println!("mkdir: {}", dest.display());
             fs::create_dir_all(&dest)?;
         }
 
@@ -44,11 +44,11 @@ fn copy<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<()> {
                 match path.file_name() {
                     Some(filename) => {
                         let dest_path = dest.join(filename);
-                        println!("copy: {:?} -> {:?}", &path, &dest_path);
+                        println!("copy: {} -> {}", &path.display(), &dest_path.display());
                         fs::copy(&path, &dest_path)?;
                     }
                     None => {
-                        println!("failed: {:?}", path);
+                        println!("failed: {}", path.display());
                     }
                 }
             }
