@@ -18,7 +18,7 @@ C:\Path\To\Project\>cargo wix init
 C:\Path\To\Project\>cargo wix
 ```
 
-The Windows installer (msi) for the project will be in the `C:\Path\To\Project\target\wix` folder.
+The Windows installer (msi) for the project will be in the `C:\Path\To\Project\target\wix` folder. Please see the [Documentation](https://volks73.github.io/cargo-wix/cargo_wix/index.html) for more advanced usage, configuration, and customization.
 
 ## Installation
 
