@@ -57,6 +57,12 @@ A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by sp
 C:\Path\to\Project> cargo wix Path\to\WiX\Source\File.wxs
 ```
 
+You can also automatically run the installer after creating it by specifying the `--install` argument:
+
+```dos
+C:\Path\to\Project> cargo wix --install
+```
+
 The `print <template>` subcommand, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
 
 ```dos

@@ -202,6 +202,13 @@
 //! is an artifact of the installer build process and can be ignored and/or
 //! deleted.
 //!
+//! You can also automatically run the installer after creating it by
+//! specifying the `--install` argument:
+//!
+//! ```dos
+//! C:\Path\to\Project> cargo wix --install
+//!  ```
+//!
 //! The installer that is created with the above steps and commands will install
 //! the `example.exe` file to: `C:\Program Files\example\bin\example.exe`. It
 //! will also add the `C:\Program Files\example\bin` path to the `PATH` system
@@ -1603,6 +1610,10 @@ fn main() {
                         for the binary and Windows installer, respectively. Use this \
                         flag to show the output.")
                     .long("nocapture"))
+                .arg(Arg::with_name("install")
+                    .help("Runs the installer after creating it")
+                    .long_help("Creates the installer and runs it after that.")
+                    .long("install"))
                 .arg(Arg::with_name("output")
                     .help("A path to a destination file or an existing folder")
                     .long_help("Sets the destination file name and path for the \
@@ -1888,6 +1899,7 @@ fn main() {
             create.locale(matches.value_of("locale"));
             create.name(matches.value_of("name"));
             create.no_build(matches.is_present("no-build"));
+            create.install(matches.is_present("install"));
             create.output(matches.value_of("output"));
             create.version(matches.value_of("install-version"));
             create.package(matches.value_of("package"));
