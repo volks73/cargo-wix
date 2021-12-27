@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cargo_wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1938,8 +1935,19 @@
 <span id="1935">1935</span>
 <span id="1936">1936</span>
 <span id="1937">1937</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="comment">// you may not use this file except in compliance with the License.</span>
@@ -2142,6 +2150,13 @@
 <span class="doccomment">//! Great! An installer (msi) exists for the application. The `main.wixobj` file</span>
 <span class="doccomment">//! is an artifact of the installer build process and can be ignored and/or</span>
 <span class="doccomment">//! deleted.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You can also automatically run the installer after creating it by</span>
+<span class="doccomment">//! specifying the `--install` argument:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```dos</span>
+<span class="doccomment">//! C:\Path\to\Project&gt; cargo wix --install</span>
+<span class="doccomment">//!  ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The installer that is created with the above steps and commands will install</span>
 <span class="doccomment">//! the `example.exe` file to: `C:\Program Files\example\bin\example.exe`. It</span>
@@ -3111,28 +3126,28 @@
 
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">crate_description</span>, <span class="ident">crate_name</span>, <span class="ident">crate_version</span>, <span class="ident">value_t</span>, <span class="ident">App</span>, <span class="ident">Arg</span>, <span class="ident">SubCommand</span>};
 
-<span class="kw">use</span> <span class="ident">env_logger</span>::<span class="ident">fmt</span>::<span class="ident">Color</span> <span class="kw">as</span> <span class="ident">LogColor</span>;
-<span class="kw">use</span> <span class="ident">env_logger</span>::<span class="ident">Builder</span>;
+<span class="kw">use</span> <span class="ident">env_logger::fmt::Color</span> <span class="kw">as</span> <span class="ident">LogColor</span>;
+<span class="kw">use</span> <span class="ident">env_logger::Builder</span>;
 
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">Level</span>, <span class="ident">LevelFilter</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
+<span class="kw">use</span> <span class="ident">std::io::Write</span>;
 
 <span class="kw">use</span> <span class="ident">termcolor</span>::{<span class="ident">Color</span>, <span class="ident">ColorChoice</span>, <span class="ident">ColorSpec</span>, <span class="ident">StandardStream</span>, <span class="ident">WriteColor</span>};
 
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">clean</span>;
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">create</span>;
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">initialize</span>;
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">print</span>;
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">purge</span>;
-<span class="kw">use</span> <span class="ident">wix</span>::<span class="ident">sign</span>;
+<span class="kw">use</span> <span class="ident">wix::clean</span>;
+<span class="kw">use</span> <span class="ident">wix::create</span>;
+<span class="kw">use</span> <span class="ident">wix::initialize</span>;
+<span class="kw">use</span> <span class="ident">wix::print</span>;
+<span class="kw">use</span> <span class="ident">wix::purge</span>;
+<span class="kw">use</span> <span class="ident">wix::sign</span>;
 <span class="kw">use</span> <span class="ident">wix</span>::{<span class="ident">Cultures</span>, <span class="ident">Template</span>, <span class="ident">BINARY_FOLDER_NAME</span>, <span class="ident">WIX_PATH_KEY</span>};
 
 <span class="kw">const</span> <span class="ident">SUBCOMMAND_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;wix&quot;</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="comment">// The banner option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">banner</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;banner&quot;</span>)
+    <span class="kw">let</span> <span class="ident">banner</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;banner&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.bmp) for the installer&#39;s banner&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
@@ -3143,7 +3158,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;b&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The binaries option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">binaries</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;binaries&quot;</span>)
+    <span class="kw">let</span> <span class="ident">binaries</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;binaries&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an executable file (.exe) for the application&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the path to an executable file that will override the default \
@@ -3162,7 +3177,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;B&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The description option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;description&quot;</span>)
+    <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;description&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string describing the application in the installer&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the &#39;description&#39; field of the package&#39;s manifest \
@@ -3173,7 +3188,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;d&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The dialog option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">dialog</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;dialog&quot;</span>)
+    <span class="kw">let</span> <span class="ident">dialog</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;dialog&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.bmp) for the installer&#39;s welcome dialog&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the path to a bitmap (.bmp) image file that will be \
@@ -3184,7 +3199,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;D&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The eula option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">eula</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;eula&quot;</span>)
+    <span class="kw">let</span> <span class="ident">eula</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;eula&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to a RTF file (.rtf) for the installer&#39;s license agreement dialog&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Specifies a Rich Text Format (RTF) file to use as the End \
@@ -3199,7 +3214,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;e&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The license option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">license</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;license&quot;</span>)
+    <span class="kw">let</span> <span class="ident">license</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;license&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to any file (.txt, .pdf, .rtf, etc.) to be used as a license&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the &#39;license-file&#39; field or any license generated \
@@ -3214,7 +3229,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;l&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The url option for the `init` and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;url&quot;</span>)
+    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;url&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A URL for the Add/Remove Programs control panel&#39;s Help Link&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Adds a URL to the installer that will be displayed in the \
@@ -3228,7 +3243,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;u&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The manufacturer option for the `init` and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">manufacturer</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;manufacturer&quot;</span>)
+    <span class="kw">let</span> <span class="ident">manufacturer</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;manufacturer&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s Manufacturer&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the first author in the &#39;authors&#39; field of the \
@@ -3240,7 +3255,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;m&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The owner option for the `init` and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;owner&quot;</span>)
+    <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;owner&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for a generated license&#39;s copyright holder&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the copyright owner for the license during \
@@ -3253,7 +3268,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;O&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The package option for the `create`, `init`, and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;package&quot;</span>)
+    <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;package&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;The name of the package in the current workspace&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Selects the package within a project organized as a workspace. \
@@ -3264,7 +3279,7 @@
         .<span class="ident">short</span>(<span class="string">&quot;p&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The path guid option for the `init` and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">path_guid</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;path-guid&quot;</span>)
+    <span class="kw">let</span> <span class="ident">path_guid</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;path-guid&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string formatted as a v4 hyphenated, uppercase UUID for the path component&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the automatically generated GUID for the path component. \
@@ -3278,7 +3293,7 @@
         .<span class="ident">long</span>(<span class="string">&quot;path-guid&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The product icon option for the `init` and `print` subcommands</span>
-    <span class="kw">let</span> <span class="ident">product_icon</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-icon&quot;</span>)
+    <span class="kw">let</span> <span class="ident">product_icon</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;product-icon&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A path to an image file (.ico) for the Add/Remove Programs control panel&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the path to an image file that will be displayed as an \
@@ -3288,7 +3303,7 @@
         .<span class="ident">long</span>(<span class="string">&quot;product-icon&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The product name option for the `init`, `print`, and `sign` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">product_name</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;product-name&quot;</span>)
+    <span class="kw">let</span> <span class="ident">product_name</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;product-name&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s Name&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the &#39;name&#39; field of the package&#39;s manifest \
@@ -3299,7 +3314,7 @@
         .<span class="ident">long</span>(<span class="string">&quot;product-name&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The upgrade guid option for the `init` and `print` subcommands.</span>
-    <span class="kw">let</span> <span class="ident">upgrade_guid</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;upgrade-guid&quot;</span>)
+    <span class="kw">let</span> <span class="ident">upgrade_guid</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;upgrade-guid&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Overrides the automatically generated GUID for the product&#39;s \
@@ -3313,7 +3328,7 @@
         .<span class="ident">long</span>(<span class="string">&quot;upgrade-guid&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
     <span class="comment">// The &quot;global&quot; verbose flag for all subcommands.</span>
-    <span class="kw">let</span> <span class="ident">verbose</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;verbose&quot;</span>)
+    <span class="kw">let</span> <span class="ident">verbose</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;verbose&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;The verbosity level for logging statements&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the level of verbosity. The higher the level of \
@@ -3325,7 +3340,7 @@
         .<span class="ident">long</span>(<span class="string">&quot;verbose&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;v&quot;</span>)
         .<span class="ident">multiple</span>(<span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;year&quot;</span>)
+    <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="ident">Arg::with_name</span>(<span class="string">&quot;year&quot;</span>)
         .<span class="ident">help</span>(<span class="string">&quot;A string for a generated license&#39;s copyright year&quot;</span>)
         .<span class="ident">long_help</span>(
             <span class="string">&quot;Sets the copyright year for the license during \
@@ -3337,18 +3352,18 @@
         .<span class="ident">long</span>(<span class="string">&quot;year&quot;</span>)
         .<span class="ident">short</span>(<span class="string">&quot;y&quot;</span>)
         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">default_culture</span> <span class="op">=</span> <span class="ident">Cultures</span>::<span class="ident">EnUs</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">App</span>::<span class="ident">new</span>(<span class="macro">crate_name</span><span class="macro">!</span>())
+    <span class="kw">let</span> <span class="ident">default_culture</span> <span class="op">=</span> <span class="ident">Cultures::EnUs</span>.<span class="ident">to_string</span>();
+    <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">App::new</span>(<span class="macro">crate_name!</span>())
         .<span class="ident">bin_name</span>(<span class="string">&quot;cargo&quot;</span>)
         .<span class="ident">subcommand</span>(
-            <span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="ident">SUBCOMMAND_NAME</span>)
-                .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
-                .<span class="ident">about</span>(<span class="macro">crate_description</span><span class="macro">!</span>())
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;bin-path&quot;</span>)
-                     .<span class="ident">help</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+            <span class="ident">SubCommand::with_name</span>(<span class="ident">SUBCOMMAND_NAME</span>)
+                .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
+                .<span class="ident">about</span>(<span class="macro">crate_description!</span>())
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;bin-path&quot;</span>)
+                     .<span class="ident">help</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                          <span class="string">&quot;A path to the WiX Toolset&#39;s &#39;{}&#39; folder&quot;</span>,
                          <span class="ident">BINARY_FOLDER_NAME</span>))
-                     .<span class="ident">long_help</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+                     .<span class="ident">long_help</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                          <span class="string">&quot;Specifies the path to the WiX Toolset&#39;s &#39;{0}&#39; folder, which should contain \
                          the needed &#39;candle.exe&#39; and &#39;light.exe&#39; applications. The default is to use \
                          the path specified with the {1} system environment variable that is created \
@@ -3361,18 +3376,18 @@
                      .<span class="ident">long</span>(<span class="string">&quot;bin-path&quot;</span>)
                      .<span class="ident">short</span>(<span class="string">&quot;b&quot;</span>)
                      .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;clean&quot;</span>)
-                    .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
+                .<span class="ident">subcommand</span>(<span class="ident">SubCommand::with_name</span>(<span class="string">&quot;clean&quot;</span>)
+                    .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Deletes the &#39;target\\wix&#39; folder&quot;</span>)
                     .<span class="ident">long_about</span>(<span class="string">&quot;Deletes the &#39;target\\wix&#39; folder if it exists.&quot;</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                          .<span class="ident">help</span>(<span class="string">&quot;A path to a package&#39;s manifest (Cargo.toml)&quot;</span>)
                          .<span class="ident">long_help</span>(<span class="string">&quot;The &#39;target\\wix&#39; folder that exists \
                             alongside the package&#39;s manifest will be removed. This \
                             is optional and the default is to use the current \
                             working directory (cwd).&quot;</span>)
                          .<span class="ident">index</span>(<span class="number">1</span>)))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;culture&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;culture&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;The culture code for localization&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Sets the culture for localization. Use with the \
                         &#39;-l,--locale&#39; option. See the WixUI localization \
@@ -3382,7 +3397,7 @@
                     .<span class="ident">short</span>(<span class="string">&quot;c&quot;</span>)
                     .<span class="ident">default_value</span>(<span class="kw-2">&amp;</span><span class="ident">default_culture</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;compiler-arg&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;compiler-arg&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Send an argument to the WiX compiler (candle.exe)&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Appends the argument to the command that is \
                         invoked when compiling an installer. This is the same as \
@@ -3399,21 +3414,21 @@
                     .<span class="ident">multiple</span>(<span class="bool-val">true</span>)
                     .<span class="ident">number_of_values</span>(<span class="number">1</span>)
                     .<span class="ident">allow_hyphen_values</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;target&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;target&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;The cargo target to build the WiX installer for.&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Tells cargo to build the given target, and instructs \
                         WiX to build an installer targeting the right architecture.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;target&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;t&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;debug-build&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;debug-build&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Builds the package using the Debug profile&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Uses the Debug profile when building the package \
                         using Cargo. The default is to build the package using the \
                         Release profile.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;dbg-build&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;d&quot;</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;debug-name&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;debug-name&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Appends &#39;-debug&#39; to the file stem of installer&#39;s file name&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Adds the &#39;-debug&#39; suffix to the file stem \
                         (content before the file extension) for the installer&#39;s file \
@@ -3424,7 +3439,7 @@
                         binary with the Debug profile.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;dbg-name&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;D&quot;</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;include&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;include&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Include an additional WiX Source (wxs) file&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Includes a WiX source (wxs) file for a project, \
                         where the wxs file is not located in the default location, \
@@ -3434,8 +3449,8 @@
                     .<span class="ident">multiple</span>(<span class="bool-val">true</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;I&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;init&quot;</span>)
-                    .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
+                .<span class="ident">subcommand</span>(<span class="ident">SubCommand::with_name</span>(<span class="string">&quot;init&quot;</span>)
+                    .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Generates files from a package&#39;s manifest (Cargo.toml) to create an installer&quot;</span>)
                     .<span class="ident">long_about</span>(<span class="string">&quot;Uses a package&#39;s manifest (Cargo.toml) to generate a WiX Source (wxs) \
                         file that can be used immediately without modification to create an \
@@ -3448,12 +3463,12 @@
                     .<span class="ident">arg</span>(<span class="ident">description</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">dialog</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">eula</span>.<span class="ident">clone</span>())
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;force&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;force&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;Overwrite existing WiX-related files&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;Overwrites any existing files that are \
                             generated during initialization. Use with caution.&quot;</span>)
                         .<span class="ident">long</span>(<span class="string">&quot;force&quot;</span>))
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a package&#39;s manifest (Cargo.toml)&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;If the &#39;-o,--output&#39; option is not used, \
                             then all output from initialization will be placed in a \
@@ -3461,7 +3476,7 @@
                         .<span class="ident">index</span>(<span class="number">1</span>))
                     .<span class="ident">arg</span>(<span class="ident">license</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">manufacturer</span>.<span class="ident">clone</span>())
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;output&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;output&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a folder for generated files&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;Sets the destination for all files \
                             generated during initialization. The default is to \
@@ -3479,7 +3494,7 @@
                     .<span class="ident">arg</span>(<span class="ident">url</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">verbose</span>.<span class="ident">clone</span>())
                     .<span class="ident">arg</span>(<span class="ident">year</span>.<span class="ident">clone</span>()))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                      .<span class="ident">help</span>(<span class="string">&quot;Path to a package&#39;s manifest (Cargo.toml) file.&quot;</span>)
                      .<span class="ident">long_help</span>(<span class="string">&quot;If no value is provided, then the current \
                         working directory (CWD) will be used to locate a package&#39;s \
@@ -3490,7 +3505,7 @@
                         the specified manifest.&quot;</span>)
                      .<span class="ident">required</span>(<span class="bool-val">false</span>)
                      .<span class="ident">index</span>(<span class="number">1</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;install-version&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;install-version&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;A string for the Add/Remove Programs control panel&#39;s version number&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the version from the package&#39;s manifest \
                         (Cargo.toml), which is used for the installer name and \
@@ -3498,7 +3513,7 @@
                     .<span class="ident">long</span>(<span class="string">&quot;install-version&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;i&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;linker-arg&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;linker-arg&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Send an argument to the WiX linker (light.exe)&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Appends the argument to the command that is \
                         invoked when linking an installer. This is the same as \
@@ -3515,7 +3530,7 @@
                     .<span class="ident">multiple</span>(<span class="bool-val">true</span>)
                     .<span class="ident">number_of_values</span>(<span class="number">1</span>)
                     .<span class="ident">allow_hyphen_values</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;locale&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;locale&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;A path to a WiX localization file (.wxl)&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Sets the path to a WiX localization file (wxl) \
                         which contains localized strings. Use in conjunction with \
@@ -3523,7 +3538,7 @@
                     .<span class="ident">long</span>(<span class="string">&quot;locale&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;l&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;name&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;name&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;A string for the installer&#39;s product name&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Overrides the &#39;name&#39; field in the package&#39;s \
                         manifest (Cargo.toml), which is used in the file name of the \
@@ -3532,19 +3547,23 @@
                     .<span class="ident">long</span>(<span class="string">&quot;name&quot;</span>)
                     .<span class="ident">short</span>(<span class="string">&quot;n&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;no-build&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;no-build&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Skips building the release binary&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;The installer is created, but the &#39;cargo build \
                         --release&#39; is not executed.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;no-build&quot;</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;no-capture&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;no-capture&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;Displays all output from the builder, compiler, linker, and signer&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;By default, this subcommand captures, or hides, \
                         all output from the builder, compiler, linker, and signer \
                         for the binary and Windows installer, respectively. Use this \
                         flag to show the output.&quot;</span>)
                     .<span class="ident">long</span>(<span class="string">&quot;nocapture&quot;</span>))
-                .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;output&quot;</span>)
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;install&quot;</span>)
+                    .<span class="ident">help</span>(<span class="string">&quot;Runs the installer after creating it&quot;</span>)
+                    .<span class="ident">long_help</span>(<span class="string">&quot;Creates the installer and runs it after that.&quot;</span>)
+                    .<span class="ident">long</span>(<span class="string">&quot;install&quot;</span>))
+                .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;output&quot;</span>)
                     .<span class="ident">help</span>(<span class="string">&quot;A path to a destination file or an existing folder&quot;</span>)
                     .<span class="ident">long_help</span>(<span class="string">&quot;Sets the destination file name and path for the \
                         created installer, or the destination folder for the \
@@ -3561,8 +3580,8 @@
                     .<span class="ident">short</span>(<span class="string">&quot;o&quot;</span>)
                     .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
                 .<span class="ident">arg</span>(<span class="ident">package</span>.<span class="ident">clone</span>())
-                .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;print&quot;</span>)
-                    .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
+                .<span class="ident">subcommand</span>(<span class="ident">SubCommand::with_name</span>(<span class="string">&quot;print&quot;</span>)
+                    .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Prints a template&quot;</span>)
                     .<span class="ident">long_about</span>(<span class="string">&quot;Prints a template to stdout or a file. In the case \
                         of a license template, the output is in the Rich Text Format \
@@ -3575,7 +3594,7 @@
                     .<span class="ident">arg</span>(<span class="ident">description</span>)
                     .<span class="ident">arg</span>(<span class="ident">dialog</span>)
                     .<span class="ident">arg</span>(<span class="ident">eula</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a package&#39;s manifest (Cargo.toml)&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;The selected template will be printed to \
                             stdout or a file based on the field values in this \
@@ -3585,7 +3604,7 @@
                         .<span class="ident">index</span>(<span class="number">2</span>))
                     .<span class="ident">arg</span>(<span class="ident">license</span>)
                     .<span class="ident">arg</span>(<span class="ident">manufacturer</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;output&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;output&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a folder for generated files&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;Sets the destination for printing the \
                             template. The default is to print/write the rendered \
@@ -3599,12 +3618,12 @@
                     .<span class="ident">arg</span>(<span class="ident">path_guid</span>)
                     .<span class="ident">arg</span>(<span class="ident">product_icon</span>)
                     .<span class="ident">arg</span>(<span class="ident">product_name</span>.<span class="ident">clone</span>())
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;TEMPLATE&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;TEMPLATE&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A name of a template&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;This is required and values are case \
                             insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]&quot;</span>)
                         .<span class="ident">hide_possible_values</span>(<span class="bool-val">true</span>)
-                        .<span class="ident">possible_values</span>(<span class="kw-2">&amp;</span><span class="ident">Template</span>::<span class="ident">possible_values</span>()
+                        .<span class="ident">possible_values</span>(<span class="kw-2">&amp;</span><span class="ident">Template::possible_values</span>()
                             .<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_ref</span>())
                             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>())
@@ -3614,20 +3633,20 @@
                     .<span class="ident">arg</span>(<span class="ident">url</span>)
                     .<span class="ident">arg</span>(<span class="ident">year</span>)
                     .<span class="ident">arg</span>(<span class="ident">verbose</span>.<span class="ident">clone</span>()))
-                .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;purge&quot;</span>)
-                    .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
+                .<span class="ident">subcommand</span>(<span class="ident">SubCommand::with_name</span>(<span class="string">&quot;purge&quot;</span>)
+                    .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Deletes the &#39;target\\wix&#39; and &#39;wix&#39; folders&quot;</span>)
                     .<span class="ident">long_about</span>(<span class="string">&quot;Deletes the &#39;target\\wix&#39; and &#39;wix&#39; folders if they \
                         exist. Use with caution!&quot;</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a package&#39;s manifest (Cargo.toml)&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;The &#39;target\\wix&#39; and &#39;wix&#39; folders that \
                             exists alongside the package&#39;s manifest will be removed. \
                             This is optional and the default is to use the current \
                             working directory (cwd).&quot;</span>)
                         .<span class="ident">index</span>(<span class="number">1</span>)))
-                .<span class="ident">subcommand</span>(<span class="ident">SubCommand</span>::<span class="ident">with_name</span>(<span class="string">&quot;sign&quot;</span>)
-                    .<span class="ident">version</span>(<span class="macro">crate_version</span><span class="macro">!</span>())
+                .<span class="ident">subcommand</span>(<span class="ident">SubCommand::with_name</span>(<span class="string">&quot;sign&quot;</span>)
+                    .<span class="ident">version</span>(<span class="macro">crate_version!</span>())
                     .<span class="ident">about</span>(<span class="string">&quot;Signs an installer&quot;</span>)
                     .<span class="ident">long_about</span>(<span class="string">&quot;The Windows installer (msi) will be signed using the \
                         SignTool application available in the Windows 10 SDK. The \
@@ -3635,14 +3654,14 @@
                         obtain an appropriate certificate from the Windows \
                         certificate manager. The default is to also use the Comodo \
                         timestamp server with the &#39;/t&#39; flag.&quot;</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;bin-path&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;bin-path&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to the folder containing the &#39;signtool&#39; application&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;The default is to use the PATH system environment \
                              variable to locate the application.&quot;</span>)
                         .<span class="ident">long</span>(<span class="string">&quot;bin-path&quot;</span>)
                         .<span class="ident">short</span>(<span class="string">&quot;b&quot;</span>)
                         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;description&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;description&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A string for the extended ACL dialog&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;The information for the extended text of \
                             the ACL dialog that appears. This will be appended to \
@@ -3653,26 +3672,26 @@
                         .<span class="ident">long</span>(<span class="string">&quot;description&quot;</span>)
                         .<span class="ident">short</span>(<span class="string">&quot;d&quot;</span>)
                         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;homepage&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;homepage&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A URL for the product&#39;s homepage&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;This will be displayed in the ACL dialog.&quot;</span>)
                         .<span class="ident">long</span>(<span class="string">&quot;homepage&quot;</span>)
                         .<span class="ident">short</span>(<span class="string">&quot;u&quot;</span>)
                         .<span class="ident">takes_value</span>(<span class="bool-val">true</span>))
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;INPUT&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;A path to a package&#39;s manifest (Cargo.toml)&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;The installer located in the &#39;target\\wix&#39; \
                             folder alongside this manifest will be signed based on \
                             the metadata within the manifest.&quot;</span>)
                         .<span class="ident">index</span>(<span class="number">1</span>))
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;no-capture&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;no-capture&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;Display output from the signer&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;By default, this subcommand captures, or \
                             hides, all output from the signer. Use this flag to \
                             show the output.&quot;</span>)
                         .<span class="ident">long</span>(<span class="string">&quot;nocapture&quot;</span>))
                     .<span class="ident">arg</span>(<span class="ident">product_name</span>)
-                    .<span class="ident">arg</span>(<span class="ident">Arg</span>::<span class="ident">with_name</span>(<span class="string">&quot;timestamp&quot;</span>)
+                    .<span class="ident">arg</span>(<span class="ident">Arg::with_name</span>(<span class="string">&quot;timestamp&quot;</span>)
                         .<span class="ident">help</span>(<span class="string">&quot;An alias or URL to a timestamp server&quot;</span>)
                         .<span class="ident">long_help</span>(<span class="string">&quot;Either an alias or URL can be used. Aliases \
                             are case-insenstive. [values: Comodo, Verisign]&quot;</span>)
@@ -3684,11 +3703,11 @@
         ).<span class="ident">get_matches</span>();
     <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">subcommand_matches</span>(<span class="ident">SUBCOMMAND_NAME</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">verbosity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">matches</span>.<span class="ident">subcommand</span>() {
-        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">matches</span>,
+        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">m</span>,
+        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">m</span>,
+        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">m</span>,
+        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">m</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">matches</span>,
     }
     .<span class="ident">occurrences_of</span>(<span class="string">&quot;verbose&quot;</span>);
     <span class="comment">// Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`</span>
@@ -3706,7 +3725,7 @@
     <span class="comment">//</span>
     <span class="comment">// For now, implementing environment variable support is held off and only the verbosity is</span>
     <span class="comment">// used to set the log level.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Builder::new</span>();
     <span class="ident">builder</span>
         .<span class="ident">format</span>(<span class="op">|</span><span class="ident">buf</span>, <span class="ident">record</span><span class="op">|</span> {
             <span class="comment">// This implmentation for a format is copied from the default format implemented for the</span>
@@ -3718,34 +3737,34 @@
                 <span class="comment">// Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows</span>
                 <span class="comment">// consoles, so TRACE and DEBUG statements are differentiated by boldness but use the</span>
                 <span class="comment">// same white color.</span>
-                <span class="ident">Level</span>::<span class="ident">Trace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
-                <span class="ident">Level</span>::<span class="ident">Debug</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Warn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
-                <span class="ident">Level</span>::<span class="ident">Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor</span>::<span class="ident">Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level::Trace</span> =&gt; <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor::White</span>).<span class="ident">set_bold</span>(<span class="bool-val">false</span>),
+                <span class="ident">Level::Debug</span> =&gt; <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor::White</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level::Info</span> =&gt; <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor::Green</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level::Warn</span> =&gt; <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor::Yellow</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
+                <span class="ident">Level::Error</span> =&gt; <span class="ident">level_style</span>.<span class="ident">set_color</span>(<span class="ident">LogColor::Red</span>).<span class="ident">set_bold</span>(<span class="bool-val">true</span>),
             };
-            <span class="kw">let</span> <span class="ident">write_level</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{:&gt;5}: &quot;</span>, <span class="ident">level_style</span>.<span class="ident">value</span>(<span class="ident">level</span>));
-            <span class="kw">let</span> <span class="ident">write_args</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">record</span>.<span class="ident">args</span>());
+            <span class="kw">let</span> <span class="ident">write_level</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">buf</span>, <span class="string">&quot;{:&gt;5}: &quot;</span>, <span class="ident">level_style</span>.<span class="ident">value</span>(<span class="ident">level</span>));
+            <span class="kw">let</span> <span class="ident">write_args</span> <span class="op">=</span> <span class="macro">writeln!</span>(<span class="ident">buf</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">record</span>.<span class="ident">args</span>());
             <span class="ident">write_level</span>.<span class="ident">and</span>(<span class="ident">write_args</span>)
         })
         .<span class="ident">filter</span>(
             <span class="prelude-val">Some</span>(<span class="string">&quot;wix&quot;</span>),
             <span class="kw">match</span> <span class="ident">verbosity</span> {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Warn</span>,
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Info</span>,
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Debug</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LevelFilter</span>::<span class="ident">Trace</span>,
+                <span class="number">0</span> =&gt; <span class="ident">LevelFilter::Warn</span>,
+                <span class="number">1</span> =&gt; <span class="ident">LevelFilter::Info</span>,
+                <span class="number">2</span> =&gt; <span class="ident">LevelFilter::Debug</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">LevelFilter::Trace</span>,
             },
         )
         .<span class="ident">init</span>();
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">matches</span>.<span class="ident">subcommand</span>() {
-        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clean</span> <span class="op">=</span> <span class="ident">clean</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+        (<span class="string">&quot;clean&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clean</span> <span class="op">=</span> <span class="ident">clean::Builder::new</span>();
             <span class="ident">clean</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
             <span class="ident">clean</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">initialize</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+        (<span class="string">&quot;init&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">initialize::Builder::new</span>();
             <span class="ident">init</span>.<span class="ident">banner</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;banner&quot;</span>));
             <span class="ident">init</span>.<span class="ident">binaries</span>(<span class="ident">m</span>.<span class="ident">values_of</span>(<span class="string">&quot;binaries&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">collect</span>()));
             <span class="ident">init</span>.<span class="ident">copyright_holder</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;owner&quot;</span>));
@@ -3766,11 +3785,11 @@
             <span class="ident">init</span>.<span class="ident">upgrade_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;upgrade-guid&quot;</span>));
             <span class="ident">init</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="macro">value_t</span><span class="macro">!</span>(<span class="ident">m</span>, <span class="string">&quot;TEMPLATE&quot;</span>, <span class="ident">Template</span>).<span class="ident">unwrap</span>();
+        (<span class="string">&quot;print&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; {
+            <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="macro">value_t!</span>(<span class="ident">m</span>, <span class="string">&quot;TEMPLATE&quot;</span>, <span class="ident">Template</span>).<span class="ident">unwrap</span>();
             <span class="kw">match</span> <span class="ident">template</span> {
-                <span class="ident">Template</span>::<span class="ident">Wxs</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print</span>::<span class="ident">wxs</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+                <span class="ident">Template::Wxs</span> =&gt; {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print::wxs::Builder::new</span>();
                     <span class="ident">print</span>.<span class="ident">banner</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;banner&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">binaries</span>(<span class="ident">m</span>.<span class="ident">values_of</span>(<span class="string">&quot;binaries&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">collect</span>()));
                     <span class="ident">print</span>.<span class="ident">description</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;description&quot;</span>));
@@ -3788,8 +3807,8 @@
                     <span class="ident">print</span>.<span class="ident">upgrade_guid</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;upgrade-guid&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">build</span>().<span class="ident">run</span>()
                 }
-                <span class="ident">t</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print</span>::<span class="ident">license</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+                <span class="ident">t</span> =&gt; {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">print</span> <span class="op">=</span> <span class="ident">print::license::Builder::new</span>();
                     <span class="ident">print</span>.<span class="ident">copyright_holder</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;owner&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">copyright_year</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;year&quot;</span>));
                     <span class="ident">print</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
@@ -3798,13 +3817,13 @@
                 }
             }
         }
-        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">purge</span> <span class="op">=</span> <span class="ident">purge</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+        (<span class="string">&quot;purge&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">purge</span> <span class="op">=</span> <span class="ident">purge::Builder::new</span>();
             <span class="ident">purge</span>.<span class="ident">input</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;INPUT&quot;</span>));
             <span class="ident">purge</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        (<span class="string">&quot;sign&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sign</span> <span class="op">=</span> <span class="ident">sign</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+        (<span class="string">&quot;sign&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sign</span> <span class="op">=</span> <span class="ident">sign::Builder::new</span>();
             <span class="ident">sign</span>.<span class="ident">bin_path</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;bin-path&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">capture_output</span>(<span class="op">!</span><span class="ident">m</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-capture&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">description</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;description&quot;</span>));
@@ -3815,8 +3834,8 @@
             <span class="ident">sign</span>.<span class="ident">timestamp</span>(<span class="ident">m</span>.<span class="ident">value_of</span>(<span class="string">&quot;timestamp&quot;</span>));
             <span class="ident">sign</span>.<span class="ident">build</span>().<span class="ident">run</span>()
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">create</span>::<span class="ident">Builder</span>::<span class="ident">new</span>();
+        <span class="kw">_</span> =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">create::Builder::new</span>();
             <span class="ident">create</span>.<span class="ident">bin_path</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;bin-path&quot;</span>));
             <span class="ident">create</span>.<span class="ident">capture_output</span>(<span class="op">!</span><span class="ident">matches</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-capture&quot;</span>));
             <span class="ident">create</span>.<span class="ident">compiler_args</span>(<span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;compiler-arg&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">collect</span>()));
@@ -3829,6 +3848,7 @@
             <span class="ident">create</span>.<span class="ident">locale</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;locale&quot;</span>));
             <span class="ident">create</span>.<span class="ident">name</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;name&quot;</span>));
             <span class="ident">create</span>.<span class="ident">no_build</span>(<span class="ident">matches</span>.<span class="ident">is_present</span>(<span class="string">&quot;no-build&quot;</span>));
+            <span class="ident">create</span>.<span class="ident">install</span>(<span class="ident">matches</span>.<span class="ident">is_present</span>(<span class="string">&quot;install&quot;</span>));
             <span class="ident">create</span>.<span class="ident">output</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;output&quot;</span>));
             <span class="ident">create</span>.<span class="ident">version</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;install-version&quot;</span>));
             <span class="ident">create</span>.<span class="ident">package</span>(<span class="ident">matches</span>.<span class="ident">value_of</span>(<span class="string">&quot;package&quot;</span>));
@@ -3837,14 +3857,14 @@
         }
     };
     <span class="kw">match</span> <span class="ident">result</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">exit</span>(<span class="number">0</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::process::exit</span>(<span class="number">0</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">StandardStream</span>::<span class="ident">stderr</span>(<span class="ident">ColorChoice</span>::<span class="ident">Auto</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">StandardStream::stderr</span>(<span class="ident">ColorChoice::Auto</span>);
                 <span class="ident">stderr</span>
-                    .<span class="ident">set_color</span>(<span class="ident">ColorSpec</span>::<span class="ident">new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color</span>::<span class="ident">Red</span>)).<span class="ident">set_bold</span>(<span class="bool-val">true</span>))
+                    .<span class="ident">set_color</span>(<span class="ident">ColorSpec::new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color::Red</span>)).<span class="ident">set_bold</span>(<span class="bool-val">true</span>))
                     .<span class="ident">expect</span>(<span class="string">&quot;Coloring stderr&quot;</span>);
-                <span class="macro">write</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stderr</span>, <span class="string">&quot;Error[{}] ({}): &quot;</span>, <span class="ident">e</span>.<span class="ident">code</span>(), <span class="ident">e</span>.<span class="ident">as_str</span>())
+                <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stderr</span>, <span class="string">&quot;Error[{}] ({}): &quot;</span>, <span class="ident">e</span>.<span class="ident">code</span>(), <span class="ident">e</span>.<span class="ident">as_str</span>())
                     .<span class="ident">expect</span>(<span class="string">&quot;Write tag to stderr&quot;</span>);
                 <span class="comment">// This prevents &quot;leaking&quot; the color settings to the console after the</span>
                 <span class="comment">// sub-command/application has completed and ensures the message is not printed in</span>
@@ -3858,9 +3878,9 @@
                     .<span class="ident">reset</span>()
                     .<span class="ident">expect</span>(<span class="string">&quot;Revert color settings after printing the tag&quot;</span>);
                 <span class="ident">stderr</span>
-                    .<span class="ident">set_color</span>(<span class="ident">ColorSpec</span>::<span class="ident">new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color</span>::<span class="ident">White</span>)).<span class="ident">set_bold</span>(<span class="bool-val">false</span>))
+                    .<span class="ident">set_color</span>(<span class="ident">ColorSpec::new</span>().<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">Color::White</span>)).<span class="ident">set_bold</span>(<span class="bool-val">false</span>))
                     .<span class="ident">expect</span>(<span class="string">&quot;Coloring stderr&quot;</span>);
-                <span class="macro">writeln</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stderr</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>).<span class="ident">expect</span>(<span class="string">&quot;Write message to stderr&quot;</span>);
+                <span class="macro">writeln!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stderr</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>).<span class="ident">expect</span>(<span class="string">&quot;Write message to stderr&quot;</span>);
                 <span class="comment">// This prevents &quot;leaking&quot; the color settings to the console after the</span>
                 <span class="comment">// sub-command/application has completed.</span>
                 <span class="comment">//</span>
@@ -3872,9 +3892,11 @@
                     .<span class="ident">reset</span>()
                     .<span class="ident">expect</span>(<span class="string">&quot;Revert color settings after printing the message&quot;</span>);
             }
-            <span class="ident">std</span>::<span class="ident">process</span>::<span class="ident">exit</span>(<span class="ident">e</span>.<span class="ident">code</span>());
+            <span class="ident">std::process::exit</span>(<span class="ident">e</span>.<span class="ident">code</span>());
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cargo_wix";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cargo_wix" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>

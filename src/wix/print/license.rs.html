@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\print\license.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>license.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../wix/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\print\license.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>license.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../wix/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -257,8 +254,7 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="comment">// you may not use this file except in compliance with the License.</span>
@@ -276,19 +272,19 @@
 
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">Datelike</span>, <span class="ident">Utc</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">manifest</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">package</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="prelude-ty">Result</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Template</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::manifest</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::package</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Result</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Template</span>;
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">debug</span>;
+<span class="kw">use</span> <span class="ident">log::debug</span>;
 
 <span class="kw">use</span> <span class="ident">mustache</span>::{<span class="self">self</span>, <span class="ident">MapBuilder</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
+<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
 
-<span class="kw">use</span> <span class="ident">cargo_metadata</span>::<span class="ident">Package</span>;
+<span class="kw">use</span> <span class="ident">cargo_metadata::Package</span>;
 
 <span class="doccomment">/// A builder for creating an execution context to print a license.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -301,7 +297,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new `Builder` instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Builder</span> {
             <span class="ident">copyright_year</span>: <span class="prelude-val">None</span>,
             <span class="ident">copyright_holder</span>: <span class="prelude-val">None</span>,
@@ -317,7 +313,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default is to use the first author from the `authors` field of the</span>
     <span class="doccomment">/// package&#39;s manifest (Cargo.toml).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">h</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">h</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">copyright_holder</span> <span class="op">=</span> <span class="ident">h</span>;
         <span class="self">self</span>
     }
@@ -328,7 +324,7 @@
     <span class="doccomment">/// is ignored.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default is to use this year when generating the license.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copyright_year</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copyright_year</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">copyright_year</span> <span class="op">=</span> <span class="ident">y</span>;
         <span class="self">self</span>
     }
@@ -340,7 +336,7 @@
     <span class="doccomment">/// [`output`] method is used.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`output`]: #output</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">input</span> <span class="op">=</span> <span class="ident">i</span>;
         <span class="self">self</span>
     }
@@ -350,25 +346,25 @@
     <span class="doccomment">/// The default is to print all output to `STDOUT`. This method can be used</span>
     <span class="doccomment">/// to specify that the generated license be written, or &quot;printed&quot;, to a</span>
     <span class="doccomment">/// file instead of `STDOUT`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">output</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">o</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">output</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">o</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">output</span> <span class="op">=</span> <span class="ident">o</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Builds an execution context based on the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Execution</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Execution</span> {
         <span class="ident">Execution</span> {
-            <span class="ident">copyright_holder</span>: <span class="self">self</span>.<span class="ident">copyright_holder</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
-            <span class="ident">copyright_year</span>: <span class="self">self</span>.<span class="ident">copyright_year</span>.<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>),
-            <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>),
-            <span class="ident">output</span>: <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>),
+            <span class="ident">copyright_holder</span>: <span class="self">self</span>.<span class="ident">copyright_holder</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
+            <span class="ident">copyright_year</span>: <span class="self">self</span>.<span class="ident">copyright_year</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
+            <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">map</span>(<span class="ident">PathBuf::from</span>),
+            <span class="ident">output</span>: <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">map</span>(<span class="ident">PathBuf::from</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Builder</span>::<span class="ident">new</span>()
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">Builder::new</span>()
     }
 }
 
@@ -383,43 +379,43 @@
 
 <span class="kw">impl</span> <span class="ident">Execution</span> {
     <span class="doccomment">/// Prints a license based on the built context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>, <span class="ident">template</span>: <span class="ident">Template</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;copyright_holder = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_holder</span>);
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;copyright_year = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_year</span>);
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;input = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">input</span>);
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;output = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">output</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>, <span class="ident">template</span>: <span class="ident">Template</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">debug!</span>(<span class="string">&quot;copyright_holder = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_holder</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;copyright_year = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_year</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;input = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">input</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;output = {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">output</span>);
         <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="ident">manifest</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">package</span> <span class="op">=</span> <span class="ident">package</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">destination</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">destination</span>(<span class="self">self</span>.<span class="ident">output</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">mustache</span>::<span class="ident">compile_str</span>(<span class="ident">template</span>.<span class="ident">to_str</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">MapBuilder</span>::<span class="ident">new</span>()
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">destination</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::destination</span>(<span class="self">self</span>.<span class="ident">output</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">mustache::compile_str</span>(<span class="ident">template</span>.<span class="ident">to_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">MapBuilder::new</span>()
             .<span class="ident">insert_str</span>(<span class="string">&quot;copyright-year&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_year</span>())
             .<span class="ident">insert_str</span>(<span class="string">&quot;copyright-holder&quot;</span>, <span class="self">self</span>.<span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="ident">package</span>)<span class="question-mark">?</span>)
             .<span class="ident">build</span>();
         <span class="ident">template</span>
             .<span class="ident">render_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">destination</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">from</span>)
+            .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">h</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">copyright_holder</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">h</span>.<span class="ident">to_owned</span>())
         } <span class="kw">else</span> {
-            <span class="kw">super</span>::<span class="ident">first_author</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)
+            <span class="ident"><span class="kw">super</span>::first_author</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">copyright_year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">copyright_year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">copyright_year</span>
             .<span class="ident">clone</span>()
-            .<span class="ident">map</span>(<span class="ident">String</span>::<span class="ident">from</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc</span>::<span class="ident">now</span>().<span class="ident">year</span>().<span class="ident">to_string</span>())
+            .<span class="ident">map</span>(<span class="ident">String::from</span>)
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc::now</span>().<span class="ident">year</span>().<span class="ident">to_string</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Execution</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Builder</span>::<span class="ident">new</span>().<span class="ident">build</span>()
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">Builder::new</span>().<span class="ident">build</span>()
     }
 }
 
@@ -433,33 +429,33 @@
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_holder_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Example&quot;</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>();
             <span class="ident">actual</span>.<span class="ident">copyright_holder</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">copyright_holder</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>.<span class="ident">copyright_holder</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_year_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;1982&quot;</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>();
             <span class="ident">actual</span>.<span class="ident">copyright_year</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">copyright_year</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>.<span class="ident">copyright_year</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">input_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Example.wxs&quot;</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>();
             <span class="ident">actual</span>.<span class="ident">input</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">input</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>.<span class="ident">input</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">output_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;C:\\Example\\output&quot;</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>();
             <span class="ident">actual</span>.<span class="ident">output</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>.<span class="ident">output</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>.<span class="ident">output</span>, <span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>));
         }
     }
 
@@ -480,39 +476,41 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_holder_works</span>() {
-            <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">MIN_MANIFEST</span>).<span class="ident">expect</span>(<span class="string">&quot;Parsing TOML&quot;</span>);
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>().<span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>, <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;First Last&quot;</span>));
+            <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">MIN_MANIFEST</span>).<span class="ident">expect</span>(<span class="string">&quot;Parsing TOML&quot;</span>);
+            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Execution::default</span>().<span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">String::from</span>(<span class="string">&quot;First Last&quot;</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_holder_with_override_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Dr. Example&quot;</span>;
-            <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="ident">MIN_MANIFEST</span>).<span class="ident">expect</span>(<span class="string">&quot;Parsing TOML&quot;</span>);
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>()
+            <span class="kw">let</span> <span class="ident">manifest</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">MIN_MANIFEST</span>).<span class="ident">expect</span>(<span class="string">&quot;Parsing TOML&quot;</span>);
+            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>()
                 .<span class="ident">copyright_holder</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>))
                 .<span class="ident">build</span>()
                 .<span class="ident">copyright_holder</span>(<span class="kw-2">&amp;</span><span class="ident">manifest</span>)
                 .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>, <span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">String::from</span>(<span class="ident">EXPECTED</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_year_works</span>() {
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Execution</span>::<span class="ident">default</span>().<span class="ident">copyright_year</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>, <span class="ident">Utc</span>::<span class="ident">now</span>().<span class="ident">year</span>().<span class="ident">to_string</span>());
+            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Execution::default</span>().<span class="ident">copyright_year</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">Utc::now</span>().<span class="ident">year</span>().<span class="ident">to_string</span>());
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">copyright_year_with_override_works</span>() {
             <span class="kw">const</span> <span class="ident">EXPECTED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;1982&quot;</span>;
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder</span>::<span class="ident">new</span>()
+            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Builder::new</span>()
                 .<span class="ident">copyright_year</span>(<span class="prelude-val">Some</span>(<span class="ident">EXPECTED</span>))
                 .<span class="ident">build</span>()
                 .<span class="ident">copyright_year</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual</span>, <span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">EXPECTED</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">String::from</span>(<span class="ident">EXPECTED</span>));
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "wix";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="wix" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</body></html>

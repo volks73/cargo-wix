@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wix/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1103,8 +1100,10 @@
 <span id="1100">1100</span>
 <span id="1101">1101</span>
 <span id="1102">1102</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (C) 2017 Christopher R. Field.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="comment">// you may not use this file except in compliance with the License.</span>
@@ -1168,7 +1167,7 @@
 <span class="doccomment">//! [`cargo wix`]: ../cargo_wix/index.html</span>
 <span class="doccomment">//! [`std::process::Command`]: https://doc.rust-lang.org/std/process/struct.Command.html</span>
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">templates</span>::<span class="ident">Template</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::templates::Template</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">clean</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">create</span>;
@@ -1179,22 +1178,22 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sign</span>;
 <span class="kw">mod</span> <span class="ident">templates</span>;
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">debug</span>;
+<span class="kw">use</span> <span class="ident">log::debug</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsStr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">ErrorKind</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+<span class="kw">use</span> <span class="ident">std::default::Default</span>;
+<span class="kw">use</span> <span class="ident">std::env</span>;
+<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">ErrorKind</span>};
+<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">use</span> <span class="ident">cargo_metadata</span>::{<span class="ident">Metadata</span>, <span class="ident">MetadataCommand</span>, <span class="ident">Package</span>};
 
-<span class="kw">use</span> <span class="ident">rustc_cfg</span>::<span class="ident">Cfg</span>;
+<span class="kw">use</span> <span class="ident">rustc_cfg::Cfg</span>;
 
 <span class="doccomment">/// The name of the folder where binaries are typically stored.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BINARY_FOLDER_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;bin&quot;</span>;
@@ -1235,6 +1234,9 @@
 <span class="doccomment">/// Windows installer.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WIX_LINKER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;light&quot;</span>;
 
+<span class="doccomment">/// The application name without the file extension of the `msiexec` utility.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MSIEXEC</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;msiexec&quot;</span>;
+
 <span class="doccomment">/// The file extension for a WiX Toolset object file, which is the output from</span>
 <span class="doccomment">/// the WiX compiler.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WIX_OBJECT_FILE_EXTENSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;wixobj&quot;</span>;
@@ -1255,67 +1257,67 @@
 <span class="doccomment">/// A specialized [`Result`] type for wix operations.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Result`]: https://doc.rust-lang.org/std/result/</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
-<span class="kw">fn</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">to_owned</span>(),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cwd</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">current_dir</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">to_owned</span>(),
+        <span class="prelude-val">None</span> =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cwd</span> <span class="op">=</span> <span class="ident">env::current_dir</span>()<span class="question-mark">?</span>;
             <span class="ident">cwd</span>.<span class="ident">push</span>(<span class="ident">CARGO_MANIFEST_FILE</span>);
             <span class="ident">cwd</span>
         }
     };
-    <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">exists</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_file</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">file_name</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr</span>::<span class="ident">new</span>(<span class="ident">CARGO_MANIFEST_FILE</span>)) {
+    <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">exists</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_file</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">file_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::new</span>(<span class="ident">CARGO_MANIFEST_FILE</span>)) {
         <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
     } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">not_found</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
+        <span class="prelude-val">Err</span>(<span class="ident">Error::not_found</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">description</span>(<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">description</span>(<span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">description</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">manifest</span>.<span class="ident">description</span>.<span class="ident">clone</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">manifest</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Metadata</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">manifest</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Metadata</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">cargo_file_path</span> <span class="op">=</span> <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;cargo_file_path = {:?}&quot;</span>, <span class="ident">cargo_file_path</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">MetadataCommand</span>::<span class="ident">new</span>()
+    <span class="macro">debug!</span>(<span class="string">&quot;cargo_file_path = {:?}&quot;</span>, <span class="ident">cargo_file_path</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">MetadataCommand::new</span>()
         .<span class="ident">manifest_path</span>(<span class="ident">cargo_file_path</span>)
         .<span class="ident">exec</span>()
         .<span class="ident">unwrap</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">package</span>(<span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>, <span class="ident">package</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Package</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">package</span>(<span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>, <span class="ident">package</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Package</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">package_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">package</span> {
         <span class="ident">manifest</span>
             .<span class="ident">workspace_members</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">manifest</span>[<span class="ident">n</span>].<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">p</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;No `{}` package found in the project&quot;</span>, <span class="ident">p</span>)))<span class="question-mark">?</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">manifest</span>.<span class="ident">workspace_members</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">manifest</span>[<span class="ident">n</span>].<span class="ident">name</span> <span class="op">==</span> <span class="ident">p</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::Generic</span>(<span class="macro">format!</span>(<span class="string">&quot;No `{}` package found in the project&quot;</span>, <span class="ident">p</span>)))<span class="question-mark">?</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">manifest</span>.<span class="ident">workspace_members</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
         <span class="kw-2">&amp;</span><span class="ident">manifest</span>.<span class="ident">workspace_members</span>[<span class="number">0</span>]
     } <span class="kw">else</span> {
         <span class="comment">// TODO: Replace error with creating installers for all packages in a</span>
         <span class="comment">// workspace. I think this currently means that to create installers for</span>
         <span class="comment">// all packages in workspace, a `cargo wix --package &lt;name&gt;` must be</span>
         <span class="comment">// executed for each workspace member.</span>
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">String</span>::<span class="ident">from</span>(
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Generic</span>(<span class="ident">String::from</span>(
             <span class="string">&quot;Workspace detected. Please pass a package name.&quot;</span>,
         )));
     };
     <span class="prelude-val">Ok</span>(<span class="ident">manifest</span>[<span class="ident">package_id</span>].<span class="ident">clone</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">package_root</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">package_root</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="ident">cargo_toml_file</span>(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
         <span class="ident">p</span>.<span class="ident">parent</span>()
-            .<span class="ident">map</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>)
+            .<span class="ident">map</span>(<span class="ident">PathBuf::from</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;The Cargo.toml file to NOT be root.&quot;</span>)
     })
 }
 
-<span class="kw">fn</span> <span class="ident">product_name</span>(<span class="ident">product_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">product_name</span>(<span class="ident">product_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">manifest</span>: <span class="kw-2">&amp;</span><span class="ident">Package</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">product_name</span> {
         <span class="ident">p</span>.<span class="ident">to_owned</span>()
     } <span class="kw">else</span> {
@@ -1334,19 +1336,19 @@
     <span class="doccomment">/// A generic or custom error occurred. The message should contain the detailed information.</span>
     <span class="ident">Generic</span>(<span class="ident">String</span>),
     <span class="doccomment">/// An I/O operation failed.</span>
-    <span class="ident">Io</span>(<span class="ident">io</span>::<span class="ident">Error</span>),
+    <span class="ident">Io</span>(<span class="ident">io::Error</span>),
     <span class="doccomment">/// A needed field within the `Cargo.toml` manifest could not be found.</span>
     <span class="ident">Manifest</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
     <span class="doccomment">/// An error occurred with rendering the template using the mustache renderer.</span>
-    <span class="ident">Mustache</span>(<span class="ident">mustache</span>::<span class="ident">Error</span>),
+    <span class="ident">Mustache</span>(<span class="ident">mustache::Error</span>),
     <span class="doccomment">/// UUID generation or parsing failed.</span>
-    <span class="ident">Uuid</span>(<span class="ident">uuid</span>::<span class="ident">Error</span>),
+    <span class="ident">Uuid</span>(<span class="ident">uuid::Error</span>),
     <span class="doccomment">/// Parsing error for a version string or field.</span>
-    <span class="ident">Version</span>(<span class="ident">semver</span>::<span class="ident">SemVerError</span>),
+    <span class="ident">Version</span>(<span class="ident">semver::SemVerError</span>),
     <span class="doccomment">/// Parsing the intermediate WiX Object (wixobj) file, which is XML, failed.</span>
-    <span class="ident">Xml</span>(<span class="ident">sxd_document</span>::<span class="ident">parser</span>::<span class="ident">Error</span>),
+    <span class="ident">Xml</span>(<span class="ident">sxd_document::parser::Error</span>),
     <span class="doccomment">/// Evaluation of an XPath expression failed.</span>
-    <span class="ident">XPath</span>(<span class="ident">sxd_xpath</span>::<span class="ident">ExecutionError</span>),
+    <span class="ident">XPath</span>(<span class="ident">sxd_xpath::ExecutionError</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
@@ -1364,17 +1366,17 @@
     <span class="doccomment">/// This is useful as a return, or exit, code for a command line application, where a non-zero</span>
     <span class="doccomment">/// integer indicates a failure in the application. it can also be used for quickly and easily</span>
     <span class="doccomment">/// testing equality between two errors.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="ident">Error</span>::<span class="ident">Uuid</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">7</span>,
-            <span class="ident">Error</span>::<span class="ident">Xml</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">Error</span>::<span class="ident">XPath</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="number">9</span>,
+            <span class="ident">Error::Command</span>(..) =&gt; <span class="number">1</span>,
+            <span class="ident">Error::Generic</span>(..) =&gt; <span class="number">2</span>,
+            <span class="ident">Error::Io</span>(..) =&gt; <span class="number">3</span>,
+            <span class="ident">Error::Manifest</span>(..) =&gt; <span class="number">4</span>,
+            <span class="ident">Error::Mustache</span>(..) =&gt; <span class="number">5</span>,
+            <span class="ident">Error::Uuid</span>(..) =&gt; <span class="number">6</span>,
+            <span class="ident">Error::Version</span>(..) =&gt; <span class="number">7</span>,
+            <span class="ident">Error::Xml</span>(..) =&gt; <span class="number">8</span>,
+            <span class="ident">Error::XPath</span>(..) =&gt; <span class="number">9</span>,
         }
     }
 
@@ -1398,8 +1400,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html</span>
     <span class="doccomment">/// [std::io::ErrorKind::AlreadyExists]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">already_exists</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ErrorKind</span>::<span class="ident">AlreadyExists</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">already_exists</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">io::Error::new</span>(<span class="ident">ErrorKind::AlreadyExists</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Creates a new `Error` from a [std::io::Error] with the</span>
@@ -1422,8 +1424,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html</span>
     <span class="doccomment">/// [std::io::ErrorKind::NotFound]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_found</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">ErrorKind</span>::<span class="ident">NotFound</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_found</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">io::Error::new</span>(<span class="ident">ErrorKind::NotFound</span>, <span class="ident">p</span>.<span class="ident">display</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Extracts a short, single word representation of the error.</span>
@@ -1435,141 +1437,141 @@
     <span class="doccomment">/// type, and it is nice to have a short, single word representation for</span>
     <span class="doccomment">/// nicely formatting errors to humans. This method maintains the error</span>
     <span class="doccomment">/// message formatting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Command&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Generic&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Io</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Io&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Manifest&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Mustache&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Uuid</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UUID&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Version</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Version&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">Xml</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;XML&quot;</span>,
-            <span class="ident">Error</span>::<span class="ident">XPath</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;XPath&quot;</span>,
+            <span class="ident">Error::Command</span>(..) =&gt; <span class="string">&quot;Command&quot;</span>,
+            <span class="ident">Error::Generic</span>(..) =&gt; <span class="string">&quot;Generic&quot;</span>,
+            <span class="ident">Error::Io</span>(..) =&gt; <span class="string">&quot;Io&quot;</span>,
+            <span class="ident">Error::Manifest</span>(..) =&gt; <span class="string">&quot;Manifest&quot;</span>,
+            <span class="ident">Error::Mustache</span>(..) =&gt; <span class="string">&quot;Mustache&quot;</span>,
+            <span class="ident">Error::Uuid</span>(..) =&gt; <span class="string">&quot;UUID&quot;</span>,
+            <span class="ident">Error::Version</span>(..) =&gt; <span class="string">&quot;Version&quot;</span>,
+            <span class="ident">Error::Xml</span>(..) =&gt; <span class="string">&quot;XML&quot;</span>,
+            <span class="ident">Error::XPath</span>(..) =&gt; <span class="string">&quot;XPath&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Uuid</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">Xml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error</span>::<span class="ident">XPath</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Uuid</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Xml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::XPath</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">Command</span>(<span class="kw-2">ref</span> <span class="ident">command</span>, <span class="kw-2">ref</span> <span class="ident">code</span>, <span class="ident">captured_output</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::Command</span>(<span class="kw-2">ref</span> <span class="ident">command</span>, <span class="kw-2">ref</span> <span class="ident">code</span>, <span class="ident">captured_output</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">captured_output</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(
+                    <span class="macro">write!</span>(
                         <span class="ident">f</span>,
                         <span class="string">&quot;The &#39;{}&#39; application failed with exit code = {}. Consider using the \
                          &#39;--nocapture&#39; flag to obtain more information.&quot;</span>,
                         <span class="ident">command</span>, <span class="ident">code</span>
                     )
                 } <span class="kw">else</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(
+                    <span class="macro">write!</span>(
                         <span class="ident">f</span>,
                         <span class="string">&quot;The &#39;{}&#39; application failed with exit code = {}&quot;</span>,
                         <span class="ident">command</span>, <span class="ident">code</span>
                     )
                 }
             }
-            <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-                <span class="ident">ErrorKind</span>::<span class="ident">AlreadyExists</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::Generic</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
+                <span class="ident">ErrorKind::AlreadyExists</span> =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">get_ref</span>() {
-                        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; file already exists. Use the &#39;--force&#39; flag to overwrite the contents.&quot;</span>, <span class="ident">path</span>)
+                        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; file already exists. Use the &#39;--force&#39; flag to overwrite the contents.&quot;</span>, <span class="ident">path</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
                     }
                 }
-                <span class="ident">ErrorKind</span>::<span class="ident">NotFound</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ErrorKind::NotFound</span> =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">get_ref</span>() {
-                        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; path does not exist&quot;</span>, <span class="ident">path</span>)
+                        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;The &#39;{}&#39; path does not exist&quot;</span>, <span class="ident">path</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
                     }
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             },
-            <span class="ident">Error</span>::<span class="ident">Manifest</span>(<span class="kw-2">ref</span> <span class="ident">var</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
+            <span class="ident">Error::Manifest</span>(<span class="kw-2">ref</span> <span class="ident">var</span>) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;No &#39;{}&#39; field found in the package&#39;s manifest (Cargo.toml)&quot;</span>,
                 <span class="ident">var</span>
             ),
-            <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Uuid</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">Xml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error</span>::<span class="ident">XPath</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::Mustache</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::Uuid</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::Version</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::Xml</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::XPath</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">code</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">code</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">s</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Generic</span>(<span class="ident">s</span>.<span class="ident">to_string</span>())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Io</span>(<span class="ident">err</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mustache</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mustache</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Mustache</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mustache::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mustache::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Mustache</span>(<span class="ident">err</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">semver</span>::<span class="ident">SemVerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">semver</span>::<span class="ident">SemVerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Version</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">semver::SemVerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">semver::SemVerError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Version</span>(<span class="ident">err</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">StripPrefixError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">StripPrefixError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::path::StripPrefixError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">std::path::StripPrefixError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Generic</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sxd_document</span>::<span class="ident">parser</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">sxd_document</span>::<span class="ident">parser</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Xml</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sxd_document::parser::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">sxd_document::parser::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Xml</span>(<span class="ident">err</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sxd_xpath</span>::<span class="ident">ExecutionError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">sxd_xpath</span>::<span class="ident">ExecutionError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">XPath</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sxd_xpath::ExecutionError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">sxd_xpath::ExecutionError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::XPath</span>(<span class="ident">err</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">uuid</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Error</span>::<span class="ident">Uuid</span>(<span class="ident">err</span>)
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">uuid::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">Error::Uuid</span>(<span class="ident">err</span>)
     }
 }
 
@@ -1590,30 +1592,30 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">WixArch</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">X86</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x86&quot;</span>),
-            <span class="self">Self</span>::<span class="ident">X64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;x64&quot;</span>),
-            <span class="self">Self</span>::<span class="ident">Arm</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;arm&quot;</span>),
-            <span class="self">Self</span>::<span class="ident">Arm64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;arm64&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::X86</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;x86&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::X64</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;x64&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Arm</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;arm&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Arm64</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;arm64&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Cfg</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WixArch</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Cfg</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Cfg</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">c</span>.<span class="ident">target_arch</span> {
-            <span class="string">&quot;x86&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">X86</span>),
-            <span class="string">&quot;x86_64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">X64</span>),
-            <span class="string">&quot;aarch64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Arm64</span>),
-            <span class="string">&quot;thumbv7a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Arm</span>),
-            <span class="ident">a</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;x86&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::X86</span>),
+            <span class="string">&quot;x86_64&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::X64</span>),
+            <span class="string">&quot;aarch64&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Arm64</span>),
+            <span class="string">&quot;thumbv7a&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Arm</span>),
+            <span class="ident">a</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">starts_with</span>(<span class="string">&quot;arm&quot;</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Arm</span>)
+                    <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Arm</span>)
                 } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(
+                    <span class="prelude-val">Err</span>(<span class="ident">Error::Generic</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;Unsupported target architecture: {}&quot;</span>,
                         <span class="ident">a</span>
                     )))
@@ -1624,10 +1626,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">WixArch</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
-        <span class="self">Self</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>)
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::Generic</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>)
     }
 }
 
@@ -1664,29 +1666,29 @@
     <span class="doccomment">///     &quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">url</span>,
-            <span class="ident">TimestampServer</span>::<span class="ident">Comodo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;http://timestamp.comodoca.com/&quot;</span>,
-            <span class="ident">TimestampServer</span>::<span class="ident">Verisign</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>,
+            <span class="ident">TimestampServer::Custom</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) =&gt; <span class="ident">url</span>,
+            <span class="ident">TimestampServer::Comodo</span> =&gt; <span class="string">&quot;http://timestamp.comodoca.com/&quot;</span>,
+            <span class="ident">TimestampServer::Verisign</span> =&gt; <span class="string">&quot;http://timestamp.verisign.com/scripts/timstamp.dll&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TimestampServer</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">url</span>())
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TimestampServer</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">url</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">TimestampServer</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">trim</span>() {
-            <span class="string">&quot;comodo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Comodo</span>),
-            <span class="string">&quot;verisign&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Verisign</span>),
-            <span class="ident">u</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer</span>::<span class="ident">Custom</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="ident">u</span>))),
+            <span class="string">&quot;comodo&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer::Comodo</span>),
+            <span class="string">&quot;verisign&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer::Verisign</span>),
+            <span class="ident">u</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TimestampServer::Custom</span>(<span class="ident">String::from</span>(<span class="ident">u</span>))),
         }
     }
 }
@@ -1826,47 +1828,47 @@
     <span class="doccomment">/// assert_eq!(Cultures::TrTr.language(), &quot;Turkish&quot;);</span>
     <span class="doccomment">/// assert_eq!(Cultures::UkUa.language(), &quot;Ukrainian&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">language</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">language</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Arabic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bulgarian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Catalan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Croatian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Czech&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Danish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Dutch&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;English&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Estonian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Finnish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;French&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;German&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Greek&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hebrew&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hindi&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hungarian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Italian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Japanese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Kazakh&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Korean&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Latvian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Lithuanian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Norwegian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Polish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portuguese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Romanian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Russian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Serbian (Latin)&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Simplified Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovak&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovenian&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spanish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Swedish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Thai&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Traditional Chinese&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Turkish&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Ukrainian&quot;</span>,
+            <span class="ident">Cultures::ArSa</span> =&gt; <span class="string">&quot;Arabic&quot;</span>,
+            <span class="ident">Cultures::BgBg</span> =&gt; <span class="string">&quot;Bulgarian&quot;</span>,
+            <span class="ident">Cultures::CaEs</span> =&gt; <span class="string">&quot;Catalan&quot;</span>,
+            <span class="ident">Cultures::HrHr</span> =&gt; <span class="string">&quot;Croatian&quot;</span>,
+            <span class="ident">Cultures::CsCz</span> =&gt; <span class="string">&quot;Czech&quot;</span>,
+            <span class="ident">Cultures::DaDk</span> =&gt; <span class="string">&quot;Danish&quot;</span>,
+            <span class="ident">Cultures::NlNl</span> =&gt; <span class="string">&quot;Dutch&quot;</span>,
+            <span class="ident">Cultures::EnUs</span> =&gt; <span class="string">&quot;English&quot;</span>,
+            <span class="ident">Cultures::EtEe</span> =&gt; <span class="string">&quot;Estonian&quot;</span>,
+            <span class="ident">Cultures::FiFi</span> =&gt; <span class="string">&quot;Finnish&quot;</span>,
+            <span class="ident">Cultures::FrFr</span> =&gt; <span class="string">&quot;French&quot;</span>,
+            <span class="ident">Cultures::DeDe</span> =&gt; <span class="string">&quot;German&quot;</span>,
+            <span class="ident">Cultures::ElGr</span> =&gt; <span class="string">&quot;Greek&quot;</span>,
+            <span class="ident">Cultures::HeIl</span> =&gt; <span class="string">&quot;Hebrew&quot;</span>,
+            <span class="ident">Cultures::HiIn</span> =&gt; <span class="string">&quot;Hindi&quot;</span>,
+            <span class="ident">Cultures::HuHu</span> =&gt; <span class="string">&quot;Hungarian&quot;</span>,
+            <span class="ident">Cultures::ItIt</span> =&gt; <span class="string">&quot;Italian&quot;</span>,
+            <span class="ident">Cultures::JaJp</span> =&gt; <span class="string">&quot;Japanese&quot;</span>,
+            <span class="ident">Cultures::KkKz</span> =&gt; <span class="string">&quot;Kazakh&quot;</span>,
+            <span class="ident">Cultures::KoKr</span> =&gt; <span class="string">&quot;Korean&quot;</span>,
+            <span class="ident">Cultures::LvLv</span> =&gt; <span class="string">&quot;Latvian&quot;</span>,
+            <span class="ident">Cultures::LtLt</span> =&gt; <span class="string">&quot;Lithuanian&quot;</span>,
+            <span class="ident">Cultures::NbNo</span> =&gt; <span class="string">&quot;Norwegian&quot;</span>,
+            <span class="ident">Cultures::PlPl</span> =&gt; <span class="string">&quot;Polish&quot;</span>,
+            <span class="ident">Cultures::PtBr</span> =&gt; <span class="string">&quot;Portuguese&quot;</span>,
+            <span class="ident">Cultures::PtPt</span> =&gt; <span class="string">&quot;Portuguese&quot;</span>,
+            <span class="ident">Cultures::RoRo</span> =&gt; <span class="string">&quot;Romanian&quot;</span>,
+            <span class="ident">Cultures::RuRu</span> =&gt; <span class="string">&quot;Russian&quot;</span>,
+            <span class="ident">Cultures::SrLatnCs</span> =&gt; <span class="string">&quot;Serbian (Latin)&quot;</span>,
+            <span class="ident">Cultures::ZhCn</span> =&gt; <span class="string">&quot;Simplified Chinese&quot;</span>,
+            <span class="ident">Cultures::SkSk</span> =&gt; <span class="string">&quot;Slovak&quot;</span>,
+            <span class="ident">Cultures::SlSi</span> =&gt; <span class="string">&quot;Slovenian&quot;</span>,
+            <span class="ident">Cultures::EsEs</span> =&gt; <span class="string">&quot;Spanish&quot;</span>,
+            <span class="ident">Cultures::SvSe</span> =&gt; <span class="string">&quot;Swedish&quot;</span>,
+            <span class="ident">Cultures::ThTh</span> =&gt; <span class="string">&quot;Thai&quot;</span>,
+            <span class="ident">Cultures::ZhHk</span> =&gt; <span class="string">&quot;Traditional Chinese&quot;</span>,
+            <span class="ident">Cultures::ZhTw</span> =&gt; <span class="string">&quot;Traditional Chinese&quot;</span>,
+            <span class="ident">Cultures::TrTr</span> =&gt; <span class="string">&quot;Turkish&quot;</span>,
+            <span class="ident">Cultures::UkUa</span> =&gt; <span class="string">&quot;Ukrainian&quot;</span>,
         }
     }
 
@@ -1917,93 +1919,93 @@
     <span class="doccomment">/// assert_eq!(Cultures::TrTr.location(), &quot;Turkey&quot;);</span>
     <span class="doccomment">/// assert_eq!(Cultures::UkUa.location(), &quot;Ukraine&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">location</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">location</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Saudi Arabia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bulgaria&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spain&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Croatia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Czech Republic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Denmark&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Netherlands&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;United States&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Estonia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Finland&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;France&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Germany&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Greece&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Israel&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;India&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hungary&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Italy&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Japan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Kazakhstan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Korea&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Latvia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Lithuania&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Norway&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Poland&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Brazil&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Portugal&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Romania&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Russia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Serbia and Montenegro&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;China&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Slovak Republic&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Solvenia&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Spain&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Sweden&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Thailand&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hong Kong SAR&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Taiwan&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Turkey&quot;</span>,
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Ukraine&quot;</span>,
+            <span class="ident">Cultures::ArSa</span> =&gt; <span class="string">&quot;Saudi Arabia&quot;</span>,
+            <span class="ident">Cultures::BgBg</span> =&gt; <span class="string">&quot;Bulgaria&quot;</span>,
+            <span class="ident">Cultures::CaEs</span> =&gt; <span class="string">&quot;Spain&quot;</span>,
+            <span class="ident">Cultures::HrHr</span> =&gt; <span class="string">&quot;Croatia&quot;</span>,
+            <span class="ident">Cultures::CsCz</span> =&gt; <span class="string">&quot;Czech Republic&quot;</span>,
+            <span class="ident">Cultures::DaDk</span> =&gt; <span class="string">&quot;Denmark&quot;</span>,
+            <span class="ident">Cultures::NlNl</span> =&gt; <span class="string">&quot;Netherlands&quot;</span>,
+            <span class="ident">Cultures::EnUs</span> =&gt; <span class="string">&quot;United States&quot;</span>,
+            <span class="ident">Cultures::EtEe</span> =&gt; <span class="string">&quot;Estonia&quot;</span>,
+            <span class="ident">Cultures::FiFi</span> =&gt; <span class="string">&quot;Finland&quot;</span>,
+            <span class="ident">Cultures::FrFr</span> =&gt; <span class="string">&quot;France&quot;</span>,
+            <span class="ident">Cultures::DeDe</span> =&gt; <span class="string">&quot;Germany&quot;</span>,
+            <span class="ident">Cultures::ElGr</span> =&gt; <span class="string">&quot;Greece&quot;</span>,
+            <span class="ident">Cultures::HeIl</span> =&gt; <span class="string">&quot;Israel&quot;</span>,
+            <span class="ident">Cultures::HiIn</span> =&gt; <span class="string">&quot;India&quot;</span>,
+            <span class="ident">Cultures::HuHu</span> =&gt; <span class="string">&quot;Hungary&quot;</span>,
+            <span class="ident">Cultures::ItIt</span> =&gt; <span class="string">&quot;Italy&quot;</span>,
+            <span class="ident">Cultures::JaJp</span> =&gt; <span class="string">&quot;Japan&quot;</span>,
+            <span class="ident">Cultures::KkKz</span> =&gt; <span class="string">&quot;Kazakhstan&quot;</span>,
+            <span class="ident">Cultures::KoKr</span> =&gt; <span class="string">&quot;Korea&quot;</span>,
+            <span class="ident">Cultures::LvLv</span> =&gt; <span class="string">&quot;Latvia&quot;</span>,
+            <span class="ident">Cultures::LtLt</span> =&gt; <span class="string">&quot;Lithuania&quot;</span>,
+            <span class="ident">Cultures::NbNo</span> =&gt; <span class="string">&quot;Norway&quot;</span>,
+            <span class="ident">Cultures::PlPl</span> =&gt; <span class="string">&quot;Poland&quot;</span>,
+            <span class="ident">Cultures::PtBr</span> =&gt; <span class="string">&quot;Brazil&quot;</span>,
+            <span class="ident">Cultures::PtPt</span> =&gt; <span class="string">&quot;Portugal&quot;</span>,
+            <span class="ident">Cultures::RoRo</span> =&gt; <span class="string">&quot;Romania&quot;</span>,
+            <span class="ident">Cultures::RuRu</span> =&gt; <span class="string">&quot;Russia&quot;</span>,
+            <span class="ident">Cultures::SrLatnCs</span> =&gt; <span class="string">&quot;Serbia and Montenegro&quot;</span>,
+            <span class="ident">Cultures::ZhCn</span> =&gt; <span class="string">&quot;China&quot;</span>,
+            <span class="ident">Cultures::SkSk</span> =&gt; <span class="string">&quot;Slovak Republic&quot;</span>,
+            <span class="ident">Cultures::SlSi</span> =&gt; <span class="string">&quot;Solvenia&quot;</span>,
+            <span class="ident">Cultures::EsEs</span> =&gt; <span class="string">&quot;Spain&quot;</span>,
+            <span class="ident">Cultures::SvSe</span> =&gt; <span class="string">&quot;Sweden&quot;</span>,
+            <span class="ident">Cultures::ThTh</span> =&gt; <span class="string">&quot;Thailand&quot;</span>,
+            <span class="ident">Cultures::ZhHk</span> =&gt; <span class="string">&quot;Hong Kong SAR&quot;</span>,
+            <span class="ident">Cultures::ZhTw</span> =&gt; <span class="string">&quot;Taiwan&quot;</span>,
+            <span class="ident">Cultures::TrTr</span> =&gt; <span class="string">&quot;Turkey&quot;</span>,
+            <span class="ident">Cultures::UkUa</span> =&gt; <span class="string">&quot;Ukraine&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Cultures</span>::<span class="ident">ArSa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ar-SA&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">BgBg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;bg-BG&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">CaEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ca-ES&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HrHr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hr-HR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">CsCz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;cs-CZ&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">DaDk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;da-DK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">NlNl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nl-NL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EnUs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;en-US&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EtEe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;et-EE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">FiFi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fi-FI&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">FrFr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;fr-FR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">DeDe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;de-DE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ElGr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;el-GR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HeIl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;he-IL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HiIn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hi-IN&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">HuHu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;hu-HU&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ItIt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;it-IT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">JaJp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ja-JP&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">KkKz</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;kk-KZ&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">KoKr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ko-KR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">LvLv</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lv-LV&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">LtLt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;lt-LT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">NbNo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;nb-NO&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PlPl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pl-PL&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PtBr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-BR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">PtPt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-PT&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">RoRo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ro-RO&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">RuRu</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ru-RU&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sr-Latn-CS&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhCn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-CN&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SkSk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sk-SK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SlSi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sl-SI&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">EsEs</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;es-ES&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">SvSe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sv-SE&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ThTh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;th-TH&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhHk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-HK&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">ZhTw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-TW&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">TrTr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;tr-TR&quot;</span>),
-            <span class="ident">Cultures</span>::<span class="ident">UkUa</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;uk-UA&quot;</span>),
+            <span class="ident">Cultures::ArSa</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ar-SA&quot;</span>),
+            <span class="ident">Cultures::BgBg</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;bg-BG&quot;</span>),
+            <span class="ident">Cultures::CaEs</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ca-ES&quot;</span>),
+            <span class="ident">Cultures::HrHr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;hr-HR&quot;</span>),
+            <span class="ident">Cultures::CsCz</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cs-CZ&quot;</span>),
+            <span class="ident">Cultures::DaDk</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;da-DK&quot;</span>),
+            <span class="ident">Cultures::NlNl</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;nl-NL&quot;</span>),
+            <span class="ident">Cultures::EnUs</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;en-US&quot;</span>),
+            <span class="ident">Cultures::EtEe</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;et-EE&quot;</span>),
+            <span class="ident">Cultures::FiFi</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;fi-FI&quot;</span>),
+            <span class="ident">Cultures::FrFr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;fr-FR&quot;</span>),
+            <span class="ident">Cultures::DeDe</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;de-DE&quot;</span>),
+            <span class="ident">Cultures::ElGr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;el-GR&quot;</span>),
+            <span class="ident">Cultures::HeIl</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;he-IL&quot;</span>),
+            <span class="ident">Cultures::HiIn</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;hi-IN&quot;</span>),
+            <span class="ident">Cultures::HuHu</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;hu-HU&quot;</span>),
+            <span class="ident">Cultures::ItIt</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;it-IT&quot;</span>),
+            <span class="ident">Cultures::JaJp</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ja-JP&quot;</span>),
+            <span class="ident">Cultures::KkKz</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;kk-KZ&quot;</span>),
+            <span class="ident">Cultures::KoKr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ko-KR&quot;</span>),
+            <span class="ident">Cultures::LvLv</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;lv-LV&quot;</span>),
+            <span class="ident">Cultures::LtLt</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;lt-LT&quot;</span>),
+            <span class="ident">Cultures::NbNo</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;nb-NO&quot;</span>),
+            <span class="ident">Cultures::PlPl</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;pl-PL&quot;</span>),
+            <span class="ident">Cultures::PtBr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-BR&quot;</span>),
+            <span class="ident">Cultures::PtPt</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;pt-PT&quot;</span>),
+            <span class="ident">Cultures::RoRo</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ro-RO&quot;</span>),
+            <span class="ident">Cultures::RuRu</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ru-RU&quot;</span>),
+            <span class="ident">Cultures::SrLatnCs</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sr-Latn-CS&quot;</span>),
+            <span class="ident">Cultures::ZhCn</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-CN&quot;</span>),
+            <span class="ident">Cultures::SkSk</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sk-SK&quot;</span>),
+            <span class="ident">Cultures::SlSi</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sl-SI&quot;</span>),
+            <span class="ident">Cultures::EsEs</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;es-ES&quot;</span>),
+            <span class="ident">Cultures::SvSe</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sv-SE&quot;</span>),
+            <span class="ident">Cultures::ThTh</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;th-TH&quot;</span>),
+            <span class="ident">Cultures::ZhHk</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-HK&quot;</span>),
+            <span class="ident">Cultures::ZhTw</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;zh-TW&quot;</span>),
+            <span class="ident">Cultures::TrTr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;tr-TR&quot;</span>),
+            <span class="ident">Cultures::UkUa</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;uk-UA&quot;</span>),
         }
     }
 }
@@ -2011,75 +2013,75 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">trim</span>() {
-            <span class="string">&quot;ar-sa&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ArSa</span>),
-            <span class="string">&quot;bg-bg&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">BgBg</span>),
-            <span class="string">&quot;ca-es&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CaEs</span>),
-            <span class="string">&quot;hr-hr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HrHr</span>),
-            <span class="string">&quot;cs-cz&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">CsCz</span>),
-            <span class="string">&quot;da-dk&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DaDk</span>),
-            <span class="string">&quot;nl-nl&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NlNl</span>),
-            <span class="string">&quot;en-us&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EnUs</span>),
-            <span class="string">&quot;et-ee&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EtEe</span>),
-            <span class="string">&quot;fi-fi&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FiFi</span>),
-            <span class="string">&quot;fr-fr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">FrFr</span>),
-            <span class="string">&quot;de-de&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">DeDe</span>),
-            <span class="string">&quot;el-gr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ElGr</span>),
-            <span class="string">&quot;he-il&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HeIl</span>),
-            <span class="string">&quot;hi-in&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HiIn</span>),
-            <span class="string">&quot;hu-hu&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">HuHu</span>),
-            <span class="string">&quot;it-it&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ItIt</span>),
-            <span class="string">&quot;ja-jp&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">JaJp</span>),
-            <span class="string">&quot;kk-kz&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KkKz</span>),
-            <span class="string">&quot;ko-kr&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">KoKr</span>),
-            <span class="string">&quot;lv-lv&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LvLv</span>),
-            <span class="string">&quot;lt-lt&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">LtLt</span>),
-            <span class="string">&quot;nb-no&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">NbNo</span>),
-            <span class="string">&quot;pl-pl&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PlPl</span>),
-            <span class="string">&quot;pt-br&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtBr</span>),
-            <span class="string">&quot;pt-pt&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">PtPt</span>),
-            <span class="string">&quot;ro-ro&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RoRo</span>),
-            <span class="string">&quot;ru-ru&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RuRu</span>),
-            <span class="string">&quot;sr-Latn-CS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SrLatnCs</span>),
-            <span class="string">&quot;zh-CN&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhCn</span>),
-            <span class="string">&quot;sk-SK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SkSk</span>),
-            <span class="string">&quot;sl-SI&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SlSi</span>),
-            <span class="string">&quot;es-ES&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">EsEs</span>),
-            <span class="string">&quot;sv-SE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">SvSe</span>),
-            <span class="string">&quot;th-TH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ThTh</span>),
-            <span class="string">&quot;zh-HK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhHk</span>),
-            <span class="string">&quot;zh-TW&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">ZhTw</span>),
-            <span class="string">&quot;tr-TR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">TrTr</span>),
-            <span class="string">&quot;uk-UA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">UkUa</span>),
-            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Generic</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Unknown &#39;{}&#39; culture&quot;</span>, <span class="ident">e</span>))),
+            <span class="string">&quot;ar-sa&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ArSa</span>),
+            <span class="string">&quot;bg-bg&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::BgBg</span>),
+            <span class="string">&quot;ca-es&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::CaEs</span>),
+            <span class="string">&quot;hr-hr&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::HrHr</span>),
+            <span class="string">&quot;cs-cz&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::CsCz</span>),
+            <span class="string">&quot;da-dk&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::DaDk</span>),
+            <span class="string">&quot;nl-nl&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::NlNl</span>),
+            <span class="string">&quot;en-us&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::EnUs</span>),
+            <span class="string">&quot;et-ee&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::EtEe</span>),
+            <span class="string">&quot;fi-fi&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::FiFi</span>),
+            <span class="string">&quot;fr-fr&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::FrFr</span>),
+            <span class="string">&quot;de-de&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::DeDe</span>),
+            <span class="string">&quot;el-gr&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ElGr</span>),
+            <span class="string">&quot;he-il&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::HeIl</span>),
+            <span class="string">&quot;hi-in&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::HiIn</span>),
+            <span class="string">&quot;hu-hu&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::HuHu</span>),
+            <span class="string">&quot;it-it&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ItIt</span>),
+            <span class="string">&quot;ja-jp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::JaJp</span>),
+            <span class="string">&quot;kk-kz&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::KkKz</span>),
+            <span class="string">&quot;ko-kr&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::KoKr</span>),
+            <span class="string">&quot;lv-lv&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::LvLv</span>),
+            <span class="string">&quot;lt-lt&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::LtLt</span>),
+            <span class="string">&quot;nb-no&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::NbNo</span>),
+            <span class="string">&quot;pl-pl&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::PlPl</span>),
+            <span class="string">&quot;pt-br&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::PtBr</span>),
+            <span class="string">&quot;pt-pt&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::PtPt</span>),
+            <span class="string">&quot;ro-ro&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::RoRo</span>),
+            <span class="string">&quot;ru-ru&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::RuRu</span>),
+            <span class="string">&quot;sr-Latn-CS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::SrLatnCs</span>),
+            <span class="string">&quot;zh-CN&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ZhCn</span>),
+            <span class="string">&quot;sk-SK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::SkSk</span>),
+            <span class="string">&quot;sl-SI&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::SlSi</span>),
+            <span class="string">&quot;es-ES&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::EsEs</span>),
+            <span class="string">&quot;sv-SE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::SvSe</span>),
+            <span class="string">&quot;th-TH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ThTh</span>),
+            <span class="string">&quot;zh-HK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ZhHk</span>),
+            <span class="string">&quot;zh-TW&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::ZhTw</span>),
+            <span class="string">&quot;tr-TR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::TrTr</span>),
+            <span class="string">&quot;uk-UA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cultures::UkUa</span>),
+            <span class="ident">e</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Generic</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown &#39;{}&#39; culture&quot;</span>, <span class="ident">e</span>))),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Cultures</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Cultures</span>::<span class="ident">EnUs</span>
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">Cultures::EnUs</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">assert_fs</span>::<span class="ident">TempDir</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
+    <span class="kw">use</span> <span class="ident">assert_fs::TempDir</span>;
+    <span class="kw">use</span> <span class="ident">std::env</span>;
+    <span class="kw">use</span> <span class="ident">std::fs</span>;
 
     <span class="doccomment">/// Create a simple project with the provided TOML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_project</span>(<span class="ident">toml</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TempDir</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_project</span>(<span class="ident">toml</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TempDir</span> {
         <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PERSIST_VAR_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CARGO_WIX_TEST_PERSIST&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">TempDir</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
-        <span class="ident">fs</span>::<span class="ident">write</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>), <span class="ident">toml</span>).<span class="ident">unwrap</span>();
-        <span class="ident">fs</span>::<span class="ident">create_dir</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>)).<span class="ident">unwrap</span>();
-        <span class="ident">fs</span>::<span class="ident">write</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>).<span class="ident">join</span>(<span class="string">&quot;main.rs&quot;</span>), <span class="string">&quot;fn main() {}&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">TempDir::new</span>().<span class="ident">unwrap</span>();
+        <span class="ident">fs::write</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>), <span class="ident">toml</span>).<span class="ident">unwrap</span>();
+        <span class="ident">fs::create_dir</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>)).<span class="ident">unwrap</span>();
+        <span class="ident">fs::write</span>(<span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>).<span class="ident">join</span>(<span class="string">&quot;main.rs&quot;</span>), <span class="string">&quot;fn main() {}&quot;</span>).<span class="ident">unwrap</span>();
 
-        <span class="ident">temp_dir</span>.<span class="ident">into_persistent_if</span>(<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">PERSIST_VAR_NAME</span>).<span class="ident">is_ok</span>())
+        <span class="ident">temp_dir</span>.<span class="ident">into_persistent_if</span>(<span class="ident">env::var</span>(<span class="ident">PERSIST_VAR_NAME</span>).<span class="ident">is_ok</span>())
     }
 
     <span class="kw">mod</span> <span class="ident">culture</span> {
@@ -2087,18 +2089,18 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">from_str_is_correct_for_dash_russian</span>() {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Cultures</span>::<span class="ident">from_str</span>(<span class="string">&quot;ru-ru&quot;</span>), <span class="prelude-val">Ok</span>(<span class="ident">Cultures</span>::<span class="ident">RuRu</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">Cultures::from_str</span>(<span class="string">&quot;ru-ru&quot;</span>), <span class="prelude-val">Ok</span>(<span class="ident">Cultures::RuRu</span>));
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="attribute">#[<span class="ident">should_panic</span>]</span>
         <span class="kw">fn</span> <span class="ident">from_str_fails_for_underscore_russian</span>() {
-            <span class="ident">Cultures</span>::<span class="ident">from_str</span>(<span class="string">&quot;ru_ru&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="ident">Cultures::from_str</span>(<span class="string">&quot;ru_ru&quot;</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">display_is_correct_for_russian</span>() {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">Cultures</span>::<span class="ident">RuRu</span>), <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;ru-RU&quot;</span>));
+            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">Cultures::RuRu</span>), <span class="ident">String::from</span>(<span class="string">&quot;ru-RU&quot;</span>));
         }
     }
 
@@ -2107,104 +2109,106 @@
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_x86_64_pc_windows_msvc_is_correct</span>() {
-            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;x86_64-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;x86_64-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                 .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X64</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_x86_64_pc_windows_gnu_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;x86_64-pc-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X64</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;x86_64-pc-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_x86_64_uwp_windows_msvc_is_correct</span>() {
-            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;x86_64-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;x86_64-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                 .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X64</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_x86_64_uwp_windows_gnu_is_correct</span>() {
-            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;x86_64-uwp-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;x86_64-uwp-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                 .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X64</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_i686_pc_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;i686-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X86</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;i686-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X86</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_i686_pc_windows_gnu_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;i686-pc-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X86</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;i686-pc-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X86</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_i686_uwp_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;i686-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X86</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;i686-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X86</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_i686_uwp_windows_gnu_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;i686-uwp-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X86</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;i686-uwp-windows-gnu&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X86</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_i586_pc_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;i586-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">X86</span>);
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;i586-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>)).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::X86</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_aarch64_pc_windows_msvc_is_correct</span>() {
-            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;aarch64-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;aarch64-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                 .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">Arm64</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::Arm64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_aarch64_uwp_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;aarch64-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;aarch64-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                     .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">Arm64</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::Arm64</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_thumbv7a_pc_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;thumbv7a-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;thumbv7a-pc-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                     .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">Arm</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::Arm</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">try_from_thumbv7a_uwp_windows_msvc_is_correct</span>() {
             <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span>
-                <span class="ident">WixArch</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg</span>::<span class="ident">of</span>(<span class="string">&quot;thumbv7a-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
+                <span class="ident">WixArch::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">Cfg::of</span>(<span class="string">&quot;thumbv7a-uwp-windows-msvc&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Cfg parsing&quot;</span>))
                     .<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">Arm</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::Arm</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">from_str_is_correct</span>() {
-            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch</span>::<span class="ident">from_str</span>(<span class="string">&quot;thumbv7a-uwp-windows-msvc&quot;</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arch</span>, <span class="ident">WixArch</span>::<span class="ident">Arm</span>);
+            <span class="kw">let</span> <span class="ident">arch</span> <span class="op">=</span> <span class="ident">WixArch::from_str</span>(<span class="string">&quot;thumbv7a-uwp-windows-msvc&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">arch</span>, <span class="ident">WixArch::Arm</span>);
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wix";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wix" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>
