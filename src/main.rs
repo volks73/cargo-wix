@@ -924,6 +924,12 @@
 //!
 //! This will be displayed in the ACL dialog.
 //!
+//! ### `--install`
+//!
+//! Available for the default _create_ (`cargo wix`) subcommand.
+//!
+//! Automatically runs the installer after creating it.
+//!
 //! ### `-i,--install-version`
 //!
 //! Available for the default _create_ (`cargo wix`) subcommand.
