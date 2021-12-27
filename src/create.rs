@@ -29,8 +29,8 @@ use crate::WixArch;
 use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
 use crate::EXE_FILE_EXTENSION;
-use crate::MSI_FILE_EXTENSION;
 use crate::MSIEXEC;
+use crate::MSI_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
@@ -640,9 +640,7 @@ impl Execution {
         // Launch the installer
         info!("Launching the installer");
         let mut installer = Command::new(MSIEXEC);
-        installer
-            .arg("/i")
-            .arg(&installer_destination);
+        installer.arg("/i").arg(&installer_destination);
         let status = installer.status()?;
         if !status.success() {
             return Err(Error::Command(
