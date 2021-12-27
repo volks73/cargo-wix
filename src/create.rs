@@ -638,17 +638,20 @@ impl Execution {
         }
 
         // Launch the installer
-        info!("Launching the installer");
-        let mut installer = Command::new(MSIEXEC);
-        installer.arg("/i").arg(&installer_destination);
-        let status = installer.status()?;
-        if !status.success() {
-            return Err(Error::Command(
-                MSIEXEC,
-                status.code().unwrap_or(100),
-                self.capture_output,
-            ));
+        if self.install {
+            info!("Launching the installer");
+            let mut installer = Command::new(MSIEXEC);
+            installer.arg("/i").arg(&installer_destination);
+            let status = installer.status()?;
+            if !status.success() {
+                return Err(Error::Command(
+                    MSIEXEC,
+                    status.code().unwrap_or(100),
+                    self.capture_output,
+                ));
+            }
         }
+
         Ok(())
     }
 
