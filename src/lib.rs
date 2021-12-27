@@ -129,6 +129,9 @@ pub const WIX_COMPILER: &str = "candle";
 /// Windows installer.
 pub const WIX_LINKER: &str = "light";
 
+/// The application name without the file extension of the `msiexec` utility.
+pub const MSIEXEC: &str = "msiexec";
+
 /// The file extension for a WiX Toolset object file, which is the output from
 /// the WiX compiler.
 pub const WIX_OBJECT_FILE_EXTENSION: &str = "wixobj";

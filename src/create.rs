@@ -29,6 +29,7 @@ use crate::WixArch;
 use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
 use crate::EXE_FILE_EXTENSION;
+use crate::MSIEXEC;
 use crate::MSI_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_COMPILER;
@@ -71,6 +72,7 @@ pub struct Builder<'a> {
     locale: Option<&'a str>,
     name: Option<&'a str>,
     no_build: bool,
+    install: bool,
     output: Option<&'a str>,
     package: Option<&'a str>,
     target: Option<&'a str>,
@@ -93,6 +95,7 @@ impl<'a> Builder<'a> {
             locale: None,
             name: None,
             no_build: false,
+            install: false,
             output: None,
             package: None,
             target: None,
@@ -262,6 +265,19 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Runs the installer after creating it.
+    ///
+    /// If `true`, the MSI installer will be created and then launched. This will
+    /// automatically open the installation wizard for the project and allow the
+    /// user to install it.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
+    pub fn install(&mut self, n: bool) -> &mut Self {
+        self.install = n;
+        self
+    }
+
     /// Sets the output file and destination.
     ///
     /// The default is to create a MSI file with the
@@ -340,6 +356,7 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
+            install: self.install,
             output: self.output.map(String::from),
             package: self.package.map(String::from),
             version: self.version.map(String::from),
@@ -369,6 +386,7 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
+    install: bool,
     output: Option<String>,
     package: Option<String>,
     target: Option<String>,
@@ -391,6 +409,7 @@ impl Execution {
         debug!("self.locale = {:?}", self.locale);
         debug!("self.name = {:?}", self.name);
         debug!("self.no_build = {:?}", self.no_build);
+        debug!("self.install = {:?}", self.install);
         debug!("self.output = {:?}", self.output);
         debug!("self.package = {:?}", self.package);
         debug!("self.target = {:?}", self.target);
@@ -432,6 +451,7 @@ impl Execution {
         let cfg = Cfg::of(&target_triple).map_err(|e| Error::Generic(e.to_string()))?;
         let wix_arch = WixArch::try_from(&cfg)?;
         debug!("wix_arch = {:?}", wix_arch);
+
         if no_build {
             warn!("Skipped building the binary");
         } else {
@@ -468,6 +488,7 @@ impl Execution {
                 ));
             }
         }
+
         // Compile the installer
         info!("Compiling the installer");
         let mut compiler = self.compiler()?;
@@ -555,6 +576,7 @@ impl Execution {
             &manifest.target_directory,
         );
         debug!("installer_destination = {:?}", installer_destination);
+
         // Link the installer
         info!("Linking the installer");
         let mut linker = self.linker()?;
@@ -614,6 +636,22 @@ impl Execution {
                 self.capture_output,
             ));
         }
+
+        // Launch the installer
+        if self.install {
+            info!("Launching the installer");
+            let mut installer = Command::new(MSIEXEC);
+            installer.arg("/i").arg(&installer_destination);
+            let status = installer.status()?;
+            if !status.success() {
+                return Err(Error::Command(
+                    MSIEXEC,
+                    status.code().unwrap_or(100),
+                    self.capture_output,
+                ));
+            }
+        }
+
         Ok(())
     }
 
