@@ -938,7 +938,7 @@ impl FromStr for Cultures {
             "pt-pt" => Ok(Cultures::PtPt),
             "ro-ro" => Ok(Cultures::RoRo),
             "ru-ru" => Ok(Cultures::RuRu),
-            "sr-Latn-CS" => Ok(Cultures::SrLatnCs),
+            "sr-latn-cs" => Ok(Cultures::SrLatnCs),
             "zh-cn" => Ok(Cultures::ZhCn),
             "sk-sk" => Ok(Cultures::SkSk),
             "sl-si" => Ok(Cultures::SlSi),
