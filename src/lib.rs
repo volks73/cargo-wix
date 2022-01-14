@@ -939,16 +939,16 @@ impl FromStr for Cultures {
             "ro-ro" => Ok(Cultures::RoRo),
             "ru-ru" => Ok(Cultures::RuRu),
             "sr-Latn-CS" => Ok(Cultures::SrLatnCs),
-            "zh-CN" => Ok(Cultures::ZhCn),
-            "sk-SK" => Ok(Cultures::SkSk),
-            "sl-SI" => Ok(Cultures::SlSi),
-            "es-ES" => Ok(Cultures::EsEs),
-            "sv-SE" => Ok(Cultures::SvSe),
-            "th-TH" => Ok(Cultures::ThTh),
-            "zh-HK" => Ok(Cultures::ZhHk),
-            "zh-TW" => Ok(Cultures::ZhTw),
-            "tr-TR" => Ok(Cultures::TrTr),
-            "uk-UA" => Ok(Cultures::UkUa),
+            "zh-cn" => Ok(Cultures::ZhCn),
+            "sk-sk" => Ok(Cultures::SkSk),
+            "sl-si" => Ok(Cultures::SlSi),
+            "es-es" => Ok(Cultures::EsEs),
+            "sv-se" => Ok(Cultures::SvSe),
+            "th-th" => Ok(Cultures::ThTh),
+            "zh-hk" => Ok(Cultures::ZhHk),
+            "zh-tw" => Ok(Cultures::ZhTw),
+            "tr-tr" => Ok(Cultures::TrTr),
+            "uk-ua" => Ok(Cultures::UkUa),
             e => Err(Error::Generic(format!("Unknown '{}' culture", e))),
         }
     }
@@ -996,6 +996,27 @@ mod tests {
         #[test]
         fn display_is_correct_for_russian() {
             assert_eq!(format!("{}", Cultures::RuRu), String::from("ru-RU"));
+        }
+
+        #[test]
+        fn from_str_is_correct_for_lowercase_slovak() {
+            assert_eq!(Cultures::from_str("sk-sk"), Ok(Cultures::SkSk));
+        }
+
+        #[test]
+        fn from_str_is_correct_for_uppercase_slovak() {
+            assert_eq!(Cultures::from_str("sk-SK"), Ok(Cultures::SkSk));
+        }
+
+        #[test]
+        #[should_panic]
+        fn from_str_fails_for_underscore_slovak() {
+            Cultures::from_str("sk_sk").unwrap();
+        }
+
+        #[test]
+        fn display_is_correct_for_slovak() {
+            assert_eq!(format!("{}", Cultures::SkSk), String::from("sk-SK"));
         }
     }
 
