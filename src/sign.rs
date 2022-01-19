@@ -201,7 +201,7 @@ impl Execution {
             signer.stdout(Stdio::null());
             signer.stderr(Stdio::null());
         }
-        signer.arg("sign").arg("/a").arg("/d").arg(description);
+        signer.arg("sign").arg("/a").arg("/fd").arg("certHash").arg("/d").arg(description);
         if let Some(h) = self.homepage(&package) {
             trace!("Using the '{}' URL for the expanded description", h);
             signer.arg("/du").arg(h);
