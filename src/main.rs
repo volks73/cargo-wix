@@ -1198,7 +1198,7 @@ use wix::initialize;
 use wix::print;
 use wix::purge;
 use wix::sign;
-use wix::{Cultures, Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
+use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
 const SUBCOMMAND_NAME: &str = "wix";
 
@@ -1409,7 +1409,6 @@ fn main() {
         .long("year")
         .short("y")
         .takes_value(true);
-    let default_culture = Cultures::EnUs.to_string();
     let matches = App::new(crate_name!())
         .bin_name("cargo")
         .subcommand(
@@ -1452,7 +1451,6 @@ fn main() {
                         codes. The codes are case insensitive.")
                     .long("culture")
                     .short("c")
-                    .default_value(&default_culture)
                     .takes_value(true))
                 .arg(Arg::with_name("compiler-arg")
                     .help("Send an argument to the WiX compiler (candle.exe)")
