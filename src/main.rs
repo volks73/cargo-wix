@@ -1335,6 +1335,16 @@ fn main() {
         .long("package")
         .short("p")
         .takes_value(true);
+    let variant = Arg::with_name("variant")
+        .help("The variant to build")
+        .long_help(
+            "Selects the package within a project organized as a workspace. \
+             Workspaces have one or more members, where each member is a package. \
+             This option selects the package by name.",
+        )
+        .long("variant")
+        .short("a")
+        .takes_value(true);
     // The path guid option for the `init` and `print` subcommands
     let path_guid = Arg::with_name("path-guid")
         .help("A string formatted as a v4 hyphenated, uppercase UUID for the path component")
@@ -1476,6 +1486,7 @@ fn main() {
                     .long("target")
                     .short("t")
                     .takes_value(true))
+                .arg(variant.clone())
                 .arg(Arg::with_name("debug-build")
                     .help("Builds the package using the Debug profile")
                     .long_help("Uses the Debug profile when building the package \
@@ -1907,6 +1918,7 @@ fn main() {
             create.output(matches.value_of("output"));
             create.version(matches.value_of("install-version"));
             create.package(matches.value_of("package"));
+            create.variant(matches.value_of("variant"));
             create.target(matches.value_of("target"));
             create.build().run()
         }

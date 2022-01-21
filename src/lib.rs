@@ -89,6 +89,7 @@ use std::str::FromStr;
 use cargo_metadata::{Metadata, MetadataCommand, Package};
 
 use rustc_cfg::Cfg;
+use serde_json::{Value, json};
 
 /// The name of the folder where binaries are typically stored.
 pub const BINARY_FOLDER_NAME: &str = "bin";
@@ -181,6 +182,32 @@ fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
         .manifest_path(cargo_file_path)
         .exec()
         .unwrap())
+}
+
+fn metadata(package: &Package, variant: &Option<String>) -> Result<Value> {
+    let metadata_base = package.metadata.get("wix");
+
+    let metadata = match variant {
+        Some(v) => {
+            let vm = metadata_base
+                .and_then(|m| m.get("variants"))
+                .and_then(|va| va.get(&v))
+                .map(|m| m.to_owned());
+            if vm.is_none() {
+                return Err(Error::Generic(format!(
+                    "The variant ('{}') does not exist.",
+                    v
+                )));
+            }
+            vm
+        }
+        None => metadata_base.map(|m| m.to_owned()),
+    };
+    let final_metadata = match metadata {
+        Some(metadata) => metadata,
+        None => json!({ "an": "object" })
+    };
+    Ok(final_metadata)
 }
 
 fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
