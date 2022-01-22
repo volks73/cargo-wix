@@ -1505,15 +1505,15 @@ fn main() {
                         binary with the Debug profile.")
                     .long("dbg-name")
                     .short("D"))
-                .arg(Arg::with_name("include")
+                .arg(Arg::with_name("sources")
                     .help("Include an additional WiX Source (wxs) file")
                     .long_help("Includes a WiX source (wxs) file for a project, \
                         where the wxs file is not located in the default location, \
                         i.e. 'wix'. Use this option multiple times to include \
                         multiple wxs files.")
-                    .long("include")
+                    .long("sources")
                     .multiple(true)
-                    .short("I")
+                    .short("s")
                     .takes_value(true))
                 .subcommand(SubCommand::with_name("init")
                     .version(crate_version!())
@@ -1908,7 +1908,7 @@ fn main() {
             create.culture(matches.value_of("culture"));
             create.debug_build(matches.is_present("debug-build"));
             create.debug_name(matches.is_present("debug-name"));
-            create.includes(matches.values_of("include").map(|a| a.collect()));
+            create.sources(matches.values_of("sources").map(|a| a.collect()));
             create.input(matches.value_of("INPUT"));
             create.linker_args(matches.values_of("linker-arg").map(|a| a.collect()));
             create.locale(matches.value_of("locale"));

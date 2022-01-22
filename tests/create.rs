@@ -815,7 +815,7 @@ fn includes_works_with_wix_dir() {
     let three_wxs = package.path().join(MISC_NAME).join("three.wxs");
     env::set_current_dir(package.path()).unwrap();
     initialize::Builder::default().build().run().unwrap();
-    let result = run(Builder::default().includes(Some(vec![
+    let result = run(Builder::default().sources(Some(vec![
         two_wxs.to_str().unwrap(),
         three_wxs.to_str().unwrap(),
     ])));
@@ -839,7 +839,7 @@ fn includes_works_without_wix_dir() {
     let one_wxs = package.path().join(MISC_NAME).join("one.wxs");
     let two_wxs = package.path().join(MISC_NAME).join("two.wxs");
     env::set_current_dir(package.path()).unwrap();
-    let result = run(Builder::default().includes(Some(vec![
+    let result = run(Builder::default().sources(Some(vec![
         one_wxs.to_str().unwrap(),
         two_wxs.to_str().unwrap(),
     ])));
@@ -871,7 +871,7 @@ fn includes_works_with_input_outside_cwd() {
         .unwrap();
     let result = run(Builder::default()
         .input(package_manifest.path().to_str())
-        .includes(Some(vec![
+        .sources(Some(vec![
             two_wxs.to_str().unwrap(),
             three_wxs.to_str().unwrap(),
         ])));
