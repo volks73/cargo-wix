@@ -1127,6 +1127,12 @@
 //! will be printed during execution of a subcommand. When combined with the
 //! `--nocapture` flag, this is useful for debugging and testing.
 //!
+//! ### `-i,--installer`
+//!
+//! Available for the _sign_ (`cargo wix sign`) subcommand.
+//!
+//! Speicifies path to the installer(msi) to be signed.
+//!
 //! ### `-y,--year`
 //!
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
@@ -1739,6 +1745,12 @@ fn main() {
                             folder alongside this manifest will be signed based on \
                             the metadata within the manifest.")
                         .index(1))
+                    .arg(Arg::with_name("installer")
+                        .help("specify the installer to be signed")
+                        .long_help("Specify the installer to be signed.")
+                        .long("installer")
+                        .short("i")
+                        .takes_value(true))
                     .arg(Arg::with_name("no-capture")
                         .help("Display output from the signer")
                         .long_help("By default, this subcommand captures, or \
@@ -1884,6 +1896,7 @@ fn main() {
             sign.description(m.value_of("description"));
             sign.homepage(m.value_of("homepage"));
             sign.input(m.value_of("INPUT"));
+            sign.installer(m.value_of("installer"));
             sign.package(m.value_of("package"));
             sign.product_name(m.value_of("product-name"));
             sign.timestamp(m.value_of("timestamp"));

@@ -45,6 +45,7 @@ pub struct Builder<'a> {
     description: Option<&'a str>,
     homepage: Option<&'a str>,
     input: Option<&'a str>,
+    installer: Option<&'a str>,
     package: Option<&'a str>,
     product_name: Option<&'a str>,
     timestamp: Option<&'a str>,
@@ -59,6 +60,7 @@ impl<'a> Builder<'a> {
             description: None,
             homepage: None,
             input: None,
+            installer: None,
             package: None,
             product_name: None,
             timestamp: None,
@@ -117,6 +119,12 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Override default installer path.
+    pub fn installer(&mut self, i: Option<&'a str>) -> &mut Self {
+        self.installer = i;
+        self
+    }
+
     /// Sets the product name.
     ///
     /// The default is to use the value for the `name` field in the package's
@@ -143,6 +151,7 @@ impl<'a> Builder<'a> {
             description: self.description.map(String::from),
             homepage: self.homepage.map(String::from),
             input: self.input.map(PathBuf::from),
+            installer: self.installer.map(PathBuf::from),
             package: self.package.map(String::from),
             product_name: self.product_name.map(String::from),
             timestamp: self.timestamp.map(String::from),
@@ -164,6 +173,7 @@ pub struct Execution {
     description: Option<String>,
     homepage: Option<String>,
     input: Option<PathBuf>,
+    installer: Option<PathBuf>,
     package: Option<String>,
     product_name: Option<String>,
     timestamp: Option<String>,
@@ -178,6 +188,7 @@ impl Execution {
         debug!("description = {:?}", self.description);
         debug!("homepage = {:?}", self.homepage);
         debug!("input = {:?}", self.input);
+        debug!("installer = {:?}", self.installer);
         debug!("package = {:?}", self.package);
         debug!("product_name = {:?}", self.product_name);
         debug!("timestamp = {:?}", self.timestamp);
@@ -252,7 +263,7 @@ impl Execution {
     }
 
     fn msi(&self, target_directory: &Path) -> Result<PathBuf> {
-        if let Some(ref i) = self.input {
+        if let Some(ref i) = self.installer {
             trace!("The path to an installer to sign has been explicitly set");
             let msi = PathBuf::from(i);
             if msi.exists() {
@@ -472,7 +483,7 @@ mod tests {
             let msi_path = temp_dir.path().join("Example.msi");
             let _msi_handle = File::create(&msi_path).expect("Create file");
             let actual = Builder::new()
-                .input(msi_path.to_str())
+                .installer(msi_path.to_str())
                 .build()
                 .msi(Path::new("target"))
                 .unwrap();
