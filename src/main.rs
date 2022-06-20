@@ -1519,6 +1519,12 @@ fn main() {
                         Text Format (RTF) if the 'license' field is specified with a supported \
                         license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                         the 'wix' sub-folder by default.")
+                        .arg(Arg::with_name("INPUT")
+                        .help("A path to a package's manifest (Cargo.toml)")
+                        .long_help("If the '-o,--output' option is not used, \
+                            then all output from initialization will be placed in a \
+                            'wix' folder created alongside this path.")
+                        .index(1))
                     .arg(banner.clone())
                     .arg(binaries.clone())
                     .arg(description.clone())
@@ -1529,12 +1535,6 @@ fn main() {
                         .long_help("Overwrites any existing files that are \
                             generated during initialization. Use with caution.")
                         .long("force"))
-                    .arg(Arg::with_name("INPUT")
-                        .help("A path to a package's manifest (Cargo.toml)")
-                        .long_help("If the '-o,--output' option is not used, \
-                            then all output from initialization will be placed in a \
-                            'wix' folder created alongside this path.")
-                        .index(1))
                     .arg(license.clone())
                     .arg(manufacturer.clone())
                     .arg(Arg::with_name("output")
@@ -1650,12 +1650,18 @@ fn main() {
                         New GUIDs are generated for the 'UpgradeCode' and Path \
                         Component each time the 'WXS' template is printed. [values: \
                         Apache-2.0, GPL-3.0, MIT, WXS]")
-                    .arg(banner)
-                    .arg(binaries)
-                    .arg(description)
-                    .arg(dialog)
-                    .arg(eula)
-                    .arg(Arg::with_name("INPUT")
+                        .arg(Arg::with_name("TEMPLATE")
+                        .help("A name of a template")
+                        .long_help("This is required and values are case \
+                            insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
+                        .hide_possible_values(true)
+                        .possible_values(&Template::possible_values()
+                            .iter()
+                            .map(|s| s.as_ref())
+                            .collect::<Vec<&str>>())
+                        .required(true)
+                        .index(1))
+                        .arg(Arg::with_name("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
                         .long_help("The selected template will be printed to \
                             stdout or a file based on the field values in this \
@@ -1663,6 +1669,11 @@ fn main() {
                             current working directory (cwd). An error occurs if a \
                             manifest is not found.")
                         .index(2))
+                    .arg(banner)
+                    .arg(binaries)
+                    .arg(description)
+                    .arg(dialog)
+                    .arg(eula)
                     .arg(license)
                     .arg(manufacturer)
                     .arg(Arg::with_name("output")
@@ -1679,17 +1690,6 @@ fn main() {
                     .arg(path_guid)
                     .arg(product_icon)
                     .arg(product_name.clone())
-                    .arg(Arg::with_name("TEMPLATE")
-                        .help("A name of a template")
-                        .long_help("This is required and values are case \
-                            insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
-                        .hide_possible_values(true)
-                        .possible_values(&Template::possible_values()
-                            .iter()
-                            .map(|s| s.as_ref())
-                            .collect::<Vec<&str>>())
-                        .required(true)
-                        .index(1))
                     .arg(upgrade_guid)
                     .arg(url)
                     .arg(year)
