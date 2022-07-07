@@ -36,7 +36,7 @@ use wix::{
     WIX_SOURCE_FILE_NAME,
 };
 
-use crate::common::{init_logging, SUBPACKAGE1_NAME};
+use crate::common::{add_license_to_package, init_logging, SUBPACKAGE1_NAME, SUBPACKAGE2_NAME};
 
 lazy_static! {
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;
@@ -843,4 +843,23 @@ fn workspace_package_works() {
         .child(SUBPACKAGE1_NAME)
         .child(LICENSE_RTF_PATH.as_path())
         .assert(predicate::path::missing());
+}
+
+#[test]
+#[serial]
+fn workspace_package_with_license_works() {
+    init_logging();
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_workspace();
+    add_license_to_package(&package.path().join(SUBPACKAGE1_NAME), "GPL-3.0");
+    add_license_to_package(&package.path().join(SUBPACKAGE2_NAME), "GPL-3.0");
+
+    env::set_current_dir(package.path()).unwrap();
+    let result = Builder::default()
+        .package(Some(SUBPACKAGE1_NAME))
+        .license(Some("license"))
+        .build()
+        .run();
+    env::set_current_dir(original_working_directory).unwrap();
+    assert!(result.is_ok());
 }
