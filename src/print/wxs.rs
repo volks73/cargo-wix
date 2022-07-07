@@ -511,7 +511,7 @@ impl Execution {
             manifest
                 .license
                 .as_ref()
-                .filter(|l| Template::license_ids().contains(&l))
+                .filter(|l| Template::license_ids().contains(l))
                 .map(|_| String::from(LICENSE_FILE_NAME))
                 .or_else(|| {
                     manifest
@@ -528,7 +528,7 @@ impl Execution {
             manifest
                 .license
                 .as_ref()
-                .filter(|l| Template::license_ids().contains(&l))
+                .filter(|l| Template::license_ids().contains(l))
                 .map(|_| LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
                 .or_else(|| {
                     manifest.license_file().and_then(|s| {
@@ -551,7 +551,7 @@ impl Execution {
         if let Some(ref m) = self.manufacturer {
             Ok(m.to_owned())
         } else {
-            super::first_author(&manifest)
+            super::first_author(manifest)
         }
     }
 

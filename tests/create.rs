@@ -793,7 +793,7 @@ fn input_works_outside_cwd() {
         .unwrap();
     let result = run_with_package(
         Builder::default().input(package_manifest.path().to_str()),
-        &package.path(),
+        package.path(),
     );
     result.expect("OK result");
     package
@@ -1003,7 +1003,7 @@ fn workspace_package_works() {
         .build()
         .run()
         .unwrap();
-    let result = run(&mut Builder::default().package(Some(SUBPACKAGE1_NAME)));
+    let result = run(Builder::default().package(Some(SUBPACKAGE1_NAME)));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
@@ -1023,7 +1023,7 @@ fn cross_compilation_works() {
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{}-0.1.0-x86_64.msi", PACKAGE_NAME));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    let result = run(&mut Builder::default().target(Some("x86_64-pc-windows-msvc")));
+    let result = run(Builder::default().target(Some("x86_64-pc-windows-msvc")));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
