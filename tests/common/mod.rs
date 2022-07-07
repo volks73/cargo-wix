@@ -84,6 +84,35 @@ fn create_test_package_at_path(path: &Path, package_name: &str) {
     }
 }
 
+pub fn add_license_to_package(path: &Path, license: &str) {
+    let cargo_path = path.join("Cargo.toml");
+
+    let mut toml: Value = {
+        let mut cargo_toml_handle = File::open(&cargo_path).unwrap();
+        let mut cargo_toml_content = String::new();
+        cargo_toml_handle
+            .read_to_string(&mut cargo_toml_content)
+            .unwrap();
+        toml::from_str(&cargo_toml_content).unwrap()
+    };
+    {
+        toml.get_mut("package")
+            .map(|p| {
+                match p {
+                    Value::Table(ref mut t) => {
+                        t.insert(String::from("license"), Value::from(license))
+                    }
+                    _ => panic!("The 'package' section is not a table"),
+                };
+                Some(p)
+            })
+            .expect("A package section for the Cargo.toml");
+        let toml_string = toml.to_string();
+        let mut cargo_toml_handle = File::create(cargo_path).unwrap();
+        cargo_toml_handle.write_all(toml_string.as_bytes()).unwrap();
+    }
+}
+
 /// Create a new cargo project/package for a binary project in a temporary
 /// directory.
 ///

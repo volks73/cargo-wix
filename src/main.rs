@@ -1880,6 +1880,7 @@ fn main() {
                     print.copyright_year(m.value_of("year"));
                     print.input(m.value_of("INPUT"));
                     print.output(m.value_of("output"));
+                    print.package(m.value_of("package"));
                     print.build().run(t)
                 }
             }

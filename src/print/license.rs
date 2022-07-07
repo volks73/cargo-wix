@@ -37,6 +37,7 @@ pub struct Builder<'a> {
     copyright_holder: Option<&'a str>,
     input: Option<&'a str>,
     output: Option<&'a str>,
+    package: Option<&'a str>,
 }
 
 impl<'a> Builder<'a> {
@@ -47,6 +48,7 @@ impl<'a> Builder<'a> {
             copyright_holder: None,
             input: None,
             output: None,
+            package: None,
         }
     }
 
@@ -95,6 +97,13 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the package.
+    ///
+    pub fn package(&mut self, o: Option<&'a str>) -> &mut Self {
+        self.package = o;
+        self
+    }
+
     /// Builds an execution context based on the configuration.
     pub fn build(&self) -> Execution {
         Execution {
@@ -102,6 +111,7 @@ impl<'a> Builder<'a> {
             copyright_year: self.copyright_year.map(String::from),
             input: self.input.map(PathBuf::from),
             output: self.output.map(PathBuf::from),
+            package: self.package.map(PathBuf::from),
         }
     }
 }
@@ -119,6 +129,7 @@ pub struct Execution {
     copyright_year: Option<String>,
     input: Option<PathBuf>,
     output: Option<PathBuf>,
+    package: Option<PathBuf>,
 }
 
 impl Execution {
@@ -129,7 +140,7 @@ impl Execution {
         debug!("input = {:?}", self.input);
         debug!("output = {:?}", self.output);
         let manifest = manifest(self.input.as_ref())?;
-        let package = package(&manifest, None)?;
+        let package = package(&manifest, self.package.as_ref().and_then(|p| p.to_str()))?;
         let mut destination = super::destination(self.output.as_ref())?;
         let template = mustache::compile_str(template.to_str())?;
         let data = MapBuilder::new()
