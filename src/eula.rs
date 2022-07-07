@@ -39,7 +39,7 @@ impl Eula {
         if let Some(ref path) = p {
             Ok(Eula::CommandLine(path.into()))
         } else {
-            Eula::from_manifest(&package)
+            Eula::from_manifest(package)
         }
     }
 
@@ -79,7 +79,7 @@ impl Eula {
         } else if let Some(license_name) = package.license.as_ref() {
             trace!("The 'license' field is specified in the package's manifest (Cargo.toml)");
             debug!("license_name = {:?}", license_name);
-            if let Ok(template) = Template::from_str(&license_name) {
+            if let Ok(template) = Template::from_str(license_name) {
                 trace!(
                     "An embedded template for the '{}' license from the package's \
                      manifest (Cargo.toml) exists.",

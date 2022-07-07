@@ -145,7 +145,7 @@ impl Execution {
         if let Some(ref h) = self.copyright_holder {
             Ok(h.to_owned())
         } else {
-            super::first_author(&manifest)
+            super::first_author(manifest)
         }
     }
 
