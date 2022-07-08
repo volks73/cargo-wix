@@ -477,6 +477,9 @@ impl Execution {
             if self.target.is_some() {
                 builder.arg(format!("--target={}", target_triple));
             }
+            if let Some(ref package) = self.package {
+                builder.arg(format!("--package={}", package));
+            }
             builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
             let status = builder.status()?;
