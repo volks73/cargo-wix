@@ -474,7 +474,7 @@ impl From<uuid::Error> for Error {
 ///
 /// These are also the valid values for the `-arch` option to the WiX compiler
 /// (candle.exe).
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WixArch {
     /// The x86 32-bit architecture.
     X86,
@@ -529,7 +529,7 @@ impl FromStr for WixArch {
 }
 
 /// The aliases for the URLs to different Microsoft Authenticode timestamp servers.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TimestampServer {
     /// A URL to a timestamp server.
     Custom(String),
@@ -593,7 +593,7 @@ impl FromStr for TimestampServer {
 /// These are taken from the table in the [WixUI localization] documentation.
 ///
 /// [WixUI localization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Cultures {
     /// Arabic, Saudi Arabia
     ArSa,

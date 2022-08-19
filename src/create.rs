@@ -1130,7 +1130,7 @@ impl Default for Execution {
 }
 
 /// The kind of WiX Object (wixobj) file.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum WixObjKind {
     /// A WiX Object (wixobj) file that ultimately links back to a WiX Source
     /// (wxs) file with a [`bundle`] tag.
@@ -1232,7 +1232,7 @@ impl TryFrom<&str> for WixObjKind {
 
 /// The kinds of installers that can be created using the WiX compiler
 /// (candle.exe) and linker (light.exe).
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum InstallerKind {
     /// An executable is used when an [Installation Package Bundle] is created.
     ///

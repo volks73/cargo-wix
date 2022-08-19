@@ -29,7 +29,7 @@ static GPL3_LICENSE_TEMPLATE: &str = include_str!("GPL-3.0.rtf.mustache");
 static MIT_LICENSE_TEMPLATE: &str = include_str!("MIT.rtf.mustache");
 
 /// The different templates that can be printed or written to a file.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Template {
     /// The [Apache-2.0] license.
     ///

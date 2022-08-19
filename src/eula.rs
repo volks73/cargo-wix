@@ -26,7 +26,7 @@ use std::str::FromStr;
 
 use cargo_metadata::Package;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Eula {
     CommandLine(PathBuf),
     Manifest(PathBuf),
