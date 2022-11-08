@@ -163,8 +163,16 @@ fn cargo_toml_file(input: Option<&PathBuf>) -> Result<PathBuf> {
             cwd
         }
     };
-    if i.exists() && i.is_file() && i.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {
-        Ok(i)
+    if i.exists() {
+        if i.is_file() {
+            if i.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {
+                Ok(i)
+            } else {
+                Err(Error::not_a_manifest(&i))
+            }
+        } else {
+            Err(Error::not_a_file(&i))
+        }
     } else {
         Err(Error::not_found(&i))
     }
@@ -321,6 +329,70 @@ impl Error {
     /// [std::io::ErrorKind::NotFound]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
     pub fn not_found(p: &Path) -> Self {
         io::Error::new(ErrorKind::NotFound, p.display().to_string()).into()
+    }
+
+    /// Creates a new `Error` from a [std::io::Error] with the
+    /// [std::io::ErrorKind::InvalidInput] variant if a path is not a file.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
+    /// let path = Path::new("C:\\Cargo\\Wix\\file.txt");
+    /// let expected = Error::Io(io::Error::new(
+    ///     io::ErrorKind::InvalidInput,
+    ///     format!("The '{}' path is not a file.", path.display())
+    /// ));
+    /// assert_eq!(expected, Error::not_a_file(path));
+    /// ```
+    ///
+    /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
+    /// [std::io::ErrorKind::InvalidInput]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
+    pub fn not_a_file(p: &Path) -> Self {
+        io::Error::new(
+            ErrorKind::InvalidInput,
+            format!("The '{}' path is not a file.", p.display()),
+        )
+        .into()
+    }
+
+    /// Creates a new `Error` from a [std::io::Error] with the
+    /// [std::io::ErrorKind::InvalidInput] variant if a path is not to a
+    /// `Cargo.toml` file.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use std::io;
+    /// use std::path::Path;
+    /// use wix::Error;
+    ///
+    /// let path = Path::new("C:\\Cargo\\Wix\\file.txt");
+    /// let expected = Error::Io(io::Error::new(
+    ///     io::ErrorKind::InvalidInput,
+    ///     format!(
+    ///         "The '{}' path does not appear to be to a 'Cargo.toml' file.",
+    ///         path.display(),
+    ///     ),
+    /// ));
+    /// assert_eq!(expected, Error::not_a_manifest(path));
+    /// ```
+    ///
+    /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
+    /// [std::io::ErrorKind::InvalidInput]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
+    pub fn not_a_manifest(p: &Path) -> Self {
+        io::Error::new(
+            ErrorKind::InvalidInput,
+            format!(
+                "The '{}' path does not appear to be to a '{}' file.",
+                p.display(),
+                CARGO_MANIFEST_FILE
+            ),
+        )
+        .into()
     }
 
     /// Extracts a short, single word representation of the error.
