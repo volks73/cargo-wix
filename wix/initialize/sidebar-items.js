@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Builder","A builder for running the `cargo wix init` subcommand."],["Execution","A context for creating the necessary files to eventually build an installer."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Builder","A builder for running the `cargo wix init` subcommand."],["Execution","A context for creating the necessary files to eventually build an installer."]]};

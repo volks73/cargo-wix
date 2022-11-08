@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["SUBCOMMAND_NAME",""]],"fn":[["main",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["SUBCOMMAND_NAME",""]],"fn":[["main",""]]};

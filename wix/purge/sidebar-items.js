@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Builder","A builder for creating an execution context to remove all files and folders related to the `cargo wix` subcommand."],["Execution","A context for removing WiX Toolset-related source and output files from a package."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Builder","A builder for creating an execution context to remove all files and folders related to the `cargo wix` subcommand."],["Execution","A context for removing WiX Toolset-related source and output files from a package."]]};

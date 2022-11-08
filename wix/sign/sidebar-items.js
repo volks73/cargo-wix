@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Builder","A builder for creating an execution context to sign an installer."],["Execution","A context for signing a package’s installer."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Builder","A builder for creating an execution context to sign an installer."],["Execution","A context for signing a package’s installer."]]};
