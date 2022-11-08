@@ -603,7 +603,7 @@ impl Execution {
             .arg("-out")
             .arg(&installer_destination)
             .arg("-b")
-            .arg(&base_path);
+            .arg(base_path);
         if let Some(l) = locale {
             trace!("Using the a WiX localization file");
             linker.arg("-loc").arg(l);
@@ -960,7 +960,7 @@ impl Execution {
             Ok(t.to_owned())
         } else {
             let output = Command::new("rustc")
-                .args(&["--version", "--verbose"])
+                .args(["--version", "--verbose"])
                 .output()?;
             for line in output.stdout.split(|b| *b == b'\n') {
                 let mut line_elt = line.splitn(2, |b| *b == b':');
