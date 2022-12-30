@@ -1167,7 +1167,7 @@ mod tests {
         fn eula_with_license_file_extension_works() {
             let project = setup_project(LICENSE_FILE_TXT_MANIFEST);
             let license_file_path = project.path().join("Example.txt");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
 
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
