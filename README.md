@@ -5,7 +5,7 @@ A subcommand for [Cargo](http://doc.crates.io/) that builds a Windows installer 
 [![Crates.io](https://img.shields.io/crates/v/cargo-wix.svg)](https://crates.io/crates/cargo-wix)
 [![GitHub release](https://img.shields.io/github/release/volks73/cargo-wix.svg)](https://github.com/volks73/cargo-wix/releases)
 [![Crates.io](https://img.shields.io/crates/l/cargo-wix.svg)](https://github.com/volks73/cargo-wix#license)
-[![Build Status](https://github.com/volks73/cargo-wix/workflows/CI/badge.svg?branch=master)](https://github.com/volks73/cargo-wix/actions?query=branch%3main)
+[![Build Status](https://github.com/volks73/cargo-wix/workflows/CI/badge.svg?branch=main)](https://github.com/volks73/cargo-wix/actions?query=branch%3main)
 
 ## Quick Start
 
@@ -63,7 +63,7 @@ You can also automatically run the installer after creating it by specifying the
 C:\Path\to\Project> cargo wix --install
 ```
 
-The `print <template>` subcommand, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/master/src/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
+The `print <template>` subcommand, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/main/src/templates/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
 
 ```dos
 C:\Path\to\Project> cargo wix print wxs > example.wxs
@@ -108,5 +108,5 @@ PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item En
 
 ## License
 
-The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/master/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/master/LICENSE-APACHE) files for more information about licensing and copyright.
+The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE) files for more information about licensing and copyright.
 
