@@ -248,7 +248,7 @@ pub enum Error {
     /// UUID generation or parsing failed.
     Uuid(uuid::Error),
     /// Parsing error for a version string or field.
-    Version(semver::SemVerError),
+    Version(semver::Error),
     /// Parsing the intermediate WiX Object (wixobj) file, which is XML, failed.
     Xml(sxd_document::parser::Error),
     /// Evaluation of an XPath expression failed.
@@ -520,8 +520,8 @@ impl From<mustache::Error> for Error {
     }
 }
 
-impl From<semver::SemVerError> for Error {
-    fn from(err: semver::SemVerError) -> Self {
+impl From<semver::Error> for Error {
+    fn from(err: semver::Error) -> Self {
         Error::Version(err)
     }
 }

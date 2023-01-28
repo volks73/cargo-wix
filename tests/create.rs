@@ -34,7 +34,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
-use toml::Value;
+use toml::{Table, Value};
 
 use wix::create::Builder;
 use wix::initialize;
@@ -287,7 +287,7 @@ fn init_with_package_section_fields_works() {
     let expected_msi_file = TARGET_WIX_DIR.join(format!("{PACKAGE_NAME}-0.1.0-x86_64.msi"));
     env::set_current_dir(package.path()).unwrap();
     let package_manifest = package.child("Cargo.toml");
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle

@@ -25,7 +25,7 @@ use std::io::{Read, Write};
 use std::path::Path;
 use std::process::Command;
 
-use toml::Value;
+use toml::{Table, Value};
 
 pub const TARGET_NAME: &str = "target";
 
@@ -57,13 +57,13 @@ fn create_test_package_at_path(path: &Path, package_name: &str) {
     assert!(cargo_init_status.success());
     let cargo_path = path.join("Cargo.toml");
 
-    let mut toml: Value = {
+    let mut toml = {
         let mut cargo_toml_handle = File::open(&cargo_path).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
             .read_to_string(&mut cargo_toml_content)
             .unwrap();
-        toml::from_str(&cargo_toml_content).unwrap()
+        cargo_toml_content.parse::<Table>().unwrap()
     };
     {
         toml.get_mut("package")
@@ -87,13 +87,13 @@ fn create_test_package_at_path(path: &Path, package_name: &str) {
 pub fn add_license_to_package(path: &Path, license: &str) {
     let cargo_path = path.join("Cargo.toml");
 
-    let mut toml: Value = {
+    let mut toml = {
         let mut cargo_toml_handle = File::open(&cargo_path).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
             .read_to_string(&mut cargo_toml_content)
             .unwrap();
-        toml::from_str(&cargo_toml_content).unwrap()
+        cargo_toml_content.parse::<Table>().unwrap()
     };
     {
         toml.get_mut("package")

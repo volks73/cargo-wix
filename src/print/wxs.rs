@@ -516,7 +516,7 @@ impl Execution {
                 .or_else(|| {
                     manifest
                         .license_file()
-                        .and_then(|l| l.file_name().and_then(|f| f.to_str()).map(String::from))
+                        .and_then(|l| l.file_name().map(String::from))
                 })
         }
     }
@@ -536,7 +536,7 @@ impl Execution {
                             trace!(
                                 "The '{}' path from the 'license-file' field in the package's \
                                  manifest (Cargo.toml) exists.",
-                                s.display()
+                                s
                             );
                             Some(s.into_os_string().into_string().unwrap())
                         } else {
@@ -567,10 +567,10 @@ impl Execution {
             .and_then(|u| u.as_str())
         {
             Uuid::from_str(pkg_meta_wix_path_guid)
-                .map(|u| u.to_hyphenated().to_string().to_uppercase())
+                .map(|u| u.as_hyphenated().to_string().to_uppercase())
                 .map_err(Error::from)
         } else {
-            Ok(Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
+            Ok(Uuid::new_v4().as_hyphenated().to_string().to_uppercase())
         }
     }
 
@@ -586,10 +586,10 @@ impl Execution {
             .and_then(|u| u.as_str())
         {
             Uuid::from_str(pkg_meta_wix_upgrade_guid)
-                .map(|u| u.to_hyphenated().to_string().to_uppercase())
+                .map(|u| u.as_hyphenated().to_string().to_uppercase())
                 .map_err(Error::from)
         } else {
-            Ok(Uuid::new_v4().to_hyphenated().to_string().to_uppercase())
+            Ok(Uuid::new_v4().as_hyphenated().to_string().to_uppercase())
         }
     }
 }
@@ -691,7 +691,7 @@ mod tests {
 
         #[test]
         fn path_guid_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
             let mut actual = Builder::new();
             actual.path_guid(Some(&expected));
             assert_eq!(actual.path_guid, Some(expected.as_ref()));
@@ -715,7 +715,7 @@ mod tests {
 
         #[test]
         fn upgrade_guid_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
             let mut actual = Builder::new();
             actual.upgrade_guid(Some(&expected));
             assert_eq!(actual.upgrade_guid, Some(expected.as_ref()));
@@ -1195,7 +1195,7 @@ mod tests {
 
         #[test]
         fn path_guid_with_override_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(MIN_MANIFEST);
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
@@ -1221,7 +1221,7 @@ mod tests {
 
         #[test]
         fn path_guid_metadata_and_override_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(PATH_GUID_MANIFEST);
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
@@ -1237,7 +1237,7 @@ mod tests {
 
         #[test]
         fn upgrade_guid_with_override_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(MIN_MANIFEST);
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
@@ -1263,7 +1263,7 @@ mod tests {
 
         #[test]
         fn upgrade_guid_metadata_and_override_works() {
-            let expected = Uuid::new_v4().to_hyphenated().to_string().to_uppercase();
+            let expected = Uuid::new_v4().as_hyphenated().to_string().to_uppercase();
 
             let project = setup_project(UPGRADE_GUID_MANIFEST);
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
