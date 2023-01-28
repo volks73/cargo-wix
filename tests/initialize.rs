@@ -57,7 +57,7 @@ fn default_works() {
     env::set_current_dir(package.path()).unwrap();
     let result = Execution::default().run();
     env::set_current_dir(original_working_directory).unwrap();
-    println!("{:?}", result);
+    println!("{result:?}");
     assert!(result.is_ok());
     package
         .child(WIX_PATH.as_path())
@@ -767,7 +767,7 @@ fn multiple_binaries_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='exe0']/@Name"
         ),
-        format!("{}.exe", EXPECTED_NAME_1)
+        format!("{EXPECTED_NAME_1}.exe")
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -781,7 +781,7 @@ fn multiple_binaries_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='exe1']/@Name"
         ),
-        format!("{}.exe", EXPECTED_NAME_2)
+        format!("{EXPECTED_NAME_2}.exe")
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -795,7 +795,7 @@ fn multiple_binaries_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='exe2']/@Name"
         ),
-        format!("{}.exe", EXPECTED_NAME_3)
+        format!("{EXPECTED_NAME_3}.exe")
     );
     assert_eq!(
         common::evaluate_xpath(

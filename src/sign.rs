@@ -198,7 +198,7 @@ impl Execution {
         let product_name = super::product_name(self.product_name.as_ref(), &package);
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
-            format!("{} - {}", product_name, d)
+            format!("{product_name} - {d}")
         } else {
             trace!("A description was not provided at the command line or in the package's manifest (Cargo.toml).");
             product_name
@@ -235,11 +235,10 @@ impl Execution {
         let status = signer.arg(&msi).status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
-                    "The {0} application could not be found. Please check the Windows 10 SDK \
+                    "The {SIGNTOOL} application could not be found. Please check the Windows 10 SDK \
                      (https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) is \
                      installed and you are using the x64 or x86 Native Build Tools prompt so the \
-                     {0} application is available.",
-                    SIGNTOOL
+                     {SIGNTOOL} application is available."
                 ))
             } else {
                 err.into()
@@ -286,8 +285,7 @@ impl Execution {
                 }
             }
             Err(Error::Generic(format!(
-                "Could not find an installer ({}) to sign",
-                MSI_FILE_EXTENSION
+                "Could not find an installer ({MSI_FILE_EXTENSION}) to sign"
             )))
         }
     }

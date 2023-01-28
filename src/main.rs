@@ -1423,18 +1423,15 @@ fn main() {
                 .about(crate_description!())
                 .arg(Arg::with_name("bin-path")
                      .help(&format!(
-                         "A path to the WiX Toolset's '{}' folder",
-                         BINARY_FOLDER_NAME))
+                         "A path to the WiX Toolset's '{BINARY_FOLDER_NAME}' folder"))
                      .long_help(&format!(
-                         "Specifies the path to the WiX Toolset's '{0}' folder, which should contain \
+                         "Specifies the path to the WiX Toolset's '{BINARY_FOLDER_NAME}' folder, which should contain \
                          the needed 'candle.exe' and 'light.exe' applications. The default is to use \
-                         the path specified with the {1} system environment variable that is created \
+                         the path specified with the {WIX_PATH_KEY} system environment variable that is created \
                          during the installation of the WiX Toolset. Failing the existence of the \
-                         {1} system environment variable, the path specified in the PATH system \
+                         {WIX_PATH_KEY} system environment variable, the path specified in the PATH system \
                          environment variable is used. This is useful when working with multiple \
-                         versions of the WiX Toolset.",
-                         BINARY_FOLDER_NAME,
-                         WIX_PATH_KEY))
+                         versions of the WiX Toolset."))
                      .long("bin-path")
                      .short("b")
                      .takes_value(true))
@@ -1949,7 +1946,7 @@ fn main() {
                 stderr
                     .set_color(ColorSpec::new().set_fg(Some(Color::White)).set_bold(false))
                     .expect("Coloring stderr");
-                writeln!(&mut stderr, "{}", e).expect("Write message to stderr");
+                writeln!(&mut stderr, "{e}").expect("Write message to stderr");
                 // This prevents "leaking" the color settings to the console after the
                 // sub-command/application has completed.
                 //

@@ -287,8 +287,7 @@ pub fn create_test_workspace() -> TempDir {
         temp_dir.path().join("Cargo.toml"),
         format!(
             r#"[workspace]
-            members = [{:?}, {:?}]"#,
-            SUBPACKAGE1_NAME, SUBPACKAGE2_NAME
+            members = [{SUBPACKAGE1_NAME:?}, {SUBPACKAGE2_NAME:?}]"#
         ),
     )
     .unwrap();
