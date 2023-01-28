@@ -475,10 +475,10 @@ impl Execution {
                 builder.arg("--release");
             }
             if self.target.is_some() {
-                builder.arg(format!("--target={}", target_triple));
+                builder.arg(format!("--target={target_triple}"));
             }
             if let Some(ref package) = self.package {
-                builder.arg(format!("--package={}", package));
+                builder.arg(format!("--package={package}"));
             }
             builder.arg("--manifest-path").arg(&manifest_path);
             debug!("command = {:?}", builder);
@@ -507,15 +507,15 @@ impl Execution {
             .arg("-ext")
             .arg("WixUtilExtension");
         if let Some(vendor) = &cfg.target_vendor {
-            compiler.arg(format!("-dTargetVendor={}", vendor));
+            compiler.arg(format!("-dTargetVendor={vendor}"));
         }
         compiler
-            .arg(format!("-dVersion={}", version))
-            .arg(format!("-dPlatform={}", wix_arch))
-            .arg(format!("-dProfile={}", profile))
+            .arg(format!("-dVersion={version}"))
+            .arg(format!("-dPlatform={wix_arch}"))
+            .arg(format!("-dProfile={profile}"))
             .arg(format!("-dTargetEnv={}", cfg.target_env))
-            .arg(format!("-dTargetTriple={}", target_triple))
-            .arg(format!("-dCargoProfile={}", profile))
+            .arg(format!("-dTargetTriple={target_triple}"))
+            .arg(format!("-dCargoProfile={profile}"))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -542,12 +542,11 @@ impl Execution {
         let status = compiler.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
-                    "The compiler application ({}) could not be found in the PATH environment \
+                    "The compiler application ({WIX_COMPILER}) could not be found in the PATH environment \
                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                    installed and check the WiX Toolset's '{}' folder has been added to the PATH \
-                    system environment variable, the {} system environment variable exists, or use \
-                    the '-b,--bin-path' command line argument.",
-                    WIX_COMPILER, BINARY_FOLDER_NAME, WIX_PATH_KEY
+                    installed and check the WiX Toolset's '{BINARY_FOLDER_NAME}' folder has been added to the PATH \
+                    system environment variable, the {WIX_PATH_KEY} system environment variable exists, or use \
+                    the '-b,--bin-path' command line argument."
                 ))
             } else {
                 err.into()
@@ -599,7 +598,7 @@ impl Execution {
             .arg("WixUIExtension")
             .arg("-ext")
             .arg("WixUtilExtension")
-            .arg(format!("-cultures:{}", culture))
+            .arg(format!("-cultures:{culture}"))
             .arg("-out")
             .arg(&installer_destination)
             .arg("-b")
@@ -621,12 +620,11 @@ impl Execution {
         let status = linker.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
-                    "The linker application ({}) could not be found in the PATH environment \
+                    "The linker application ({WIX_LINKER}) could not be found in the PATH environment \
                      variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                     installed and check the WiX Toolset's '{}' folder has been added to the PATH \
-                     environment variable, the {} system environment variable exists, or use the \
-                     '-b,--bin-path' command line argument.",
-                    WIX_LINKER, BINARY_FOLDER_NAME, WIX_PATH_KEY
+                     installed and check the WiX Toolset's '{BINARY_FOLDER_NAME}' folder has been added to the PATH \
+                     environment variable, the {WIX_PATH_KEY} system environment variable exists, or use the \
+                     '-b,--bin-path' command line argument."
                 ))
             } else {
                 err.into()
@@ -1192,8 +1190,7 @@ impl FromStr for WixObjKind {
             "fragment" => Ok(Self::Fragment),
             "product" => Ok(Self::Product),
             v => Err(Self::Err::Generic(format!(
-                "Unknown '{}' tag name from a WiX Object (wixobj) file.",
-                v
+                "Unknown '{v}' tag name from a WiX Object (wixobj) file."
             ))),
         }
     }
@@ -1284,8 +1281,7 @@ impl FromStr for InstallerKind {
             "exe" => Ok(Self::Exe),
             "msi" => Ok(Self::Msi),
             _ => Err(Self::Err::Generic(format!(
-                "Unknown '{}' file extension for an installer",
-                value
+                "Unknown '{value}' file extension for an installer"
             ))),
         }
     }
@@ -1833,7 +1829,7 @@ mod tests {
             );
             let e = Execution::default();
             let actual = e.compiler().unwrap();
-            assert_eq!(format!("{:?}", actual), format!("{:?}", expected));
+            assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
         }
 
         #[test]

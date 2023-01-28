@@ -197,7 +197,7 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
             .workspace_members
             .iter()
             .find(|n| manifest[n].name == p)
-            .ok_or_else(|| Error::Generic(format!("No `{}` package found in the project", p)))?
+            .ok_or_else(|| Error::Generic(format!("No `{p}` package found in the project")))?
     } else if manifest.workspace_members.len() == 1 {
         &manifest.workspace_members[0]
     } else {
@@ -444,15 +444,13 @@ impl fmt::Display for Error {
                 if captured_output {
                     write!(
                         f,
-                        "The '{}' application failed with exit code = {}. Consider using the \
-                         '--nocapture' flag to obtain more information.",
-                        command, code
+                        "The '{command}' application failed with exit code = {code}. Consider using the \
+                         '--nocapture' flag to obtain more information."
                     )
                 } else {
                     write!(
                         f,
-                        "The '{}' application failed with exit code = {}",
-                        command, code
+                        "The '{command}' application failed with exit code = {code}"
                     )
                 }
             }
@@ -460,14 +458,14 @@ impl fmt::Display for Error {
             Error::Io(ref err) => match err.kind() {
                 ErrorKind::AlreadyExists => {
                     if let Some(path) = err.get_ref() {
-                        write!(f, "The '{}' file already exists. Use the '--force' flag to overwrite the contents.", path)
+                        write!(f, "The '{path}' file already exists. Use the '--force' flag to overwrite the contents.")
                     } else {
                         err.fmt(f)
                     }
                 }
                 ErrorKind::NotFound => {
                     if let Some(path) = err.get_ref() {
-                        write!(f, "The '{}' path does not exist", path)
+                        write!(f, "The '{path}' path does not exist")
                     } else {
                         err.fmt(f)
                     }
@@ -476,8 +474,7 @@ impl fmt::Display for Error {
             },
             Error::Manifest(ref var) => write!(
                 f,
-                "No '{}' field found in the package's manifest (Cargo.toml)",
-                var
+                "No '{var}' field found in the package's manifest (Cargo.toml)"
             ),
             Error::Mustache(ref err) => err.fmt(f),
             Error::Uuid(ref err) => err.fmt(f),
@@ -583,8 +580,7 @@ impl TryFrom<&Cfg> for WixArch {
                     Ok(Self::Arm)
                 } else {
                     Err(Error::Generic(format!(
-                        "Unsupported target architecture: {}",
-                        a
+                        "Unsupported target architecture: {a}"
                     )))
                 }
             }
@@ -1021,7 +1017,7 @@ impl FromStr for Cultures {
             "zh-tw" => Ok(Cultures::ZhTw),
             "tr-tr" => Ok(Cultures::TrTr),
             "uk-ua" => Ok(Cultures::UkUa),
-            e => Err(Error::Generic(format!("Unknown '{}' culture", e))),
+            e => Err(Error::Generic(format!("Unknown '{e}' culture"))),
         }
     }
 }

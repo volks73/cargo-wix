@@ -165,8 +165,7 @@ impl FromStr for Template {
             "mit" => Ok(Template::Mit),
             "wxs" => Ok(Template::Wxs),
             _ => Err(Error::Generic(format!(
-                "Cannot convert from '{}' to a Template variant",
-                s
+                "Cannot convert from '{s}' to a Template variant"
             ))),
         }
     }
