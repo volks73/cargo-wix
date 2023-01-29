@@ -187,8 +187,7 @@ fn manifest(input: Option<&PathBuf>) -> Result<Metadata> {
     debug!("cargo_file_path = {:?}", cargo_file_path);
     Ok(MetadataCommand::new()
         .manifest_path(cargo_file_path)
-        .exec()
-        .unwrap())
+        .exec()?)
 }
 
 fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
@@ -234,6 +233,8 @@ fn product_name(product_name: Option<&String>, manifest: &Package) -> String {
 /// with the `Generic` variant and a message.
 #[derive(Debug)]
 pub enum Error {
+    /// Parsing of Cargo metadata failed.
+    CargoMetadata(cargo_metadata::Error),
     /// A command operation failed.
     Command(&'static str, i32, bool),
     /// A generic or custom error occurred. The message should contain the detailed information.
@@ -280,6 +281,7 @@ impl Error {
             Error::Version(..) => 7,
             Error::Xml(..) => 8,
             Error::XPath(..) => 9,
+            Error::CargoMetadata(..) => 10,
         }
     }
 
@@ -406,6 +408,7 @@ impl Error {
     /// message formatting.
     pub fn as_str(&self) -> &str {
         match *self {
+            Error::CargoMetadata(..) => "CargoMetadata",
             Error::Command(..) => "Command",
             Error::Generic(..) => "Generic",
             Error::Io(..) => "Io",
@@ -426,6 +429,7 @@ impl StdError for Error {
 
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match *self {
+            Error::CargoMetadata(ref err) => Some(err),
             Error::Io(ref err) => Some(err),
             Error::Mustache(ref err) => Some(err),
             Error::Uuid(ref err) => Some(err),
@@ -440,6 +444,7 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            Error::CargoMetadata(ref err) => err.fmt(f),
             Error::Command(ref command, ref code, captured_output) => {
                 if captured_output {
                     write!(
@@ -494,6 +499,12 @@ impl PartialEq for Error {
 impl<'a> From<&'a str> for Error {
     fn from(s: &str) -> Self {
         Error::Generic(s.to_string())
+    }
+}
+
+impl From<cargo_metadata::Error> for Error {
+    fn from(err: cargo_metadata::Error) -> Self {
+        Error::CargoMetadata(err)
     }
 }
 
