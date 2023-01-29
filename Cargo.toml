@@ -44,7 +44,7 @@ serial_test = "1"
 toml = "0.7"
 
 [dependencies.clap]
-version = "2"
+version = "4"
 default-features = false
 features = ["suggestions", "vec_map"]
 
