@@ -28,7 +28,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 
-use toml::Value;
+use toml::{Table, Value};
 
 use wix::initialize::{Builder, Execution};
 use wix::{
@@ -232,7 +232,7 @@ fn input_with_output_works() {
     let output = package.path().join("assets").join("windows");
     fs::create_dir(output.parent().unwrap()).unwrap();
     fs::create_dir(&output).unwrap();
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
@@ -366,7 +366,7 @@ fn mit_license_id_works() {
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
@@ -432,7 +432,7 @@ fn apache2_license_id_works() {
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
@@ -498,7 +498,7 @@ fn gpl3_license_id_works() {
     let package = common::create_test_package();
     env::set_current_dir(package.path()).unwrap();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
@@ -567,7 +567,7 @@ fn license_file_field_with_rtf_file_works() {
     env::set_current_dir(package.path()).unwrap();
     let _license_handle = File::create(package_license.path()).unwrap();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle
@@ -628,7 +628,7 @@ fn license_file_field_with_txt_file_works() {
     env::set_current_dir(package.path()).unwrap();
     let _license_handle = File::create(package_license.path()).unwrap();
     let package_manifest = package.child(CARGO_MANIFEST_FILE);
-    let mut toml: Value = {
+    let mut toml: Table = {
         let mut cargo_toml_handle = File::open(package_manifest.path()).unwrap();
         let mut cargo_toml_content = String::new();
         cargo_toml_handle

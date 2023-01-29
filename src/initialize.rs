@@ -524,6 +524,7 @@ impl Execution {
             trace!("An output path has NOT been explicitly specified. Implicitly determine output from manifest location.");
             package
                 .manifest_path
+                .as_std_path()
                 .parent()
                 .map(|p| p.to_path_buf())
                 .map(|mut p| {

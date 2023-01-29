@@ -44,7 +44,7 @@ impl Eula {
     }
 
     pub fn from_manifest(package: &Package) -> Result<Self> {
-        if let Some(license_file_path) = package.license_file() {
+        if let Some(license_file_path) = package.license_file().map(|p| p.into_std_path_buf()) {
             trace!("The 'license-file' field is specified in the package's manifest (Cargo.toml)");
             debug!("license_file_path = {:?}", license_file_path);
             if license_file_path.extension().and_then(|s| s.to_str()) == Some(RTF_FILE_EXTENSION) {

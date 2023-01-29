@@ -444,7 +444,7 @@ impl Execution {
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
         debug!("wxs_sources = {:?}", wxs_sources);
-        let wixobj_destination = self.wixobj_destination(&manifest.target_directory);
+        let wixobj_destination = self.wixobj_destination(manifest.target_directory.as_std_path());
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
@@ -575,7 +575,7 @@ impl Execution {
             debug_name,
             &installer_kind,
             &package,
-            &manifest.target_directory,
+            manifest.target_directory.as_std_path(),
         );
         debug!("installer_destination = {:?}", installer_destination);
 
@@ -1017,7 +1017,7 @@ impl Execution {
             .ok_or_else(|| {
                 Error::Generic(format!(
                     "The '{}' path for the package's manifest file is invalid",
-                    package.manifest_path.display()
+                    package.manifest_path
                 ))
             })
             .map(|d| PathBuf::from(d).join(WIX))?;

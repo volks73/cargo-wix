@@ -204,7 +204,7 @@ impl Execution {
             product_name
         };
         debug!("description = {:?}", description);
-        let msi = self.msi(&manifest.target_directory)?;
+        let msi = self.msi(manifest.target_directory.as_std_path())?;
         let mut signer = self.signer()?;
         debug!("signer = {:?}", signer);
         if self.capture_output {
