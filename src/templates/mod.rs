@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::Error;
+use lazy_static::lazy_static;
 use std::fmt;
 use std::str::FromStr;
 
@@ -47,6 +48,19 @@ pub enum Template {
     ///
     /// [Wix Source (wxs)]: http://wixtoolset.org/documentation/manual/v3/overview/files.html
     Wxs,
+}
+
+lazy_static! {
+    static ref POSSIBLE_VALUES: Vec<String> = vec![
+        Template::Apache2.id().to_owned(),
+        Template::Apache2.id().to_lowercase(),
+        Template::Gpl3.id().to_owned(),
+        Template::Gpl3.id().to_lowercase(),
+        Template::Mit.id().to_owned(),
+        Template::Mit.id().to_lowercase(),
+        Template::Wxs.id().to_owned(),
+        Template::Wxs.id().to_lowercase(),
+    ];
 }
 
 impl Template {
@@ -101,17 +115,8 @@ impl Template {
     ///     ]
     /// );
     /// ```
-    pub fn possible_values() -> Vec<String> {
-        vec![
-            Template::Apache2.id().to_owned(),
-            Template::Apache2.id().to_lowercase(),
-            Template::Gpl3.id().to_owned(),
-            Template::Gpl3.id().to_lowercase(),
-            Template::Mit.id().to_owned(),
-            Template::Mit.id().to_lowercase(),
-            Template::Wxs.id().to_owned(),
-            Template::Wxs.id().to_lowercase(),
-        ]
+    pub fn possible_values() -> &'static Vec<String> {
+        &POSSIBLE_VALUES
     }
 
     /// Gets the IDs of all supported licenses.

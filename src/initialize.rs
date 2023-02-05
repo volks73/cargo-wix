@@ -471,7 +471,7 @@ impl Execution {
                     eula_printer.input(self.input.as_deref().and_then(Path::to_str));
                     eula_printer.output(destination.as_path().to_str());
                     eula_printer.package(self.package.as_deref());
-                    eula_printer.build().run(template)?;
+                    eula_printer.build().run(&template)?;
                 }
                 destination.pop();
                 let mut relative = destination

@@ -134,7 +134,7 @@ pub struct Execution {
 
 impl Execution {
     /// Prints a license based on the built context.
-    pub fn run(self, template: Template) -> Result<()> {
+    pub fn run(self, template: &Template) -> Result<()> {
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
         debug!("input = {:?}", self.input);
