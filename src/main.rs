@@ -1187,7 +1187,7 @@
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
-use clap::{crate_description, crate_name, crate_version, value_t, App, Arg, SubCommand};
+use clap::{Arg, ArgAction, Command};
 
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
@@ -1206,11 +1206,15 @@ use wix::purge;
 use wix::sign;
 use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
+pub const PKG_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+pub const PKG_NAME: &str = env!("CARGO_PKG_NAME");
+pub const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 const SUBCOMMAND_NAME: &str = "wix";
 
 fn main() {
     // The banner option for the `init` and `print` subcommands.
-    let banner = Arg::with_name("banner")
+    let banner = Arg::new("banner")
         .help("A path to an image file (.bmp) for the installer's banner")
         .long_help(
             "Sets the path to a bitmap (.bmp) image file that will be \
@@ -1218,10 +1222,10 @@ fn main() {
              image dimensions should be 493 x 58 pixels.",
         )
         .long("banner")
-        .short("b")
-        .takes_value(true);
+        .short('b')
+        .num_args(1);
     // The binaries option for the `init` and `print` subcommands.
-    let binaries = Arg::with_name("binaries")
+    let binaries = Arg::new("binaries")
         .help("A path to an executable file (.exe) for the application")
         .long_help(
             "Sets the path to an executable file that will override the default \
@@ -1235,12 +1239,11 @@ fn main() {
              repeatedly to include multiple binaries.",
         )
         .long("binary")
-        .multiple(true)
-        .number_of_values(1)
-        .short("B")
-        .takes_value(true);
+        .action(ArgAction::Append)
+        .short('B')
+        .num_args(1);
     // The description option for the `init` and `print` subcommands.
-    let description = Arg::with_name("description")
+    let description = Arg::new("description")
         .help("A string describing the application in the installer")
         .long_help(
             "Overrides the 'description' field of the package's manifest \
@@ -1248,10 +1251,10 @@ fn main() {
              should be surrounded by double quotes.",
         )
         .long("description")
-        .short("d")
-        .takes_value(true);
+        .short('d')
+        .num_args(1);
     // The dialog option for the `init` and `print` subcommands.
-    let dialog = Arg::with_name("dialog")
+    let dialog = Arg::new("dialog")
         .help("A path to an image file (.bmp) for the installer's welcome dialog")
         .long_help(
             "Sets the path to a bitmap (.bmp) image file that will be \
@@ -1259,10 +1262,10 @@ fn main() {
              image dimensions should be 493 x 312 pxiels.",
         )
         .long("dialog")
-        .short("D")
-        .takes_value(true);
+        .short('D')
+        .num_args(1);
     // The eula option for the `init` and `print` subcommands.
-    let eula = Arg::with_name("eula")
+    let eula = Arg::new("eula")
         .help("A path to a RTF file (.rtf) for the installer's license agreement dialog")
         .long_help(
             "Specifies a Rich Text Format (RTF) file to use as the End \
@@ -1274,10 +1277,10 @@ fn main() {
              Source (wxs) file with a text editor.",
         )
         .long("eula")
-        .short("e")
-        .takes_value(true);
+        .short('e')
+        .num_args(1);
     // The license option for the `init` and `print` subcommands.
-    let license = Arg::with_name("license")
+    let license = Arg::new("license")
         .help("A path to any file (.txt, .pdf, .rtf, etc.) to be used as a license")
         .long_help(
             "Overrides the 'license-file' field or any license generated \
@@ -1289,10 +1292,10 @@ fn main() {
              editing the generated WiX Source file (wxs) in a text editor.",
         )
         .long("license")
-        .short("l")
-        .takes_value(true);
+        .short('l')
+        .num_args(1);
     // The url option for the `init` and `print` subcommands
-    let url = Arg::with_name("url")
+    let url = Arg::new("url")
         .help("A URL for the Add/Remove Programs control panel's Help Link")
         .long_help(
             "Adds a URL to the installer that will be displayed in the \
@@ -1303,10 +1306,10 @@ fn main() {
              directly modifying the WiX Source (wxs) file with a text editor.",
         )
         .long("url")
-        .short("u")
-        .takes_value(true);
+        .short('u')
+        .num_args(1);
     // The manufacturer option for the `init` and `print` subcommands
-    let manufacturer = Arg::with_name("manufacturer")
+    let manufacturer = Arg::new("manufacturer")
         .help("A string for the Add/Remove Programs control panel's Manufacturer")
         .long_help(
             "Overrides the first author in the 'authors' field of the \
@@ -1315,10 +1318,10 @@ fn main() {
              directly modifying the WiX Source file (wxs) with a text editor.",
         )
         .long("manufacturer")
-        .short("m")
-        .takes_value(true);
+        .short('m')
+        .num_args(1);
     // The owner option for the `init` and `print` subcommands
-    let owner = Arg::with_name("owner")
+    let owner = Arg::new("owner")
         .help("A string for a generated license's copyright holder")
         .long_help(
             "Sets the copyright owner for the license during \
@@ -1328,10 +1331,10 @@ fn main() {
              manifest.",
         )
         .long("owner")
-        .short("O")
-        .takes_value(true);
+        .short('O')
+        .num_args(1);
     // The package option for the `create`, `init`, and `print` subcommands
-    let package = Arg::with_name("package")
+    let package = Arg::new("package")
         .help("The name of the package in the current workspace")
         .long_help(
             "Selects the package within a project organized as a workspace. \
@@ -1339,10 +1342,10 @@ fn main() {
              This option selects the package by name.",
         )
         .long("package")
-        .short("p")
-        .takes_value(true);
+        .short('p')
+        .num_args(1);
     // The path guid option for the `init` and `print` subcommands
-    let path_guid = Arg::with_name("path-guid")
+    let path_guid = Arg::new("path-guid")
         .help("A string formatted as a v4 hyphenated, uppercase UUID for the path component")
         .long_help(
             "Overrides the automatically generated GUID for the path component. \
@@ -1354,9 +1357,9 @@ fn main() {
              after uninstallation.",
         )
         .long("path-guid")
-        .takes_value(true);
+        .num_args(1);
     // The product icon option for the `init` and `print` subcommands
-    let product_icon = Arg::with_name("product-icon")
+    let product_icon = Arg::new("product-icon")
         .help("A path to an image file (.ico) for the Add/Remove Programs control panel")
         .long_help(
             "Sets the path to an image file that will be displayed as an \
@@ -1364,9 +1367,10 @@ fn main() {
              application.",
         )
         .long("product-icon")
-        .takes_value(true);
+        .num_args(1);
+
     // The product name option for the `init`, `print`, and `sign` subcommands.
-    let product_name = Arg::with_name("product-name")
+    let product_name = Arg::new("product-name")
         .help("A string for the Add/Remove Programs control panel's Name")
         .long_help(
             "Overrides the 'name' field of the package's manifest \
@@ -1375,9 +1379,9 @@ fn main() {
              file (wxs) with a text editor.",
         )
         .long("product-name")
-        .takes_value(true);
+        .num_args(1);
     // The upgrade guid option for the `init` and `print` subcommands.
-    let upgrade_guid = Arg::with_name("upgrade-guid")
+    let upgrade_guid = Arg::new("upgrade-guid")
         .help("A string formatted as a v4 hyphenated, uppercase UUID for the globally unique upgrade code")
         .long_help(
             "Overrides the automatically generated GUID for the product's \
@@ -1389,9 +1393,9 @@ fn main() {
              creation will install separate versions of a product."
         )
         .long("upgrade-guid")
-        .takes_value(true);
+        .num_args(1);
     // The "global" verbose flag for all subcommands.
-    let verbose = Arg::with_name("verbose")
+    let verbose = Arg::new("verbose")
         .help("The verbosity level for logging statements")
         .long_help(
             "Sets the level of verbosity. The higher the level of \
@@ -1401,9 +1405,9 @@ fn main() {
              each statement.",
         )
         .long("verbose")
-        .short("v")
-        .multiple(true);
-    let year = Arg::with_name("year")
+        .short('v')
+        .action(ArgAction::Count);
+    let year = Arg::new("year")
         .help("A string for a generated license's copyright year")
         .long_help(
             "Sets the copyright year for the license during \
@@ -1413,18 +1417,18 @@ fn main() {
              (Cargo.toml).",
         )
         .long("year")
-        .short("y")
-        .takes_value(true);
-    let matches = App::new(crate_name!())
+        .short('y')
+        .num_args(1);
+    let matches = Command::new(PKG_NAME)
         .bin_name("cargo")
         .subcommand(
-            SubCommand::with_name(SUBCOMMAND_NAME)
-                .version(crate_version!())
-                .about(crate_description!())
-                .arg(Arg::with_name("bin-path")
-                     .help(&format!(
+            Command::new(SUBCOMMAND_NAME)
+                .version(PKG_VERSION)
+                .about(PKG_DESCRIPTION)
+                .arg(Arg::new("bin-path")
+                     .help(format!(
                          "A path to the WiX Toolset's '{BINARY_FOLDER_NAME}' folder"))
-                     .long_help(&format!(
+                     .long_help(format!(
                          "Specifies the path to the WiX Toolset's '{BINARY_FOLDER_NAME}' folder, which should contain \
                          the needed 'candle.exe' and 'light.exe' applications. The default is to use \
                          the path specified with the {WIX_PATH_KEY} system environment variable that is created \
@@ -1433,29 +1437,29 @@ fn main() {
                          environment variable is used. This is useful when working with multiple \
                          versions of the WiX Toolset."))
                      .long("bin-path")
-                     .short("b")
-                     .takes_value(true))
-                .subcommand(SubCommand::with_name("clean")
-                    .version(crate_version!())
+                     .short('b')
+                     .num_args(1))
+                .subcommand(Command::new("clean")
+                    .version(PKG_VERSION)
                     .about("Deletes the 'target\\wix' folder")
                     .long_about("Deletes the 'target\\wix' folder if it exists.")
-                    .arg(Arg::with_name("INPUT")
+                    .arg(Arg::new("INPUT")
                          .help("A path to a package's manifest (Cargo.toml)")
                          .long_help("The 'target\\wix' folder that exists \
                             alongside the package's manifest will be removed. This \
                             is optional and the default is to use the current \
                             working directory (cwd).")
                          .index(1)))
-                .arg(Arg::with_name("culture")
+                .arg(Arg::new("culture")
                     .help("The culture code for localization")
                     .long_help("Sets the culture for localization. Use with the \
                         '-l,--locale' option. See the WixUI localization \
                         documentation for more information about acceptable culture \
                         codes. The codes are case insensitive.")
                     .long("culture")
-                    .short("c")
-                    .takes_value(true))
-                .arg(Arg::with_name("compiler-arg")
+                    .short('c')
+                    .num_args(1))
+                .arg(Arg::new("compiler-arg")
                     .help("Send an argument to the WiX compiler (candle.exe)")
                     .long_help("Appends the argument to the command that is \
                         invoked when compiling an installer. This is the same as \
@@ -1467,26 +1471,25 @@ fn main() {
                         argument parsing. For example, '-C -ext -C \
                         WixUtilExtension'.")
                     .long("compiler-arg")
-                    .short("C")
-                    .takes_value(true)
-                    .multiple(true)
-                    .number_of_values(1)
+                    .short('C')
+                    .num_args(1)
+                    .action(ArgAction::Append)
                     .allow_hyphen_values(true))
-                .arg(Arg::with_name("target")
+                .arg(Arg::new("target")
                     .help("The cargo target to build the WiX installer for.")
                     .long_help("Tells cargo to build the given target, and instructs \
                         WiX to build an installer targeting the right architecture.")
                     .long("target")
-                    .short("t")
-                    .takes_value(true))
-                .arg(Arg::with_name("debug-build")
+                    .short('t')
+                    .num_args(1))
+                .arg(Arg::new("debug-build")
                     .help("Builds the package using the Debug profile")
                     .long_help("Uses the Debug profile when building the package \
                         using Cargo. The default is to build the package using the \
                         Release profile.")
                     .long("dbg-build")
-                    .short("d"))
-                .arg(Arg::with_name("debug-name")
+                    .short('d'))
+                .arg(Arg::new("debug-name")
                     .help("Appends '-debug' to the file stem of installer's file name")
                     .long_help("Adds the '-debug' suffix to the file stem \
                         (content before the file extension) for the installer's file \
@@ -1496,19 +1499,19 @@ fn main() {
                         combination with the '-d,--dbg-build' flag to build the \
                         binary with the Debug profile.")
                     .long("dbg-name")
-                    .short("D"))
-                .arg(Arg::with_name("include")
+                    .short('D'))
+                .arg(Arg::new("include")
                     .help("Include an additional WiX Source (wxs) file")
                     .long_help("Includes a WiX source (wxs) file for a project, \
                         where the wxs file is not located in the default location, \
                         i.e. 'wix'. Use this option multiple times to include \
                         multiple wxs files.")
                     .long("include")
-                    .multiple(true)
-                    .short("I")
-                    .takes_value(true))
-                .subcommand(SubCommand::with_name("init")
-                    .version(crate_version!())
+                    .short('I')
+                    .num_args(1)
+                    .action(ArgAction::Append))
+                .subcommand(Command::new("init")
+                    .version(PKG_VERSION)
                     .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
                     .long_about("Uses a package's manifest (Cargo.toml) to generate a WiX Source (wxs) \
                         file that can be used immediately without modification to create an \
@@ -1516,7 +1519,7 @@ fn main() {
                         Text Format (RTF) if the 'license' field is specified with a supported \
                         license (GPL-3.0, Apache-2.0, or MIT). All generated files are placed in \
                         the 'wix' sub-folder by default.")
-                        .arg(Arg::with_name("INPUT")
+                        .arg(Arg::new("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
                         .long_help("If the '-o,--output' option is not used, \
                             then all output from initialization will be placed in a \
@@ -1527,22 +1530,22 @@ fn main() {
                     .arg(description.clone())
                     .arg(dialog.clone())
                     .arg(eula.clone())
-                    .arg(Arg::with_name("force")
+                    .arg(Arg::new("force")
                         .help("Overwrite existing WiX-related files")
                         .long_help("Overwrites any existing files that are \
                             generated during initialization. Use with caution.")
                         .long("force"))
                     .arg(license.clone())
                     .arg(manufacturer.clone())
-                    .arg(Arg::with_name("output")
+                    .arg(Arg::new("output")
                         .help("A path to a folder for generated files")
                         .long_help("Sets the destination for all files \
                             generated during initialization. The default is to \
                             create a 'wix' folder within the project then generate \
                             all files in the 'wix' sub-folder.")
                         .long("output")
-                        .short("o")
-                        .takes_value(true))
+                        .short('o')
+                        .num_args(1))
                     .arg(owner.clone())
                     .arg(package.clone())
                     .arg(path_guid.clone())
@@ -1552,7 +1555,7 @@ fn main() {
                     .arg(url.clone())
                     .arg(verbose.clone())
                     .arg(year.clone()))
-                .arg(Arg::with_name("INPUT")
+                .arg(Arg::new("INPUT")
                      .help("Path to a package's manifest (Cargo.toml) file.")
                      .long_help("If no value is provided, then the current \
                         working directory (CWD) will be used to locate a package's \
@@ -1563,15 +1566,15 @@ fn main() {
                         the specified manifest.")
                      .required(false)
                      .index(1))
-                .arg(Arg::with_name("install-version")
+                .arg(Arg::new("install-version")
                     .help("A string for the Add/Remove Programs control panel's version number")
                     .long_help("Overrides the version from the package's manifest \
                         (Cargo.toml), which is used for the installer name and \
                         appears in the Add/Remove Programs control panel.")
                     .long("install-version")
-                    .short("i")
-                    .takes_value(true))
-                .arg(Arg::with_name("linker-arg")
+                    .short('i')
+                    .num_args(1))
+                .arg(Arg::new("linker-arg")
                     .help("Send an argument to the WiX linker (light.exe)")
                     .long_help("Appends the argument to the command that is \
                         invoked when linking an installer. This is the same as \
@@ -1583,45 +1586,44 @@ fn main() {
                         argument parsing. For example, '-L -ext -L \
                         WixUIExtension'.")
                     .long("linker-arg")
-                    .short("L")
-                    .takes_value(true)
-                    .multiple(true)
-                    .number_of_values(1)
+                    .short('L')
+                    .num_args(1)
+                    .action(ArgAction::Append)
                     .allow_hyphen_values(true))
-                .arg(Arg::with_name("locale")
+                .arg(Arg::new("locale")
                     .help("A path to a WiX localization file (.wxl)")
                     .long_help("Sets the path to a WiX localization file (wxl) \
                         which contains localized strings. Use in conjunction with \
                         the '-c,--culture' option.")
                     .long("locale")
-                    .short("l")
-                    .takes_value(true))
-                .arg(Arg::with_name("name")
+                    .short('l')
+                    .num_args(1))
+                .arg(Arg::new("name")
                     .help("A string for the installer's product name")
                     .long_help("Overrides the 'name' field in the package's \
                         manifest (Cargo.toml), which is used in the file name of the \
                         installer (msi). This does not change the name of the \
                         executable within the installer.")
                     .long("name")
-                    .short("n")
-                    .takes_value(true))
-                .arg(Arg::with_name("no-build")
+                    .short('n')
+                    .num_args(1))
+                .arg(Arg::new("no-build")
                     .help("Skips building the release binary")
                     .long_help("The installer is created, but the 'cargo build \
                         --release' is not executed.")
                     .long("no-build"))
-                .arg(Arg::with_name("no-capture")
+                .arg(Arg::new("no-capture")
                     .help("Displays all output from the builder, compiler, linker, and signer")
                     .long_help("By default, this subcommand captures, or hides, \
                         all output from the builder, compiler, linker, and signer \
                         for the binary and Windows installer, respectively. Use this \
                         flag to show the output.")
                     .long("nocapture"))
-                .arg(Arg::with_name("install")
+                .arg(Arg::new("install")
                     .help("Runs the installer after creating it")
                     .long_help("Creates the installer and runs it after that.")
                     .long("install"))
-                .arg(Arg::with_name("output")
+                .arg(Arg::new("output")
                     .help("A path to a destination file or an existing folder")
                     .long_help("Sets the destination file name and path for the \
                         created installer, or the destination folder for the \
@@ -1635,11 +1637,11 @@ fn main() {
                         '<product-name>-<version>-<arch>.msi' file name in the \
                         'target\\wix' folder.")
                     .long("output")
-                    .short("o")
-                    .takes_value(true))
+                    .short('o')
+                    .num_args(1))
                 .arg(package.clone())
-                .subcommand(SubCommand::with_name("print")
-                    .version(crate_version!())
+                .subcommand(Command::new("print")
+                    .version(PKG_VERSION)
                     .about("Prints a template")
                     .long_about("Prints a template to stdout or a file. In the case \
                         of a license template, the output is in the Rich Text Format \
@@ -1647,18 +1649,15 @@ fn main() {
                         New GUIDs are generated for the 'UpgradeCode' and Path \
                         Component each time the 'WXS' template is printed. [values: \
                         Apache-2.0, GPL-3.0, MIT, WXS]")
-                        .arg(Arg::with_name("TEMPLATE")
+                        .arg(Arg::new("TEMPLATE")
                         .help("A name of a template")
                         .long_help("This is required and values are case \
                             insensitive. [values: Apache-2.0, GPL-3.0, MIT, WXS]")
                         .hide_possible_values(true)
-                        .possible_values(&Template::possible_values()
-                            .iter()
-                            .map(|s| s.as_ref())
-                            .collect::<Vec<&str>>())
+                        .value_parser(Template::possible_values().iter().map(String::as_str).collect::<Vec<&str>>())
                         .required(true)
                         .index(1))
-                        .arg(Arg::with_name("INPUT")
+                        .arg(Arg::new("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
                         .long_help("The selected template will be printed to \
                             stdout or a file based on the field values in this \
@@ -1673,15 +1672,15 @@ fn main() {
                     .arg(eula)
                     .arg(license)
                     .arg(manufacturer)
-                    .arg(Arg::with_name("output")
+                    .arg(Arg::new("output")
                         .help("A path to a folder for generated files")
                         .long_help("Sets the destination for printing the \
                             template. The default is to print/write the rendered \
                             template to stdout. If the destination, a.k.a. file, \
                             does not exist, it will be created.")
                         .long("output")
-                        .short("o")
-                        .takes_value(true))
+                        .short('o')
+                        .num_args(1))
                     .arg(owner)
                     .arg(package)
                     .arg(path_guid)
@@ -1691,20 +1690,20 @@ fn main() {
                     .arg(url)
                     .arg(year)
                     .arg(verbose.clone()))
-                .subcommand(SubCommand::with_name("purge")
-                    .version(crate_version!())
+                .subcommand(Command::new("purge")
+                    .version(PKG_VERSION)
                     .about("Deletes the 'target\\wix' and 'wix' folders")
                     .long_about("Deletes the 'target\\wix' and 'wix' folders if they \
                         exist. Use with caution!")
-                    .arg(Arg::with_name("INPUT")
+                    .arg(Arg::new("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
                         .long_help("The 'target\\wix' and 'wix' folders that \
                             exists alongside the package's manifest will be removed. \
                             This is optional and the default is to use the current \
                             working directory (cwd).")
                         .index(1)))
-                .subcommand(SubCommand::with_name("sign")
-                    .version(crate_version!())
+                .subcommand(Command::new("sign")
+                    .version(PKG_VERSION)
                     .about("Signs an installer")
                     .long_about("The Windows installer (msi) will be signed using the \
                         SignTool application available in the Windows 10 SDK. The \
@@ -1712,14 +1711,14 @@ fn main() {
                         obtain an appropriate certificate from the Windows \
                         certificate manager. The default is to also use the Comodo \
                         timestamp server with the '/t' flag.")
-                    .arg(Arg::with_name("bin-path")
+                    .arg(Arg::new("bin-path")
                         .help("A path to the folder containing the 'signtool' application")
                         .long_help("The default is to use the PATH system environment \
                              variable to locate the application.")
                         .long("bin-path")
-                        .short("b")
-                        .takes_value(true))
-                    .arg(Arg::with_name("description")
+                        .short('b')
+                        .num_args(1))
+                    .arg(Arg::new("description")
                         .help("A string for the extended ACL dialog")
                         .long_help("The information for the extended text of \
                             the ACL dialog that appears. This will be appended to \
@@ -1728,52 +1727,52 @@ fn main() {
                             manifest (Cargo.toml). This option will override the \
                             default.")
                         .long("description")
-                        .short("d")
-                        .takes_value(true))
-                    .arg(Arg::with_name("homepage")
+                        .short('d')
+                        .num_args(1))
+                    .arg(Arg::new("homepage")
                         .help("A URL for the product's homepage")
                         .long_help("This will be displayed in the ACL dialog.")
                         .long("homepage")
-                        .short("u")
-                        .takes_value(true))
-                    .arg(Arg::with_name("INPUT")
+                        .short('u')
+                        .num_args(1))
+                    .arg(Arg::new("INPUT")
                         .help("A path to a package's manifest (Cargo.toml)")
                         .long_help("The installer located in the 'target\\wix' \
                             folder alongside this manifest will be signed based on \
                             the metadata within the manifest.")
                         .index(1))
-                    .arg(Arg::with_name("installer")
+                    .arg(Arg::new("installer")
                         .help("specify the installer to be signed")
                         .long_help("Specify the installer to be signed.")
                         .long("installer")
-                        .short("i")
-                        .takes_value(true))
-                    .arg(Arg::with_name("no-capture")
+                        .short('i')
+                        .num_args(1))
+                    .arg(Arg::new("no-capture")
                         .help("Display output from the signer")
                         .long_help("By default, this subcommand captures, or \
                             hides, all output from the signer. Use this flag to \
                             show the output.")
                         .long("nocapture"))
                     .arg(product_name)
-                    .arg(Arg::with_name("timestamp")
+                    .arg(Arg::new("timestamp")
                         .help("An alias or URL to a timestamp server")
                         .long_help("Either an alias or URL can be used. Aliases \
-                            are case-insenstive. [values: Comodo, Verisign]")
-                        .short("t")
+                            are case-insensitive. [values: Comodo, Verisign]")
+                        .short('t')
                         .long("timestamp")
-                        .takes_value(true))
+                        .num_args(1))
                     .arg(verbose.clone()))
                 .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
     let verbosity = match matches.subcommand() {
-        ("clean", Some(m)) => m,
-        ("init", Some(m)) => m,
-        ("print", Some(m)) => m,
-        ("purge", Some(m)) => m,
+        Some(("clean", m)) => m,
+        Some(("init", m)) => m,
+        Some(("print", m)) => m,
+        Some(("purge", m)) => m,
         _ => matches,
     }
-    .occurrences_of("verbose");
+    .get_count("verbose");
     // Using the `Builder::new` instead of the `Builder::from_env` or `Builder::from_default_env`
     // skips reading the configuration from any environment variable, i.e. `RUST_LOG`. The log
     // level is later configured with the verbosity using the `filter` method. There are many
@@ -1822,103 +1821,121 @@ fn main() {
         )
         .init();
     let result = match matches.subcommand() {
-        ("clean", Some(m)) => {
+        Some(("clean", m)) => {
             let mut clean = clean::Builder::new();
-            clean.input(m.value_of("INPUT"));
+            clean.input(m.get_one("INPUT").map(String::as_str));
             clean.build().run()
         }
-        ("init", Some(m)) => {
+        Some(("init", m)) => {
             let mut init = initialize::Builder::new();
-            init.banner(m.value_of("banner"));
-            init.binaries(m.values_of("binaries").map(|v| v.collect()));
-            init.copyright_holder(m.value_of("owner"));
-            init.copyright_year(m.value_of("year"));
-            init.description(m.value_of("description"));
-            init.dialog(m.value_of("dialog"));
-            init.eula(m.value_of("eula"));
-            init.force(m.is_present("force"));
-            init.help_url(m.value_of("url"));
-            init.input(m.value_of("INPUT"));
-            init.license(m.value_of("license"));
-            init.manufacturer(m.value_of("manufacturer"));
-            init.output(m.value_of("output"));
-            init.package(m.value_of("package"));
-            init.path_guid(m.value_of("path-guid"));
-            init.product_icon(m.value_of("product-icon"));
-            init.product_name(m.value_of("product-name"));
-            init.upgrade_guid(m.value_of("upgrade-guid"));
+            init.banner(m.get_one("banner").map(String::as_str));
+            init.binaries(
+                m.get_many::<String>("binaries")
+                    .map(|v| v.map(String::as_str).collect()),
+            );
+            init.copyright_holder(m.get_one("owner").map(String::as_str));
+            init.copyright_year(m.get_one("year").map(String::as_str));
+            init.description(m.get_one("description").map(String::as_str));
+            init.dialog(m.get_one("dialog").map(String::as_str));
+            init.eula(m.get_one("eula").map(String::as_str));
+            init.force(m.get_flag("force"));
+            init.help_url(m.get_one("url").map(String::as_str));
+            init.input(m.get_one("INPUT").map(String::as_str));
+            init.license(m.get_one("license").map(String::as_str));
+            init.manufacturer(m.get_one("manufacturer").map(String::as_str));
+            init.output(m.get_one("output").map(String::as_str));
+            init.package(m.get_one("package").map(String::as_str));
+            init.path_guid(m.get_one("path-guid").map(String::as_str));
+            init.product_icon(m.get_one("product-icon").map(String::as_str));
+            init.product_name(m.get_one("product-name").map(String::as_str));
+            init.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
             init.build().run()
         }
-        ("print", Some(m)) => {
-            let template = value_t!(m, "TEMPLATE", Template).unwrap();
+        Some(("print", m)) => {
+            let template = m.get_one::<Template>("TEMPLATE").unwrap();
             match template {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
-                    print.banner(m.value_of("banner"));
-                    print.binaries(m.values_of("binaries").map(|v| v.collect()));
-                    print.description(m.value_of("description"));
-                    print.dialog(m.value_of("dialog"));
-                    print.eula(m.value_of("eula"));
-                    print.help_url(m.value_of("url"));
-                    print.input(m.value_of("INPUT"));
-                    print.license(m.value_of("license"));
-                    print.manufacturer(m.value_of("manufacturer"));
-                    print.output(m.value_of("output"));
-                    print.package(m.value_of("package"));
-                    print.path_guid(m.value_of("path-guid"));
-                    print.product_icon(m.value_of("product-icon"));
-                    print.product_name(m.value_of("product-name"));
-                    print.upgrade_guid(m.value_of("upgrade-guid"));
+                    print.banner(m.get_one("banner").map(String::as_str));
+                    print.binaries(
+                        m.get_many("binaries")
+                            .map(|v| v.map(String::as_str).collect()),
+                    );
+                    print.description(m.get_one("description").map(String::as_str));
+                    print.dialog(m.get_one("dialog").map(String::as_str));
+                    print.eula(m.get_one("eula").map(String::as_str));
+                    print.help_url(m.get_one("url").map(String::as_str));
+                    print.input(m.get_one("INPUT").map(String::as_str));
+                    print.license(m.get_one("license").map(String::as_str));
+                    print.manufacturer(m.get_one("manufacturer").map(String::as_str));
+                    print.output(m.get_one("output").map(String::as_str));
+                    print.package(m.get_one("package").map(String::as_str));
+                    print.path_guid(m.get_one("path-guid").map(String::as_str));
+                    print.product_icon(m.get_one("product-icon").map(String::as_str));
+                    print.product_name(m.get_one("product-name").map(String::as_str));
+                    print.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
                     print.build().run()
                 }
                 t => {
                     let mut print = print::license::Builder::new();
-                    print.copyright_holder(m.value_of("owner"));
-                    print.copyright_year(m.value_of("year"));
-                    print.input(m.value_of("INPUT"));
-                    print.output(m.value_of("output"));
-                    print.package(m.value_of("package"));
+                    print.copyright_holder(m.get_one("owner").map(String::as_str));
+                    print.copyright_year(m.get_one("year").map(String::as_str));
+                    print.input(m.get_one("INPUT").map(String::as_str));
+                    print.output(m.get_one("output").map(String::as_str));
+                    print.package(m.get_one("package").map(String::as_str));
                     print.build().run(t)
                 }
             }
         }
-        ("purge", Some(m)) => {
+        Some(("purge", m)) => {
             let mut purge = purge::Builder::new();
-            purge.input(m.value_of("INPUT"));
+            purge.input(m.get_one("INPUT").map(String::as_str));
             purge.build().run()
         }
-        ("sign", Some(m)) => {
+        Some(("sign", m)) => {
             let mut sign = sign::Builder::new();
-            sign.bin_path(m.value_of("bin-path"));
-            sign.capture_output(!m.is_present("no-capture"));
-            sign.description(m.value_of("description"));
-            sign.homepage(m.value_of("homepage"));
-            sign.input(m.value_of("INPUT"));
-            sign.installer(m.value_of("installer"));
-            sign.package(m.value_of("package"));
-            sign.product_name(m.value_of("product-name"));
-            sign.timestamp(m.value_of("timestamp"));
+            sign.bin_path(m.get_one("bin-path").map(String::as_str));
+            sign.capture_output(!m.get_flag("no-capture"));
+            sign.description(m.get_one("description").map(String::as_str));
+            sign.homepage(m.get_one("homepage").map(String::as_str));
+            sign.input(m.get_one("INPUT").map(String::as_str));
+            sign.installer(m.get_one("installer").map(String::as_str));
+            sign.package(m.get_one("package").map(String::as_str));
+            sign.product_name(m.get_one("product-name").map(String::as_str));
+            sign.timestamp(m.get_one("timestamp").map(String::as_str));
             sign.build().run()
         }
         _ => {
             let mut create = create::Builder::new();
-            create.bin_path(matches.value_of("bin-path"));
-            create.capture_output(!matches.is_present("no-capture"));
-            create.compiler_args(matches.values_of("compiler-arg").map(|a| a.collect()));
-            create.culture(matches.value_of("culture"));
-            create.debug_build(matches.is_present("debug-build"));
-            create.debug_name(matches.is_present("debug-name"));
-            create.includes(matches.values_of("include").map(|a| a.collect()));
-            create.input(matches.value_of("INPUT"));
-            create.linker_args(matches.values_of("linker-arg").map(|a| a.collect()));
-            create.locale(matches.value_of("locale"));
-            create.name(matches.value_of("name"));
-            create.no_build(matches.is_present("no-build"));
-            create.install(matches.is_present("install"));
-            create.output(matches.value_of("output"));
-            create.version(matches.value_of("install-version"));
-            create.package(matches.value_of("package"));
-            create.target(matches.value_of("target"));
+            create.bin_path(matches.get_one("bin-path").map(String::as_str));
+            create.capture_output(!matches.get_flag("no-capture"));
+            create.compiler_args(
+                matches
+                    .get_many("compiler-arg")
+                    .map(|v| v.map(String::as_str).collect()),
+            );
+            create.culture(matches.get_one("culture").map(String::as_str));
+            create.debug_build(matches.get_flag("debug-build"));
+            create.debug_name(matches.get_flag("debug-name"));
+            create.includes(
+                matches
+                    .get_many("include")
+                    .map(|v| v.map(String::as_str).collect()),
+            );
+            create.input(matches.get_one("INPUT").map(String::as_str));
+            create.linker_args(
+                matches
+                    .get_many("linker-arg")
+                    .map(|v| v.map(String::as_str).collect()),
+            );
+            create.locale(matches.get_one("locale").map(String::as_str));
+            create.name(matches.get_one("name").map(String::as_str));
+            create.no_build(matches.get_flag("no-build"));
+            create.install(matches.get_flag("install"));
+            create.output(matches.get_one("output").map(String::as_str));
+            create.version(matches.get_one("install-version").map(String::as_str));
+            create.package(matches.get_one("package").map(String::as_str));
+            create.target(matches.get_one("target").map(String::as_str));
             create.build().run()
         }
     };

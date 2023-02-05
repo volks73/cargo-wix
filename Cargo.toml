@@ -21,8 +21,10 @@ name = "wix"
 
 [dependencies]
 chrono = "0.4"
+clap = "4"
 encoding_rs_io = "0.1"
 env_logger = "0.10"
+lazy_static = "1"
 log = "0.4"
 mustache = "0.9"
 regex = "1"
@@ -37,16 +39,10 @@ serde_json = "1.0"
 
 [dev-dependencies]
 assert_fs = "1.0"
-lazy_static = "1"
 maplit = "1"
 predicates = "2"
 serial_test = "1"
 toml = "0.7"
-
-[dependencies.clap]
-version = "2"
-default-features = false
-features = ["suggestions", "vec_map"]
 
 [workspace]
 members = [
