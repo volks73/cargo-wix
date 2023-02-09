@@ -16,6 +16,7 @@
 //! printing various templates based on a package's manifest (Cargo.toml) or
 //! end-user input.
 
+use itertools::Itertools;
 pub mod license;
 pub mod wxs;
 
@@ -46,17 +47,24 @@ fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     }
 }
 
-fn first_author(package: &Package) -> Result<String> {
-    package
+fn authors(package: &Package) -> Result<String> {
+    let result = package
         .authors
-        .first()
+        .iter()
         .map(|s| {
             // Strip email if it exists.
             let re = Regex::new(r"<(.*?)>").unwrap();
             re.replace_all(s, "")
         })
         .map(|s| String::from(s.trim()))
-        .ok_or(Error::Manifest("authors"))
+        // Replace this with intersperse from stdlib when it is stabilized: https://github.com/rust-lang/rust/issues/79524
+        .join("; ");
+
+    if result.is_empty() {
+        Err(Error::Manifest("authors"))
+    } else {
+        Ok(result)
+    }
 }
 
 #[cfg(test)]
@@ -88,16 +96,16 @@ mod tests {
         }"#;
 
     #[test]
-    fn first_author_with_single_author_works() {
+    fn authors_with_single_author_works() {
         let manifest = serde_json::from_str(SINGLE_AUTHOR_MANIFEST).expect("Parsing TOML");
-        let actual = first_author(&manifest).unwrap();
+        let actual = authors(&manifest).unwrap();
         assert_eq!(actual, String::from("First Last"));
     }
 
     #[test]
-    fn first_author_with_multiple_authors_works() {
+    fn authors_with_multiple_authors_works() {
         let manifest = serde_json::from_str(MULTIPLE_AUTHORS_MANIFEST).expect("Parsing TOML");
-        let actual = first_author(&manifest).unwrap();
-        assert_eq!(actual, String::from("1 Author"));
+        let actual = authors(&manifest).unwrap();
+        assert_eq!(actual, String::from("1 Author; 2 Author; 3 author"));
     }
 }

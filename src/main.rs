@@ -989,7 +989,7 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
-//! Overrides the first author in the `authors` field of the package's manifest
+//! Overrides the `authors` field of the package's manifest
 //! (Cargo.toml) as the manufacturer within the installer. The manufacturer can
 //! be changed after initialization by directly modifying the WiX Source file
 //! (WXS) with a text editor.
@@ -1037,7 +1037,7 @@
 //! subcommands.
 //!
 //! Sets the copyright owner of the license during initialization or printing.
-//! The default is to use the first author from the package's manifest
+//! The default is to use the `authors` field of the package's manifest
 //! (Cargo.toml). This is only used when generating a license based on the value
 //! of the `license` field in the package's manifest.
 //!
@@ -1312,7 +1312,7 @@ fn main() {
     let manufacturer = Arg::new("manufacturer")
         .help("A string for the Add/Remove Programs control panel's Manufacturer")
         .long_help(
-            "Overrides the first author in the 'authors' field of the \
+            "Overrides the 'authors' field of the \
              package's manifest (Cargo.toml) as the manufacturer within the \
              installer. The manufacturer can be changed after initialization by \
              directly modifying the WiX Source file (wxs) with a text editor.",
@@ -1325,7 +1325,7 @@ fn main() {
         .help("A string for a generated license's copyright holder")
         .long_help(
             "Sets the copyright owner for the license during \
-             initialization. The default is to use the first author from the \
+             initialization. The default is to use the `authors` field from the \
              package's manifest (Cargo.toml). This is only used when generating a \
              license based on the value of the 'license' field in the package's \
              manifest.",

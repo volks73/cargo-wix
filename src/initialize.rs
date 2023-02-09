@@ -130,7 +130,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the copyright holder for the generated license file and EULA.
     ///
-    /// The default is to use the first author from the `authors` field of the
+    /// The default is to use the `authors` field of the
     /// package's manifest (Cargo.toml). This method can be used to override the
     /// default and set a different copyright holder if and when a Rich Text
     /// Format (RTF) license and EULA are generated based on the value of the
@@ -275,7 +275,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the manufacturer.
     ///
-    /// Default is to use the first author in the `authors` field of the
+    /// Default is to use the `authors` field of the
     /// package's manifest (Cargo.toml). This would override the default value.
     pub fn manufacturer(&mut self, m: Option<&'a str>) -> &mut Self {
         self.manufacturer = m;

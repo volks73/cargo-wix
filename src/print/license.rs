@@ -57,8 +57,7 @@ impl<'a> Builder<'a> {
     /// If the license template does not use a copyright holder, then this value
     /// is ignored.
     ///
-    /// The default is to use the first author from the `authors` field of the
-    /// package's manifest (Cargo.toml).
+    /// The default is to use `authors` field of the package's manifest (Cargo.toml).
     pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
         self.copyright_holder = h;
         self
@@ -156,7 +155,7 @@ impl Execution {
         if let Some(ref h) = self.copyright_holder {
             Ok(h.to_owned())
         } else {
-            super::first_author(manifest)
+            super::authors(manifest)
         }
     }
 
