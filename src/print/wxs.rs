@@ -195,7 +195,7 @@ impl<'a> Builder<'a> {
 
     /// Sets the manufacturer.
     ///
-    /// Default is to use the first author in the `authors` field of the
+    /// Default is to use the `authors` field of the
     /// package's manifest (Cargo.toml). This would override the default value.
     pub fn manufacturer(&mut self, m: Option<&'a str>) -> &mut Self {
         self.manufacturer = m;
@@ -551,7 +551,7 @@ impl Execution {
         if let Some(ref m) = self.manufacturer {
             Ok(m.to_owned())
         } else {
-            super::first_author(manifest)
+            super::authors(manifest)
         }
     }
 
