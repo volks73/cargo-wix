@@ -1,32 +1,25 @@
 name: CI
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   test:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 'stable'
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --all-targets
   rustfmt:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 'stable'
-          override: true
           components: rustfmt
       - run: cargo fmt --all -- --check
   clippy:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 'stable'
-          override: true
           components: clippy
       - run: cargo clippy --all-targets -- -D warnings
