@@ -1229,13 +1229,14 @@ impl TryFrom<&str> for WixObjKind {
 
 /// The kinds of installers that can be created using the WiX compiler
 /// (candle.exe) and linker (light.exe).
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub enum InstallerKind {
     /// An executable is used when an [Installation Package Bundle] is created.
     ///
     /// [Installation Package Bundle]: https://wixtoolset.org/documentation/manual/v3/bundle/
     Exe,
     /// A Microsoft installer. This is the more common and typical installer to be created.
+    #[default]
     Msi,
 }
 
@@ -1310,12 +1311,6 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
                      'bundle' tag in the collective WiX source files (wxs).",
                 ))
             })
-    }
-}
-
-impl Default for InstallerKind {
-    fn default() -> Self {
-        InstallerKind::Msi
     }
 }
 
