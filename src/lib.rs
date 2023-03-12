@@ -672,7 +672,7 @@ impl FromStr for TimestampServer {
 /// These are taken from the table in the [WixUI localization] documentation.
 ///
 /// [WixUI localization]: http://wixtoolset.org/documentation/manual/v3/wixui/wixui_localization.html
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum Cultures {
     /// Arabic, Saudi Arabia
     ArSa,
@@ -689,6 +689,7 @@ pub enum Cultures {
     /// Dutch, Netherlands
     NlNl,
     /// English, United States
+    #[default]
     EnUs,
     /// Estonian, Estonia
     EtEe,
@@ -1030,12 +1031,6 @@ impl FromStr for Cultures {
             "uk-ua" => Ok(Cultures::UkUa),
             e => Err(Error::Generic(format!("Unknown '{e}' culture"))),
         }
-    }
-}
-
-impl Default for Cultures {
-    fn default() -> Self {
-        Cultures::EnUs
     }
 }
 
