@@ -25,7 +25,7 @@ The Windows installer (msi) for the project will be in the `C:\Path\To\Project\t
 The cargo-wix project can be installed on any platform supported by the Rust programming language, but the Wix Toolset is Windows only; thus, this project is only useful when installed on a Windows machine. Ensure the following dependencies are installed before proceeding. Note, Cargo is installed automatically when installing the Rust programming language. The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
 
 - [Cargo](http://doc.crates.io)
-- [Rust v1.40.0 or newer](https://www.rust-lang.org)
+- [Rust v1.64.0 or newer](https://www.rust-lang.org)
 - [WiX Toolset](http://wixtoolset.org)
 - [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk) (Optional), needed for signing the installer
 
