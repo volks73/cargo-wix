@@ -42,7 +42,7 @@ serde_json = "1.0"
 assert_fs = "1.0"
 maplit = "1"
 predicates = "2"
-serial_test = "1"
+serial_test = "2"
 toml = "0.7"
 
 [workspace]
