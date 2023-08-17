@@ -65,6 +65,7 @@ pub struct Builder<'a> {
     compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
     debug_build: bool,
+    profile: Option<&'a str>,
     debug_name: bool,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
@@ -88,6 +89,7 @@ impl<'a> Builder<'a> {
             compiler_args: None,
             culture: None,
             debug_build: false,
+            profile: None,
             debug_name: false,
             includes: None,
             input: None,
@@ -343,6 +345,7 @@ impl<'a> Builder<'a> {
                 .map(|c| c.iter().map(|s| (*s).to_string()).collect()),
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
+            profile: self.profile.map(String::from),
             debug_name: self.debug_name,
             includes: self
                 .includes
@@ -363,6 +366,11 @@ impl<'a> Builder<'a> {
             target: self.target.map(String::from),
         }
     }
+
+    pub fn profile(&mut self, profile: Option<&'a str>) -> &mut Self {
+        self.profile = profile;
+        self
+    }
 }
 
 impl<'a> Default for Builder<'a> {
@@ -379,6 +387,7 @@ pub struct Execution {
     compiler_args: Option<Vec<String>>,
     culture: Option<String>,
     debug_build: bool,
+    profile: Option<String>,
     debug_name: bool,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
@@ -402,6 +411,7 @@ impl Execution {
         debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
         debug!("self.debug_build = {:?}", self.debug_build);
+        debug!("self.profile = {:?}", self.profile);
         debug!("self.debug_name = {:?}", self.debug_name);
         debug!("self.includes = {:?}", self.includes);
         debug!("self.input = {:?}", self.input);
@@ -438,7 +448,13 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
-        let profile = if debug_build { "debug" } else { "release" };
+        let profile = if let Some(profile) = &self.profile {
+            profile
+        } else if debug_build {
+            "debug"
+        } else {
+            "release"
+        };
         debug!("profile = {:?}", profile);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
