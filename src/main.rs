@@ -1488,7 +1488,15 @@ fn main() {
                         using Cargo. The default is to build the package using the \
                         Release profile.")
                     .long("dbg-build")
-                    .short('d'))
+                    .short('d')
+                    .action(ArgAction::SetTrue))
+                .arg(Arg::new("profile")
+                    .help("Builds the package using the given profile")
+                    .long_help("Uses the given profile when building the package \
+                        using Cargo. The default is to build the package using the \
+                        Release profile.")
+                    .long("profile")
+                    .num_args(1))
                 .arg(Arg::new("debug-name")
                     .help("Appends '-debug' to the file stem of installer's file name")
                     .long_help("Adds the '-debug' suffix to the file stem \
@@ -1499,7 +1507,8 @@ fn main() {
                         combination with the '-d,--dbg-build' flag to build the \
                         binary with the Debug profile.")
                     .long("dbg-name")
-                    .short('D'))
+                    .short('D')
+                    .action(ArgAction::SetTrue))
                 .arg(Arg::new("include")
                     .help("Include an additional WiX Source (wxs) file")
                     .long_help("Includes a WiX source (wxs) file for a project, \
@@ -1534,7 +1543,8 @@ fn main() {
                         .help("Overwrite existing WiX-related files")
                         .long_help("Overwrites any existing files that are \
                             generated during initialization. Use with caution.")
-                        .long("force"))
+                        .long("force")
+                        .action(ArgAction::SetTrue))
                     .arg(license.clone())
                     .arg(manufacturer.clone())
                     .arg(Arg::new("output")
@@ -1611,18 +1621,21 @@ fn main() {
                     .help("Skips building the release binary")
                     .long_help("The installer is created, but the 'cargo build \
                         --release' is not executed.")
-                    .long("no-build"))
+                    .long("no-build")
+                    .action(ArgAction::SetTrue))
                 .arg(Arg::new("no-capture")
                     .help("Displays all output from the builder, compiler, linker, and signer")
                     .long_help("By default, this subcommand captures, or hides, \
                         all output from the builder, compiler, linker, and signer \
                         for the binary and Windows installer, respectively. Use this \
                         flag to show the output.")
-                    .long("nocapture"))
+                    .long("nocapture")
+                    .action(ArgAction::SetTrue))
                 .arg(Arg::new("install")
                     .help("Runs the installer after creating it")
                     .long_help("Creates the installer and runs it after that.")
-                    .long("install"))
+                    .long("install")
+                    .action(ArgAction::SetTrue))
                 .arg(Arg::new("output")
                     .help("A path to a destination file or an existing folder")
                     .long_help("Sets the destination file name and path for the \
@@ -1916,6 +1929,7 @@ fn main() {
             );
             create.culture(matches.get_one("culture").map(String::as_str));
             create.debug_build(matches.get_flag("debug-build"));
+            create.profile(matches.get_one("profile").map(String::as_str));
             create.debug_name(matches.get_flag("debug-name"));
             create.includes(
                 matches

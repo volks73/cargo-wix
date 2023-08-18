@@ -65,6 +65,7 @@ pub struct Builder<'a> {
     compiler_args: Option<Vec<&'a str>>,
     culture: Option<&'a str>,
     debug_build: bool,
+    profile: Option<&'a str>,
     debug_name: bool,
     includes: Option<Vec<&'a str>>,
     input: Option<&'a str>,
@@ -88,6 +89,7 @@ impl<'a> Builder<'a> {
             compiler_args: None,
             culture: None,
             debug_build: false,
+            profile: None,
             debug_name: false,
             includes: None,
             input: None,
@@ -343,6 +345,7 @@ impl<'a> Builder<'a> {
                 .map(|c| c.iter().map(|s| (*s).to_string()).collect()),
             culture: self.culture.map(String::from),
             debug_build: self.debug_build,
+            profile: self.profile.map(String::from),
             debug_name: self.debug_name,
             includes: self
                 .includes
@@ -363,6 +366,11 @@ impl<'a> Builder<'a> {
             target: self.target.map(String::from),
         }
     }
+
+    pub fn profile(&mut self, profile: Option<&'a str>) -> &mut Self {
+        self.profile = profile;
+        self
+    }
 }
 
 impl<'a> Default for Builder<'a> {
@@ -379,6 +387,7 @@ pub struct Execution {
     compiler_args: Option<Vec<String>>,
     culture: Option<String>,
     debug_build: bool,
+    profile: Option<String>,
     debug_name: bool,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
@@ -402,6 +411,7 @@ impl Execution {
         debug!("self.compiler_args = {:?}", self.compiler_args);
         debug!("self.culture = {:?}", self.culture);
         debug!("self.debug_build = {:?}", self.debug_build);
+        debug!("self.profile = {:?}", self.profile);
         debug!("self.debug_name = {:?}", self.debug_name);
         debug!("self.includes = {:?}", self.includes);
         debug!("self.input = {:?}", self.input);
@@ -438,8 +448,24 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
-        let profile = if debug_build { "debug" } else { "release" };
-        debug!("profile = {:?}", profile);
+        // Figure out what profile we're building
+        let profile_name = if let Some(profile) = &self.profile {
+            profile
+        } else if debug_build {
+            // The default "debug" build profile is called "dev" for whatever reason
+            "dev"
+        } else {
+            "release"
+        };
+        // Figure out what subdir of target will contain our output
+        // Cargo specially maps the builtin profile names to "debug" or "release"
+        // in the target directory, but custom profiles get forwarded verbatim.
+        let profile_dir = match profile_name {
+            "dev" | "test" => "debug",
+            "release" | "bench" => "release",
+            p => p,
+        };
+        debug!("profile = {:?}", profile_name);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
@@ -471,9 +497,7 @@ impl Execution {
                 builder.stderr(Stdio::null());
             }
             builder.arg("build");
-            if !debug_build {
-                builder.arg("--release");
-            }
+            builder.arg(format!("--profile={profile_name}"));
             if self.target.is_some() {
                 builder.arg(format!("--target={target_triple}"));
             }
@@ -512,10 +536,10 @@ impl Execution {
         compiler
             .arg(format!("-dVersion={version}"))
             .arg(format!("-dPlatform={wix_arch}"))
-            .arg(format!("-dProfile={profile}"))
+            .arg(format!("-dProfile={profile_name}"))
             .arg(format!("-dTargetEnv={}", cfg.target_env))
             .arg(format!("-dTargetTriple={target_triple}"))
-            .arg(format!("-dCargoProfile={profile}"))
+            .arg(format!("-dCargoProfile={profile_name}"))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -527,7 +551,7 @@ impl Execution {
                 if let Some(target) = &self.target {
                     bin_path.push(target);
                 }
-                bin_path.push(profile);
+                bin_path.push(profile_dir);
                 s.push(&bin_path);
                 s
             })
@@ -1392,6 +1416,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.debug_build(true);
             assert!(actual.debug_build);
+        }
+
+        #[test]
+        fn profile_works() {
+            const EXPECTED: &str = "dist";
+            let mut actual = Builder::new();
+            actual.profile(Some(EXPECTED));
+            assert_eq!(actual.profile, Some(EXPECTED));
         }
 
         #[test]

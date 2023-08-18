@@ -242,6 +242,42 @@ linker-args = ["-nologo"]
     package
 }
 
+/// Create a new cargo project/package for a project with a
+/// `[profile.{profile}]` section.
+///
+/// Following creation of the project, the manifest file (Cargo.toml) is
+/// modified to include a `[profile.{profile}]` section.
+///
+/// # Panics
+///
+/// This will panic if a temporary directory fails to be created or if cargo
+/// fails to create the project/package.
+///
+/// It will also panic if it cannot modify the manifest file (Cargo.toml) or the
+/// project layout for multiple binaries.
+pub fn create_test_package_profile(profile: &str) -> TempDir {
+    let package = create_test_package();
+    let package_manifest = package.child("Cargo.toml");
+    let mut cargo_toml_handle = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .open(package_manifest.path())
+        .unwrap();
+    cargo_toml_handle
+        .write_all(
+            format!(
+                r#"
+[profile.{profile}]
+inherits = "release"
+lto = "thin"
+"#
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+    package
+}
+
 /// Create a new cargo project/package for a project with multiple WXS files.
 ///
 /// # Panics

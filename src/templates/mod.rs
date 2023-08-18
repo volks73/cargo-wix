@@ -103,15 +103,15 @@ impl Template {
     ///
     /// assert_eq!(
     ///     Template::possible_values(),
-    ///     vec![
-    ///         "Apache-2.0",
-    ///         "apache-2.0",
-    ///         "GPL-3.0",
-    ///         "gpl-3.0",
-    ///         "MIT",
-    ///         "mit",
-    ///         "WXS",
-    ///         "wxs"
+    ///     &vec![
+    ///         "Apache-2.0".to_owned(),
+    ///         "apache-2.0".to_owned(),
+    ///         "GPL-3.0".to_owned(),
+    ///         "gpl-3.0".to_owned(),
+    ///         "MIT".to_owned(),
+    ///         "mit".to_owned(),
+    ///         "WXS".to_owned(),
+    ///         "wxs".to_owned()
     ///     ]
     /// );
     /// ```
@@ -129,9 +129,9 @@ impl Template {
     /// assert_eq!(
     ///     Template::license_ids(),
     ///     vec![
-    ///         "Apache-2.0",
-    ///         "GPL-3.0",
-    ///         "MIT",
+    ///         "Apache-2.0".to_owned(),
+    ///         "GPL-3.0".to_owned(),
+    ///         "MIT".to_owned(),
     ///     ]
     /// );
     /// ```

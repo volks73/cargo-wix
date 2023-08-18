@@ -131,6 +131,28 @@ fn debug_build_works() {
 
 #[test]
 #[serial]
+fn profile_build_works() {
+    init_logging();
+    const PROFILE: &str = "dist";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package_profile(PROFILE);
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{PACKAGE_NAME}-0.1.0-x86_64.msi"));
+    eprintln!("{}", expected_msi_file.display());
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = run(Builder::default().profile(Some(PROFILE)));
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+#[serial]
 fn debug_name_works() {
     init_logging();
     let original_working_directory = env::current_dir().unwrap();
@@ -1024,6 +1046,31 @@ fn cross_compilation_works() {
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
     let result = run(Builder::default().target(Some("x86_64-pc-windows-msvc")));
+    env::set_current_dir(original_working_directory).unwrap();
+    result.expect("OK result");
+    package
+        .child(TARGET_WIX_DIR.as_path())
+        .assert(predicate::path::exists());
+    package
+        .child(expected_msi_file)
+        .assert(predicate::path::exists());
+}
+
+#[test]
+#[serial]
+fn profile_cross_compilation_works() {
+    // Makes sure we handle customizing profile+target, in terms of target paths
+    init_logging();
+    const PROFILE: &str = "dist";
+    let original_working_directory = env::current_dir().unwrap();
+    let package = common::create_test_package_profile(PROFILE);
+    let expected_msi_file = TARGET_WIX_DIR.join(format!("{PACKAGE_NAME}-0.1.0-x86_64.msi"));
+    eprintln!("{}", expected_msi_file.display());
+    env::set_current_dir(package.path()).unwrap();
+    initialize::Execution::default().run().unwrap();
+    let result = run(Builder::default()
+        .profile(Some(PROFILE))
+        .target(Some("x86_64-pc-windows-msvc")));
     env::set_current_dir(original_working_directory).unwrap();
     result.expect("OK result");
     package
