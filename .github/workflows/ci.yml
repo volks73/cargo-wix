@@ -12,6 +12,16 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - run: cargo test --all-targets
+  docs:
+    runs-on: windows-latest
+    env:
+      RUSTDOCFLAGS: -Dwarnings
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rust-docs
+      - run: cargo doc --workspace --no-deps
   rustfmt:
     runs-on: windows-latest
     steps:

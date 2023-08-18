@@ -448,14 +448,24 @@ impl Execution {
         debug!("locale = {:?}", locale);
         let debug_build = self.debug_build(&metadata);
         debug!("debug_build = {:?}", debug_build);
-        let profile = if let Some(profile) = &self.profile {
+        // Figure out what profile we're building
+        let profile_name = if let Some(profile) = &self.profile {
             profile
         } else if debug_build {
-            "debug"
+            // The default "debug" build profile is called "dev" for whatever reason
+            "dev"
         } else {
             "release"
         };
-        debug!("profile = {:?}", profile);
+        // Figure out what subdir of target will contain our output
+        // Cargo specially maps the builtin profile names to "debug" or "release"
+        // in the target directory, but custom profiles get forwarded verbatim.
+        let profile_dir = match profile_name {
+            "dev" | "test" => "debug",
+            "release" | "bench" => "release",
+            p => p,
+        };
+        debug!("profile = {:?}", profile_name);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
@@ -487,9 +497,7 @@ impl Execution {
                 builder.stderr(Stdio::null());
             }
             builder.arg("build");
-            if !debug_build {
-                builder.arg("--release");
-            }
+            builder.arg(format!("--profile={profile_name}"));
             if self.target.is_some() {
                 builder.arg(format!("--target={target_triple}"));
             }
@@ -528,10 +536,10 @@ impl Execution {
         compiler
             .arg(format!("-dVersion={version}"))
             .arg(format!("-dPlatform={wix_arch}"))
-            .arg(format!("-dProfile={profile}"))
+            .arg(format!("-dProfile={profile_name}"))
             .arg(format!("-dTargetEnv={}", cfg.target_env))
             .arg(format!("-dTargetTriple={target_triple}"))
-            .arg(format!("-dCargoProfile={profile}"))
+            .arg(format!("-dCargoProfile={profile_name}"))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -543,7 +551,7 @@ impl Execution {
                 if let Some(target) = &self.target {
                     bin_path.push(target);
                 }
-                bin_path.push(profile);
+                bin_path.push(profile_dir);
                 s.push(&bin_path);
                 s
             })
@@ -1408,6 +1416,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.debug_build(true);
             assert!(actual.debug_build);
+        }
+
+        #[test]
+        fn profile_works() {
+            const EXPECTED: &str = "dist";
+            let mut actual = Builder::new();
+            actual.profile(Some(EXPECTED));
+            assert_eq!(actual.profile, Some(EXPECTED));
         }
 
         #[test]
