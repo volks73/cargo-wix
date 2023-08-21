@@ -41,7 +41,7 @@ version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ca84f3628370c59db74ee214b3263d58f9aadd9b4fe7e711fd87dc452b7f163"
 dependencies = [
- "anstyle 1.0.1",
+ "anstyle",
  "anstyle-parse",
  "anstyle-query",
  "anstyle-wincon",
@@ -49,12 +49,6 @@ dependencies = [
  "is-terminal",
  "utf8parse",
 ]
-
-[[package]]
-name = "anstyle"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23ea9e81bd02e310c216d080f6223c179012256e5151c41db88d12c88a1684d2"
 
 [[package]]
 name = "anstyle"
@@ -86,7 +80,7 @@ version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c677ab05e09154296dd37acecd46420c17b9713e8366facafa8fc0885167cf4c"
 dependencies = [
- "anstyle 1.0.1",
+ "anstyle",
  "windows-sys",
 ]
 
@@ -98,11 +92,11 @@ checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 
 [[package]]
 name = "assert_fs"
-version = "1.0.12"
+version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9d5bf7e5441c6393b5a9670a5036abe6b4847612f594b870f7332dbf10cf6fa"
+checksum = "f070617a68e5c2ed5d06ee8dd620ee18fb72b99f6c094bed34cf8ab07c875b48"
 dependencies = [
- "anstyle 0.3.5",
+ "anstyle",
  "doc-comment",
  "globwalk",
  "predicates 3.0.3",
@@ -277,7 +271,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c90dc0f0e42c64bff177ca9d7be6fcc9ddb0f26a6e062174a61c84dd6c644d4"
 dependencies = [
  "anstream",
- "anstyle 1.0.1",
+ "anstyle",
  "clap_lex",
  "strsim 0.10.0",
 ]
@@ -790,7 +784,7 @@ version = "3.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09963355b9f467184c04017ced4a2ba2d75cbcb4e7462690d388233253d4b1a9"
 dependencies = [
- "anstyle 1.0.1",
+ "anstyle",
  "difflib",
  "itertools",
  "predicates-core",
