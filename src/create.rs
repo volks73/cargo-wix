@@ -798,7 +798,7 @@ impl Execution {
     fn installer_destination(
         &self,
         name: &str,
-        version: &Version,
+        version: &str,
         cfg: &Cfg,
         debug_name: bool,
         installer_kind: &InstallerKind,
@@ -1128,9 +1128,30 @@ impl Execution {
         }
     }
 
-    fn version(&self, package: &Package) -> Result<Version> {
-        if let Some(ref v) = self.version {
-            Version::parse(v).map_err(Error::from)
+    /// Attempts to convert a Rust SemVer version to the format WiX desires.
+    ///
+    /// WiX only supports numbers in versions, with a format of "x.x.x.x"
+    /// WiX itself requires each component to be an integer from 0 to 65534 (inclusive).
+    /// However the first 3 parts are forwarded to Windows as a [ProductVersion][0],
+    /// which interprets them as "major.minor.build" and states:
+    ///
+    /// > The major version and has a maximum value of 255.
+    /// > The minor version and has a maximum value of 255.
+    /// > The build version or the update version and has a maximum value of 65,535.
+    ///
+    /// So we take the intersection of these requirements, and shove the rust "major.minor.patch"
+    /// format into it. This leaves the more freeform "prerelease" and "build" components of a
+    /// SemVer Version to get squeezed into the 4th value.
+    ///
+    /// The 4th value is seemingly just a bonus value that WiX keeps to itself, so it's not
+    /// terribly important that we get it perfect. We therefore attempt to heuritistically
+    /// parse out a numeric "prerelease version" based on common formats.
+    ///
+    /// [0]: https://learn.microsoft.com/en-us/windows/win32/msi/productversion
+    fn version(&self, package: &Package) -> Result<String> {
+        // Select the version
+        let version = if let Some(ref v) = self.version {
+            Version::parse(v).map_err(Error::from)?
         } else if let Some(pkg_meta_wix_version) = package
             .metadata
             .get("wix")
@@ -1138,9 +1159,77 @@ impl Execution {
             .and_then(|t| t.get("version"))
             .and_then(|v| v.as_str())
         {
-            Version::parse(pkg_meta_wix_version).map_err(Error::from)
+            Version::parse(pkg_meta_wix_version).map_err(Error::from)?
         } else {
-            Ok(package.version.clone())
+            package.version.clone()
+        };
+
+        // validate basic parts
+        if version.major > 255 {
+            return Err(Error::Generic(format!(
+                "The app's major version {} can't be greater than 255 for an msi",
+                version.major
+            )));
+        }
+        if version.minor > 255 {
+            return Err(Error::Generic(format!(
+                "The app's minor version {} can't be greater than 255 for an msi",
+                version.minor
+            )));
+        }
+        if version.patch > 65534 {
+            return Err(Error::Generic(format!(
+                "The app's patch version {} can't be greater than 65534 for an msi",
+                version.patch
+            )));
+        }
+
+        // Attempt to validate + convert the prerelease parts
+        let needs_prerelease_handling = !version.build.is_empty() || !version.pre.is_empty();
+        if needs_prerelease_handling {
+            // This mess is trying 3 approaches in sequence:
+            //
+            // * parse as if it's `1.2.3-4`
+            // * parse as if it's `1.2.3-prerelease.4`
+            // * parse as if it's `1.2.3-prerelease+4`
+            let bonus = version
+                .pre
+                .parse::<u64>()
+                .or_else(|e| {
+                    if let Some((_, dotted)) = version.pre.split_once('.') {
+                        dotted.parse::<u64>()
+                    } else {
+                        Err(e)
+                    }
+                })
+                .or_else(|_| version.build.parse::<u64>());
+
+            let bonus = if let Ok(bonus) = bonus {
+                bonus
+            } else {
+                return Err(Error::Generic(format!(
+                    "The app's version {} is a prerelease, but we couldn't convert the prerelease \
+                     components to an integer. We recommend a format like 1.2.3-prerelease.4, \
+                     as we can map it to the 1.2.3.4 format that works for an msi.",
+                    version,
+                )));
+            };
+            if bonus > 65534 {
+                return Err(Error::Generic(format!(
+                    "The app's prerelease version {} can't be greater than 65534 for an msi",
+                    bonus
+                )));
+            }
+
+            Ok(format!(
+                "{}.{}.{}.{}",
+                version.major, version.minor, version.patch, bonus
+            ))
+        } else {
+            Ok(format!(
+                "{}.{}.{}",
+                version.major, version.minor, version.patch
+            ))
         }
     }
 }
@@ -1633,7 +1722,73 @@ mod tests {
             let version = execution
                 .version(&serde_json::from_str(PKG_META_WIX).unwrap())
                 .unwrap();
-            assert_eq!(version, Version::parse("2.1.0").unwrap());
+            assert_eq!(version, "2.1.0");
+        }
+
+        #[test]
+        fn version_prerelease_parse_works() {
+            const PKG_META_WIX: &str = r#"
+            {
+                "name": "Example",
+                "version": "2.1.0-5",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "Apache-2.0",
+
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": ""
+            }"#;
+            let execution = Execution::default();
+            let version = execution
+                .version(&serde_json::from_str(PKG_META_WIX).unwrap())
+                .unwrap();
+            assert_eq!(version, "2.1.0.5");
+        }
+
+        #[test]
+        fn version_prerelease_dot_parse_works() {
+            const PKG_META_WIX: &str = r#"
+            {
+                "name": "Example",
+                "version": "2.1.0-prerelease.5",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "Apache-2.0",
+
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": ""
+            }"#;
+            let execution = Execution::default();
+            let version = execution
+                .version(&serde_json::from_str(PKG_META_WIX).unwrap())
+                .unwrap();
+            assert_eq!(version, "2.1.0.5");
+        }
+
+        #[test]
+        fn version_build_parse_works() {
+            const PKG_META_WIX: &str = r#"
+            {
+                "name": "Example",
+                "version": "2.1.0-prerelease+5",
+                "authors": ["First Last <first.last@example.com>"],
+                "license": "Apache-2.0",
+
+                "id": "",
+                "dependencies": [],
+                "targets": [],
+                "features": {},
+                "manifest_path": ""
+            }"#;
+            let execution = Execution::default();
+            let version = execution
+                .version(&serde_json::from_str(PKG_META_WIX).unwrap())
+                .unwrap();
+            assert_eq!(version, "2.1.0.5");
         }
 
         #[test]
@@ -1720,7 +1875,7 @@ mod tests {
             let execution = Execution::default();
             let output = execution.installer_destination(
                 "Different",
-                &"2.1.0".parse::<Version>().unwrap(),
+                "2.1.0",
                 &Cfg::of("x86_64-pc-windows-msvc").unwrap(),
                 false,
                 &InstallerKind::default(),
