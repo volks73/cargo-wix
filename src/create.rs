@@ -73,6 +73,7 @@ pub struct Builder<'a> {
     locale: Option<&'a str>,
     name: Option<&'a str>,
     no_build: bool,
+    target_bin_dir: Option<&'a str>,
     install: bool,
     output: Option<&'a str>,
     package: Option<&'a str>,
@@ -98,6 +99,7 @@ impl<'a> Builder<'a> {
             name: None,
             no_build: false,
             install: false,
+            target_bin_dir: None,
             output: None,
             package: None,
             target: None,
@@ -267,6 +269,16 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Specifies that binaries should be sourced from the given directory.
+    ///
+    /// Specifically this sets `CargoTargetBinDir` in wxs templates. It is
+    /// intended to be combined with `no_build(true)` to let another tool
+    /// orchestrate cargo-wix and handle the builds for it.
+    pub fn target_bin_dir(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.target_bin_dir = p;
+        self
+    }
+
     /// Runs the installer after creating it.
     ///
     /// If `true`, the MSI installer will be created and then launched. This will
@@ -359,6 +371,7 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
+            target_bin_dir: self.target_bin_dir.map(PathBuf::from),
             install: self.install,
             output: self.output.map(String::from),
             package: self.package.map(String::from),
@@ -391,6 +404,7 @@ pub struct Execution {
     debug_name: bool,
     includes: Option<Vec<PathBuf>>,
     input: Option<PathBuf>,
+    target_bin_dir: Option<PathBuf>,
     linker_args: Option<Vec<String>>,
     locale: Option<PathBuf>,
     name: Option<String>,
@@ -419,6 +433,7 @@ impl Execution {
         debug!("self.locale = {:?}", self.locale);
         debug!("self.name = {:?}", self.name);
         debug!("self.no_build = {:?}", self.no_build);
+        debug!("self.target_bin_dir = {:?}", self.target_bin_dir);
         debug!("self.install = {:?}", self.install);
         debug!("self.output = {:?}", self.output);
         debug!("self.package = {:?}", self.package);
@@ -434,8 +449,8 @@ impl Execution {
         debug!("metadata = {:?}", metadata);
         let name = self.name(&package);
         debug!("name = {:?}", name);
-        let target_triple = self.target()?;
-        debug!("target_triple = {:?}", target_triple);
+        let target = self.target()?;
+        debug!("target = {:?}", target);
         let version = self.version(&package)?;
         debug!("version = {:?}", version);
         let compiler_args = self.compiler_args(&metadata);
@@ -446,26 +461,8 @@ impl Execution {
         debug!("linker_args = {:?}", linker_args);
         let locale = self.locale(&metadata)?;
         debug!("locale = {:?}", locale);
-        let debug_build = self.debug_build(&metadata);
-        debug!("debug_build = {:?}", debug_build);
-        // Figure out what profile we're building
-        let profile_name = if let Some(profile) = &self.profile {
-            profile
-        } else if debug_build {
-            // The default "debug" build profile is called "dev" for whatever reason
-            "dev"
-        } else {
-            "release"
-        };
-        // Figure out what subdir of target will contain our output
-        // Cargo specially maps the builtin profile names to "debug" or "release"
-        // in the target directory, but custom profiles get forwarded verbatim.
-        let profile_dir = match profile_name {
-            "dev" | "test" => "debug",
-            "release" | "bench" => "release",
-            p => p,
-        };
-        debug!("profile = {:?}", profile_name);
+        let profile = self.profile(&metadata);
+        debug!("profile = {:?}", profile);
         let debug_name = self.debug_name(&metadata);
         debug!("debug_name = {:?}", debug_name);
         let wxs_sources = self.wxs_sources(&package)?;
@@ -474,15 +471,20 @@ impl Execution {
         debug!("wixobj_destination = {:?}", wixobj_destination);
         let no_build = self.no_build(&metadata);
         debug!("no_build = {:?}", no_build);
-        let cfg = Cfg::of(&target_triple).map_err(|e| Error::Generic(e.to_string()))?;
+        let target_bin_dir =
+            self.target_bin_dir(manifest.target_directory.as_std_path(), &target, &profile);
+        debug!("target_bin_dir = {:?}", target_bin_dir);
+        let cfg = Cfg::of(&target.triple).map_err(|e| Error::Generic(e.to_string()))?;
         let wix_arch = WixArch::try_from(&cfg)?;
         debug!("wix_arch = {:?}", wix_arch);
 
         if no_build {
-            warn!("Skipped building the binary");
+            // Only warn if the user isn't clearly trying to be in charge of builds
+            if self.target_bin_dir.is_none() {
+                warn!("Skipped building the binary");
+            }
         } else {
-            // Build the binary with the release profile. If a release binary
-            // has already been built, then this will essentially do nothing.
+            // Build the binary, if a binary been built, then this will essentially do nothing.
             info!("Building the binary");
             let mut builder = Command::new(
                 env::var("CARGO")
@@ -497,9 +499,9 @@ impl Execution {
                 builder.stderr(Stdio::null());
             }
             builder.arg("build");
-            builder.arg(format!("--profile={profile_name}"));
-            if self.target.is_some() {
-                builder.arg(format!("--target={target_triple}"));
+            builder.arg(format!("--profile={}", profile.name));
+            if let Some(target) = &target.arg {
+                builder.arg(format!("--target={target}"));
             }
             if let Some(ref package) = self.package {
                 builder.arg(format!("--package={package}"));
@@ -536,10 +538,10 @@ impl Execution {
         compiler
             .arg(format!("-dVersion={version}"))
             .arg(format!("-dPlatform={wix_arch}"))
-            .arg(format!("-dProfile={profile_name}"))
+            .arg(format!("-dProfile={}", profile.name))
             .arg(format!("-dTargetEnv={}", cfg.target_env))
-            .arg(format!("-dTargetTriple={target_triple}"))
-            .arg(format!("-dCargoProfile={profile_name}"))
+            .arg(format!("-dTargetTriple={}", target.triple))
+            .arg(format!("-dCargoProfile={}", profile.name))
             .arg({
                 let mut s = OsString::from("-dCargoTargetDir=");
                 s.push(&manifest.target_directory);
@@ -547,12 +549,7 @@ impl Execution {
             })
             .arg({
                 let mut s = OsString::from("-dCargoTargetBinDir=");
-                let mut bin_path = manifest.target_directory.clone();
-                if let Some(target) = &self.target {
-                    bin_path.push(target);
-                }
-                bin_path.push(profile_dir);
-                s.push(&bin_path);
+                s.push(&target_bin_dir);
                 s
             })
             .arg("-o")
@@ -794,6 +791,45 @@ impl Execution {
         }
     }
 
+    /// Get the name of the cargo build profile
+    ///
+    /// If `profile` is set, prefer that.
+    /// Otherwise use `debug_build` to choose if we're debug or release.
+    fn profile_name(&self, metadata: &Value) -> String {
+        if let Some(profile) = self.profile.clone() {
+            profile
+        } else if let Some(pkg_meta_wix_profile) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("profile"))
+            .and_then(|c| c.as_str())
+        {
+            pkg_meta_wix_profile.to_owned()
+        } else if self.debug_build(metadata) {
+            // The default "debug" build profile is called "dev" for whatever reason
+            "dev".to_owned()
+        } else {
+            "release".to_owned()
+        }
+    }
+
+    /// Gets the name and dir of the cargo build profile
+    fn profile(&self, metadata: &Value) -> Profile {
+        let name = self.profile_name(metadata);
+
+        // Figure out what subdir of target will contain our output
+        // Cargo specially maps the builtin profile names to "debug" or "release"
+        // in the target directory, but custom profiles get forwarded verbatim.
+        let dir = match &*name {
+            "dev" | "test" => "debug",
+            "release" | "bench" => "release",
+            p => p,
+        }
+        .to_owned();
+
+        Profile { name, dir }
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn installer_destination(
         &self,
@@ -972,14 +1008,41 @@ impl Execution {
         }
     }
 
+    /// Get the value of CargoTargetBinDir
+    ///
+    /// If it's explicitly set, just use that.
+    /// Otherwise compute it from the various relevant settings of a build.
+    fn target_bin_dir(
+        &self,
+        target_directory: &Path,
+        target: &Target,
+        profile: &Profile,
+    ) -> PathBuf {
+        // Setting this via [package.metadata.wix] explicitly unsupported to avoid footguns
+        if let Some(target_bin_dir) = &self.target_bin_dir {
+            target_bin_dir.clone()
+        } else {
+            let mut bin_path = target_directory.to_owned();
+            // Cargo only adds the target to the path if it's explicitly passed via --target
+            if let Some(target) = &target.arg {
+                bin_path.push(target);
+            }
+            bin_path.push(&profile.dir);
+            bin_path
+        }
+    }
+
     // TODO: Change to use --unit-graph feature of cargo once stable. See #124.
     //
     // This does not support default-target. Ideally we would use cargo
     // --unit-graph to figure this out without having to second-guess the
     // compiler. Unfortunately, cargo --unit-graph is unstable.
-    fn target(&self) -> Result<String> {
-        if let Some(ref t) = self.target {
-            Ok(t.to_owned())
+    fn target(&self) -> Result<Target> {
+        if let Some(t) = &self.target {
+            Ok(Target {
+                triple: t.clone(),
+                arg: Some(t.clone()),
+            })
         } else {
             let output = Command::new("rustc")
                 .args(["--version", "--verbose"])
@@ -996,7 +1059,10 @@ impl Execution {
                                 .to_string(),
                         )
                     });
-                    return Ok(s?.trim().to_string());
+                    return Ok(Target {
+                        triple: s?.trim().to_string(),
+                        arg: None,
+                    });
                 }
             }
             Err(Error::Generic(
@@ -1427,6 +1493,24 @@ impl TryFrom<Vec<WixObjKind>> for InstallerKind {
     }
 }
 
+/// Details of the cargo build profile
+#[derive(Debug, Clone)]
+pub struct Profile {
+    /// The name of the profile to pass to `--profile=...`
+    name: String,
+    /// The name of the subdirectory of the cargo target dir that the profile will get
+    dir: String,
+}
+
+/// Details of the cargo build target
+#[derive(Debug, Clone)]
+pub struct Target {
+    /// The name of the target triple being built
+    triple: String,
+    /// If an explicit --target flag is being passed to Cargo, this is it
+    arg: Option<String>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1459,6 +1543,14 @@ mod tests {
             let mut actual = Builder::new();
             actual.bin_path(Some(EXPECTED));
             assert_eq!(actual.bin_path, Some(EXPECTED));
+        }
+
+        #[test]
+        fn target_bin_dir_works() {
+            const EXPECTED: &str = "target\\special\\build\\";
+            let mut actual = Builder::new();
+            actual.target_bin_dir(Some(EXPECTED));
+            assert_eq!(actual.target_bin_dir, Some(EXPECTED));
         }
 
         #[test]
@@ -1674,6 +1766,17 @@ mod tests {
         use super::*;
 
         #[test]
+        fn default_profile_works() {
+            const PKG_META_WIX: &str = r#"{
+                "wix": { }
+            }"#;
+            let execution = Execution::default();
+            let profile = execution.profile(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(profile.name, "release");
+            assert_eq!(profile.dir, "release");
+        }
+
+        #[test]
         fn debug_build_metadata_works() {
             const PKG_META_WIX: &str = r#"{
                 "wix": {
@@ -1681,8 +1784,9 @@ mod tests {
                 }
             }"#;
             let execution = Execution::default();
-            let debug_build = execution.debug_build(&PKG_META_WIX.parse::<Value>().unwrap());
-            assert!(debug_build);
+            let profile = execution.profile(&PKG_META_WIX.parse::<Value>().unwrap());
+            assert_eq!(profile.name, "dev");
+            assert_eq!(profile.dir, "debug");
         }
 
         #[test]
@@ -1723,6 +1827,19 @@ mod tests {
                 .version(&serde_json::from_str(PKG_META_WIX).unwrap())
                 .unwrap();
             assert_eq!(version, "2.1.0");
+        }
+
+        #[test]
+        fn profile_metadata_works() {
+            const PKG_META_WIX: &str = r#" {
+                "wix": {
+                    "profile": "dist"
+                }
+            }"#;
+            let execution = Execution::default();
+            let profile = execution.profile(&serde_json::from_str(PKG_META_WIX).unwrap());
+            assert_eq!(profile.name, "dist");
+            assert_eq!(profile.dir, "dist");
         }
 
         #[test]
@@ -1994,6 +2111,37 @@ mod tests {
             let execution = Execution::default();
             let no_build = execution.no_build(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap());
             assert!(!no_build);
+        }
+
+        #[test]
+        fn target_bin_dir_overwrite_works() {
+            const EXPECTED: &str = "C:\\my-app\\fancy\\build";
+            let mut builder = Builder::new();
+            builder.target_bin_dir(Some(EXPECTED));
+
+            let execution = builder.build();
+            let target_directory = PathBuf::from("C:\\my-app\\target");
+            let target = execution.target().unwrap();
+            let profile = execution.profile(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap());
+
+            let target_bin_dir = execution.target_bin_dir(&target_directory, &target, &profile);
+            assert_eq!(target_bin_dir, PathBuf::from(EXPECTED));
+        }
+
+        #[test]
+        fn target_bin_dir_computation_works() {
+            const EXPECTED: &str = "C:\\my-app\\target\\i686-pc-windows-msvc\\release";
+            let mut builder = Builder::new();
+            builder.target(Some("i686-pc-windows-msvc"));
+            builder.profile(Some("bench"));
+            let target_directory = PathBuf::from("C:\\my-app\\target");
+
+            let execution = builder.build();
+            let target = execution.target().unwrap();
+            let profile = execution.profile(&EMPTY_PKG_META_WIX.parse::<Value>().unwrap());
+
+            let target_bin_dir = execution.target_bin_dir(&target_directory, &target, &profile);
+            assert_eq!(target_bin_dir, PathBuf::from(EXPECTED));
         }
 
         #[test]

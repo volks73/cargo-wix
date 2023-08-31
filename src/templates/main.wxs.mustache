@@ -26,20 +26,19 @@
                       installed.
   TargetVendor      = The rustc target vendor. This is typically "pc", but Rust
                       does support other vendors, like "uwp".
-  CargoTargetBinDir = The complete path to the binary (exe). The default would
-                      be "target\release\<BINARY_NAME>.exe" where
-                      "<BINARY_NAME>" is replaced with the name of each binary
-                      target defined in the package's manifest (Cargo.toml). If
-                      a different rustc target triple is used than the host,
-                      i.e. cross-compiling, then the default path would be
-                      "target\<CARGO_TARGET>\<CARGO_PROFILE>\<BINARY_NAME>.exe",
+  CargoTargetBinDir = The complete path to the directory containing the
+                      binaries (exes) to include. The default would be
+                      "target\release\". If an explicit rustc target triple is
+                      used, i.e. cross-compiling, then the default path would
+                      be "target\<CARGO_TARGET>\<CARGO_PROFILE>",
                       where "<CARGO_TARGET>" is replaced with the "CargoTarget"
                       variable value and "<CARGO_PROFILE>" is replaced with the
-                      value from the `CargoProfile` variable.
+                      value from the "CargoProfile" variable. This can also
+                      be overriden manually with tne "target-bin-dir" flag.
   CargoTargetDir    = The path to the directory for the build artifacts, i.e.
                       "target".
-  CargoProfile      = Either "debug" or `release` depending on the build
-                      profile. The default is "release".
+  CargoProfile      = The cargo profile used to build the binaries
+                      (usually "debug" or "release").
   Version           = The version for the installer. The default is the
                       "Major.Minor.Fix" semantic versioning number of the Rust
                       package.

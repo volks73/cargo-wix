@@ -1623,6 +1623,12 @@ fn main() {
                         --release' is not executed.")
                     .long("no-build")
                     .action(ArgAction::SetTrue))
+                .arg(Arg::new("target-bin-dir")
+                    .help("A path to the directory of binaries to include in the installer")
+                    .long_help("Sets the CargoTargetBinDir variable that will be substituted \
+                        into main.wxs. Use in conjunction with --no-build to fully handle builds.")
+                    .long("target-bin-dir")
+                    .num_args(1))
                 .arg(Arg::new("no-capture")
                     .help("Displays all output from the builder, compiler, linker, and signer")
                     .long_help("By default, this subcommand captures, or hides, \
@@ -1945,6 +1951,7 @@ fn main() {
             create.locale(matches.get_one("locale").map(String::as_str));
             create.name(matches.get_one("name").map(String::as_str));
             create.no_build(matches.get_flag("no-build"));
+            create.target_bin_dir(matches.get_one("target-bin-dir").map(String::as_str));
             create.install(matches.get_flag("install"));
             create.output(matches.get_one("output").map(String::as_str));
             create.version(matches.get_one("install-version").map(String::as_str));
