@@ -1871,7 +1871,11 @@ fn main() {
             init.build().run()
         }
         Some(("print", m)) => {
-            let template = m.get_one::<Template>("TEMPLATE").unwrap();
+            let template = m
+                .get_one::<String>("TEMPLATE")
+                .unwrap()
+                .parse::<Template>()
+                .unwrap();
             match template {
                 Template::Wxs => {
                     let mut print = print::wxs::Builder::new();
@@ -1902,7 +1906,7 @@ fn main() {
                     print.input(m.get_one("INPUT").map(String::as_str));
                     print.output(m.get_one("output").map(String::as_str));
                     print.package(m.get_one("package").map(String::as_str));
-                    print.build().run(t)
+                    print.build().run(&t)
                 }
             }
         }
