@@ -28,6 +28,7 @@ use crate::RTF_FILE_EXTENSION;
 
 use log::{debug, trace, warn};
 
+use mustache::Data;
 use mustache::{self, MapBuilder};
 
 use std::path::{Path, PathBuf};
@@ -336,9 +337,26 @@ pub struct Execution {
 }
 
 impl Execution {
-    #[allow(clippy::cognitive_complexity)]
     /// Prints a WiX Source (wxs) file based on the built context.
     pub fn run(self) -> Result<()> {
+        let template = mustache::compile_str(Template::Wxs.to_str())?;
+        let mut destination = super::destination(self.output.as_ref())?;
+        let data = self.build_data()?;
+        template
+            .render_data(&mut destination, &data)
+            .map_err(Error::from)
+    }
+
+    /// Instead of printing the output like [`Execution::run`][], return it as a String
+    pub fn render_to_string(self) -> Result<String> {
+        let template = mustache::compile_str(Template::Wxs.to_str())?;
+        let data = self.build_data()?;
+        template.render_data_to_string(&data).map_err(Error::from)
+    }
+
+    /// Inner implementation of [`Execution::run`][] which computes all the template inputs
+    #[allow(clippy::cognitive_complexity)]
+    fn build_data(self) -> Result<Data> {
         debug!("banner = {:?}", self.banner);
         debug!("binaries = {:?}", self.binaries);
         debug!("description = {:?}", self.description);
@@ -356,8 +374,6 @@ impl Execution {
         debug!("upgrade_guid = {:?}", self.upgrade_guid);
         let manifest = manifest(self.input.as_ref())?;
         let package = package(&manifest, self.package.as_deref())?;
-        let mut destination = super::destination(self.output.as_ref())?;
-        let template = mustache::compile_str(Template::Wxs.to_str())?;
         let binaries = self.binaries(&package)?;
         let mut map = MapBuilder::new()
             .insert_vec("binaries", |mut builder| {
@@ -431,10 +447,8 @@ impl Execution {
         if let Some(icon) = self.product_icon {
             map = map.insert_str("product-icon", icon.display().to_string());
         }
-        let data = map.build();
-        template
-            .render_data(&mut destination, &data)
-            .map_err(Error::from)
+
+        Ok(map.build())
     }
 
     fn binaries(&self, package: &Package) -> Result<Vec<HashMap<&'static str, String>>> {
