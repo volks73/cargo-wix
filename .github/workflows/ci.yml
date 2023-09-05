@@ -1,11 +1,11 @@
 name: CI
-on: [ push, pull_request ]
+on: [push, pull_request]
 jobs:
   test:
     runs-on: windows-latest
     strategy:
       matrix:
-        rust: [stable, 1.64.0]
+        rust: [stable, 1.70.0]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
