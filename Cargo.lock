@@ -176,7 +176,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-wix"
-version = "0.3.4"
+version = "0.3.5"
 dependencies = [
  "assert_fs",
  "cargo_metadata",
