@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["InstallerKind","WixObjKind"],"struct":["Builder","Execution","Profile","Target"]};
