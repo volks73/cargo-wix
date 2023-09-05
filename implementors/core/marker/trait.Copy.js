@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["wix"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.64.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"wix/enum.Template.html\" title=\"enum wix::Template\">Template</a>","synthetic":false,"types":["wix::templates::Template"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
