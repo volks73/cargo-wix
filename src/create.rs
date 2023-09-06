@@ -2129,6 +2129,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(windows)]
         fn target_bin_dir_computation_works() {
             const EXPECTED: &str = "C:\\my-app\\target\\i686-pc-windows-msvc\\release";
             let mut builder = Builder::new();
@@ -2145,6 +2146,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(windows)]
         fn compiler_is_correct_with_defaults() {
             let expected = Command::new(
                 env::var_os(WIX_PATH_KEY)

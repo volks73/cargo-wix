@@ -32,8 +32,8 @@ use toml::{Table, Value};
 
 use wix::initialize::{Builder, Execution};
 use wix::{
-    CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
-    WIX_SOURCE_FILE_NAME,
+    StoredPathBuf, CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX,
+    WIX_SOURCE_FILE_EXTENSION, WIX_SOURCE_FILE_NAME,
 };
 
 use crate::common::{add_license_to_package, init_logging, SUBPACKAGE1_NAME, SUBPACKAGE2_NAME};
@@ -414,14 +414,18 @@ fn mit_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Source"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
 }
 
@@ -480,14 +484,18 @@ fn apache2_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Source"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
 }
 
@@ -546,14 +554,18 @@ fn gpl3_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Source"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
         ),
-        LICENSE_RTF_PATH.display().to_string()
+        StoredPathBuf::from_std_path(LICENSE_RTF_PATH.as_path())
+            .unwrap()
+            .to_string()
     );
 }
 
@@ -607,14 +619,18 @@ fn license_file_field_with_rtf_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Source"
         ),
-        package_license.path().to_str().unwrap()
+        StoredPathBuf::from_std_path(package_license.path())
+            .unwrap()
+            .to_string()
     );
     assert_eq!(
         common::evaluate_xpath(
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:WixVariable[@Id='WixUILicenseRtf']/@Value"
         ),
-        package_license.path().to_str().unwrap()
+        StoredPathBuf::from_std_path(package_license.path())
+            .unwrap()
+            .to_string()
     );
 }
 
@@ -668,7 +684,9 @@ fn license_file_field_with_txt_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Source"
         ),
-        package_license.path().to_str().unwrap()
+        StoredPathBuf::from_std_path(package_license.path())
+            .unwrap()
+            .to_string()
     );
 }
 
