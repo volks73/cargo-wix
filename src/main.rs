@@ -1443,6 +1443,7 @@ fn main() {
                     .version(PKG_VERSION)
                     .about("Deletes the 'target\\wix' folder")
                     .long_about("Deletes the 'target\\wix' folder if it exists.")
+                    .arg(verbose.clone())
                     .arg(Arg::new("INPUT")
                          .help("A path to a package's manifest (Cargo.toml)")
                          .long_help("The 'target\\wix' folder that exists \
