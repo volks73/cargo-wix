@@ -169,7 +169,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-wix"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "assert_fs",
  "camino",
