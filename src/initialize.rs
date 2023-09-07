@@ -22,12 +22,14 @@
 //! exists for the project, the `init` command does not need to be executed
 //! again.
 
+use camino::Utf8PathBuf;
 use cargo_metadata::Package;
 
 use crate::eula::Eula;
 use crate::print;
 use crate::Error;
 use crate::Result;
+use crate::StoredPathBuf;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
 use crate::WIX;
@@ -370,25 +372,25 @@ impl<'a> Builder<'a> {
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
         Execution {
-            banner: self.banner.map(PathBuf::from),
+            banner: self.banner.map(StoredPathBuf::from),
             binaries: self
                 .binaries
                 .as_ref()
-                .map(|b| b.iter().map(PathBuf::from).collect()),
+                .map(|b| b.iter().copied().map(StoredPathBuf::from).collect()),
             copyright_year: self.copyright_year.map(String::from),
             copyright_holder: self.copyright_holder.map(String::from),
             description: self.description.map(String::from),
-            dialog: self.dialog.map(PathBuf::from),
-            eula: self.eula.map(PathBuf::from),
+            dialog: self.dialog.map(StoredPathBuf::from),
+            eula: self.eula.map(StoredPathBuf::from),
             force: self.force,
             help_url: self.help_url.map(String::from),
             input: self.input.map(PathBuf::from),
-            license: self.license.map(PathBuf::from),
+            license: self.license.map(StoredPathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
             output: self.output.map(PathBuf::from),
             package: self.package.map(String::from),
             path_guid: self.path_guid.map(String::from),
-            product_icon: self.product_icon.map(PathBuf::from),
+            product_icon: self.product_icon.map(StoredPathBuf::from),
             product_name: self.product_name.map(String::from),
             upgrade_guid: self.upgrade_guid.map(String::from),
         }
@@ -404,22 +406,22 @@ impl<'a> Default for Builder<'a> {
 /// A context for creating the necessary files to eventually build an installer.
 #[derive(Debug)]
 pub struct Execution {
-    banner: Option<PathBuf>,
-    binaries: Option<Vec<PathBuf>>,
+    banner: Option<StoredPathBuf>,
+    binaries: Option<Vec<StoredPathBuf>>,
     copyright_holder: Option<String>,
     copyright_year: Option<String>,
     description: Option<String>,
-    dialog: Option<PathBuf>,
-    eula: Option<PathBuf>,
+    dialog: Option<StoredPathBuf>,
+    eula: Option<StoredPathBuf>,
     force: bool,
     help_url: Option<String>,
     input: Option<PathBuf>,
-    license: Option<PathBuf>,
+    license: Option<StoredPathBuf>,
     manufacturer: Option<String>,
     output: Option<PathBuf>,
     package: Option<String>,
     path_guid: Option<String>,
-    product_icon: Option<PathBuf>,
+    product_icon: Option<StoredPathBuf>,
     product_name: Option<String>,
     upgrade_guid: Option<String>,
 }
@@ -451,10 +453,10 @@ impl Execution {
         let mut destination = self.destination(&package);
         debug!("destination = {:?}", destination);
         if !destination.exists() {
-            info!("Creating the '{}' directory", destination.display());
+            info!("Creating the '{}' directory", destination);
             fs::create_dir(&destination)?;
         }
-        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_ref(), &package)? {
+        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_deref(), &package)? {
             Eula::CommandLine(path) => (Some(path), self.license),
             Eula::Manifest(path) => (Some(path), self.license),
             Eula::Generate(template) => {
@@ -469,7 +471,7 @@ impl Execution {
                         .copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
                     eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
                     eula_printer.input(self.input.as_deref().and_then(Path::to_str));
-                    eula_printer.output(destination.as_path().to_str());
+                    eula_printer.output(Some(destination.as_str()));
                     eula_printer.package(self.package.as_deref());
                     eula_printer.build().run(&template)?;
                 }
@@ -479,7 +481,8 @@ impl Execution {
                     .to_owned();
                 relative.push(LICENSE_FILE_NAME);
                 relative.set_extension(RTF_FILE_EXTENSION);
-                (Some(relative.clone()), Some(relative))
+                let stored_relative = StoredPathBuf::from_utf8_path(&relative);
+                (Some(stored_relative.clone()), Some(stored_relative))
             }
             Eula::Disabled => (None, self.license),
         };
@@ -489,26 +492,25 @@ impl Execution {
         if destination.exists() && !self.force {
             return Err(Error::already_exists(&destination));
         } else {
-            info!("Creating the '{}' file", destination.display());
+            info!("Creating the '{}' file", destination);
             let mut wxs_printer = print::wxs::Builder::new();
-            wxs_printer.banner(self.banner.as_deref().and_then(Path::to_str));
-            wxs_printer.binaries(self.binaries.as_ref().map(|b| {
-                b.iter()
-                    .map(PathBuf::as_path)
-                    .map(|p| p.to_str().unwrap())
-                    .collect()
-            }));
+            wxs_printer.banner(self.banner.as_ref().map(|s| s.as_str()));
+            wxs_printer.binaries(
+                self.binaries
+                    .as_ref()
+                    .map(|b| b.iter().map(|s| s.as_str()).collect()),
+            );
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
-            wxs_printer.dialog(self.dialog.as_deref().and_then(Path::to_str));
-            wxs_printer.eula(eula_wxs_path.as_deref().and_then(Path::to_str));
+            wxs_printer.dialog(self.dialog.as_deref().map(|s| s.as_str()));
+            wxs_printer.eula(eula_wxs_path.as_deref().map(|s| s.as_str()));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(self.input.as_deref().and_then(Path::to_str));
-            wxs_printer.license(license_wxs_path.as_deref().and_then(Path::to_str));
+            wxs_printer.license(license_wxs_path.as_ref().map(|s| s.as_str()));
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
-            wxs_printer.output(destination.as_path().to_str());
+            wxs_printer.output(Some(destination.as_str()));
             wxs_printer.package(self.package.as_deref());
             wxs_printer.path_guid(self.path_guid.as_ref().map(String::as_ref));
-            wxs_printer.product_icon(self.product_icon.as_deref().and_then(Path::to_str));
+            wxs_printer.product_icon(self.product_icon.as_ref().map(|s| s.as_str()));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(self.upgrade_guid.as_ref().map(String::as_ref));
             wxs_printer.build().run()?;
@@ -516,15 +518,14 @@ impl Execution {
         Ok(())
     }
 
-    fn destination(&self, package: &Package) -> PathBuf {
-        if let Some(ref output) = self.output {
+    fn destination(&self, package: &Package) -> Utf8PathBuf {
+        if let Some(output) = &self.output {
             trace!("An output path has been explicitly specified");
-            output.to_owned()
+            Utf8PathBuf::from_path_buf(output.to_owned()).unwrap()
         } else {
             trace!("An output path has NOT been explicitly specified. Implicitly determine output from manifest location.");
             package
                 .manifest_path
-                .as_std_path()
                 .parent()
                 .map(|p| p.to_path_buf())
                 .map(|mut p| {
@@ -760,7 +761,8 @@ mod tests {
             let execution = b.build();
             assert_eq!(
                 execution.binaries,
-                Some(vec![EXPECTED_BINARY]).map(|s| s.iter().map(PathBuf::from).collect())
+                Some(vec![EXPECTED_BINARY])
+                    .map(|s| s.into_iter().map(StoredPathBuf::from).collect())
             );
             assert_eq!(
                 execution.copyright_year,
@@ -774,11 +776,14 @@ mod tests {
                 execution.description,
                 Some(EXPECTED_DESCRIPTION).map(String::from)
             );
-            assert_eq!(execution.eula, Some(EXPECTED_EULA).map(PathBuf::from));
+            assert_eq!(execution.eula, Some(EXPECTED_EULA).map(StoredPathBuf::from));
             assert!(execution.force);
             assert_eq!(execution.help_url, Some(EXPECTED_URL).map(String::from));
             assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
-            assert_eq!(execution.license, Some(EXPECTED_LICENSE).map(PathBuf::from));
+            assert_eq!(
+                execution.license,
+                Some(EXPECTED_LICENSE).map(StoredPathBuf::from)
+            );
             assert_eq!(
                 execution.manufacturer,
                 Some(EXPECTED_MANUFACTURER).map(String::from)
@@ -787,7 +792,7 @@ mod tests {
             assert_eq!(execution.path_guid, Some(PATH_GUID).map(String::from));
             assert_eq!(
                 execution.product_icon,
-                Some(EXPECTED_PRODUCT_ICON).map(PathBuf::from)
+                Some(EXPECTED_PRODUCT_ICON).map(StoredPathBuf::from)
             );
             assert_eq!(
                 execution.product_name,
@@ -797,10 +802,12 @@ mod tests {
         }
     }
 
+    #[cfg(windows)]
     mod execution {
         extern crate assert_fs;
 
         use super::*;
+        use serial_test::serial;
         use std::env;
 
         const MIN_PACKAGE: &str = r#"[package]
@@ -809,6 +816,7 @@ mod tests {
         "#;
 
         #[test]
+        #[serial]
         fn destination_is_correct_with_defaults() {
             let original = env::current_dir().unwrap();
             let temp_dir = crate::tests::setup_project(MIN_PACKAGE);
@@ -827,6 +835,7 @@ mod tests {
         }
 
         #[test]
+        #[serial]
         fn destination_is_correct_with_output() {
             let expected = PathBuf::from("output");
             let temp_dir = crate::tests::setup_project(MIN_PACKAGE);

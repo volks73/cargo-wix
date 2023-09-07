@@ -21,6 +21,7 @@ use crate::package;
 use crate::product_name;
 use crate::Error;
 use crate::Result;
+use crate::StoredPathBuf;
 use crate::Template;
 use crate::EXE_FILE_EXTENSION;
 use crate::LICENSE_FILE_NAME;
@@ -31,7 +32,6 @@ use log::{debug, trace, warn};
 use mustache::Data;
 use mustache::{self, MapBuilder};
 
-use std::path::{Path, PathBuf};
 use std::{collections::HashMap, str::FromStr};
 
 use cargo_metadata::Package;
@@ -288,22 +288,22 @@ impl<'a> Builder<'a> {
     /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
-            banner: self.banner.map(PathBuf::from),
+            banner: self.banner.map(StoredPathBuf::from),
             binaries: self
                 .binaries
                 .as_ref()
-                .map(|b| b.iter().map(PathBuf::from).collect()),
+                .map(|b| b.iter().copied().map(StoredPathBuf::from).collect()),
             description: self.description.map(String::from),
-            dialog: self.dialog.map(PathBuf::from),
-            eula: self.eula.map(PathBuf::from),
+            dialog: self.dialog.map(StoredPathBuf::from),
+            eula: self.eula.map(StoredPathBuf::from),
             help_url: self.help_url.map(String::from),
-            input: self.input.map(PathBuf::from),
-            license: self.license.map(PathBuf::from),
+            input: self.input.map(std::path::PathBuf::from),
+            license: self.license.map(StoredPathBuf::from),
             manufacturer: self.manufacturer.map(String::from),
-            output: self.output.map(PathBuf::from),
+            output: self.output.map(std::path::PathBuf::from),
             package: self.package.map(String::from),
             path_guid: self.path_guid.map(String::from),
-            product_icon: self.product_icon.map(PathBuf::from),
+            product_icon: self.product_icon.map(StoredPathBuf::from),
             product_name: self.product_name.map(String::from),
             upgrade_guid: self.upgrade_guid.map(String::from),
         }
@@ -319,19 +319,19 @@ impl<'a> Default for Builder<'a> {
 /// A context for printing a WiX Toolset source file (wxs).
 #[derive(Debug)]
 pub struct Execution {
-    banner: Option<PathBuf>,
-    binaries: Option<Vec<PathBuf>>,
+    banner: Option<StoredPathBuf>,
+    binaries: Option<Vec<StoredPathBuf>>,
     description: Option<String>,
-    dialog: Option<PathBuf>,
-    eula: Option<PathBuf>,
+    dialog: Option<StoredPathBuf>,
+    eula: Option<StoredPathBuf>,
     help_url: Option<String>,
-    input: Option<PathBuf>,
-    license: Option<PathBuf>,
+    input: Option<std::path::PathBuf>,
+    license: Option<StoredPathBuf>,
     manufacturer: Option<String>,
-    output: Option<PathBuf>,
+    output: Option<std::path::PathBuf>,
     package: Option<String>,
     path_guid: Option<String>,
-    product_icon: Option<PathBuf>,
+    product_icon: Option<StoredPathBuf>,
     product_name: Option<String>,
     upgrade_guid: Option<String>,
 }
@@ -395,7 +395,7 @@ impl Execution {
             .insert_str("upgrade-code-guid", self.upgrade_guid(&package)?)
             .insert_str("path-component-guid", self.path_guid(&package)?);
         if let Some(ref banner) = self.banner {
-            map = map.insert_str("banner", banner.display().to_string());
+            map = map.insert_str("banner", banner);
         }
         if let Some(description) = description(self.description.clone(), &package) {
             map = map.insert_str("description", description);
@@ -407,7 +407,7 @@ impl Execution {
             );
         }
         if let Some(ref dialog) = self.dialog {
-            map = map.insert_str("dialog", dialog.display().to_string());
+            map = map.insert_str("dialog", dialog);
         }
         match self.eula(&package)? {
             Eula::Disabled => {
@@ -445,7 +445,7 @@ impl Execution {
             );
         }
         if let Some(icon) = self.product_icon {
-            map = map.insert_str("product-icon", icon.display().to_string());
+            map = map.insert_str("product-icon", icon);
         }
 
         Ok(map.build())
@@ -459,15 +459,12 @@ impl Execution {
                 let binary_file_stem = binary.file_stem().ok_or_else(|| {
                     Error::Generic(format!(
                         "The '{}' binary path does not have a file name",
-                        binary.display()
+                        binary
                     ))
                 })?;
                 map.insert("binary-index", index.to_string());
-                map.insert(
-                    "binary-name",
-                    binary_file_stem.to_string_lossy().into_owned(),
-                );
-                map.insert("binary-source", binary.to_string_lossy().into_owned());
+                map.insert("binary-name", binary_file_stem.to_owned());
+                map.insert("binary-source", binary.to_string());
             }
             binaries.push(map);
         } else {
@@ -479,19 +476,21 @@ impl Execution {
                 let mut map = HashMap::with_capacity(3);
                 map.insert("binary-index", index.to_string());
                 map.insert("binary-name", binary.name.clone());
-                map.insert("binary-source", Self::default_binary_path(&binary.name));
+                map.insert(
+                    "binary-source",
+                    Self::default_binary_path(&binary.name).to_string(),
+                );
                 binaries.push(map);
             }
         }
         Ok(binaries)
     }
 
-    fn default_binary_path(name: &str) -> String {
-        let mut path = Path::new("$(var.CargoTargetBinDir)").join(name);
-        path.set_extension(EXE_FILE_EXTENSION);
-        path.to_str()
-            .map(String::from)
-            .expect("Path to string conversion")
+    fn default_binary_path(name: &str) -> StoredPathBuf {
+        // Use hardcoded path separator here to avoid platform-specific output
+        StoredPathBuf::from(format!(
+            "$(var.CargoTargetBinDir)\\{name}.{EXE_FILE_EXTENSION}"
+        ))
     }
 
     fn help_url(&self, manifest: &Package) -> Option<String> {
@@ -504,23 +503,21 @@ impl Execution {
     }
 
     fn eula(&self, manifest: &Package) -> Result<Eula> {
-        if let Some(ref path) = self.eula.clone().map(PathBuf::from) {
+        if let Some(ref path) = self.eula.clone() {
             Eula::new(Some(path), manifest)
         } else {
             Eula::new(
                 self.license
-                    .clone()
-                    .map(PathBuf::from)
-                    .filter(|p| p.extension().and_then(|p| p.to_str()) == Some(RTF_FILE_EXTENSION))
-                    .as_ref(),
+                    .as_deref()
+                    .filter(|p| p.extension() == Some(RTF_FILE_EXTENSION)),
                 manifest,
             )
         }
     }
 
     fn license_name(&self, manifest: &Package) -> Option<String> {
-        if let Some(ref l) = self.license.clone().map(PathBuf::from) {
-            l.file_name().and_then(|f| f.to_str()).map(String::from)
+        if let Some(l) = &self.license {
+            l.file_name().map(String::from)
         } else {
             manifest
                 .license
@@ -535,15 +532,15 @@ impl Execution {
         }
     }
 
-    fn license_source(&self, manifest: &Package) -> Option<String> {
-        if let Some(ref path) = self.license.clone().map(PathBuf::from) {
-            path.to_str().map(String::from)
+    fn license_source(&self, manifest: &Package) -> Option<StoredPathBuf> {
+        if let Some(path) = &self.license {
+            Some(path.clone())
         } else {
             manifest
                 .license
                 .as_ref()
                 .filter(|l| Template::license_ids().contains(l))
-                .map(|_| LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+                .map(|_| StoredPathBuf::from(format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")))
                 .or_else(|| {
                     manifest.license_file().and_then(|s| {
                         if s.exists() {
@@ -552,7 +549,7 @@ impl Execution {
                                  manifest (Cargo.toml) exists.",
                                 s
                             );
-                            Some(s.into_os_string().into_string().unwrap())
+                            Some(StoredPathBuf::from_utf8_path(&s))
                         } else {
                             None
                         }
@@ -920,7 +917,9 @@ mod tests {
             let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
-                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+                Some(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -933,7 +932,9 @@ mod tests {
             let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
-                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+                Some(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -946,7 +947,9 @@ mod tests {
             let actual = Execution::default().license_source(&package);
             assert_eq!(
                 actual,
-                Some(LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION)
+                Some(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -1148,6 +1151,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(windows)]
         fn eula_with_override_works() {
             let project = setup_project(MIT_MANIFEST);
             let license_file_path = project.path().join("Example.rtf");
@@ -1161,7 +1165,10 @@ mod tests {
                 .build()
                 .eula(&package)
                 .unwrap();
-            assert_eq!(actual, Eula::CommandLine(license_file_path));
+            assert_eq!(
+                actual,
+                Eula::CommandLine(StoredPathBuf::from_std_path(&license_file_path).unwrap())
+            );
         }
 
         #[test]
@@ -1174,7 +1181,10 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Manifest(license_file_path));
+            assert_eq!(
+                actual,
+                Eula::Manifest(StoredPathBuf::from_std_path(&license_file_path).unwrap())
+            );
         }
 
         #[test]
@@ -1199,12 +1209,16 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
+            // We want to check that if the user hands us an OS-specific path here then we preserve it's format
+            // So we turn the input to a string without escaping.
+            let input = license_file_path.to_str().unwrap();
+            let expected = StoredPathBuf::new(input.to_owned());
             let actual = Builder::default()
-                .eula(license_file_path.to_str())
+                .eula(Some(input))
                 .build()
                 .eula(&package)
                 .unwrap();
-            assert_eq!(actual, Eula::CommandLine(license_file_path));
+            assert_eq!(actual, Eula::CommandLine(expected));
         }
 
         #[test]

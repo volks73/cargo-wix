@@ -489,6 +489,7 @@ mod tests {
         }
 
         #[test]
+        #[cfg(windows)]
         fn signer_works() {
             let result = Execution::default().signer();
             assert!(result.is_ok());

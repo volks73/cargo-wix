@@ -73,6 +73,7 @@ pub mod purge;
 pub mod sign;
 mod templates;
 
+use camino::{Utf8Component, Utf8Path};
 use log::debug;
 
 use std::convert::TryFrom;
@@ -293,21 +294,21 @@ impl Error {
     ///
     /// ```rust
     /// use std::io;
-    /// use std::path::Path;
+    /// use camino::Utf8Path;
     /// use wix::Error;
     ///
-    /// let path = Path::new("C:\\");
+    /// let path = Utf8Path::new("C:\\");
     /// let expected = Error::Io(io::Error::new(
     ///     io::ErrorKind::AlreadyExists,
-    ///     path.display().to_string()
+    ///     path.to_string()
     /// ));
     /// assert_eq!(expected, Error::already_exists(path));
     /// ```
     ///
     /// [std::io::Error]: https://doc.rust-lang.org/std/io/struct.Error.html
     /// [std::io::ErrorKind::AlreadyExists]: https://doc.rust-lang.org/std/io/enum.ErrorKind.html
-    pub fn already_exists(p: &Path) -> Self {
-        io::Error::new(ErrorKind::AlreadyExists, p.display().to_string()).into()
+    pub fn already_exists(p: &Utf8Path) -> Self {
+        io::Error::new(ErrorKind::AlreadyExists, p.to_string()).into()
     }
 
     /// Creates a new `Error` from a [std::io::Error] with the
@@ -1034,6 +1035,213 @@ impl FromStr for Cultures {
         }
     }
 }
+/// A PathBuf that will be in the output of print (and therefore saved to disk)
+///
+/// A proper PathBuf should not be used for that, as we don't want to introduce
+/// platform-specific separators.
+///
+/// This type intentionally lacks some path functionality like `.exists()` because
+/// we don't want to be using it for *actual* path stuff, only for writing it to output.
+/// Most StoredPathBufs are just user-provided strings with no processing applied.
+///
+/// However sometimes we are forced to handle a PathBuf because of things like
+/// cargo-metadata, in which case [`StoredPathBuf::from_utf8_path`][] or
+/// [`StoredPathBuf::from_std_path`][] will convert the path to the windows path style.
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct StoredPathBuf(String);
+
+/// A borrowed [`StoredPathBuf`][]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct StoredPath(str);
+
+impl StoredPathBuf {
+    /// Make a new StoredPathBuf from a String
+    pub fn new(v: String) -> Self {
+        Self(v)
+    }
+
+    /// Make a new StoredPath from a OS-specific path
+    ///
+    /// This breaks the path into its components and rewrites the slashes to `\`.
+    ///
+    /// Generally you should avoid this and just try to preserve the user input,
+    /// but it's required when using things like the output of cargo-metadata.
+    pub fn from_std_path(path: &Path) -> Option<Self> {
+        Utf8Path::from_path(path).map(Self::from_utf8_path)
+    }
+
+    /// Make a new StoredPath from a OS-specific Utf8Path
+    ///
+    /// This breaks the path into its components and rewrites the slashes to `\`.
+    ///
+    /// Generally you should avoid this and just try to preserve the user input,
+    /// but it's required when using things like the output of cargo-metadata.
+    ///
+    /// Also note that this does some handling of absolute paths, but that those
+    /// are kind of nonsensical to store longterm. Still, the user can hand them
+    /// to us, and we have to do our best to deal with it. Mostly this just comes
+    /// up in test code.
+    pub fn from_utf8_path(path: &Utf8Path) -> Self {
+        // The main quirk of this code is handling absolute paths.
+        // `C:\a\b\c` is given to us as `["C:", "\", "a", "b", "c"]`
+        let mut result = String::new();
+        let mut multipart = false;
+        for component in path.components() {
+            // Add separator for every part but the first,
+            // ignoring root prefixes like "C:\" and "/" which
+            // provide their own separators.
+            if multipart {
+                result.push('\\');
+            }
+            let part = match component {
+                // "C:"
+                Utf8Component::Prefix(prefix) => prefix.as_str(),
+                // the root slash
+                // (either the one at the end of "C:\" or the one at the start of "/a/b/c")
+                Utf8Component::RootDir => "\\",
+                other => {
+                    // Ok we're passed the weird root stuff, now should add seperators
+                    multipart = true;
+                    other.as_str()
+                }
+            };
+            result.push_str(part);
+        }
+        Self(result)
+    }
+}
+
+impl StoredPath {
+    /// Make a new StoredPath from a str
+    pub fn new(v: &str) -> &Self {
+        // SAFETY: this is the idiomatic pattern for converting between newtyped slices.
+        // See the impl of std::str::from_utf8_unchecked for an example.
+        unsafe { std::mem::transmute(v) }
+    }
+
+    /// Get the inner string
+    pub fn as_str(&self) -> &str {
+        self
+    }
+
+    /// Extracts the extension part of the [`self.file_name`][]
+    pub fn extension(&self) -> Option<&str> {
+        self.stem_and_extension().1
+    }
+
+    /// Extracts the stem (non-extension) part of the [`self.file_name`][].
+    pub fn file_stem(&self) -> Option<&str> {
+        self.stem_and_extension().0
+    }
+
+    // Implements `stem` and `extension` together based on the semantics defined by camino/std
+    fn stem_and_extension(&self) -> (Option<&str>, Option<&str>) {
+        let Some(name) = self.file_name() else {
+            // both: None if there's no file name
+            return (None, None);
+        };
+        if let Some((stem, extension)) = name.rsplit_once('.') {
+            if stem.is_empty() {
+                // stem: The entire file name if the file name begins with '.' and has no other '.'s within
+                // extension: None, if the file name begins with '.' and has no other '.'s within;
+                (Some(name), None)
+            } else {
+                // stem: Otherwise, the portion of the file name before the final '.'
+                // extension: Otherwise, the portion of the file name after the final '.'
+                (Some(stem), Some(extension))
+            }
+        } else {
+            // stem: The entire file name if there is no embedded '.'
+            // extension: None, if there is no embedded '.'
+            (Some(name), None)
+        }
+    }
+
+    /// Returns the final component of the path, if there is one.
+    pub fn file_name(&self) -> Option<&str> {
+        // Look for either path separator (windows file names shouldn't include either,
+        // so even though unix file names can have `\`, it won't work right on the actual
+        // platform that matters, so we can ignore that consideration.)
+        let name1 = self.rsplit_once('\\').map(|(_, name)| name);
+        let name2 = self.rsplit_once('/').map(|(_, name)| name);
+        match (name1, name2) {
+            (Some(name1), Some(name2)) => {
+                // Prefer whichever one came last
+                if name1.len() < name2.len() {
+                    Some(name1)
+                } else {
+                    Some(name2)
+                }
+            }
+            (Some(name), None) | (None, Some(name)) => Some(name),
+            (None, None) => None,
+        }
+    }
+}
+impl std::ops::Deref for StoredPathBuf {
+    type Target = StoredPath;
+    fn deref(&self) -> &Self::Target {
+        StoredPath::new(&self.0)
+    }
+}
+impl std::ops::Deref for StoredPath {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl std::borrow::Borrow<StoredPath> for StoredPathBuf {
+    fn borrow(&self) -> &StoredPath {
+        self
+    }
+}
+impl std::borrow::ToOwned for StoredPath {
+    type Owned = StoredPathBuf;
+
+    fn to_owned(&self) -> StoredPathBuf {
+        StoredPathBuf::new(self.0.to_owned())
+    }
+}
+impl std::convert::From<String> for StoredPathBuf {
+    fn from(v: String) -> Self {
+        Self::new(v)
+    }
+}
+impl std::convert::From<StoredPathBuf> for String {
+    fn from(v: StoredPathBuf) -> Self {
+        v.0
+    }
+}
+impl<'a> std::convert::From<&'a StoredPathBuf> for String {
+    fn from(v: &'a StoredPathBuf) -> Self {
+        v.0.clone()
+    }
+}
+impl<'a> std::convert::From<&'a str> for StoredPathBuf {
+    fn from(v: &'a str) -> Self {
+        StoredPath::new(v).to_owned()
+    }
+}
+impl std::fmt::Debug for StoredPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        std::fmt::Debug::fmt(self.as_str(), f)
+    }
+}
+impl std::fmt::Display for StoredPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        std::fmt::Display::fmt(self.as_str(), f)
+    }
+}
+impl std::fmt::Debug for StoredPathBuf {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        std::fmt::Debug::fmt(self.as_str(), f)
+    }
+}
+impl std::fmt::Display for StoredPathBuf {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        std::fmt::Display::fmt(self.as_str(), f)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -1196,6 +1404,113 @@ mod tests {
         fn from_str_is_correct() {
             let arch = WixArch::from_str("thumbv7a-uwp-windows-msvc").unwrap();
             assert_eq!(arch, WixArch::Arm);
+        }
+    }
+
+    mod stored_path {
+        use crate::StoredPathBuf;
+        use camino::Utf8Path;
+
+        #[test]
+        fn absolute_windows_path_conversion() {
+            // Absolute native windows format
+            const INPUT: &str = "C:\\Users\\test\\AppData\\Local\\Temp\\.tmpMh0Mxg\\Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), INPUT);
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn verbatim_absolute_windows_path_conversion() {
+            // Absolute native windows format (verbatim style)
+            const INPUT: &str =
+                "\\\\?\\C:\\Users\\test\\AppData\\Local\\Temp\\.tmpMh0Mxg\\Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), INPUT);
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn relative_windows_path_conversion() {
+            // relative native windows format
+            const INPUT: &str = "resource\\Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), INPUT);
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn absolute_unix_path_conversion() {
+            // absolute native unix format
+            const INPUT: &str = "/users/home/test/Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), "\\users\\home\\test\\Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn relative_unix_path_conversion() {
+            // relative native unix format
+            const INPUT: &str = "resource/Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), "resource\\Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn mixed_path_conversion1() {
+            // a mix of both formats (natural when combining user input with OS input)
+            const INPUT: &str = "resource/blah\\Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), "resource\\blah\\Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn mixed_path_conversion2() {
+            // a mix of both formats (natural when combining user input with OS input)
+            const INPUT: &str = "resource\\blah/Example.tar.gz";
+            let path = StoredPathBuf::from_utf8_path(Utf8Path::new(INPUT));
+            assert_eq!(path.as_str(), "resource\\blah\\Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn mixed_path_unconverted1() {
+            // a mix of both formats (natural when combining user input with OS input)
+            // here we're testing the verbatim `new` conversion produces a coherent value
+            const INPUT: &str = "resource\\blah/Example.tar.gz";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "resource\\blah/Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn mixed_path_unconverted2() {
+            // a mix of both formats (natural when combining user input with OS input)
+            // here we're testing the verbatim `new` conversion produces a coherent value
+            const INPUT: &str = "resource/blah\\Example.tar.gz";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "resource/blah\\Example.tar.gz");
+            assert_eq!(path.file_name(), Some("Example.tar.gz"));
+            assert_eq!(path.file_stem(), Some("Example.tar"));
+            assert_eq!(path.extension(), Some("gz"));
         }
     }
 }
