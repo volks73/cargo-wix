@@ -468,11 +468,21 @@ impl Execution {
             }
             binaries.push(map);
         } else {
-            let binaries_iter = package
+            // cargo-metadata attempts to sort binaries by name to keep things stable,
+            // but for whatever reason it internally uses the platform-specific binary name
+            // with ".exe" appended, even though the output doesn't refer to that extension.
+            // As such, the ordering ends up being platform-specific, because any time one
+            // binary has a name that's a prefix of the other (e.g. "app" and "app-helper")
+            // the `.exe` extension changes the ordering of the sort. We sort the list again
+            // with the agnostic name to avoid this issue.
+            let mut binaries_list = package
                 .targets
                 .iter()
-                .filter(|v| v.kind.iter().any(|v| v == "bin"));
-            for (index, binary) in binaries_iter.enumerate() {
+                .filter(|v| v.kind.iter().any(|v| v == "bin"))
+                .collect::<Vec<_>>();
+            binaries_list.sort_by_key(|k| &k.name);
+
+            for (index, binary) in binaries_list.into_iter().enumerate() {
                 let mut map = HashMap::with_capacity(3);
                 map.insert("binary-index", index.to_string());
                 map.insert("binary-name", binary.name.clone());
