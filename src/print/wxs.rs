@@ -156,7 +156,7 @@ impl<'a> Builder<'a> {
     ///
     /// The default is to obtain a URL from one of the following fields in the
     /// package's manifest (Cargo.toml): `documentation`, `homepage`, or
-    /// `respository`. If none of these are specified, then the default is to
+    /// `repository`. If none of these are specified, then the default is to
     /// exclude a help URL from the installer. This will override the default
     /// behavior and provide a help URL for the installer if none of the fields
     /// exist.
@@ -182,7 +182,7 @@ impl<'a> Builder<'a> {
     /// the package's manifest (Cargo.toml) or generate a Rich Text Format (RTF)
     /// license file from an embedded template based on the license ID used in
     /// the `license` field of the package's manifest. If none of these fields
-    /// are specified or overriden, then a license sidecar file is _not_
+    /// are specified or overridden, then a license sidecar file is _not_
     /// included in the installation directory.
     ///
     /// This will override the default behavior and skip using either the

@@ -97,7 +97,7 @@ impl Execution {
 
     fn wix(&self) -> Result<PathBuf> {
         if let Some(ref input) = self.input {
-            trace!("A Cargo.toml file has been explicity specified");
+            trace!("A Cargo.toml file has been explicitly specified");
             if input.exists() && input.is_file() {
                 trace!("The input path exists and it is a file");
                 if input.file_name() == Some(OsStr::new(CARGO_MANIFEST_FILE)) {

@@ -140,7 +140,7 @@ impl<'a> Builder<'a> {
     ///
     /// This value is ignored and not used if an EULA is set with the [`eula`]
     /// method, if a custom EULA is set using the `license-file` field in the
-    /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// package's manifest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package's manifest (Cargo.toml).
     ///
     /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
@@ -158,7 +158,7 @@ impl<'a> Builder<'a> {
     ///
     /// This value is ignored and not used if an EULA is set with the [`eula`]
     /// method, if a custom EULA is set using the `license-file` field in the
-    /// package's manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// package's manifest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package's manifest (Cargo.toml).
     ///
     /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
@@ -229,7 +229,7 @@ impl<'a> Builder<'a> {
     ///
     /// The default is to obtain a URL from one of the following fields in the
     /// package's manifest (Cargo.toml): `documentation`, `homepage`, or
-    /// `respository`. If none of these are specified, then the default is to
+    /// `repository`. If none of these are specified, then the default is to
     /// exclude a help URL from the installer. This will override the default
     /// behavior and provide a help URL for the installer if none of the fields
     /// exist.
@@ -258,14 +258,14 @@ impl<'a> Builder<'a> {
     /// (Cargo.toml). If the file has the `.rtf` extension, then it will also be
     /// used for the EULA in the license agreement dialog for the installer.
     /// Otherwise, the [`eula`] method can be used to set an RTF file as the
-    /// EULA for the license agreement dialog that is indepenent of the sidecar
+    /// EULA for the license agreement dialog that is independent of the sidecar
     /// license file.
     ///
     /// The default is to use the value specified in the `license-file` field of
     /// the package's manifest or generate a license file and EULA from an
     /// embedded template based on the license ID used in the `license` field
     /// of the package's manifest. If none of these fields are specified or
-    /// overriden, then a license file is _not_ included in the installation
+    /// overridden, then a license file is _not_ included in the installation
     /// directory and the license agreement dialog is skipped in the installer.
     ///
     /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file

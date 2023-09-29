@@ -163,7 +163,7 @@
 //! ```dos
 //! C:\Path\to\Project> cargo wix init
 //!  WARN: A description was not specified at the command line or in the package's manifest (Cargo.toml). The description can be added manually to the generated WiX Source (wxs) file using a text editor.
-//!  WARN: An EULA was not specified at the command line, a RTF license file was not specified in the package manifest's (Cargo.toml) 'license-file' field, or the license ID from the pacakge manifest's 'license' field is not recognized. The license agreement dialog will be excluded from the installer. An EULA can be added manually to the generated WiX Source (wxs) file using a text editor.
+//!  WARN: An EULA was not specified at the command line, a RTF license file was not specified in the package manifest's (Cargo.toml) 'license-file' field, or the license ID from the package manifest's 'license' field is not recognized. The license agreement dialog will be excluded from the installer. An EULA can be added manually to the generated WiX Source (wxs) file using a text editor.
 //!  WARN: A help URL could not be found and it will be excluded from the installer. A help URL can be added manually to the generated WiX Source (wxs) file using a text editor.
 //!  WARN: A license file could not be found and it will be excluded from the installer. A license file can be added manually to the generated WiX Source (wxs) file using a text editor.
 //! ```
@@ -320,7 +320,7 @@
 //! ```
 //!
 //! Save the package's manifest and exit the text editor. Now, we can create a
-//! `wix\main.wxs` file witout any warnings and uses the description and
+//! `wix\main.wxs` file without any warnings and uses the description and
 //! homepage from the package's manifest:
 //!
 //! ```dos
@@ -802,7 +802,7 @@
 //! option then (2) `WIX` system environment variable. An error will be
 //! displayed if the compiler and/or linker cannot be found.
 //!
-//! This option is also avaliable for the `cargo wix sign` subcommand and can be
+//! This option is also available for the `cargo wix sign` subcommand and can be
 //! used to specify a path to the Windows SDK `bin` folder. This can be used to
 //! override default `signtool` application found using the
 //! [`std::process::Command::status`] method.
@@ -832,7 +832,7 @@
 //! Appends an argument to the WiX compiler (candle.exe) invocation. This
 //! provides a mechanism for "passing" arguments to the compiler. This can be called
 //! multiple times to pass multiple arguments (flags or options), but only one
-//! value per occurrance is allowed to avoid ambiguity during argument parsing.
+//! value per occurrence is allowed to avoid ambiguity during argument parsing.
 //! Note, if it is an option, i.e. argument with an accompanying value, then the
 //! value must be passed as a separate usage of this option. For example, adding
 //! an user-defined compiler extension would require the following command
@@ -970,7 +970,7 @@
 //! Appends an argument to the WiX linker (light.exe) invocation. This provides
 //! a mechanism for "passing" arguments to the linker. This can be called
 //! multiple times to pass multiple arguments (flags or options). Only one value
-//! per occurrance is allowed to avoid ambiguity during argument parsing. Note,
+//! per occurrence is allowed to avoid ambiguity during argument parsing. Note,
 //! if it is an option, i.e. argument with an accompanying value, then the value
 //! must be passed as a separate usage of this option. For example, adding an
 //! user-defined linker extension would require the following command `cargo wix
@@ -1086,7 +1086,7 @@
 //!
 //! An alias or URL to a timestamp server when signing an installer with a
 //! certificate. Valid aliases are: `Comodo` and `Versign`, which are case
-//! insenstive.
+//! insensitive.
 //!
 //! ### `--upgrade-guid`
 //!
@@ -1122,7 +1122,7 @@
 //!
 //! Available for all subcommands.
 //!
-//! Increases the level of logging statements based on occurance count of the
+//! Increases the level of logging statements based on occurrence count of the
 //! flag. The more `-v,--verbose` flags used, the more logging statements that
 //! will be printed during execution of a subcommand. When combined with the
 //! `--nocapture` flag, this is useful for debugging and testing.
@@ -1401,7 +1401,7 @@ fn main() {
             "Sets the level of verbosity. The higher the level of \
              verbosity, the more information that is printed and logged when the \
              application is executed. This flag can be specified multiple times, \
-             where each occurrance increases the level and/or details written for \
+             where each occurrence increases the level and/or details written for \
              each statement.",
         )
         .long("verbose")
@@ -1467,8 +1467,8 @@ fn main() {
                         manually typing the option or flag for the compiler at the \
                         command line. If the argument is for an option with a value, \
                         the option's value must be passed as a separate call of this \
-                        option. Multiple occurrances are possible, but only one \
-                        value per occurrance is allowed to avoid ambiguity in \
+                        option. Multiple occurrences are possible, but only one \
+                        value per occurrence is allowed to avoid ambiguity in \
                         argument parsing. For example, '-C -ext -C \
                         WixUtilExtension'.")
                     .long("compiler-arg")
@@ -1592,8 +1592,8 @@ fn main() {
                         manually typing the option or flag for the linker at the \
                         command line. If the argument is for an option with a value, \
                         the option's value must be passed as a separate call of this \
-                        option. Multiple occurrances are possible, but only one \
-                        value per occurrance is allowed to avoid ambiguity in \
+                        option. Multiple occurrences are possible, but only one \
+                        value per occurrence is allowed to avoid ambiguity in \
                         argument parsing. For example, '-L -ext -L \
                         WixUIExtension'.")
                     .long("linker-arg")
@@ -1811,7 +1811,7 @@ fn main() {
     let mut builder = Builder::new();
     builder
         .format(|buf, record| {
-            // This implmentation for a format is copied from the default format implemented for the
+            // This implementation for a format is copied from the default format implemented for the
             // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
             // message and change the colors to match the previous colors used by the `loggerv` crate.
             let mut level_style = buf.style();
