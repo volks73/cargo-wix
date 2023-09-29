@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\print\wxs.rs`."><title>wxs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../wix/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/print/wxs.rs`."><title>wxs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../wix/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1292,6 +1292,30 @@
 <a href="#1292" id="1292">1292</a>
 <a href="#1293" id="1293">1293</a>
 <a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright (C) 2017 Christopher R. Field.
 //
 // Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -1315,6 +1339,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::product_name;
 <span class="kw">use </span><span class="kw">crate</span>::Error;
 <span class="kw">use </span><span class="kw">crate</span>::Result;
+<span class="kw">use </span><span class="kw">crate</span>::StoredPathBuf;
 <span class="kw">use </span><span class="kw">crate</span>::Template;
 <span class="kw">use </span><span class="kw">crate</span>::EXE_FILE_EXTENSION;
 <span class="kw">use </span><span class="kw">crate</span>::LICENSE_FILE_NAME;
@@ -1325,7 +1350,6 @@
 <span class="kw">use </span>mustache::Data;
 <span class="kw">use </span>mustache::{<span class="self">self</span>, MapBuilder};
 
-<span class="kw">use </span>std::path::{Path, PathBuf};
 <span class="kw">use </span>std::{collections::HashMap, str::FromStr};
 
 <span class="kw">use </span>cargo_metadata::Package;
@@ -1450,7 +1474,7 @@
     ///
     /// The default is to obtain a URL from one of the following fields in the
     /// package&#39;s manifest (Cargo.toml): `documentation`, `homepage`, or
-    /// `respository`. If none of these are specified, then the default is to
+    /// `repository`. If none of these are specified, then the default is to
     /// exclude a help URL from the installer. This will override the default
     /// behavior and provide a help URL for the installer if none of the fields
     /// exist.
@@ -1476,7 +1500,7 @@
     /// the package&#39;s manifest (Cargo.toml) or generate a Rich Text Format (RTF)
     /// license file from an embedded template based on the license ID used in
     /// the `license` field of the package&#39;s manifest. If none of these fields
-    /// are specified or overriden, then a license sidecar file is _not_
+    /// are specified or overridden, then a license sidecar file is _not_
     /// included in the installation directory.
     ///
     /// This will override the default behavior and skip using either the
@@ -1582,22 +1606,22 @@
     <span class="doccomment">/// Builds an execution context for printing a template.
     </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Execution {
         Execution {
-            banner: <span class="self">self</span>.banner.map(PathBuf::from),
+            banner: <span class="self">self</span>.banner.map(StoredPathBuf::from),
             binaries: <span class="self">self
                 </span>.binaries
                 .as_ref()
-                .map(|b| b.iter().map(PathBuf::from).collect()),
+                .map(|b| b.iter().copied().map(StoredPathBuf::from).collect()),
             description: <span class="self">self</span>.description.map(String::from),
-            dialog: <span class="self">self</span>.dialog.map(PathBuf::from),
-            eula: <span class="self">self</span>.eula.map(PathBuf::from),
+            dialog: <span class="self">self</span>.dialog.map(StoredPathBuf::from),
+            eula: <span class="self">self</span>.eula.map(StoredPathBuf::from),
             help_url: <span class="self">self</span>.help_url.map(String::from),
-            input: <span class="self">self</span>.input.map(PathBuf::from),
-            license: <span class="self">self</span>.license.map(PathBuf::from),
+            input: <span class="self">self</span>.input.map(std::path::PathBuf::from),
+            license: <span class="self">self</span>.license.map(StoredPathBuf::from),
             manufacturer: <span class="self">self</span>.manufacturer.map(String::from),
-            output: <span class="self">self</span>.output.map(PathBuf::from),
+            output: <span class="self">self</span>.output.map(std::path::PathBuf::from),
             package: <span class="self">self</span>.package.map(String::from),
             path_guid: <span class="self">self</span>.path_guid.map(String::from),
-            product_icon: <span class="self">self</span>.product_icon.map(PathBuf::from),
+            product_icon: <span class="self">self</span>.product_icon.map(StoredPathBuf::from),
             product_name: <span class="self">self</span>.product_name.map(String::from),
             upgrade_guid: <span class="self">self</span>.upgrade_guid.map(String::from),
         }
@@ -1613,19 +1637,19 @@
 <span class="doccomment">/// A context for printing a WiX Toolset source file (wxs).
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Execution {
-    banner: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    binaries: <span class="prelude-ty">Option</span>&lt;Vec&lt;PathBuf&gt;&gt;,
+    banner: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
+    binaries: <span class="prelude-ty">Option</span>&lt;Vec&lt;StoredPathBuf&gt;&gt;,
     description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    dialog: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    eula: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    dialog: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
+    eula: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     help_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    input: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    license: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    input: <span class="prelude-ty">Option</span>&lt;std::path::PathBuf&gt;,
+    license: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     manufacturer: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    output: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    output: <span class="prelude-ty">Option</span>&lt;std::path::PathBuf&gt;,
     package: <span class="prelude-ty">Option</span>&lt;String&gt;,
     path_guid: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    product_icon: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    product_icon: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     product_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     upgrade_guid: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
@@ -1689,7 +1713,7 @@
             .insert_str(<span class="string">&quot;upgrade-code-guid&quot;</span>, <span class="self">self</span>.upgrade_guid(<span class="kw-2">&amp;</span>package)<span class="question-mark">?</span>)
             .insert_str(<span class="string">&quot;path-component-guid&quot;</span>, <span class="self">self</span>.path_guid(<span class="kw-2">&amp;</span>package)<span class="question-mark">?</span>);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>banner) = <span class="self">self</span>.banner {
-            map = map.insert_str(<span class="string">&quot;banner&quot;</span>, banner.display().to_string());
+            map = map.insert_str(<span class="string">&quot;banner&quot;</span>, banner);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = description(<span class="self">self</span>.description.clone(), <span class="kw-2">&amp;</span>package) {
             map = map.insert_str(<span class="string">&quot;description&quot;</span>, description);
@@ -1701,7 +1725,7 @@
             </span>);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>dialog) = <span class="self">self</span>.dialog {
-            map = map.insert_str(<span class="string">&quot;dialog&quot;</span>, dialog.display().to_string());
+            map = map.insert_str(<span class="string">&quot;dialog&quot;</span>, dialog);
         }
         <span class="kw">match </span><span class="self">self</span>.eula(<span class="kw-2">&amp;</span>package)<span class="question-mark">? </span>{
             Eula::Disabled =&gt; {
@@ -1739,7 +1763,7 @@
             </span>);
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(icon) = <span class="self">self</span>.product_icon {
-            map = map.insert_str(<span class="string">&quot;product-icon&quot;</span>, icon.display().to_string());
+            map = map.insert_str(<span class="string">&quot;product-icon&quot;</span>, icon);
         }
 
         <span class="prelude-val">Ok</span>(map.build())
@@ -1753,39 +1777,48 @@
                 <span class="kw">let </span>binary_file_stem = binary.file_stem().ok_or_else(|| {
                     Error::Generic(<span class="macro">format!</span>(
                         <span class="string">&quot;The &#39;{}&#39; binary path does not have a file name&quot;</span>,
-                        binary.display()
+                        binary
                     ))
                 })<span class="question-mark">?</span>;
                 map.insert(<span class="string">&quot;binary-index&quot;</span>, index.to_string());
-                map.insert(
-                    <span class="string">&quot;binary-name&quot;</span>,
-                    binary_file_stem.to_string_lossy().into_owned(),
-                );
-                map.insert(<span class="string">&quot;binary-source&quot;</span>, binary.to_string_lossy().into_owned());
+                map.insert(<span class="string">&quot;binary-name&quot;</span>, binary_file_stem.to_owned());
+                map.insert(<span class="string">&quot;binary-source&quot;</span>, binary.to_string());
             }
             binaries.push(map);
         } <span class="kw">else </span>{
-            <span class="kw">let </span>binaries_iter = package
+            <span class="comment">// cargo-metadata attempts to sort binaries by name to keep things stable,
+            // but for whatever reason it internally uses the platform-specific binary name
+            // with &quot;.exe&quot; appended, even though the output doesn&#39;t refer to that extension.
+            // As such, the ordering ends up being platform-specific, because any time one
+            // binary has a name that&#39;s a prefix of the other (e.g. &quot;app&quot; and &quot;app-helper&quot;)
+            // the `.exe` extension changes the ordering of the sort. We sort the list again
+            // with the agnostic name to avoid this issue.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>binaries_list = package
                 .targets
                 .iter()
-                .filter(|v| v.kind.iter().any(|v| v == <span class="string">&quot;bin&quot;</span>));
-            <span class="kw">for </span>(index, binary) <span class="kw">in </span>binaries_iter.enumerate() {
+                .filter(|v| v.kind.iter().any(|v| v == <span class="string">&quot;bin&quot;</span>))
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            binaries_list.sort_by_key(|k| <span class="kw-2">&amp;</span>k.name);
+
+            <span class="kw">for </span>(index, binary) <span class="kw">in </span>binaries_list.into_iter().enumerate() {
                 <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::with_capacity(<span class="number">3</span>);
                 map.insert(<span class="string">&quot;binary-index&quot;</span>, index.to_string());
                 map.insert(<span class="string">&quot;binary-name&quot;</span>, binary.name.clone());
-                map.insert(<span class="string">&quot;binary-source&quot;</span>, <span class="self">Self</span>::default_binary_path(<span class="kw-2">&amp;</span>binary.name));
+                map.insert(
+                    <span class="string">&quot;binary-source&quot;</span>,
+                    <span class="self">Self</span>::default_binary_path(<span class="kw-2">&amp;</span>binary.name).to_string(),
+                );
                 binaries.push(map);
             }
         }
         <span class="prelude-val">Ok</span>(binaries)
     }
 
-    <span class="kw">fn </span>default_binary_path(name: <span class="kw-2">&amp;</span>str) -&gt; String {
-        <span class="kw">let </span><span class="kw-2">mut </span>path = Path::new(<span class="string">&quot;$(var.CargoTargetBinDir)&quot;</span>).join(name);
-        path.set_extension(EXE_FILE_EXTENSION);
-        path.to_str()
-            .map(String::from)
-            .expect(<span class="string">&quot;Path to string conversion&quot;</span>)
+    <span class="kw">fn </span>default_binary_path(name: <span class="kw-2">&amp;</span>str) -&gt; StoredPathBuf {
+        <span class="comment">// Use hardcoded path separator here to avoid platform-specific output
+        </span>StoredPathBuf::from(<span class="macro">format!</span>(
+            <span class="string">&quot;$(var.CargoTargetBinDir)\\{name}.{EXE_FILE_EXTENSION}&quot;
+        </span>))
     }
 
     <span class="kw">fn </span>help_url(<span class="kw-2">&amp;</span><span class="self">self</span>, manifest: <span class="kw-2">&amp;</span>Package) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
@@ -1798,23 +1831,21 @@
     }
 
     <span class="kw">fn </span>eula(<span class="kw-2">&amp;</span><span class="self">self</span>, manifest: <span class="kw-2">&amp;</span>Package) -&gt; <span class="prelude-ty">Result</span>&lt;Eula&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>path) = <span class="self">self</span>.eula.clone().map(PathBuf::from) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>path) = <span class="self">self</span>.eula.clone() {
             Eula::new(<span class="prelude-val">Some</span>(path), manifest)
         } <span class="kw">else </span>{
             Eula::new(
                 <span class="self">self</span>.license
-                    .clone()
-                    .map(PathBuf::from)
-                    .filter(|p| p.extension().and_then(|p| p.to_str()) == <span class="prelude-val">Some</span>(RTF_FILE_EXTENSION))
-                    .as_ref(),
+                    .as_deref()
+                    .filter(|p| p.extension() == <span class="prelude-val">Some</span>(RTF_FILE_EXTENSION)),
                 manifest,
             )
         }
     }
 
     <span class="kw">fn </span>license_name(<span class="kw-2">&amp;</span><span class="self">self</span>, manifest: <span class="kw-2">&amp;</span>Package) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>l) = <span class="self">self</span>.license.clone().map(PathBuf::from) {
-            l.file_name().and_then(|f| f.to_str()).map(String::from)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(l) = <span class="kw-2">&amp;</span><span class="self">self</span>.license {
+            l.file_name().map(String::from)
         } <span class="kw">else </span>{
             manifest
                 .license
@@ -1829,15 +1860,15 @@
         }
     }
 
-    <span class="kw">fn </span>license_source(<span class="kw-2">&amp;</span><span class="self">self</span>, manifest: <span class="kw-2">&amp;</span>Package) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>path) = <span class="self">self</span>.license.clone().map(PathBuf::from) {
-            path.to_str().map(String::from)
+    <span class="kw">fn </span>license_source(<span class="kw-2">&amp;</span><span class="self">self</span>, manifest: <span class="kw-2">&amp;</span>Package) -&gt; <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = <span class="kw-2">&amp;</span><span class="self">self</span>.license {
+            <span class="prelude-val">Some</span>(path.clone())
         } <span class="kw">else </span>{
             manifest
                 .license
                 .as_ref()
                 .filter(|l| Template::license_ids().contains(l))
-                .map(|<span class="kw">_</span>| LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION)
+                .map(|<span class="kw">_</span>| StoredPathBuf::from(<span class="macro">format!</span>(<span class="string">&quot;{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}&quot;</span>)))
                 .or_else(|| {
                     manifest.license_file().and_then(|s| {
                         <span class="kw">if </span>s.exists() {
@@ -1846,7 +1877,7 @@
                                  manifest (Cargo.toml) exists.&quot;</span>,
                                 s
                             );
-                            <span class="prelude-val">Some</span>(s.into_os_string().into_string().unwrap())
+                            <span class="prelude-val">Some</span>(StoredPathBuf::from_utf8_path(<span class="kw-2">&amp;</span>s))
                         } <span class="kw">else </span>{
                             <span class="prelude-val">None
                         </span>}
@@ -2214,7 +2245,9 @@
             <span class="kw">let </span>actual = Execution::default().license_source(<span class="kw-2">&amp;</span>package);
             <span class="macro">assert_eq!</span>(
                 actual,
-                <span class="prelude-val">Some</span>(LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION)
+                <span class="prelude-val">Some</span>(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -2227,7 +2260,9 @@
             <span class="kw">let </span>actual = Execution::default().license_source(<span class="kw-2">&amp;</span>package);
             <span class="macro">assert_eq!</span>(
                 actual,
-                <span class="prelude-val">Some</span>(LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION)
+                <span class="prelude-val">Some</span>(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -2240,7 +2275,9 @@
             <span class="kw">let </span>actual = Execution::default().license_source(<span class="kw-2">&amp;</span>package);
             <span class="macro">assert_eq!</span>(
                 actual,
-                <span class="prelude-val">Some</span>(LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION)
+                <span class="prelude-val">Some</span>(StoredPathBuf::from(
+                    LICENSE_FILE_NAME.to_owned() + <span class="string">&quot;.&quot; </span>+ RTF_FILE_EXTENSION
+                ))
             );
         }
 
@@ -2442,6 +2479,7 @@
         }
 
         <span class="attr">#[test]
+        #[cfg(windows)]
         </span><span class="kw">fn </span>eula_with_override_works() {
             <span class="kw">let </span>project = setup_project(MIT_MANIFEST);
             <span class="kw">let </span>license_file_path = project.path().join(<span class="string">&quot;Example.rtf&quot;</span>);
@@ -2455,7 +2493,10 @@
                 .build()
                 .eula(<span class="kw-2">&amp;</span>package)
                 .unwrap();
-            <span class="macro">assert_eq!</span>(actual, Eula::CommandLine(license_file_path));
+            <span class="macro">assert_eq!</span>(
+                actual,
+                Eula::CommandLine(StoredPathBuf::from_std_path(<span class="kw-2">&amp;</span>license_file_path).unwrap())
+            );
         }
 
         <span class="attr">#[test]
@@ -2468,7 +2509,10 @@
             <span class="kw">let </span>package = <span class="kw">crate</span>::package(<span class="kw-2">&amp;</span>manifest, <span class="prelude-val">None</span>).unwrap();
 
             <span class="kw">let </span>actual = Execution::default().eula(<span class="kw-2">&amp;</span>package).unwrap();
-            <span class="macro">assert_eq!</span>(actual, Eula::Manifest(license_file_path));
+            <span class="macro">assert_eq!</span>(
+                actual,
+                Eula::Manifest(StoredPathBuf::from_std_path(<span class="kw-2">&amp;</span>license_file_path).unwrap())
+            );
         }
 
         <span class="attr">#[test]
@@ -2493,12 +2537,16 @@
             <span class="kw">let </span>manifest = <span class="kw">crate</span>::manifest(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>project.path().join(<span class="string">&quot;Cargo.toml&quot;</span>))).unwrap();
             <span class="kw">let </span>package = <span class="kw">crate</span>::package(<span class="kw-2">&amp;</span>manifest, <span class="prelude-val">None</span>).unwrap();
 
+            <span class="comment">// We want to check that if the user hands us an OS-specific path here then we preserve it&#39;s format
+            // So we turn the input to a string without escaping.
+            </span><span class="kw">let </span>input = license_file_path.to_str().unwrap();
+            <span class="kw">let </span>expected = StoredPathBuf::new(input.to_owned());
             <span class="kw">let </span>actual = Builder::default()
-                .eula(license_file_path.to_str())
+                .eula(<span class="prelude-val">Some</span>(input))
                 .build()
                 .eula(<span class="kw-2">&amp;</span>package)
                 .unwrap();
-            <span class="macro">assert_eq!</span>(actual, Eula::CommandLine(license_file_path));
+            <span class="macro">assert_eq!</span>(actual, Eula::CommandLine(expected));
         }
 
         <span class="attr">#[test]

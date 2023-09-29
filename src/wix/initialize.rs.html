@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\initialize.rs`."><title>initialize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0 (5680fa18f 2023-08-23)" data-channel="1.72.0" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/initialize.rs`."><title>initialize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -843,6 +843,15 @@
 <a href="#843" id="843">843</a>
 <a href="#844" id="844">844</a>
 <a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright (C) 2018 Christopher R. Field.
 //
 // Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -867,12 +876,14 @@
 //! exists for the project, the `init` command does not need to be executed
 //! again.
 
-</span><span class="kw">use </span>cargo_metadata::Package;
+</span><span class="kw">use </span>camino::Utf8PathBuf;
+<span class="kw">use </span>cargo_metadata::Package;
 
 <span class="kw">use </span><span class="kw">crate</span>::eula::Eula;
 <span class="kw">use </span><span class="kw">crate</span>::print;
 <span class="kw">use </span><span class="kw">crate</span>::Error;
 <span class="kw">use </span><span class="kw">crate</span>::Result;
+<span class="kw">use </span><span class="kw">crate</span>::StoredPathBuf;
 <span class="kw">use </span><span class="kw">crate</span>::LICENSE_FILE_NAME;
 <span class="kw">use </span><span class="kw">crate</span>::RTF_FILE_EXTENSION;
 <span class="kw">use </span><span class="kw">crate</span>::WIX;
@@ -983,7 +994,7 @@
     ///
     /// This value is ignored and not used if an EULA is set with the [`eula`]
     /// method, if a custom EULA is set using the `license-file` field in the
-    /// package&#39;s manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// package&#39;s manifest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package&#39;s manifest (Cargo.toml).
     ///
     /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
@@ -1001,7 +1012,7 @@
     ///
     /// This value is ignored and not used if an EULA is set with the [`eula`]
     /// method, if a custom EULA is set using the `license-file` field in the
-    /// package&#39;s manfiest (Cargo.toml), or an EULA is _not_ generated from the
+    /// package&#39;s manifest (Cargo.toml), or an EULA is _not_ generated from the
     /// `license` field in the package&#39;s manifest (Cargo.toml).
     ///
     /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
@@ -1072,7 +1083,7 @@
     ///
     /// The default is to obtain a URL from one of the following fields in the
     /// package&#39;s manifest (Cargo.toml): `documentation`, `homepage`, or
-    /// `respository`. If none of these are specified, then the default is to
+    /// `repository`. If none of these are specified, then the default is to
     /// exclude a help URL from the installer. This will override the default
     /// behavior and provide a help URL for the installer if none of the fields
     /// exist.
@@ -1101,14 +1112,14 @@
     /// (Cargo.toml). If the file has the `.rtf` extension, then it will also be
     /// used for the EULA in the license agreement dialog for the installer.
     /// Otherwise, the [`eula`] method can be used to set an RTF file as the
-    /// EULA for the license agreement dialog that is indepenent of the sidecar
+    /// EULA for the license agreement dialog that is independent of the sidecar
     /// license file.
     ///
     /// The default is to use the value specified in the `license-file` field of
     /// the package&#39;s manifest or generate a license file and EULA from an
     /// embedded template based on the license ID used in the `license` field
     /// of the package&#39;s manifest. If none of these fields are specified or
-    /// overriden, then a license file is _not_ included in the installation
+    /// overridden, then a license file is _not_ included in the installation
     /// directory and the license agreement dialog is skipped in the installer.
     ///
     /// [sidecar]: https://en.wikipedia.org/wiki/Sidecar_file
@@ -1215,25 +1226,25 @@
     <span class="doccomment">/// Builds a read-only initialization execution.
     </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Execution {
         Execution {
-            banner: <span class="self">self</span>.banner.map(PathBuf::from),
+            banner: <span class="self">self</span>.banner.map(StoredPathBuf::from),
             binaries: <span class="self">self
                 </span>.binaries
                 .as_ref()
-                .map(|b| b.iter().map(PathBuf::from).collect()),
+                .map(|b| b.iter().copied().map(StoredPathBuf::from).collect()),
             copyright_year: <span class="self">self</span>.copyright_year.map(String::from),
             copyright_holder: <span class="self">self</span>.copyright_holder.map(String::from),
             description: <span class="self">self</span>.description.map(String::from),
-            dialog: <span class="self">self</span>.dialog.map(PathBuf::from),
-            eula: <span class="self">self</span>.eula.map(PathBuf::from),
+            dialog: <span class="self">self</span>.dialog.map(StoredPathBuf::from),
+            eula: <span class="self">self</span>.eula.map(StoredPathBuf::from),
             force: <span class="self">self</span>.force,
             help_url: <span class="self">self</span>.help_url.map(String::from),
             input: <span class="self">self</span>.input.map(PathBuf::from),
-            license: <span class="self">self</span>.license.map(PathBuf::from),
+            license: <span class="self">self</span>.license.map(StoredPathBuf::from),
             manufacturer: <span class="self">self</span>.manufacturer.map(String::from),
             output: <span class="self">self</span>.output.map(PathBuf::from),
             package: <span class="self">self</span>.package.map(String::from),
             path_guid: <span class="self">self</span>.path_guid.map(String::from),
-            product_icon: <span class="self">self</span>.product_icon.map(PathBuf::from),
+            product_icon: <span class="self">self</span>.product_icon.map(StoredPathBuf::from),
             product_name: <span class="self">self</span>.product_name.map(String::from),
             upgrade_guid: <span class="self">self</span>.upgrade_guid.map(String::from),
         }
@@ -1249,22 +1260,22 @@
 <span class="doccomment">/// A context for creating the necessary files to eventually build an installer.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Execution {
-    banner: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    binaries: <span class="prelude-ty">Option</span>&lt;Vec&lt;PathBuf&gt;&gt;,
+    banner: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
+    binaries: <span class="prelude-ty">Option</span>&lt;Vec&lt;StoredPathBuf&gt;&gt;,
     copyright_holder: <span class="prelude-ty">Option</span>&lt;String&gt;,
     copyright_year: <span class="prelude-ty">Option</span>&lt;String&gt;,
     description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    dialog: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    eula: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    dialog: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
+    eula: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     force: bool,
     help_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
     input: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
-    license: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    license: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     manufacturer: <span class="prelude-ty">Option</span>&lt;String&gt;,
     output: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
     package: <span class="prelude-ty">Option</span>&lt;String&gt;,
     path_guid: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    product_icon: <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+    product_icon: <span class="prelude-ty">Option</span>&lt;StoredPathBuf&gt;,
     product_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     upgrade_guid: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
@@ -1296,10 +1307,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>destination = <span class="self">self</span>.destination(<span class="kw-2">&amp;</span>package);
         <span class="macro">debug!</span>(<span class="string">&quot;destination = {:?}&quot;</span>, destination);
         <span class="kw">if </span>!destination.exists() {
-            <span class="macro">info!</span>(<span class="string">&quot;Creating the &#39;{}&#39; directory&quot;</span>, destination.display());
+            <span class="macro">info!</span>(<span class="string">&quot;Creating the &#39;{}&#39; directory&quot;</span>, destination);
             fs::create_dir(<span class="kw-2">&amp;</span>destination)<span class="question-mark">?</span>;
         }
-        <span class="kw">let </span>(eula_wxs_path, license_wxs_path) = <span class="kw">match </span>Eula::new(<span class="self">self</span>.eula.as_ref(), <span class="kw-2">&amp;</span>package)<span class="question-mark">? </span>{
+        <span class="kw">let </span>(eula_wxs_path, license_wxs_path) = <span class="kw">match </span>Eula::new(<span class="self">self</span>.eula.as_deref(), <span class="kw-2">&amp;</span>package)<span class="question-mark">? </span>{
             Eula::CommandLine(path) =&gt; (<span class="prelude-val">Some</span>(path), <span class="self">self</span>.license),
             Eula::Manifest(path) =&gt; (<span class="prelude-val">Some</span>(path), <span class="self">self</span>.license),
             Eula::Generate(template) =&gt; {
@@ -1314,7 +1325,7 @@
                         .copyright_holder(<span class="self">self</span>.copyright_holder.as_ref().map(String::as_ref));
                     eula_printer.copyright_year(<span class="self">self</span>.copyright_year.as_ref().map(String::as_ref));
                     eula_printer.input(<span class="self">self</span>.input.as_deref().and_then(Path::to_str));
-                    eula_printer.output(destination.as_path().to_str());
+                    eula_printer.output(<span class="prelude-val">Some</span>(destination.as_str()));
                     eula_printer.package(<span class="self">self</span>.package.as_deref());
                     eula_printer.build().run(<span class="kw-2">&amp;</span>template)<span class="question-mark">?</span>;
                 }
@@ -1324,7 +1335,8 @@
                     </span>.to_owned();
                 relative.push(LICENSE_FILE_NAME);
                 relative.set_extension(RTF_FILE_EXTENSION);
-                (<span class="prelude-val">Some</span>(relative.clone()), <span class="prelude-val">Some</span>(relative))
+                <span class="kw">let </span>stored_relative = StoredPathBuf::from_utf8_path(<span class="kw-2">&amp;</span>relative);
+                (<span class="prelude-val">Some</span>(stored_relative.clone()), <span class="prelude-val">Some</span>(stored_relative))
             }
             Eula::Disabled =&gt; (<span class="prelude-val">None</span>, <span class="self">self</span>.license),
         };
@@ -1334,26 +1346,25 @@
         <span class="kw">if </span>destination.exists() &amp;&amp; !<span class="self">self</span>.force {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::already_exists(<span class="kw-2">&amp;</span>destination));
         } <span class="kw">else </span>{
-            <span class="macro">info!</span>(<span class="string">&quot;Creating the &#39;{}&#39; file&quot;</span>, destination.display());
+            <span class="macro">info!</span>(<span class="string">&quot;Creating the &#39;{}&#39; file&quot;</span>, destination);
             <span class="kw">let </span><span class="kw-2">mut </span>wxs_printer = print::wxs::Builder::new();
-            wxs_printer.banner(<span class="self">self</span>.banner.as_deref().and_then(Path::to_str));
-            wxs_printer.binaries(<span class="self">self</span>.binaries.as_ref().map(|b| {
-                b.iter()
-                    .map(PathBuf::as_path)
-                    .map(|p| p.to_str().unwrap())
-                    .collect()
-            }));
+            wxs_printer.banner(<span class="self">self</span>.banner.as_ref().map(|s| s.as_str()));
+            wxs_printer.binaries(
+                <span class="self">self</span>.binaries
+                    .as_ref()
+                    .map(|b| b.iter().map(|s| s.as_str()).collect()),
+            );
             wxs_printer.description(<span class="self">self</span>.description.as_ref().map(String::as_ref));
-            wxs_printer.dialog(<span class="self">self</span>.dialog.as_deref().and_then(Path::to_str));
-            wxs_printer.eula(eula_wxs_path.as_deref().and_then(Path::to_str));
+            wxs_printer.dialog(<span class="self">self</span>.dialog.as_deref().map(|s| s.as_str()));
+            wxs_printer.eula(eula_wxs_path.as_deref().map(|s| s.as_str()));
             wxs_printer.help_url(<span class="self">self</span>.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(<span class="self">self</span>.input.as_deref().and_then(Path::to_str));
-            wxs_printer.license(license_wxs_path.as_deref().and_then(Path::to_str));
+            wxs_printer.license(license_wxs_path.as_ref().map(|s| s.as_str()));
             wxs_printer.manufacturer(<span class="self">self</span>.manufacturer.as_ref().map(String::as_ref));
-            wxs_printer.output(destination.as_path().to_str());
+            wxs_printer.output(<span class="prelude-val">Some</span>(destination.as_str()));
             wxs_printer.package(<span class="self">self</span>.package.as_deref());
             wxs_printer.path_guid(<span class="self">self</span>.path_guid.as_ref().map(String::as_ref));
-            wxs_printer.product_icon(<span class="self">self</span>.product_icon.as_deref().and_then(Path::to_str));
+            wxs_printer.product_icon(<span class="self">self</span>.product_icon.as_ref().map(|s| s.as_str()));
             wxs_printer.product_name(<span class="self">self</span>.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(<span class="self">self</span>.upgrade_guid.as_ref().map(String::as_ref));
             wxs_printer.build().run()<span class="question-mark">?</span>;
@@ -1361,15 +1372,14 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>destination(<span class="kw-2">&amp;</span><span class="self">self</span>, package: <span class="kw-2">&amp;</span>Package) -&gt; PathBuf {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>output) = <span class="self">self</span>.output {
+    <span class="kw">fn </span>destination(<span class="kw-2">&amp;</span><span class="self">self</span>, package: <span class="kw-2">&amp;</span>Package) -&gt; Utf8PathBuf {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(output) = <span class="kw-2">&amp;</span><span class="self">self</span>.output {
             <span class="macro">trace!</span>(<span class="string">&quot;An output path has been explicitly specified&quot;</span>);
-            output.to_owned()
+            Utf8PathBuf::from_path_buf(output.to_owned()).unwrap()
         } <span class="kw">else </span>{
             <span class="macro">trace!</span>(<span class="string">&quot;An output path has NOT been explicitly specified. Implicitly determine output from manifest location.&quot;</span>);
             package
                 .manifest_path
-                .as_std_path()
                 .parent()
                 .map(|p| p.to_path_buf())
                 .map(|<span class="kw-2">mut </span>p| {
@@ -1605,7 +1615,8 @@
             <span class="kw">let </span>execution = b.build();
             <span class="macro">assert_eq!</span>(
                 execution.binaries,
-                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[EXPECTED_BINARY]).map(|s| s.iter().map(PathBuf::from).collect())
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[EXPECTED_BINARY])
+                    .map(|s| s.into_iter().map(StoredPathBuf::from).collect())
             );
             <span class="macro">assert_eq!</span>(
                 execution.copyright_year,
@@ -1619,11 +1630,14 @@
                 execution.description,
                 <span class="prelude-val">Some</span>(EXPECTED_DESCRIPTION).map(String::from)
             );
-            <span class="macro">assert_eq!</span>(execution.eula, <span class="prelude-val">Some</span>(EXPECTED_EULA).map(PathBuf::from));
+            <span class="macro">assert_eq!</span>(execution.eula, <span class="prelude-val">Some</span>(EXPECTED_EULA).map(StoredPathBuf::from));
             <span class="macro">assert!</span>(execution.force);
             <span class="macro">assert_eq!</span>(execution.help_url, <span class="prelude-val">Some</span>(EXPECTED_URL).map(String::from));
             <span class="macro">assert_eq!</span>(execution.input, <span class="prelude-val">Some</span>(EXPECTED_INPUT).map(PathBuf::from));
-            <span class="macro">assert_eq!</span>(execution.license, <span class="prelude-val">Some</span>(EXPECTED_LICENSE).map(PathBuf::from));
+            <span class="macro">assert_eq!</span>(
+                execution.license,
+                <span class="prelude-val">Some</span>(EXPECTED_LICENSE).map(StoredPathBuf::from)
+            );
             <span class="macro">assert_eq!</span>(
                 execution.manufacturer,
                 <span class="prelude-val">Some</span>(EXPECTED_MANUFACTURER).map(String::from)
@@ -1632,7 +1646,7 @@
             <span class="macro">assert_eq!</span>(execution.path_guid, <span class="prelude-val">Some</span>(PATH_GUID).map(String::from));
             <span class="macro">assert_eq!</span>(
                 execution.product_icon,
-                <span class="prelude-val">Some</span>(EXPECTED_PRODUCT_ICON).map(PathBuf::from)
+                <span class="prelude-val">Some</span>(EXPECTED_PRODUCT_ICON).map(StoredPathBuf::from)
             );
             <span class="macro">assert_eq!</span>(
                 execution.product_name,
@@ -1642,10 +1656,12 @@
         }
     }
 
-    <span class="kw">mod </span>execution {
+    <span class="attr">#[cfg(windows)]
+    </span><span class="kw">mod </span>execution {
         <span class="kw">extern crate </span>assert_fs;
 
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
+        <span class="kw">use </span>serial_test::serial;
         <span class="kw">use </span>std::env;
 
         <span class="kw">const </span>MIN_PACKAGE: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot;[package]
@@ -1654,6 +1670,7 @@
         &quot;#</span>;
 
         <span class="attr">#[test]
+        #[serial]
         </span><span class="kw">fn </span>destination_is_correct_with_defaults() {
             <span class="kw">let </span>original = env::current_dir().unwrap();
             <span class="kw">let </span>temp_dir = <span class="kw">crate</span>::tests::setup_project(MIN_PACKAGE);
@@ -1672,6 +1689,7 @@
         }
 
         <span class="attr">#[test]
+        #[serial]
         </span><span class="kw">fn </span>destination_is_correct_with_output() {
             <span class="kw">let </span>expected = PathBuf::from(<span class="string">&quot;output&quot;</span>);
             <span class="kw">let </span>temp_dir = <span class="kw">crate</span>::tests::setup_project(MIN_PACKAGE);
