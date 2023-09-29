@@ -45,7 +45,7 @@
 //! ## Organization
 //!
 //! Each subcommand is organized into a separate module. So, there is a
-//! `create`, `inititalize`, `print`, etc. module within the crate. Some of the
+//! `create`, `initialize`, `print`, etc. module within the crate. Some of the
 //! modules are in a single Rust source file, while others are organized into
 //! sub-folders. Each module follows the [Builder] design pattern, so there is a
 //! `Builder` and `Execution` struct for each module/subcommand. The `Builder`
@@ -404,7 +404,7 @@ impl Error {
     /// The `std::error::Error::description` method is "soft-deprecated"
     /// according to the Rust stdlib documentation. It is recommended to use the
     /// `std::fmt::Display` implementation for a "description" string. However,
-    /// there is already a `std::fmt::Display` implemenation for this error
+    /// there is already a `std::fmt::Display` implementation for this error
     /// type, and it is nice to have a short, single word representation for
     /// nicely formatting errors to humans. This method maintains the error
     /// message formatting.
@@ -753,7 +753,7 @@ pub enum Cultures {
     ZhTw,
     /// Turkish, Turkey
     TrTr,
-    /// Ukranian, Ukraine
+    /// Ukrainian, Ukraine
     UkUa,
 }
 
@@ -1100,7 +1100,7 @@ impl StoredPathBuf {
                 // (either the one at the end of "C:\" or the one at the start of "/a/b/c")
                 Utf8Component::RootDir => "\\",
                 other => {
-                    // Ok we're passed the weird root stuff, now should add seperators
+                    // Ok we're passed the weird root stuff, now should add separators
                     multipart = true;
                     other.as_str()
                 }

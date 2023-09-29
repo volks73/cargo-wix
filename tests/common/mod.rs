@@ -119,7 +119,7 @@ pub fn add_license_to_package(path: &Path, license: &str) {
 /// This provides a unique, isolated Cargo project/package for testing. A
 /// temporary directory is created. Then, a cargo project is initialized within
 /// the temporary directory. The package/project is initialized without any
-/// verison control system (vcs). The command that is ultimately executed to
+/// version control system (vcs). The command that is ultimately executed to
 /// create the cargo project in the temporary directory is:
 ///
 /// ```
@@ -127,7 +127,7 @@ pub fn add_license_to_package(path: &Path, license: &str) {
 /// ```
 ///
 /// where `<username>` is replaced with the current logged in user for the
-/// Windows Operating System (OS) and `######` is a hash ID that guarentees the
+/// Windows Operating System (OS) and `######` is a hash ID that guarantees the
 /// folder is unique.
 ///
 /// # Panics
@@ -372,7 +372,7 @@ pub fn evaluate_xpath(wxs: &Path, xpath: &str) -> String {
 /// by cargo's test framework keeps the formatting and coloring. There might be
 /// a decrease in performance as well.
 ///
-/// Log statements are formated the same as the verbosity format for the CLI.
+/// Log statements are formatted the same as the verbosity format for the CLI.
 ///
 /// # Examples
 ///
@@ -409,7 +409,7 @@ pub fn init_logging() {
     let mut builder = Builder::new();
     builder
         .format(|buf, record| {
-            // This implmentation for a format is copied from the default format implemented for the
+            // This implementation for a format is copied from the default format implemented for the
             // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
             // message and change the colors to match the previous colors used by the `loggerv` crate.
             let mut level_style = buf.style();

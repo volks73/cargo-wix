@@ -35,12 +35,12 @@ use cargo_metadata::Package;
 
 fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {
-        trace!("An output path has been explicity specified");
+        trace!("An output path has been explicitly specified");
         let f = File::create(output)?;
         Ok(Box::new(f))
     } else {
         trace!(
-            "An output path has NOT been explicity specified. Implicitly \
+            "An output path has NOT been explicitly specified. Implicitly \
              determine output."
         );
         Ok(Box::new(io::stdout()))
