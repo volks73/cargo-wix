@@ -286,7 +286,7 @@ fn license_with_txt_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        EXPECTED
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -317,7 +317,7 @@ fn license_with_rtf_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        EXPECTED
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -407,7 +407,7 @@ fn mit_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        LICENSE_RTF.to_owned()
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -477,7 +477,7 @@ fn apache2_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        LICENSE_RTF.to_owned()
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -547,7 +547,7 @@ fn gpl3_license_id_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        LICENSE_RTF.to_owned()
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -612,7 +612,7 @@ fn license_file_field_with_rtf_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        EXPECTED
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(
@@ -677,7 +677,7 @@ fn license_file_field_with_txt_file_works() {
             package.child(MAIN_WXS_PATH.as_path()).path(),
             "//*/wix:File[@Id='LicenseFile']/@Name"
         ),
-        EXPECTED
+        ""
     );
     assert_eq!(
         common::evaluate_xpath(

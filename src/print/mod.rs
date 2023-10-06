@@ -33,6 +33,27 @@ use std::path::PathBuf;
 
 use cargo_metadata::Package;
 
+pub struct RenderOutput {
+    pub path: Option<PathBuf>,
+    pub rendered: String,
+}
+
+impl RenderOutput {
+    pub fn write(&self) -> Result<()> {
+        let mut out = destination(self.path.as_ref())?;
+        out.write_all(self.rendered.as_bytes())?;
+        out.flush()?;
+        Ok(())
+    }
+
+    pub fn write_disk_only(&self) -> Result<()> {
+        if self.path.is_none() {
+            return Ok(());
+        }
+        self.write()
+    }
+}
+
 fn destination(output: Option<&PathBuf>) -> Result<Box<dyn Write>> {
     if let Some(ref output) = output {
         trace!("An output path has been explicitly specified");

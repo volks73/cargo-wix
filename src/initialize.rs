@@ -25,13 +25,10 @@
 use camino::Utf8PathBuf;
 use cargo_metadata::Package;
 
-use crate::eula::Eula;
 use crate::print;
 use crate::Error;
 use crate::Result;
 use crate::StoredPathBuf;
-use crate::LICENSE_FILE_NAME;
-use crate::RTF_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
@@ -456,37 +453,7 @@ impl Execution {
             info!("Creating the '{}' directory", destination);
             fs::create_dir(&destination)?;
         }
-        let (eula_wxs_path, license_wxs_path) = match Eula::new(self.eula.as_deref(), &package)? {
-            Eula::CommandLine(path) => (Some(path), self.license),
-            Eula::Manifest(path) => (Some(path), self.license),
-            Eula::Generate(template) => {
-                destination.push(LICENSE_FILE_NAME);
-                destination.set_extension(RTF_FILE_EXTENSION);
-                if destination.exists() && !self.force {
-                    return Err(Error::already_exists(&destination));
-                } else {
-                    info!("Generating an EULA");
-                    let mut eula_printer = print::license::Builder::new();
-                    eula_printer
-                        .copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
-                    eula_printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
-                    eula_printer.input(self.input.as_deref().and_then(Path::to_str));
-                    eula_printer.output(Some(destination.as_str()));
-                    eula_printer.package(self.package.as_deref());
-                    eula_printer.build().run(&template)?;
-                }
-                destination.pop();
-                let mut relative = destination
-                    .strip_prefix(&super::package_root(self.input.as_ref())?)?
-                    .to_owned();
-                relative.push(LICENSE_FILE_NAME);
-                relative.set_extension(RTF_FILE_EXTENSION);
-                let stored_relative = StoredPathBuf::from_utf8_path(&relative);
-                (Some(stored_relative.clone()), Some(stored_relative))
-            }
-            Eula::Disabled => (None, self.license),
-        };
-        debug!("eula_wxs_path = {:?}", eula_wxs_path);
+
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
         if destination.exists() && !self.force {
@@ -502,10 +469,10 @@ impl Execution {
             );
             wxs_printer.description(self.description.as_ref().map(String::as_ref));
             wxs_printer.dialog(self.dialog.as_deref().map(|s| s.as_str()));
-            wxs_printer.eula(eula_wxs_path.as_deref().map(|s| s.as_str()));
+            wxs_printer.eula(self.eula.as_deref().map(|p| p.as_str()));
             wxs_printer.help_url(self.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(self.input.as_deref().and_then(Path::to_str));
-            wxs_printer.license(license_wxs_path.as_ref().map(|s| s.as_str()));
+            wxs_printer.license(self.license.as_deref().map(|p| p.as_str()));
             wxs_printer.manufacturer(self.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(Some(destination.as_str()));
             wxs_printer.package(self.package.as_deref());
@@ -513,6 +480,7 @@ impl Execution {
             wxs_printer.product_icon(self.product_icon.as_ref().map(|s| s.as_str()));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(self.upgrade_guid.as_ref().map(String::as_ref));
+
             wxs_printer.build().run()?;
         }
         Ok(())

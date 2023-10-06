@@ -15,7 +15,8 @@
 //! The implementation for printing a WiX Source (wxs) file.
 
 use crate::description;
-use crate::eula::Eula;
+use crate::eula::License;
+use crate::eula::Licenses;
 use crate::manifest;
 use crate::package;
 use crate::product_name;
@@ -24,25 +25,28 @@ use crate::Result;
 use crate::StoredPathBuf;
 use crate::Template;
 use crate::EXE_FILE_EXTENSION;
-use crate::LICENSE_FILE_NAME;
-use crate::RTF_FILE_EXTENSION;
 
+use camino::Utf8Path;
 use log::{debug, trace, warn};
 
-use mustache::Data;
 use mustache::{self, MapBuilder};
 
+use std::path::Path;
 use std::{collections::HashMap, str::FromStr};
 
 use cargo_metadata::Package;
 
 use uuid::Uuid;
 
+use super::RenderOutput;
+
 /// A builder for creating an execution context to print a WiX Toolset source file (wxs).
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     banner: Option<&'a str>,
     binaries: Option<Vec<&'a str>>,
+    copyright_year: Option<&'a str>,
+    copyright_holder: Option<&'a str>,
     description: Option<&'a str>,
     dialog: Option<&'a str>,
     eula: Option<&'a str>,
@@ -64,6 +68,8 @@ impl<'a> Builder<'a> {
         Builder {
             banner: None,
             binaries: None,
+            copyright_year: None,
+            copyright_holder: None,
             description: None,
             dialog: None,
             eula: None,
@@ -109,6 +115,43 @@ impl<'a> Builder<'a> {
     /// panel.
     pub fn binaries(&mut self, b: Option<Vec<&'a str>>) -> &mut Self {
         self.binaries = b;
+        self
+    }
+
+    /// Sets the copyright holder for the generated license file and EULA.
+    ///
+    /// The default is to use the `authors` field of the
+    /// package's manifest (Cargo.toml). This method can be used to override the
+    /// default and set a different copyright holder if and when a Rich Text
+    /// Format (RTF) license and EULA are generated based on the value of the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// This value is ignored and not used if an EULA is set with the [`eula`]
+    /// method, if a custom EULA is set using the `license-file` field in the
+    /// package's manifest (Cargo.toml), or an EULA is _not_ generated from the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
+    pub fn copyright_holder(&mut self, h: Option<&'a str>) -> &mut Self {
+        self.copyright_holder = h;
+        self
+    }
+
+    /// Sets the copyright year for the generated license file and EULA.
+    ///
+    /// The default is to use the current year. This method can be used to
+    /// override the default and set a specific year if and when a Rich Text
+    /// Format (RTF) license and EULA are generated based on the value of the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// This value is ignored and not used if an EULA is set with the [`eula`]
+    /// method, if a custom EULA is set using the `license-file` field in the
+    /// package's manifest (Cargo.toml), or an EULA is _not_ generated from the
+    /// `license` field in the package's manifest (Cargo.toml).
+    ///
+    /// [`eula`]: https://volks73.github.io/cargo-wix/cargo_wix/initialize.html#eula
+    pub fn copyright_year(&mut self, y: Option<&'a str>) -> &mut Self {
+        self.copyright_year = y;
         self
     }
 
@@ -293,6 +336,8 @@ impl<'a> Builder<'a> {
                 .binaries
                 .as_ref()
                 .map(|b| b.iter().copied().map(StoredPathBuf::from).collect()),
+            copyright_holder: self.copyright_holder.map(String::from),
+            copyright_year: self.copyright_year.map(String::from),
             description: self.description.map(String::from),
             dialog: self.dialog.map(StoredPathBuf::from),
             eula: self.eula.map(StoredPathBuf::from),
@@ -321,6 +366,8 @@ impl<'a> Default for Builder<'a> {
 pub struct Execution {
     banner: Option<StoredPathBuf>,
     binaries: Option<Vec<StoredPathBuf>>,
+    copyright_holder: Option<String>,
+    copyright_year: Option<String>,
     description: Option<String>,
     dialog: Option<StoredPathBuf>,
     eula: Option<StoredPathBuf>,
@@ -336,29 +383,32 @@ pub struct Execution {
     upgrade_guid: Option<String>,
 }
 
+pub struct WxsRenders {
+    pub wxs: RenderOutput,
+    pub license: Option<RenderOutput>,
+    pub eula: Option<RenderOutput>,
+}
+
 impl Execution {
     /// Prints a WiX Source (wxs) file based on the built context.
     pub fn run(self) -> Result<()> {
-        let template = mustache::compile_str(Template::Wxs.to_str())?;
-        let mut destination = super::destination(self.output.as_ref())?;
-        let data = self.build_data()?;
-        template
-            .render_data(&mut destination, &data)
-            .map_err(Error::from)
+        let renders = self.render()?;
+        renders.wxs.write()?;
+        if let Some(license) = renders.license {
+            license.write_disk_only()?;
+        }
+        if let Some(eula) = renders.eula {
+            eula.write_disk_only()?;
+        }
+        Ok(())
     }
 
     /// Instead of printing the output like [`Execution::run`][], return it as a String
-    pub fn render_to_string(self) -> Result<String> {
-        let template = mustache::compile_str(Template::Wxs.to_str())?;
-        let data = self.build_data()?;
-        template.render_data_to_string(&data).map_err(Error::from)
-    }
-
-    /// Inner implementation of [`Execution::run`][] which computes all the template inputs
-    #[allow(clippy::cognitive_complexity)]
-    fn build_data(self) -> Result<Data> {
+    pub fn render(self) -> Result<WxsRenders> {
         debug!("banner = {:?}", self.banner);
         debug!("binaries = {:?}", self.binaries);
+        debug!("copyright_holder = {:?}", self.copyright_holder);
+        debug!("copyright_year = {:?}", self.copyright_year);
         debug!("description = {:?}", self.description);
         debug!("dialog = {:?}", self.description);
         debug!("eula = {:?}", self.eula);
@@ -375,6 +425,7 @@ impl Execution {
         let manifest = manifest(self.input.as_ref())?;
         let package = package(&manifest, self.package.as_deref())?;
         let binaries = self.binaries(&package)?;
+        let licenses = self.licenses(&package)?;
         let mut map = MapBuilder::new()
             .insert_vec("binaries", |mut builder| {
                 for binary in &binaries {
@@ -409,19 +460,8 @@ impl Execution {
         if let Some(dialog) = self.dialog_image(&package) {
             map = map.insert_str("dialog", dialog);
         }
-        match self.eula(&package)? {
-            Eula::Disabled => {
-                warn!(
-                    "An EULA was not specified at the command line, a RTF \
-                     license file was not specified in the package manifest's \
-                     (Cargo.toml) 'license-file' field, or the license ID from the \
-                     package manifest's 'license' field is not recognized. The \
-                     license agreement dialog will be excluded from the installer. An \
-                     EULA can be added manually to the generated WiX Source (wxs) \
-                     file using a text editor."
-                );
-            }
-            e => map = map.insert_str("eula", e.to_string()),
+        if let Some(eula) = &licenses.end_user_license {
+            map = map.insert_str("eula", &eula.stored_path);
         }
         if let Some(url) = self.help_url(&package) {
             map = map.insert_str("help-url", url);
@@ -432,23 +472,48 @@ impl Execution {
                  using a text editor."
             );
         }
-        if let Some(name) = self.license_name(&package) {
-            map = map.insert_str("license-name", name);
-        }
-        if let Some(source) = self.license_source(&package) {
-            map = map.insert_str("license-source", source);
-        } else {
-            warn!(
-                "A license file could not be found and it will be excluded from the \
-                 installer. A license file can be added manually to the generated WiX Source \
-                 (wxs) file using a text editor."
-            );
+        if let Some(license) = &licenses.source_license {
+            map = map.insert_str("license-source", &license.stored_path);
+            if let Some(name) = &license.name {
+                map = map.insert_str("license-name", name);
+            }
         }
         if let Some(icon) = self.product_icon(&package) {
             map = map.insert_str("product-icon", icon);
         }
 
-        Ok(map.build())
+        let wxs = {
+            let data = map.build();
+            let main_destination = self.output.clone();
+            let template = mustache::compile_str(Template::Wxs.to_str())?;
+            let rendered = template.render_data_to_string(&data).map_err(Error::from)?;
+            RenderOutput {
+                path: main_destination,
+                rendered,
+            }
+        };
+        let license = self.render_license_string(licenses.source_license.as_ref())?;
+        let eula = self.render_license_string(licenses.end_user_license.as_ref())?;
+        Ok(WxsRenders { wxs, license, eula })
+    }
+
+    fn render_license_string(&self, license: Option<&License>) -> Result<Option<RenderOutput>> {
+        let Some(license) = license else {
+            return Ok(None);
+        };
+        let Some((output, template)) = &license.generate else {
+            return Ok(None);
+        };
+
+        let mut printer = crate::print::license::Builder::new();
+        printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
+        printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
+        printer.input(self.input.as_deref().and_then(Path::to_str));
+        printer.output(Some(output.as_str()));
+        printer.package(self.package.as_deref());
+
+        let render = printer.build().render(template)?;
+        Ok(Some(render))
     }
 
     fn binaries(&self, package: &Package) -> Result<Vec<HashMap<&'static str, String>>> {
@@ -512,60 +577,19 @@ impl Execution {
             .or_else(|| manifest.repository.clone())
     }
 
-    fn eula(&self, manifest: &Package) -> Result<Eula> {
-        if let Some(ref path) = self.eula.clone() {
-            Eula::new(Some(path), manifest)
-        } else {
-            Eula::new(
-                self.license
-                    .as_deref()
-                    .filter(|p| p.extension() == Some(RTF_FILE_EXTENSION)),
-                manifest,
-            )
-        }
-    }
-
-    fn license_name(&self, manifest: &Package) -> Option<String> {
-        if let Some(l) = &self.license {
-            l.file_name().map(String::from)
-        } else {
-            manifest
-                .license
-                .as_ref()
-                .filter(|l| Template::license_ids().contains(l))
-                .map(|_| String::from(LICENSE_FILE_NAME))
-                .or_else(|| {
-                    manifest
-                        .license_file()
-                        .and_then(|l| l.file_name().map(String::from))
-                })
-        }
-    }
-
-    fn license_source(&self, manifest: &Package) -> Option<StoredPathBuf> {
-        if let Some(path) = &self.license {
-            Some(path.clone())
-        } else {
-            manifest
-                .license
-                .as_ref()
-                .filter(|l| Template::license_ids().contains(l))
-                .map(|_| StoredPathBuf::from(format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")))
-                .or_else(|| {
-                    manifest.license_file().and_then(|s| {
-                        if s.exists() {
-                            trace!(
-                                "The '{}' path from the 'license-file' field in the package's \
-                                 manifest (Cargo.toml) exists.",
-                                s
-                            );
-                            Some(StoredPathBuf::from_utf8_path(&s))
-                        } else {
-                            None
-                        }
-                    })
-                })
-        }
+    fn licenses(&self, manifest: &Package) -> Result<Licenses> {
+        let output_dir = self
+            .output
+            .as_deref()
+            .and_then(|p| p.parent())
+            .and_then(Utf8Path::from_path);
+        let licenses = Licenses::new(
+            output_dir,
+            self.license.as_deref(),
+            self.eula.as_deref(),
+            manifest,
+        )?;
+        Ok(licenses)
     }
 
     fn manufacturer(&self, manifest: &Package) -> Result<String> {
@@ -662,7 +686,7 @@ impl Execution {
 
 impl Default for Execution {
     fn default() -> Self {
-        Builder::new().build()
+        Builder::new().output(Some("wix/main.wxs")).build()
     }
 }
 
@@ -793,6 +817,7 @@ mod tests {
 
         use super::*;
         use crate::tests::setup_project;
+        use crate::{LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX};
         use std::fs::File;
 
         const MIN_MANIFEST: &str = r#"[package]
@@ -935,9 +960,15 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let actual = Execution::default()
-                .license_name(&package)
-                .expect("License name");
-            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
+            assert_eq!(
+                actual,
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
+            );
         }
 
         #[test]
@@ -947,9 +978,15 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let actual = Execution::default()
-                .license_name(&package)
-                .expect("License name");
-            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
+            assert_eq!(
+                actual,
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
+            );
         }
 
         #[test]
@@ -959,9 +996,15 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let actual = Execution::default()
-                .license_name(&package)
-                .expect("License name");
-            assert_eq!(actual, String::from(LICENSE_FILE_NAME));
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
+            assert_eq!(
+                actual,
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
+            );
         }
 
         #[test]
@@ -970,7 +1013,10 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_name(&package);
+            let actual = Execution::default()
+                .licenses(&package)
+                .expect("licenses")
+                .source_license;
             assert!(actual.is_none());
         }
 
@@ -980,12 +1026,15 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_source(&package);
+            let actual = Execution::default()
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
             assert_eq!(
                 actual,
-                Some(StoredPathBuf::from(
-                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
-                ))
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
             );
         }
 
@@ -995,12 +1044,15 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_source(&package);
+            let actual = Execution::default()
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
             assert_eq!(
                 actual,
-                Some(StoredPathBuf::from(
-                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
-                ))
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
             );
         }
 
@@ -1010,12 +1062,15 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_source(&package);
+            let actual = Execution::default()
+                .licenses(&package)
+                .expect("licenses")
+                .source_license
+                .expect("source license")
+                .stored_path;
             assert_eq!(
                 actual,
-                Some(StoredPathBuf::from(
-                    LICENSE_FILE_NAME.to_owned() + "." + RTF_FILE_EXTENSION
-                ))
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
             );
         }
 
@@ -1025,7 +1080,10 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().license_source(&package);
+            let actual = Execution::default()
+                .licenses(&package)
+                .expect("licenses")
+                .source_license;
             assert!(actual.is_none());
         }
 
@@ -1172,8 +1230,11 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Disabled);
+            let actual = Execution::default()
+                .licenses(&package)
+                .unwrap()
+                .end_user_license;
+            assert!(actual.is_none());
         }
 
         #[test]
@@ -1182,8 +1243,19 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Generate(Template::Mit));
+            let licenses = Execution::default().licenses(&package).unwrap();
+            let source = licenses.source_license.unwrap();
+            let (template_out, source_template) = source.generate.unwrap();
+            let eula_path = licenses.end_user_license.unwrap().stored_path;
+
+            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            assert_eq!(source_template, Template::Mit);
+            assert_eq!(source.stored_path.as_str(), expected_path);
+            assert_eq!(
+                StoredPathBuf::from_utf8_path(&template_out).as_str(),
+                expected_path
+            );
+            assert_eq!(eula_path.as_str(), expected_path);
         }
 
         #[test]
@@ -1192,8 +1264,20 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Generate(Template::Apache2));
+            let licenses = Execution::default().licenses(&package).unwrap();
+            let source = licenses.source_license.unwrap();
+            let source_path = source.stored_path;
+            let (template_out, source_template) = source.generate.unwrap();
+            let eula_path = licenses.end_user_license.unwrap().stored_path;
+
+            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            assert_eq!(source_template, Template::Apache2);
+            assert_eq!(source_path.as_str(), expected_path);
+            assert_eq!(
+                StoredPathBuf::from_utf8_path(&template_out).as_str(),
+                expected_path
+            );
+            assert_eq!(eula_path.as_str(), expected_path);
         }
 
         #[test]
@@ -1202,8 +1286,20 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Generate(Template::Gpl3));
+            let licenses = Execution::default().licenses(&package).unwrap();
+            let source = licenses.source_license.unwrap();
+            let source_path = source.stored_path;
+            let (template_out, source_template) = source.generate.unwrap();
+            let eula_path = licenses.end_user_license.unwrap().stored_path;
+
+            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            assert_eq!(source_template, Template::Gpl3);
+            assert_eq!(source_path.as_str(), expected_path);
+            assert_eq!(
+                StoredPathBuf::from_utf8_path(&template_out).as_str(),
+                expected_path
+            );
+            assert_eq!(eula_path.as_str(), expected_path);
         }
 
         #[test]
@@ -1212,8 +1308,12 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Disabled);
+            let licenses = Execution::default().licenses(&package).unwrap();
+            let source = licenses.source_license;
+            let eula = licenses.end_user_license;
+
+            assert_eq!(source, None);
+            assert_eq!(eula, None);
         }
 
         #[test]
@@ -1229,11 +1329,14 @@ mod tests {
             let actual = Builder::default()
                 .eula(license_file_path.to_str())
                 .build()
-                .eula(&package)
-                .unwrap();
+                .licenses(&package)
+                .unwrap()
+                .end_user_license
+                .unwrap()
+                .stored_path;
             assert_eq!(
                 actual,
-                Eula::CommandLine(StoredPathBuf::from_std_path(&license_file_path).unwrap())
+                StoredPathBuf::from_std_path(&license_file_path).unwrap(),
             );
         }
 
@@ -1246,10 +1349,22 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
+            let actual = Execution::default().licenses(&package);
+
+            eprintln!("{:?}", actual);
+            let actual = actual.unwrap().end_user_license.unwrap().stored_path;
+            assert_eq!(actual.as_str(), "Example.rtf");
+            Builder::default()
+                .eula(license_file_path.to_str())
+                .build()
+                .licenses(&package)
+                .unwrap()
+                .end_user_license
+                .unwrap()
+                .stored_path;
             assert_eq!(
-                actual,
-                Eula::Manifest(StoredPathBuf::from_std_path(&license_file_path).unwrap())
+                actual.as_str(),
+                "Example.rtf",
             );
         }
 
@@ -1262,8 +1377,14 @@ mod tests {
             let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().eula(&package).unwrap();
-            assert_eq!(actual, Eula::Disabled);
+            let licenses = Execution::default().licenses(&package).unwrap();
+            let source = licenses.source_license.unwrap();
+            let eula = licenses.end_user_license;
+
+            assert_eq!(source.generate, None);
+            assert_eq!(source.name, None);
+            assert_eq!(source.stored_path.as_str(), "Example.txt");
+            assert_eq!(eula, None);
         }
 
         #[test]
@@ -1279,12 +1400,14 @@ mod tests {
             // So we turn the input to a string without escaping.
             let input = license_file_path.to_str().unwrap();
             let expected = StoredPathBuf::new(input.to_owned());
-            let actual = Builder::default()
+            let licenses = Builder::default()
                 .eula(Some(input))
                 .build()
-                .eula(&package)
+                .licenses(&package)
                 .unwrap();
-            assert_eq!(actual, Eula::CommandLine(expected));
+            let eula = licenses.end_user_license.unwrap();
+
+            assert_eq!(eula.stored_path, expected);
         }
 
         #[test]

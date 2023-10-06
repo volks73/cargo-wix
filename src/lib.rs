@@ -213,14 +213,6 @@ fn package(manifest: &Metadata, package: Option<&str>) -> Result<Package> {
     Ok(manifest[package_id].clone())
 }
 
-fn package_root(input: Option<&PathBuf>) -> Result<PathBuf> {
-    cargo_toml_file(input).map(|p| {
-        p.parent()
-            .map(PathBuf::from)
-            .expect("The Cargo.toml file to NOT be root.")
-    })
-}
-
 fn product_name(product_name: Option<&String>, manifest: &Package) -> String {
     if let Some(p) = product_name {
         p.to_owned()
@@ -1174,7 +1166,13 @@ impl StoredPath {
                 }
             }
             (Some(name), None) | (None, Some(name)) => Some(name),
-            (None, None) => None,
+            (None, None) => {
+                if self.is_empty() {
+                    None
+                } else {
+                    Some(self.as_str())
+                }
+            }
         }
     }
 }
