@@ -682,11 +682,23 @@ impl Execution {
                 .map(|p| StoredPathBuf::new(p.to_owned()))
         }
     }
-}
 
-impl Default for Execution {
-    fn default() -> Self {
-        Builder::new().output(Some("wix/main.wxs")).build()
+    #[cfg(test)]
+    pub fn for_test(input: &Path) -> Self {
+        let input = Utf8Path::from_path(input).expect("utf8 path");
+        let output = input
+            .parent()
+            .expect("Cargo.toml to not be a root")
+            .join(crate::WIX)
+            .join(format!(
+                "{}.{}",
+                crate::WIX_SOURCE_FILE_NAME,
+                crate::WIX_SOURCE_FILE_EXTENSION
+            ));
+        Builder::new()
+            .input(Some(input.as_str()))
+            .output(Some(output.as_str()))
+            .build()
     }
 }
 
@@ -956,10 +968,11 @@ mod tests {
         #[test]
         fn license_name_with_mit_license_field_works() {
             let project = setup_project(MIT_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -974,10 +987,11 @@ mod tests {
         #[test]
         fn license_name_with_gpl3_license_field_works() {
             let project = setup_project(GPL3_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -992,10 +1006,11 @@ mod tests {
         #[test]
         fn license_name_with_apache2_license_field_works() {
             let project = setup_project(APACHE2_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -1010,10 +1025,11 @@ mod tests {
         #[test]
         fn license_name_with_unknown_license_field_works() {
             let project = setup_project(UNKNOWN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license;
@@ -1023,10 +1039,11 @@ mod tests {
         #[test]
         fn license_source_with_mit_license_field_works() {
             let project = setup_project(MIT_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -1041,10 +1058,11 @@ mod tests {
         #[test]
         fn license_source_with_gpl3_license_field_works() {
             let project = setup_project(GPL3_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -1059,10 +1077,11 @@ mod tests {
         #[test]
         fn license_source_with_apache2_license_field_works() {
             let project = setup_project(APACHE2_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license
@@ -1077,10 +1096,11 @@ mod tests {
         #[test]
         fn license_source_with_unknown_license_field_works() {
             let project = setup_project(UNKNOWN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
                 .source_license;
@@ -1090,10 +1110,11 @@ mod tests {
         #[test]
         fn binaries_with_no_bin_section_works() {
             let project = setup_project(MIT_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().binaries(&package).unwrap();
+            let actual = Execution::for_test(&input).binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
@@ -1107,10 +1128,11 @@ mod tests {
         #[test]
         fn binaries_with_single_bin_section_works() {
             let project = setup_project(MIT_MANIFEST_BIN);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().binaries(&package).unwrap();
+            let actual = Execution::for_test(&input).binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![hashmap! {
@@ -1124,10 +1146,11 @@ mod tests {
         #[test]
         fn binaries_with_multiple_bin_sections_works() {
             let project = setup_project(MULTIPLE_BIN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().binaries(&package).unwrap();
+            let actual = Execution::for_test(&input).binaries(&package).unwrap();
             assert_eq!(
                 actual,
                 vec![
@@ -1155,10 +1178,11 @@ mod tests {
             const EXPECTED: &str = "First Last";
 
             let project = setup_project(MIN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().manufacturer(&package).unwrap();
+            let actual = Execution::for_test(&input).manufacturer(&package).unwrap();
             assert_eq!(actual, String::from(EXPECTED));
         }
 
@@ -1227,10 +1251,11 @@ mod tests {
         #[test]
         fn eula_with_defaults_works() {
             let project = setup_project(MIN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .unwrap()
                 .end_user_license;
@@ -1240,75 +1265,80 @@ mod tests {
         #[test]
         fn eula_with_mit_license_field_works() {
             let project = setup_project(MIT_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let licenses = Execution::default().licenses(&package).unwrap();
+            let licenses = Execution::for_test(&input).licenses(&package).unwrap();
             let source = licenses.source_license.unwrap();
+            let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
             let eula_path = licenses.end_user_license.unwrap().stored_path;
 
-            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
+                .unwrap()
+                .join(&expected_rel_path);
             assert_eq!(source_template, Template::Mit);
-            assert_eq!(source.stored_path.as_str(), expected_path);
-            assert_eq!(
-                StoredPathBuf::from_utf8_path(&template_out).as_str(),
-                expected_path
-            );
-            assert_eq!(eula_path.as_str(), expected_path);
+            assert_eq!(source_path.as_str(), expected_rel_path);
+            assert_eq!(template_out, expected_abs_path);
+            assert_eq!(eula_path.as_str(), expected_rel_path);
         }
 
         #[test]
         fn eula_with_apache2_license_field_works() {
             let project = setup_project(APACHE2_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let licenses = Execution::default().licenses(&package).unwrap();
+            let licenses = Execution::for_test(&input).licenses(&package).unwrap();
             let source = licenses.source_license.unwrap();
             let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
             let eula_path = licenses.end_user_license.unwrap().stored_path;
 
-            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
+                .unwrap()
+                .join(&expected_rel_path);
             assert_eq!(source_template, Template::Apache2);
-            assert_eq!(source_path.as_str(), expected_path);
-            assert_eq!(
-                StoredPathBuf::from_utf8_path(&template_out).as_str(),
-                expected_path
-            );
-            assert_eq!(eula_path.as_str(), expected_path);
+            assert_eq!(source_path.as_str(), expected_rel_path);
+            assert_eq!(template_out, expected_abs_path);
+            assert_eq!(eula_path.as_str(), expected_rel_path);
         }
 
         #[test]
         fn eula_with_gpl3_license_field_works() {
             let project = setup_project(GPL3_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let licenses = Execution::default().licenses(&package).unwrap();
+            let licenses = Execution::for_test(&input).licenses(&package).unwrap();
             let source = licenses.source_license.unwrap();
             let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
             let eula_path = licenses.end_user_license.unwrap().stored_path;
 
-            let expected_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
+            let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
+                .unwrap()
+                .join(&expected_rel_path);
             assert_eq!(source_template, Template::Gpl3);
-            assert_eq!(source_path.as_str(), expected_path);
-            assert_eq!(
-                StoredPathBuf::from_utf8_path(&template_out).as_str(),
-                expected_path
-            );
-            assert_eq!(eula_path.as_str(), expected_path);
+            assert_eq!(source_path.as_str(), expected_rel_path);
+            assert_eq!(template_out, expected_abs_path);
+            assert_eq!(eula_path.as_str(), expected_rel_path);
         }
 
         #[test]
         fn eula_with_unknown_license_field_works() {
             let project = setup_project(UNKNOWN_MANIFEST);
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let licenses = Execution::default().licenses(&package).unwrap();
+            let licenses = Execution::for_test(&input).licenses(&package).unwrap();
             let source = licenses.source_license;
             let eula = licenses.end_user_license;
 
@@ -1346,10 +1376,11 @@ mod tests {
             let license_file_path = project.path().join("Example.rtf");
             let _license_file_handle = File::create(&license_file_path).expect("Create file");
 
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::default().licenses(&package);
+            let actual = Execution::for_test(&input).licenses(&package);
 
             eprintln!("{:?}", actual);
             let actual = actual.unwrap().end_user_license.unwrap().stored_path;
@@ -1362,10 +1393,7 @@ mod tests {
                 .end_user_license
                 .unwrap()
                 .stored_path;
-            assert_eq!(
-                actual.as_str(),
-                "Example.rtf",
-            );
+            assert_eq!(actual.as_str(), "Example.rtf",);
         }
 
         #[test]
@@ -1374,10 +1402,11 @@ mod tests {
             let license_file_path = project.path().join("Example.txt");
             let _license_file_handle = File::create(license_file_path).expect("Create file");
 
-            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let licenses = Execution::default().licenses(&package).unwrap();
+            let licenses = Execution::for_test(&input).licenses(&package).unwrap();
             let source = licenses.source_license.unwrap();
             let eula = licenses.end_user_license;
 

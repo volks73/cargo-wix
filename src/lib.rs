@@ -1151,31 +1151,51 @@ impl StoredPath {
 
     /// Returns the final component of the path, if there is one.
     pub fn file_name(&self) -> Option<&str> {
+        let mut path = self.as_str();
+
+        // First repeatedly pop trailing slashes off to get to the actual path
+        // Also pop trailing /. as this is a no-op.
+        // trailing .. is however treated as opaque!
+        while let Some(prefix) = path
+            .strip_suffix('\\')
+            .or_else(|| path.strip_suffix('/'))
+            .or_else(|| path.strip_suffix("/."))
+            .or_else(|| path.strip_suffix("\\."))
+        {
+            path = prefix;
+        }
+
         // Look for either path separator (windows file names shouldn't include either,
         // so even though unix file names can have `\`, it won't work right on the actual
         // platform that matters, so we can ignore that consideration.)
-        let name1 = self.rsplit_once('\\').map(|(_, name)| name);
-        let name2 = self.rsplit_once('/').map(|(_, name)| name);
-        match (name1, name2) {
+        let name1 = path.rsplit_once('\\').map(|(_, name)| name);
+        let name2 = path.rsplit_once('/').map(|(_, name)| name);
+
+        // Decide which parse to use
+        let name = match (name1, name2) {
+            // trivial case, only one gave an answer
+            (Some(name), None) | (None, Some(name)) => name,
+            // Both matched, use whichever one came last (shortest file name)
             (Some(name1), Some(name2)) => {
-                // Prefer whichever one came last
                 if name1.len() < name2.len() {
-                    Some(name1)
+                    name1
                 } else {
-                    Some(name2)
+                    name2
                 }
             }
-            (Some(name), None) | (None, Some(name)) => Some(name),
-            (None, None) => {
-                if self.is_empty() {
-                    None
-                } else {
-                    Some(self.as_str())
-                }
-            }
+            // No slashes left, the entire path is just the filename
+            (None, None) => path,
+        };
+
+        // Several special "names" are in fact not names at all:
+        if name.is_empty() || name == "." || name == ".." {
+            None
+        } else {
+            Some(name)
         }
     }
 }
+
 impl std::ops::Deref for StoredPathBuf {
     type Target = StoredPath;
     fn deref(&self) -> &Self::Target {
@@ -1509,6 +1529,184 @@ mod tests {
             assert_eq!(path.file_name(), Some("Example.tar.gz"));
             assert_eq!(path.file_stem(), Some("Example.tar"));
             assert_eq!(path.extension(), Some("gz"));
+        }
+
+        #[test]
+        fn empty_path() {
+            // a mix of both formats (natural when combining user input with OS input)
+            // here we're testing the verbatim `new` conversion produces a coherent value
+            const INPUT: &str = "";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "");
+            assert_eq!(path.file_name(), None);
+            assert_eq!(path.file_stem(), None);
+            assert_eq!(path.extension(), None);
+        }
+
+        #[test]
+        fn just_file() {
+            // a mix of both formats (natural when combining user input with OS input)
+            // here we're testing the verbatim `new` conversion produces a coherent value
+            const INPUT: &str = "abc.txt";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_1() {
+            // make sure we trim a trailing slash
+            const INPUT: &str = "abc.txt/";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt/");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_2() {
+            // make sure we trim a trailing slash
+            const INPUT: &str = "abc.txt\\";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt\\");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_3() {
+            // make sure we trim a trailing slash
+            const INPUT: &str = "abc.txt\\\\\\";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt\\\\\\");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_4() {
+            // make sure we trim a trailing slash
+            const INPUT: &str = "abc.txt/////";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt/////");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_5() {
+            // make sure we trim a trailing slash
+            const INPUT: &str = "abc.txt/\\//\\//";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt/\\//\\//");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_6() {
+            /// make sure we trim a trailing slash dot
+            const INPUT: &str = "abc.txt/.";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt/.");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_7() {
+            // make sure we trim a trailing slash dot
+            const INPUT: &str = "abc.txt\\.";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt\\.");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn trail_slash_8() {
+            // make sure we trim all kinds of trailing slash dot soup
+            const INPUT: &str = "abc.txt/./.\\\\//\\././";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "abc.txt/./.\\\\//\\././");
+            assert_eq!(path.file_name(), Some("abc.txt"));
+            assert_eq!(path.file_stem(), Some("abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn just_dot() {
+            // dot is not a file name, it's a relative-path directive
+            const INPUT: &str = ".";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), ".");
+            assert_eq!(path.file_name(), None);
+            assert_eq!(path.file_stem(), None);
+            assert_eq!(path.extension(), None);
+        }
+
+        #[test]
+        fn just_dotfile() {
+            // dotfiles are valid names, and they have no extensions
+            const INPUT: &str = ".abc";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), ".abc");
+            assert_eq!(path.file_name(), Some(".abc"));
+            assert_eq!(path.file_stem(), Some(".abc"));
+            assert_eq!(path.extension(), None);
+        }
+
+        #[test]
+        fn just_dotfile_txt() {
+            // dotfiles with extensions work
+            const INPUT: &str = ".abc.txt";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), ".abc.txt");
+            assert_eq!(path.file_name(), Some(".abc.txt"));
+            assert_eq!(path.file_stem(), Some(".abc"));
+            assert_eq!(path.extension(), Some("txt"));
+        }
+
+        #[test]
+        fn just_dotdot() {
+            // dot dot is not a file name, it's a relative-path directive
+            const INPUT: &str = "..";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "..");
+            assert_eq!(path.file_name(), None);
+            assert_eq!(path.file_stem(), None);
+            assert_eq!(path.extension(), None);
+        }
+
+        #[test]
+        fn opaque_dotdot1() {
+            // trailing dot dot is opaque and makes us have no filename
+            const INPUT: &str = "a/b/..";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "a/b/..");
+            assert_eq!(path.file_name(), None);
+            assert_eq!(path.file_stem(), None);
+            assert_eq!(path.extension(), None);
+        }
+
+        #[test]
+        fn opaque_dotdot2() {
+            // trailing dot dot is opaque and makes us have no filename
+            const INPUT: &str = "a/b/../";
+            let path = StoredPathBuf::new(INPUT.to_owned());
+            assert_eq!(path.as_str(), "a/b/../");
+            assert_eq!(path.file_name(), None);
+            assert_eq!(path.file_stem(), None);
+            assert_eq!(path.extension(), None);
         }
     }
 }

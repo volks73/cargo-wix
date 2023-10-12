@@ -76,6 +76,7 @@ impl License {
 }
 
 impl Licenses {
+    /// Get license/eula info for a package
     pub fn new(
         dest_dir: Option<&Utf8Path>,
         license_path: Option<&StoredPath>,
@@ -92,6 +93,7 @@ impl Licenses {
         })
     }
 
+    /// Find the source-license for a package
     fn find_source_license(
         dest_dir: Option<&Utf8Path>,
         path: Option<&StoredPath>,
@@ -136,7 +138,7 @@ impl Licenses {
 
         // First try Cargo's license_file field
         if let Some(path) = &package.license_file {
-            // TODO: remap this relativity
+            // This is already a path relative to the Cargo.toml, so it can be used verbatim
             // TODO: reproduce path.exists() logic
             trace!("Cargo.toml license_file is specified, using that");
             return Ok(Some(License::from_stored_path(
@@ -152,7 +154,9 @@ impl Licenses {
                 trace!("Found a matching template, generating that");
                 let file_name = format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
                 let dest_file = dest_dir.join(file_name);
-                let stored_path = StoredPathBuf::from_utf8_path(&dest_file);
+                let rel_file = dest_file
+                    .strip_prefix(package.manifest_path.parent().expect("non-root Cargo.toml"))?;
+                let stored_path = StoredPathBuf::from_utf8_path(rel_file);
                 return Ok(Some(License {
                     name: None,
                     stored_path,
@@ -167,6 +171,7 @@ impl Licenses {
         Ok(None)
     }
 
+    /// Find the eula for a package
     fn find_end_user_license(
         path: Option<&StoredPath>,
         package: &Package,
