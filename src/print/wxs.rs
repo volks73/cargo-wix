@@ -933,6 +933,90 @@ mod tests {
             license-file = "Example.txt"
         "#;
 
+        const LICENSE_FALSE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = false
+            eula = true
+        "#;
+
+        const EULA_FALSE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = true
+            eula = false
+        "#;
+
+        const EULA_AND_LICENSE_FALSE_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = false
+            eula = false
+        "#;
+
+        const LICENSE_PATH_RTF_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = "MyLicense.rtf"
+        "#;
+
+        const LICENSE_PATH_TXT_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = "MyLicense.txt"
+        "#;
+
+        const EULA_PATH_RTF_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            eula = "MyEula.rtf"
+        "#;
+
+        const EULA_PATH_TXT_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            eula = "MyEula.txt"
+        "#;
+
+        const EULA_AND_LICENSE_PATH_RTF_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            license = "MyLicense.rtf"
+            eula = "MyEula.rtf"
+        "#;
+
         const PATH_GUID: &str = "C38A18DB-12CC-4BDC-8A05-DFCB981A0F33";
         const UPGRADE_GUID: &str = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9";
 
@@ -1108,6 +1192,160 @@ mod tests {
         }
 
         #[test]
+        fn license_false_works() {
+            let project = setup_project(LICENSE_FALSE_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(licenses.source_license, None);
+            assert_eq!(licenses.end_user_license, None);
+        }
+
+        #[test]
+        fn eula_false_works() {
+            let project = setup_project(EULA_FALSE_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path,
+                StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
+            );
+            assert_eq!(licenses.end_user_license, None);
+        }
+
+        #[test]
+        fn eula_and_license_false_works() {
+            let project = setup_project(EULA_AND_LICENSE_FALSE_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(licenses.source_license, None);
+            assert_eq!(licenses.end_user_license, None);
+        }
+
+        #[test]
+        fn license_path_rtf_works() {
+            let project = setup_project(LICENSE_PATH_RTF_MANIFEST);
+            let license_file_path = project.path().join("MyLicense.rtf");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path.as_str(),
+                "MyLicense.rtf"
+            );
+            assert_eq!(
+                licenses.end_user_license.unwrap().stored_path.as_str(),
+                "MyLicense.rtf"
+            );
+        }
+
+        #[test]
+        fn license_path_txt_works() {
+            let project = setup_project(LICENSE_PATH_TXT_MANIFEST);
+            let license_file_path = project.path().join("MyLicense.txt");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path.as_str(),
+                "MyLicense.txt"
+            );
+            assert_eq!(licenses.end_user_license, None);
+        }
+
+        #[test]
+        fn eula_path_rtf_works() {
+            let project = setup_project(EULA_PATH_RTF_MANIFEST);
+            let license_file_path = project.path().join("MyEula.rtf");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path.as_str(),
+                format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")
+            );
+            assert_eq!(
+                licenses.end_user_license.unwrap().stored_path.as_str(),
+                "MyEula.rtf"
+            );
+        }
+
+        #[test]
+        fn eula_path_txt_works() {
+            let project = setup_project(EULA_PATH_TXT_MANIFEST);
+            let license_file_path = project.path().join("MyEula.txt");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path.as_str(),
+                format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")
+            );
+            assert_eq!(
+                licenses.end_user_license.unwrap().stored_path.as_str(),
+                "MyEula.txt"
+            );
+        }
+
+        #[test]
+        fn eula_and_license_path_rtf_works() {
+            let project = setup_project(EULA_AND_LICENSE_PATH_RTF_MANIFEST);
+            let license_file_path = project.path().join("MyLicense.rtf");
+            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let eula_file_path = project.path().join("MyEula.rtf");
+            let _eula_file_handle = File::create(&eula_file_path).expect("Create file");
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input)
+                .licenses(&package)
+                .expect("licenses");
+            assert_eq!(
+                licenses.source_license.unwrap().stored_path.as_str(),
+                "MyLicense.rtf"
+            );
+            assert_eq!(
+                licenses.end_user_license.unwrap().stored_path.as_str(),
+                "MyEula.rtf"
+            );
+        }
+
+        #[test]
         fn binaries_with_no_bin_section_works() {
             let project = setup_project(MIT_MANIFEST);
             let input = project.path().join("Cargo.toml");
@@ -1278,7 +1516,8 @@ mod tests {
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
                 .unwrap()
-                .join(&expected_rel_path);
+                .join(WIX)
+                .join(format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"));
             assert_eq!(source_template, Template::Mit);
             assert_eq!(source_path.as_str(), expected_rel_path);
             assert_eq!(template_out, expected_abs_path);
@@ -1301,7 +1540,8 @@ mod tests {
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
                 .unwrap()
-                .join(&expected_rel_path);
+                .join(WIX)
+                .join(format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"));
             assert_eq!(source_template, Template::Apache2);
             assert_eq!(source_path.as_str(), expected_rel_path);
             assert_eq!(template_out, expected_abs_path);
@@ -1324,7 +1564,8 @@ mod tests {
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
                 .unwrap()
-                .join(&expected_rel_path);
+                .join(WIX)
+                .join(format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"));
             assert_eq!(source_template, Template::Gpl3);
             assert_eq!(source_path.as_str(), expected_rel_path);
             assert_eq!(template_out, expected_abs_path);
@@ -1380,20 +1621,13 @@ mod tests {
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
 
-            let actual = Execution::for_test(&input).licenses(&package);
-
-            eprintln!("{:?}", actual);
-            let actual = actual.unwrap().end_user_license.unwrap().stored_path;
-            assert_eq!(actual.as_str(), "Example.rtf");
-            Builder::default()
-                .eula(license_file_path.to_str())
-                .build()
+            let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .unwrap()
                 .end_user_license
                 .unwrap()
                 .stored_path;
-            assert_eq!(actual.as_str(), "Example.rtf",);
+            assert_eq!(actual.as_str(), "Example.rtf");
         }
 
         #[test]
