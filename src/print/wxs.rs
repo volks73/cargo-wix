@@ -383,9 +383,22 @@ pub struct Execution {
     upgrade_guid: Option<String>,
 }
 
+/// All the possible output files of [`Execution::render`][].
+///
+/// Although we're only trying to output the "main" output of main.wxs,
+/// that file may want to reference other files that also need to be generated,
+/// so we need to report them all together.
 pub struct WxsRenders {
+    /// The main output, typically wix\main.wxs
     pub wxs: RenderOutput,
+    /// A potential source-license for the project (MIT, Apache, ...), typically wix\License.rtf
     pub license: Option<RenderOutput>,
+    /// A potential eula for the project
+    ///
+    /// This is currently always None, as the generation of eula texts
+    /// is currently always accomplished by generating a source-license,
+    /// but you should assume this can be Some so that you don't need to
+    /// do anything if we ever start using this.
     pub eula: Option<RenderOutput>,
 }
 
@@ -403,7 +416,9 @@ impl Execution {
         Ok(())
     }
 
-    /// Instead of printing the output like [`Execution::run`][], return it as a String
+    /// Instead of printing the output like [`Execution::run`][], render the output to Strings.
+    ///
+    /// See [`WxsRenders`][] for details of the output.
     pub fn render(self) -> Result<WxsRenders> {
         debug!("banner = {:?}", self.banner);
         debug!("binaries = {:?}", self.binaries);
@@ -1017,6 +1032,33 @@ mod tests {
             eula = "MyEula.rtf"
         "#;
 
+        const EULA_BAD_PATH_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            eula = "MyFakeEula.rtf"
+        "#;
+
+        const LICENSE_BAD_PATH_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license = "MIT"
+
+            [package.metadata.wix]
+            eula = "MyFakeLicense.rtf"
+        "#;
+
+        const LICENSE_FILE_BAD_PATH_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+            license-file = "MyFakeLicense.rtf"
+        "#;
+
         const PATH_GUID: &str = "C38A18DB-12CC-4BDC-8A05-DFCB981A0F33";
         const UPGRADE_GUID: &str = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9";
 
@@ -1240,7 +1282,7 @@ mod tests {
         fn license_path_rtf_works() {
             let project = setup_project(LICENSE_PATH_RTF_MANIFEST);
             let license_file_path = project.path().join("MyLicense.rtf");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1262,7 +1304,7 @@ mod tests {
         fn license_path_txt_works() {
             let project = setup_project(LICENSE_PATH_TXT_MANIFEST);
             let license_file_path = project.path().join("MyLicense.txt");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1281,7 +1323,7 @@ mod tests {
         fn eula_path_rtf_works() {
             let project = setup_project(EULA_PATH_RTF_MANIFEST);
             let license_file_path = project.path().join("MyEula.rtf");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1303,7 +1345,7 @@ mod tests {
         fn eula_path_txt_works() {
             let project = setup_project(EULA_PATH_TXT_MANIFEST);
             let license_file_path = project.path().join("MyEula.txt");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1325,9 +1367,9 @@ mod tests {
         fn eula_and_license_path_rtf_works() {
             let project = setup_project(EULA_AND_LICENSE_PATH_RTF_MANIFEST);
             let license_file_path = project.path().join("MyLicense.rtf");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
             let eula_file_path = project.path().join("MyEula.rtf");
-            let _eula_file_handle = File::create(&eula_file_path).expect("Create file");
+            let _eula_file_handle = File::create(eula_file_path).expect("Create file");
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();
             let package = crate::package(&manifest, None).unwrap();
@@ -1343,6 +1385,39 @@ mod tests {
                 licenses.end_user_license.unwrap().stored_path.as_str(),
                 "MyEula.rtf"
             );
+        }
+
+        #[test]
+        fn eula_bad_path_errors() {
+            let project = setup_project(EULA_BAD_PATH_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input).licenses(&package);
+            assert!(licenses.is_err());
+        }
+
+        #[test]
+        fn license_bad_path_errors() {
+            let project = setup_project(LICENSE_BAD_PATH_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input).licenses(&package);
+            assert!(licenses.is_err());
+        }
+
+        #[test]
+        fn license_file_bad_path_errors() {
+            let project = setup_project(LICENSE_FILE_BAD_PATH_MANIFEST);
+            let input = project.path().join("Cargo.toml");
+            let manifest = crate::manifest(Some(&input)).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let licenses = Execution::for_test(&input).licenses(&package);
+            assert!(licenses.is_err());
         }
 
         #[test]
@@ -1615,7 +1690,7 @@ mod tests {
         fn eula_with_license_file_field_works() {
             let project = setup_project(LICENSE_FILE_RTF_MANIFEST);
             let license_file_path = project.path().join("Example.rtf");
-            let _license_file_handle = File::create(&license_file_path).expect("Create file");
+            let _license_file_handle = File::create(license_file_path).expect("Create file");
 
             let input = project.path().join("Cargo.toml");
             let manifest = crate::manifest(Some(&input)).unwrap();

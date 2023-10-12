@@ -23,6 +23,7 @@ use crate::RTF_FILE_EXTENSION;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
 use log::trace;
+use log::warn;
 
 use std::str::FromStr;
 
@@ -106,6 +107,8 @@ impl Licenses {
             return Ok(Some(License::from_stored_path(path)));
         }
 
+        let package_dir = package.manifest_path.parent().expect("non-root Cargo.toml");
+
         // If there's [package.manifest.wix].license, respect that
         if let Some(license) = package
             .metadata
@@ -124,10 +127,18 @@ impl Licenses {
                     trace!("[package.manifest.wix].license is true, continuing to auto-detect");
                 }
             } else if let Some(path) = license.as_str() {
-                trace!("[package.manifest.wix].license is a path, using that");
                 // If the user sets `license = "path/to/license"`, use that
-                return Ok(Some(License::from_stored_path(StoredPath::new(path))));
+                trace!("[package.manifest.wix].license is a path, using that");
+                if package_dir.join(path).exists() {
+                    return Ok(Some(License::from_stored_path(StoredPath::new(path))));
+                } else {
+                    return Err(Error::Generic(format!(
+                        r#"{} specifies package.metadata.wix.license="{}" in its Cargo.toml, but no such file exists."#,
+                        package.name, path,
+                    )));
+                }
             } else {
+                // Don't accept anything else
                 trace!("[package.manifest.wix].license is an invalid type");
                 return Err(Error::Generic(format!(
                     "{}'s [package.metadata.wix].license must be a bool or a path",
@@ -138,12 +149,20 @@ impl Licenses {
 
         // First try Cargo's license_file field
         if let Some(path) = &package.license_file {
-            // This is already a path relative to the Cargo.toml, so it can be used verbatim
-            // TODO: reproduce path.exists() logic
             trace!("Cargo.toml license_file is specified, using that");
-            return Ok(Some(License::from_stored_path(
-                &StoredPathBuf::from_utf8_path(path),
-            )));
+            // NOTE: this join will mishandle an absolute path stored in the Cargo.toml
+            // but there's very little justification for such a thing, so it's fine.
+            if package_dir.join(path).exists() {
+                // This is already a path relative to the Cargo.toml, so it can be used verbatim
+                return Ok(Some(License::from_stored_path(
+                    &StoredPathBuf::from_utf8_path(path),
+                )));
+            } else {
+                return Err(Error::Generic(format!(
+                    r#"{} specifies license-file="{}" in its Cargo.toml, but no such file exists."#,
+                    package.name, path,
+                )));
+            }
         }
 
         // Next try Cargo's license field
@@ -154,8 +173,7 @@ impl Licenses {
                 trace!("Found a matching template, generating that");
                 let file_name = format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
                 let dest_file = dest_dir.join(file_name);
-                let rel_file = dest_file
-                    .strip_prefix(package.manifest_path.parent().expect("non-root Cargo.toml"))?;
+                let rel_file = dest_file.strip_prefix(package_dir)?;
                 let stored_path = StoredPathBuf::from_utf8_path(rel_file);
                 return Ok(Some(License {
                     name: None,
@@ -178,11 +196,14 @@ impl Licenses {
         source_license: Option<&License>,
     ) -> Result<Option<License>> {
         trace!("finding end-user-license for {}", package.name);
+
         // If explicitly passed, use that
         if let Some(path) = path {
             trace!("explicit end-user-license path passed as argument, using that");
             return Ok(Some(License::from_stored_path(path)));
         }
+
+        let package_dir = package.manifest_path.parent().expect("non-root Cargo.toml");
 
         // If there's [package.manifest.wix].eula, respect that
         if let Some(eula) = package
@@ -202,10 +223,18 @@ impl Licenses {
                     trace!("[package.manifest.wix].eula is true, continuing to auto-detect");
                 }
             } else if let Some(path) = eula.as_str() {
-                trace!("[package.manifest.wix].eula is a path, using that");
                 // If the user sets `eula = "path/to/license"`, use that
-                return Ok(Some(License::from_stored_path(StoredPath::new(path))));
+                trace!("[package.manifest.wix].eula is a path, using that");
+                if package_dir.join(path).exists() {
+                    return Ok(Some(License::from_stored_path(StoredPath::new(path))));
+                } else {
+                    return Err(Error::Generic(format!(
+                        r#"{} specifies package.metadata.wix.eula="{}" in its Cargo.toml, but no such file exists."#,
+                        package.name, path,
+                    )));
+                }
             } else {
+                // Don't accept anything else
                 trace!("[package.manifest.wix].eula is an invalid type");
                 return Err(Error::Generic(format!(
                     "{}'s [package.metadata.wix].eula must be a bool or a path",
@@ -214,7 +243,7 @@ impl Licenses {
             }
         }
 
-        // Try to use the license, if it has a path and is RTF,
+        // Try to use the source-license, if it has a path and is RTF,
         if let Some(license) = source_license {
             trace!("source-license is defined");
             let path = &license.stored_path;
@@ -225,6 +254,19 @@ impl Licenses {
         }
 
         trace!("No end-user-license found");
+
+        warn!(
+            "Could not find your project's EULA. The license agreement dialog will be excluded \
+from the installer. You can add one by either:
+
+* Setting 'package.license' to a recognized value (MIT, Apache-2.0, or GPL-3.0)
+* Setting 'package.license-file', 'package.metadata.wix.license', or 'package.metadata.wix.eula' \
+to point to an RTF file
+* Passing an RTF file with --license or --eula to the cargo-wix CLI
+* Editing the generated WiX Source (wxs) with a text editor
+
+To supress this warning, set 'package.metadata.wix.eula = false'"
+        );
         Ok(None)
     }
 }

@@ -17,6 +17,7 @@
 //! end-user input.
 
 use itertools::Itertools;
+use log::warn;
 pub mod license;
 pub mod wxs;
 
@@ -33,12 +34,22 @@ use std::path::PathBuf;
 
 use cargo_metadata::Package;
 
+/// The result of rendering a template (main.wxs, License.rtf, ...)
 pub struct RenderOutput {
+    /// The path the template should be written to
+    /// (we needed to know this at generation time to properly embed relative paths)
+    ///
+    /// If this is None then the template should be written to stdout
+    /// FIMXE: this is kinda busted! You still need to know relative paths!
     pub path: Option<PathBuf>,
+    /// The contents of the file
     pub rendered: String,
 }
 
 impl RenderOutput {
+    /// Write the output to its expected destination.
+    ///
+    /// See [`RenderOutput::path`][] for details.
     pub fn write(&self) -> Result<()> {
         let mut out = destination(self.path.as_ref())?;
         out.write_all(self.rendered.as_bytes())?;
@@ -46,8 +57,16 @@ impl RenderOutput {
         Ok(())
     }
 
+    /// Write the output to its expected destination, if that destination is a file.
+    ///
+    /// This is for "auxiliary files" which also need to be produced somehow, but
+    /// which we can't emit when printing the "main file" to stdout. With nowhere
+    /// to put them, all we can do is warn.
+    ///
+    /// See [`RenderOutput::path`][] for details.
     pub fn write_disk_only(&self) -> Result<()> {
         if self.path.is_none() {
+            warn!("License.rtf also needs to be generated!");
             return Ok(());
         }
         self.write()
