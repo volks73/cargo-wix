@@ -394,7 +394,7 @@ impl Execution {
             .insert_str("manufacturer", self.manufacturer(&package)?)
             .insert_str("upgrade-code-guid", self.upgrade_guid(&package)?)
             .insert_str("path-component-guid", self.path_guid(&package)?);
-        if let Some(ref banner) = self.banner {
+        if let Some(banner) = self.banner_image(&package) {
             map = map.insert_str("banner", banner);
         }
         if let Some(description) = description(self.description.clone(), &package) {
@@ -406,7 +406,7 @@ impl Execution {
                  Source (wxs) file using a text editor."
             );
         }
-        if let Some(ref dialog) = self.dialog {
+        if let Some(dialog) = self.dialog_image(&package) {
             map = map.insert_str("dialog", dialog);
         }
         match self.eula(&package)? {
@@ -444,7 +444,7 @@ impl Execution {
                  (wxs) file using a text editor."
             );
         }
-        if let Some(icon) = self.product_icon {
+        if let Some(icon) = self.product_icon(&package) {
             map = map.insert_str("product-icon", icon);
         }
 
@@ -611,6 +611,51 @@ impl Execution {
                 .map_err(Error::from)
         } else {
             Ok(Uuid::new_v4().as_hyphenated().to_string().to_uppercase())
+        }
+    }
+
+    fn banner_image(&self, manifest: &Package) -> Option<StoredPathBuf> {
+        if let Some(path) = &self.banner {
+            trace!("A banner image has been explicitly specified");
+            Some(path.clone())
+        } else {
+            manifest
+                .metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("banner"))
+                .and_then(|p| p.as_str())
+                .map(|p| StoredPathBuf::new(p.to_owned()))
+        }
+    }
+
+    fn dialog_image(&self, manifest: &Package) -> Option<StoredPathBuf> {
+        if let Some(path) = &self.dialog {
+            trace!("A dialog image has been explicitly specified");
+            Some(path.clone())
+        } else {
+            manifest
+                .metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dialog"))
+                .and_then(|p| p.as_str())
+                .map(|p| StoredPathBuf::new(p.to_owned()))
+        }
+    }
+
+    fn product_icon(&self, manifest: &Package) -> Option<StoredPathBuf> {
+        if let Some(path) = &self.product_icon {
+            trace!("A product icon has been explicitly specified");
+            Some(path.clone())
+        } else {
+            manifest
+                .metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("product-icon"))
+                .and_then(|p| p.as_str())
+                .map(|p| StoredPathBuf::new(p.to_owned()))
         }
     }
 }
@@ -870,6 +915,17 @@ mod tests {
 
             [package.metadata.wix]
             upgrade-guid = "71C1A58D-3FD2-493D-BB62-4B27C66FCCF9"
+        "#;
+
+        const IMAGES_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+
+            [package.metadata.wix]
+            product-icon = "wix/product.ico"
+            dialog = "wix/dialog.png"
+            banner = "wix/banner.png"
         "#;
 
         #[test]
@@ -1313,6 +1369,27 @@ mod tests {
                 .upgrade_guid(&package)
                 .unwrap();
             assert_eq!(actual, expected);
+        }
+
+        #[test]
+        fn image_metadata_works() {
+            let project = setup_project(IMAGES_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+
+            let actual = Builder::default().build();
+            assert_eq!(
+                actual.product_icon(&package).unwrap().as_str(),
+                "wix/product.ico"
+            );
+            assert_eq!(
+                actual.dialog_image(&package).unwrap().as_str(),
+                "wix/dialog.png"
+            );
+            assert_eq!(
+                actual.banner_image(&package).unwrap().as_str(),
+                "wix/banner.png"
+            );
         }
     }
 }
