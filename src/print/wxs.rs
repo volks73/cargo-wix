@@ -15,8 +15,7 @@
 //! The implementation for printing a WiX Source (wxs) file.
 
 use crate::description;
-use crate::eula::License;
-use crate::eula::Licenses;
+use crate::licenses::{License, Licenses};
 use crate::manifest;
 use crate::package;
 use crate::product_name;

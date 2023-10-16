@@ -66,8 +66,8 @@ pub use crate::templates::Template;
 
 pub mod clean;
 pub mod create;
-mod eula;
 pub mod initialize;
+mod licenses;
 pub mod print;
 pub mod purge;
 pub mod sign;
