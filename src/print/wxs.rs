@@ -19,9 +19,9 @@ use crate::licenses::{License, Licenses};
 use crate::manifest;
 use crate::package;
 use crate::product_name;
+use crate::stored_path::StoredPathBuf;
 use crate::Error;
 use crate::Result;
-use crate::StoredPathBuf;
 use crate::Template;
 use crate::EXE_FILE_EXTENSION;
 

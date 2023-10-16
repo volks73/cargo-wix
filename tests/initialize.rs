@@ -31,8 +31,9 @@ use std::path::PathBuf;
 use toml::{Table, Value};
 
 use wix::initialize::{Builder, Execution};
+use wix::stored_path::StoredPathBuf;
 use wix::{
-    StoredPathBuf, CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX,
+    CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX,
     WIX_SOURCE_FILE_EXTENSION, WIX_SOURCE_FILE_NAME,
 };
 

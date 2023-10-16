@@ -26,9 +26,9 @@ use camino::Utf8PathBuf;
 use cargo_metadata::Package;
 
 use crate::print;
+use crate::stored_path::StoredPathBuf;
 use crate::Error;
 use crate::Result;
-use crate::StoredPathBuf;
 use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;

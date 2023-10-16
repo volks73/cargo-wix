@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::stored_path::{StoredPath, StoredPathBuf};
 use crate::Error;
 use crate::Result;
-use crate::StoredPath;
-use crate::StoredPathBuf;
 use crate::Template;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
