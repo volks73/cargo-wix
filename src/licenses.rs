@@ -36,9 +36,9 @@ pub struct Licenses {
     ///
     /// This likely will become/contain a Vec at some point,
     /// since dual MIT/Apache wants to have two license files!
-    pub source_license: Option<License>,
+    pub source: Option<License>,
     /// The end-user license (EULA) that must be agreed to when installing
-    pub end_user_license: Option<License>,
+    pub end_user: Option<License>,
 }
 
 /// A license file/item
@@ -89,8 +89,8 @@ impl Licenses {
             Self::find_end_user_license(eula_path, package, source_license.as_ref())?;
 
         Ok(Self {
-            source_license,
-            end_user_license,
+            source: source_license,
+            end_user: end_user_license,
         })
     }
 

@@ -474,7 +474,7 @@ impl Execution {
         if let Some(dialog) = self.dialog_image(&package) {
             map = map.insert_str("dialog", dialog);
         }
-        if let Some(eula) = &licenses.end_user_license {
+        if let Some(eula) = &licenses.end_user {
             map = map.insert_str("eula", &eula.stored_path);
         }
         if let Some(url) = self.help_url(&package) {
@@ -486,7 +486,7 @@ impl Execution {
                  using a text editor."
             );
         }
-        if let Some(license) = &licenses.source_license {
+        if let Some(license) = &licenses.source {
             map = map.insert_str("license-source", &license.stored_path);
             if let Some(name) = &license.name {
                 map = map.insert_str("license-name", name);
@@ -506,8 +506,8 @@ impl Execution {
                 rendered,
             }
         };
-        let license = self.render_license_string(licenses.source_license.as_ref())?;
-        let eula = self.render_license_string(licenses.end_user_license.as_ref())?;
+        let license = self.render_license_string(licenses.source.as_ref())?;
+        let eula = self.render_license_string(licenses.end_user.as_ref())?;
         Ok(WxsRenders { wxs, license, eula })
     }
 
@@ -1100,7 +1100,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1119,7 +1119,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1138,7 +1138,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1157,7 +1157,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license;
+                .source;
             assert!(actual.is_none());
         }
 
@@ -1171,7 +1171,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1190,7 +1190,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1209,7 +1209,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license
+                .source
                 .expect("source license")
                 .stored_path;
             assert_eq!(
@@ -1228,7 +1228,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses")
-                .source_license;
+                .source;
             assert!(actual.is_none());
         }
 
@@ -1242,8 +1242,8 @@ mod tests {
             let licenses = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses");
-            assert_eq!(licenses.source_license, None);
-            assert_eq!(licenses.end_user_license, None);
+            assert_eq!(licenses.source, None);
+            assert_eq!(licenses.end_user, None);
         }
 
         #[test]
@@ -1257,10 +1257,10 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path,
+                licenses.source.unwrap().stored_path,
                 StoredPathBuf::from(format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}"))
             );
-            assert_eq!(licenses.end_user_license, None);
+            assert_eq!(licenses.end_user, None);
         }
 
         #[test]
@@ -1273,8 +1273,8 @@ mod tests {
             let licenses = Execution::for_test(&input)
                 .licenses(&package)
                 .expect("licenses");
-            assert_eq!(licenses.source_license, None);
-            assert_eq!(licenses.end_user_license, None);
+            assert_eq!(licenses.source, None);
+            assert_eq!(licenses.end_user, None);
         }
 
         #[test]
@@ -1290,11 +1290,11 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path.as_str(),
+                licenses.source.unwrap().stored_path.as_str(),
                 "MyLicense.rtf"
             );
             assert_eq!(
-                licenses.end_user_license.unwrap().stored_path.as_str(),
+                licenses.end_user.unwrap().stored_path.as_str(),
                 "MyLicense.rtf"
             );
         }
@@ -1312,10 +1312,10 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path.as_str(),
+                licenses.source.unwrap().stored_path.as_str(),
                 "MyLicense.txt"
             );
-            assert_eq!(licenses.end_user_license, None);
+            assert_eq!(licenses.end_user, None);
         }
 
         #[test]
@@ -1331,11 +1331,11 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path.as_str(),
+                licenses.source.unwrap().stored_path.as_str(),
                 format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")
             );
             assert_eq!(
-                licenses.end_user_license.unwrap().stored_path.as_str(),
+                licenses.end_user.unwrap().stored_path.as_str(),
                 "MyEula.rtf"
             );
         }
@@ -1353,11 +1353,11 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path.as_str(),
+                licenses.source.unwrap().stored_path.as_str(),
                 format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}")
             );
             assert_eq!(
-                licenses.end_user_license.unwrap().stored_path.as_str(),
+                licenses.end_user.unwrap().stored_path.as_str(),
                 "MyEula.txt"
             );
         }
@@ -1377,11 +1377,11 @@ mod tests {
                 .licenses(&package)
                 .expect("licenses");
             assert_eq!(
-                licenses.source_license.unwrap().stored_path.as_str(),
+                licenses.source.unwrap().stored_path.as_str(),
                 "MyLicense.rtf"
             );
             assert_eq!(
-                licenses.end_user_license.unwrap().stored_path.as_str(),
+                licenses.end_user.unwrap().stored_path.as_str(),
                 "MyEula.rtf"
             );
         }
@@ -1570,7 +1570,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .unwrap()
-                .end_user_license;
+                .end_user;
             assert!(actual.is_none());
         }
 
@@ -1582,10 +1582,10 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let licenses = Execution::for_test(&input).licenses(&package).unwrap();
-            let source = licenses.source_license.unwrap();
+            let source = licenses.source.unwrap();
             let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
-            let eula_path = licenses.end_user_license.unwrap().stored_path;
+            let eula_path = licenses.end_user.unwrap().stored_path;
 
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
@@ -1606,10 +1606,10 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let licenses = Execution::for_test(&input).licenses(&package).unwrap();
-            let source = licenses.source_license.unwrap();
+            let source = licenses.source.unwrap();
             let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
-            let eula_path = licenses.end_user_license.unwrap().stored_path;
+            let eula_path = licenses.end_user.unwrap().stored_path;
 
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
@@ -1630,10 +1630,10 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let licenses = Execution::for_test(&input).licenses(&package).unwrap();
-            let source = licenses.source_license.unwrap();
+            let source = licenses.source.unwrap();
             let source_path = source.stored_path;
             let (template_out, source_template) = source.generate.unwrap();
-            let eula_path = licenses.end_user_license.unwrap().stored_path;
+            let eula_path = licenses.end_user.unwrap().stored_path;
 
             let expected_rel_path = format!("{WIX}\\{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
             let expected_abs_path = Utf8Path::from_path(input.parent().unwrap())
@@ -1654,8 +1654,8 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let licenses = Execution::for_test(&input).licenses(&package).unwrap();
-            let source = licenses.source_license;
-            let eula = licenses.end_user_license;
+            let source = licenses.source;
+            let eula = licenses.end_user;
 
             assert_eq!(source, None);
             assert_eq!(eula, None);
@@ -1676,7 +1676,7 @@ mod tests {
                 .build()
                 .licenses(&package)
                 .unwrap()
-                .end_user_license
+                .end_user
                 .unwrap()
                 .stored_path;
             assert_eq!(
@@ -1698,7 +1698,7 @@ mod tests {
             let actual = Execution::for_test(&input)
                 .licenses(&package)
                 .unwrap()
-                .end_user_license
+                .end_user
                 .unwrap()
                 .stored_path;
             assert_eq!(actual.as_str(), "Example.rtf");
@@ -1715,8 +1715,8 @@ mod tests {
             let package = crate::package(&manifest, None).unwrap();
 
             let licenses = Execution::for_test(&input).licenses(&package).unwrap();
-            let source = licenses.source_license.unwrap();
-            let eula = licenses.end_user_license;
+            let source = licenses.source.unwrap();
+            let eula = licenses.end_user;
 
             assert_eq!(source.generate, None);
             assert_eq!(source.name, None);
@@ -1742,7 +1742,7 @@ mod tests {
                 .build()
                 .licenses(&package)
                 .unwrap();
-            let eula = licenses.end_user_license.unwrap();
+            let eula = licenses.end_user.unwrap();
 
             assert_eq!(eula.stored_path, expected);
         }
