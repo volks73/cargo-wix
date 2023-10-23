@@ -33,8 +33,8 @@ use toml::{Table, Value};
 use wix::initialize::{Builder, Execution};
 use wix::stored_path::StoredPathBuf;
 use wix::{
-    CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX,
-    WIX_SOURCE_FILE_EXTENSION, WIX_SOURCE_FILE_NAME,
+    CARGO_MANIFEST_FILE, LICENSE_FILE_NAME, RTF_FILE_EXTENSION, WIX, WIX_SOURCE_FILE_EXTENSION,
+    WIX_SOURCE_FILE_NAME,
 };
 
 use crate::common::{add_license_to_package, init_logging, SUBPACKAGE1_NAME, SUBPACKAGE2_NAME};

@@ -107,6 +107,9 @@ impl Licenses {
         }
 
         let package_dir = package.manifest_path.parent().expect("non-root Cargo.toml");
+        let dest_dir = dest_dir
+            .map(|p| p.to_owned())
+            .unwrap_or_else(|| package_dir.join(crate::WIX));
 
         // If there's [package.manifest.wix].license, respect that
         if let Some(license) = package
@@ -168,11 +171,11 @@ impl Licenses {
         if let Some(name) = package.license.clone() {
             trace!("Cargo.toml license is specified");
             // If there's a template for this license, generate it
-            if let (Some(dest_dir), Ok(generate)) = (dest_dir, Template::from_str(&name)) {
+            if let Ok(generate) = Template::from_str(&name) {
                 trace!("Found a matching template, generating that");
                 let file_name = format!("{LICENSE_FILE_NAME}.{RTF_FILE_EXTENSION}");
                 let dest_file = dest_dir.join(file_name);
-                let rel_file = dest_file.strip_prefix(package_dir)?;
+                let rel_file = dest_file.strip_prefix(package_dir).unwrap_or(&dest_file);
                 let stored_path = StoredPathBuf::from_utf8_path(rel_file);
                 return Ok(Some(License {
                     name: None,

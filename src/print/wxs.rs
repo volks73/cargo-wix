@@ -523,7 +523,12 @@ impl Execution {
         printer.copyright_holder(self.copyright_holder.as_ref().map(String::as_ref));
         printer.copyright_year(self.copyright_year.as_ref().map(String::as_ref));
         printer.input(self.input.as_deref().and_then(Path::to_str));
-        printer.output(Some(output.as_str()));
+        // Slightly hacky: only respect the template's desire to be written to disk
+        // if we're writing the overall wxs to disk! This makes "stdout" mode
+        // behave in the desired manner.
+        if self.output.is_some() {
+            printer.output(Some(output.as_str()));
+        }
         printer.package(self.package.as_deref());
 
         let render = printer.build().render(template)?;
