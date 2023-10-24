@@ -733,12 +733,16 @@
 //! culture = "Fr-Fr"
 //! dbg-build = false
 //! dbg-name = false
+//! eula = "path\to\eula.rtf"
 //! include = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
+//! license = "path\to\license.txt"
 //! linker-args = ["-nologo"]
 //! locale = "Path\to\WIX\Localization\File.wxl"
 //! name = "example"
 //! no-build = false
 //! output = "Path\and\file\name\for\installer.msi"
+//! path-guid = "BFD25009-65A4-4D1E-97F1-0030465D90D6"
+//! upgrade-guid = "B36177BE-EA4D-44FB-B05C-EDDABDAA95CA"
 //! version = "2.1.0"
 //! ```
 //!
@@ -786,9 +790,12 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
-//! Sets the path to a bitmap (.bmp) image file that will be displayed across
+//! Sets the path to an image file (.png, .bmp, ...) that will be displayed across
 //! the top of each dialog in the installer. The banner image dimensions should
-//! be 493 x 58 pixels.
+//! be 493 x 58 pixels, but the left-most 50% of that image is covered with text,
+//! so if you want to leave a blank background for text readability, you only want
+//! to color in the right-most ~200 pixels of that image.
+//!
 //!
 //! ### `-b,--bin-path`
 //!
@@ -885,10 +892,13 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
-//! Sets the path to a bitmap (.bmp) image file that will be displayed to the
-//! left on the first dialog of the installer. The dialog image dimensions
-//! should be 493 x 312 pixels. The first dialog is known as the "Welcome"
-//! dialog.
+//! Sets the path to an image file (.png, bmp, ...) that will be displayed as
+//! the background of the first dialog of the installer. The dialog image dimensions
+//! should be 493 x 312 pixels, but the right-most 60% of that area is covered
+//! by the actual text of the dialog, so if you want to leave a blank background for text
+//! readability, you only want to color in the left-most ~200 pixels of that image.
+//!
+//! The first dialog is known as the "Welcome" dialog.
 //!
 //! ### `-e,--eula`
 //!
@@ -902,6 +912,10 @@
 //! value of the `license` field in the package's manifest (Cargo.toml). An EULA
 //! can be enabled later by directly modifying the WiX Source (WXS) file with a
 //! text editor.
+//!
+//! When specified via `package.metadata.wix.eula` the path is assumed to be relative
+//! to the Cargo.toml (directory). This field can also be set to `false` to disable
+//! the eula even if we could auto-generate one for you, as described above.
 //!
 //! ### `--force`
 //!
@@ -962,6 +976,10 @@
 //! along side the `bin` folder. A file containing the license, such as a TXT,
 //! PDF, or RTF file, can be added later by directly editing the generated WiX
 //! Source file (WXS) in a text editor.
+//!
+//! When specified via `package.metadata.wix.license` the path is assumed to be relative
+//! to the Cargo.toml (directory). This field can also be set to `false` to disable
+//! the license auto-generation features described above.
 //!
 //! ### `-L,--linker-arg`
 //!
@@ -1067,7 +1085,7 @@
 //! Available for the _init_ (`cargo wix init`) and _print_ (`cargo wix print`)
 //! subcommands.
 //!
-//! Sets the path to an image file that will be display as an icon in the
+//! Sets the path to a 16x16 image file (.ico) that will be display as an icon in the
 //! Add/Remove Programs (ARP) control panel for the installed application.
 //!
 //! ### `--product-name`

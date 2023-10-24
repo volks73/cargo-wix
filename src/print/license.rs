@@ -30,6 +30,8 @@ use std::path::PathBuf;
 
 use cargo_metadata::Package;
 
+use super::RenderOutput;
+
 /// A builder for creating an execution context to print a license.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
@@ -134,21 +136,29 @@ pub struct Execution {
 impl Execution {
     /// Prints a license based on the built context.
     pub fn run(self, template: &Template) -> Result<()> {
+        let render = self.render(template)?;
+        render.write()?;
+        Ok(())
+    }
+
+    pub fn render(self, template: &Template) -> Result<RenderOutput> {
         debug!("copyright_holder = {:?}", self.copyright_holder);
         debug!("copyright_year = {:?}", self.copyright_year);
         debug!("input = {:?}", self.input);
         debug!("output = {:?}", self.output);
         let manifest = manifest(self.input.as_ref())?;
         let package = package(&manifest, self.package.as_ref().and_then(|p| p.to_str()))?;
-        let mut destination = super::destination(self.output.as_ref())?;
         let template = mustache::compile_str(template.to_str())?;
         let data = MapBuilder::new()
             .insert_str("copyright-year", self.copyright_year())
             .insert_str("copyright-holder", self.copyright_holder(&package)?)
             .build();
-        template
-            .render_data(&mut destination, &data)
-            .map_err(Error::from)
+        let rendered = template.render_data_to_string(&data).map_err(Error::from)?;
+
+        Ok(RenderOutput {
+            path: self.output,
+            rendered,
+        })
     }
 
     fn copyright_holder(&self, manifest: &Package) -> Result<String> {
