@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Utilities for working with paths that need to be stored in files in a cross-platform way."><title>wix::stored_path - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Module stored_path</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#structs">Structs</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">wix</a>::<wbr><a class="mod" href="#">stored_path</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/wix/stored_path.rs.html#1-568">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Utilities for working with paths that need to be stored in files in a cross-platform way.</p>
+<p>Big picture: work with paths however you want, as long as any path that gets written to
+a file (e.g. via a template) always gets converted into a <a href="struct.StoredPathBuf.html" title="struct wix::stored_path::StoredPathBuf"><code>StoredPathBuf</code></a> first,
+forcing all the platform-specific differences to get normalized out.</p>
+<p>Although both std and camino have excellent support for working with paths, they’re both
+designed to have host-platform-specific behaviour (which is good/correct) that makes them
+unsuitable for working with paths that need to stored in persistent cross-platform
+ways – like writing them to files. The wxs files we generate contain paths to other files,
+and we want to reliably produce the same wxs file on all machines, so we need something else!</p>
+<p>Most notably, std and camino handle path separators differently on different platforms:</p>
+<ul>
+<li>valid separtors:
+<ul>
+<li>on windows, <code>\</code> and <code>/</code> are both valid path separators</li>
+<li>on unix, only <code>/</code> is a valid separator, and <code>\</code> can appear in file names</li>
+</ul>
+</li>
+<li>auto separators:
+<ul>
+<li>on windows, using APIs like <code>join</code> will use a <code>\</code> separator</li>
+<li>on unix, using APIs like <code>join</code> will use a <code>/</code> separator</li>
+</ul>
+</li>
+</ul>
+<p>Since cargo-wix is fundamentally concerned with producing things that work on windows, we
+can comfortably force unix to be “like windows” to normalize the behaviour. This normalization
+is handled by the <a href="struct.StoredPath.html" title="struct wix::stored_path::StoredPath"><code>StoredPath</code></a> and <a href="struct.StoredPathBuf.html" title="struct wix::stored_path::StoredPathBuf"><code>StoredPathBuf</code></a> types.</p>
+<p>These types have two flavours of entry-point:</p>
+<ul>
+<li>
+<p>When making a StoredPathBuf from a String, the input is assumed to be user-provided and is forwarded
+verbatim without any normalization. Windows is permissive of both kinds of path separator,
+so we never need to “fix” things up.</p>
+</li>
+<li>
+<p>When making a StoredPathBuf from a Path or Utf8Path, the input is assumed to be tainted with
+platform-specific behaviour, and all path separators are normalized to <code>\</code>. The net effect is
+that on windows StoredPathBuf usually doesn’t do anything, but on unix it forces
+many <code>/</code>’s to <code>\</code>’s. See <a href="struct.StoredPathBuf.html#method.from_utf8_path" title="associated function wix::stored_path::StoredPathBuf::from_utf8_path"><code>StoredPathBuf::from_utf8_path</code></a> for the implementation.</p>
+</li>
+</ul>
+<p>A StoredPath is not intended for doing actual i/o, and as such does not expose a way
+for it to be turned back into a “real” path, and does not expose APIs like <code>exists</code>.
+However it is useful/necessary to be able to ask questions like “is this file an RTF”,
+so we do need to implement basic path parsing functions like <code>file_name</code> and <code>extension</code>.</p>
+<p>Notably <a href="struct.StoredPath.html#method.file_name" title="method wix::stored_path::StoredPath::file_name"><code>StoredPath::file_name</code></a><code>considers both</code>` and <code>/</code> to be path separators.
+Ideally it should behave identically to std/camino on windows, making all platforms
+behave like windows.</p>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.StoredPath.html" title="struct wix::stored_path::StoredPath">StoredPath</a></div><div class="desc docblock-short">A borrowed <a href="struct.StoredPathBuf.html" title="struct wix::stored_path::StoredPathBuf"><code>StoredPathBuf</code></a></div></li><li><div class="item-name"><a class="struct" href="struct.StoredPathBuf.html" title="struct wix::stored_path::StoredPathBuf">StoredPathBuf</a></div><div class="desc docblock-short">A PathBuf that will be in the output of print (and therefore saved to disk)</div></li></ul></section></div></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/initialize.rs`."><title>initialize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/initialize.rs`."><title>initialize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wix/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -820,38 +820,6 @@
 <a href="#820" id="820">820</a>
 <a href="#821" id="821">821</a>
 <a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-<a href="#840" id="840">840</a>
-<a href="#841" id="841">841</a>
-<a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright (C) 2018 Christopher R. Field.
 //
 // Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -879,13 +847,10 @@
 </span><span class="kw">use </span>camino::Utf8PathBuf;
 <span class="kw">use </span>cargo_metadata::Package;
 
-<span class="kw">use </span><span class="kw">crate</span>::eula::Eula;
 <span class="kw">use </span><span class="kw">crate</span>::print;
+<span class="kw">use </span><span class="kw">crate</span>::stored_path::StoredPathBuf;
 <span class="kw">use </span><span class="kw">crate</span>::Error;
 <span class="kw">use </span><span class="kw">crate</span>::Result;
-<span class="kw">use </span><span class="kw">crate</span>::StoredPathBuf;
-<span class="kw">use </span><span class="kw">crate</span>::LICENSE_FILE_NAME;
-<span class="kw">use </span><span class="kw">crate</span>::RTF_FILE_EXTENSION;
 <span class="kw">use </span><span class="kw">crate</span>::WIX;
 <span class="kw">use </span><span class="kw">crate</span>::WIX_SOURCE_FILE_EXTENSION;
 <span class="kw">use </span><span class="kw">crate</span>::WIX_SOURCE_FILE_NAME;
@@ -1310,37 +1275,7 @@
             <span class="macro">info!</span>(<span class="string">&quot;Creating the &#39;{}&#39; directory&quot;</span>, destination);
             fs::create_dir(<span class="kw-2">&amp;</span>destination)<span class="question-mark">?</span>;
         }
-        <span class="kw">let </span>(eula_wxs_path, license_wxs_path) = <span class="kw">match </span>Eula::new(<span class="self">self</span>.eula.as_deref(), <span class="kw-2">&amp;</span>package)<span class="question-mark">? </span>{
-            Eula::CommandLine(path) =&gt; (<span class="prelude-val">Some</span>(path), <span class="self">self</span>.license),
-            Eula::Manifest(path) =&gt; (<span class="prelude-val">Some</span>(path), <span class="self">self</span>.license),
-            Eula::Generate(template) =&gt; {
-                destination.push(LICENSE_FILE_NAME);
-                destination.set_extension(RTF_FILE_EXTENSION);
-                <span class="kw">if </span>destination.exists() &amp;&amp; !<span class="self">self</span>.force {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::already_exists(<span class="kw-2">&amp;</span>destination));
-                } <span class="kw">else </span>{
-                    <span class="macro">info!</span>(<span class="string">&quot;Generating an EULA&quot;</span>);
-                    <span class="kw">let </span><span class="kw-2">mut </span>eula_printer = print::license::Builder::new();
-                    eula_printer
-                        .copyright_holder(<span class="self">self</span>.copyright_holder.as_ref().map(String::as_ref));
-                    eula_printer.copyright_year(<span class="self">self</span>.copyright_year.as_ref().map(String::as_ref));
-                    eula_printer.input(<span class="self">self</span>.input.as_deref().and_then(Path::to_str));
-                    eula_printer.output(<span class="prelude-val">Some</span>(destination.as_str()));
-                    eula_printer.package(<span class="self">self</span>.package.as_deref());
-                    eula_printer.build().run(<span class="kw-2">&amp;</span>template)<span class="question-mark">?</span>;
-                }
-                destination.pop();
-                <span class="kw">let </span><span class="kw-2">mut </span>relative = destination
-                    .strip_prefix(<span class="kw-2">&amp;</span><span class="kw">super</span>::package_root(<span class="self">self</span>.input.as_ref())<span class="question-mark">?</span>)<span class="question-mark">?
-                    </span>.to_owned();
-                relative.push(LICENSE_FILE_NAME);
-                relative.set_extension(RTF_FILE_EXTENSION);
-                <span class="kw">let </span>stored_relative = StoredPathBuf::from_utf8_path(<span class="kw-2">&amp;</span>relative);
-                (<span class="prelude-val">Some</span>(stored_relative.clone()), <span class="prelude-val">Some</span>(stored_relative))
-            }
-            Eula::Disabled =&gt; (<span class="prelude-val">None</span>, <span class="self">self</span>.license),
-        };
-        <span class="macro">debug!</span>(<span class="string">&quot;eula_wxs_path = {:?}&quot;</span>, eula_wxs_path);
+
         destination.push(WIX_SOURCE_FILE_NAME);
         destination.set_extension(WIX_SOURCE_FILE_EXTENSION);
         <span class="kw">if </span>destination.exists() &amp;&amp; !<span class="self">self</span>.force {
@@ -1356,10 +1291,10 @@
             );
             wxs_printer.description(<span class="self">self</span>.description.as_ref().map(String::as_ref));
             wxs_printer.dialog(<span class="self">self</span>.dialog.as_deref().map(|s| s.as_str()));
-            wxs_printer.eula(eula_wxs_path.as_deref().map(|s| s.as_str()));
+            wxs_printer.eula(<span class="self">self</span>.eula.as_deref().map(|p| p.as_str()));
             wxs_printer.help_url(<span class="self">self</span>.help_url.as_ref().map(String::as_ref));
             wxs_printer.input(<span class="self">self</span>.input.as_deref().and_then(Path::to_str));
-            wxs_printer.license(license_wxs_path.as_ref().map(|s| s.as_str()));
+            wxs_printer.license(<span class="self">self</span>.license.as_deref().map(|p| p.as_str()));
             wxs_printer.manufacturer(<span class="self">self</span>.manufacturer.as_ref().map(String::as_ref));
             wxs_printer.output(<span class="prelude-val">Some</span>(destination.as_str()));
             wxs_printer.package(<span class="self">self</span>.package.as_deref());
@@ -1367,6 +1302,7 @@
             wxs_printer.product_icon(<span class="self">self</span>.product_icon.as_ref().map(|s| s.as_str()));
             wxs_printer.product_name(<span class="self">self</span>.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(<span class="self">self</span>.upgrade_guid.as_ref().map(String::as_ref));
+
             wxs_printer.build().run()<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
@@ -1620,39 +1556,39 @@
             );
             <span class="macro">assert_eq!</span>(
                 execution.copyright_year,
-                <span class="prelude-val">Some</span>(EXPECTED_COPYRIGHT_YEAR).map(String::from)
+                <span class="prelude-val">Some</span>(String::from(EXPECTED_COPYRIGHT_YEAR))
             );
             <span class="macro">assert_eq!</span>(
                 execution.copyright_holder,
-                <span class="prelude-val">Some</span>(EXPECTED_COPYRIGHT_HOLDER).map(String::from)
+                <span class="prelude-val">Some</span>(String::from(EXPECTED_COPYRIGHT_HOLDER))
             );
             <span class="macro">assert_eq!</span>(
                 execution.description,
-                <span class="prelude-val">Some</span>(EXPECTED_DESCRIPTION).map(String::from)
+                <span class="prelude-val">Some</span>(String::from(EXPECTED_DESCRIPTION))
             );
-            <span class="macro">assert_eq!</span>(execution.eula, <span class="prelude-val">Some</span>(EXPECTED_EULA).map(StoredPathBuf::from));
+            <span class="macro">assert_eq!</span>(execution.eula, <span class="prelude-val">Some</span>(StoredPathBuf::from(EXPECTED_EULA)));
             <span class="macro">assert!</span>(execution.force);
-            <span class="macro">assert_eq!</span>(execution.help_url, <span class="prelude-val">Some</span>(EXPECTED_URL).map(String::from));
-            <span class="macro">assert_eq!</span>(execution.input, <span class="prelude-val">Some</span>(EXPECTED_INPUT).map(PathBuf::from));
+            <span class="macro">assert_eq!</span>(execution.help_url, <span class="prelude-val">Some</span>(String::from(EXPECTED_URL)));
+            <span class="macro">assert_eq!</span>(execution.input, <span class="prelude-val">Some</span>(PathBuf::from(EXPECTED_INPUT)));
             <span class="macro">assert_eq!</span>(
                 execution.license,
-                <span class="prelude-val">Some</span>(EXPECTED_LICENSE).map(StoredPathBuf::from)
+                <span class="prelude-val">Some</span>(StoredPathBuf::from(EXPECTED_LICENSE))
             );
             <span class="macro">assert_eq!</span>(
                 execution.manufacturer,
-                <span class="prelude-val">Some</span>(EXPECTED_MANUFACTURER).map(String::from)
+                <span class="prelude-val">Some</span>(String::from(EXPECTED_MANUFACTURER))
             );
-            <span class="macro">assert_eq!</span>(execution.output, <span class="prelude-val">Some</span>(EXPECTED_OUTPUT).map(PathBuf::from));
-            <span class="macro">assert_eq!</span>(execution.path_guid, <span class="prelude-val">Some</span>(PATH_GUID).map(String::from));
+            <span class="macro">assert_eq!</span>(execution.output, <span class="prelude-val">Some</span>(PathBuf::from(EXPECTED_OUTPUT)));
+            <span class="macro">assert_eq!</span>(execution.path_guid, <span class="prelude-val">Some</span>(String::from(PATH_GUID)));
             <span class="macro">assert_eq!</span>(
                 execution.product_icon,
-                <span class="prelude-val">Some</span>(EXPECTED_PRODUCT_ICON).map(StoredPathBuf::from)
+                <span class="prelude-val">Some</span>(StoredPathBuf::from(EXPECTED_PRODUCT_ICON))
             );
             <span class="macro">assert_eq!</span>(
                 execution.product_name,
-                <span class="prelude-val">Some</span>(EXPECTED_PRODUCT_NAME).map(String::from)
+                <span class="prelude-val">Some</span>(String::from(EXPECTED_PRODUCT_NAME))
             );
-            <span class="macro">assert_eq!</span>(execution.upgrade_guid, <span class="prelude-val">Some</span>(UPGRADE_GUID).map(String::from));
+            <span class="macro">assert_eq!</span>(execution.upgrade_guid, <span class="prelude-val">Some</span>(String::from(UPGRADE_GUID)));
         }
     }
 

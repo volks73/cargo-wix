@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Builder","Execution"]};
+window.SIDEBAR_ITEMS = {"struct":["Builder","Execution","WxsRenders"]};

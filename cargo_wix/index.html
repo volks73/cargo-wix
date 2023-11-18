@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`cargo-wix` Binary and Subcommand"><title>cargo_wix - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="cargo_wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../cargo_wix/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../cargo_wix/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate cargo_wix</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.3.7</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">cargo_wix</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/cargo_wix/main.rs.html#15-2007">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="cargo-wix-binary-and-subcommand"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`cargo-wix` Binary and Subcommand"><title>cargo_wix - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="cargo_wix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../cargo_wix/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../cargo_wix/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate cargo_wix</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.3.8</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">cargo_wix</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/cargo_wix/main.rs.html#15-2025">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="cargo-wix-binary-and-subcommand"><a href="#cargo-wix-binary-and-subcommand"><code>cargo-wix</code> Binary and Subcommand</a></h2>
 <p>The goal of the cargo-wix project and the <code>cargo wix</code> subcommand is to make
 it easy to create a Windows installer (msi) for any Rust project. The
 project is primarily implemented as a <a href="https://github.com/rust-lang/cargo/wiki/Third-party-cargo-subcommands">cargo subcommand</a>, but the core
@@ -583,12 +583,16 @@ compiler-args = [&quot;-nologo&quot;, &quot;-wn&quot;]
 culture = &quot;Fr-Fr&quot;
 dbg-build = false
 dbg-name = false
+eula = &quot;path\to\eula.rtf&quot;
 include = [&quot;Path\to\WIX\Source\File\One.wxs&quot;, &quot;Path\to\WIX\Source\File\Two.wxs&quot;]
+license = &quot;path\to\license.txt&quot;
 linker-args = [&quot;-nologo&quot;]
 locale = &quot;Path\to\WIX\Localization\File.wxl&quot;
 name = &quot;example&quot;
 no-build = false
 output = &quot;Path\and\file\name\for\installer.msi&quot;
+path-guid = &quot;BFD25009-65A4-4D1E-97F1-0030465D90D6&quot;
+upgrade-guid = &quot;B36177BE-EA4D-44FB-B05C-EDDABDAA95CA&quot;
 version = &quot;2.1.0&quot;
 </code></pre></div>
 <p>See the documentation for each CLI option for more information about each
@@ -627,9 +631,11 @@ subcommands.</p>
 <h4 id="-b--banner"><a href="#-b--banner"><code>-b,--banner</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
-<p>Sets the path to a bitmap (.bmp) image file that will be displayed across
+<p>Sets the path to an image file (.png, .bmp, …) that will be displayed across
 the top of each dialog in the installer. The banner image dimensions should
-be 493 x 58 pixels.</p>
+be 493 x 58 pixels, but the left-most 50% of that image is covered with text,
+so if you want to leave a blank background for text readability, you only want
+to color in the right-most ~200 pixels of that image.</p>
 <h4 id="-b--bin-path"><a href="#-b--bin-path"><code>-b,--bin-path</code></a></h4>
 <p>Available for the default <em>create</em> (<code>cargo wix</code>) and <em>sign</em> (<code>cargo wix sign</code>) subcommands.</p>
 <p>The <code>-b,--bin-path</code> option can be used to specify a path (relative or
@@ -698,10 +704,12 @@ the <code>cargo wix init</code> or <code>cargo wix sign</code> subcommands, resp
 <h4 id="-d--dialog"><a href="#-d--dialog"><code>-D,--dialog</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
-<p>Sets the path to a bitmap (.bmp) image file that will be displayed to the
-left on the first dialog of the installer. The dialog image dimensions
-should be 493 x 312 pixels. The first dialog is known as the “Welcome”
-dialog.</p>
+<p>Sets the path to an image file (.png, bmp, …) that will be displayed as
+the background of the first dialog of the installer. The dialog image dimensions
+should be 493 x 312 pixels, but the right-most 60% of that area is covered
+by the actual text of the dialog, so if you want to leave a blank background for text
+readability, you only want to color in the left-most ~200 pixels of that image.</p>
+<p>The first dialog is known as the “Welcome” dialog.</p>
 <h4 id="-e--eula"><a href="#-e--eula"><code>-e,--eula</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
@@ -712,6 +720,9 @@ supported licenses (GPL-3.0, Apache-2.0, or MIT) is generated based on the
 value of the <code>license</code> field in the package’s manifest (Cargo.toml). An EULA
 can be enabled later by directly modifying the WiX Source (WXS) file with a
 text editor.</p>
+<p>When specified via <code>package.metadata.wix.eula</code> the path is assumed to be relative
+to the Cargo.toml (directory). This field can also be set to <code>false</code> to disable
+the eula even if we could auto-generate one for you, as described above.</p>
 <h4 id="--force"><a href="#--force"><code>--force</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) subcommand.</p>
 <p>Forces overwriting of generated files from the <em>init</em> subcommand. Use with
@@ -751,6 +762,9 @@ license file is included in the installer or in the installation folder
 along side the <code>bin</code> folder. A file containing the license, such as a TXT,
 PDF, or RTF file, can be added later by directly editing the generated WiX
 Source file (WXS) in a text editor.</p>
+<p>When specified via <code>package.metadata.wix.license</code> the path is assumed to be relative
+to the Cargo.toml (directory). This field can also be set to <code>false</code> to disable
+the license auto-generation features described above.</p>
 <h4 id="-l--linker-arg"><a href="#-l--linker-arg"><code>-L,--linker-arg</code></a></h4>
 <p>Available for the default _create (<code>cargo wix</code>) subcommand.</p>
 <p>Appends an argument to the WiX linker (light.exe) invocation. This provides
@@ -820,7 +834,7 @@ and proper modification of the <code>PATH</code> environment variable.</p>
 <h4 id="--product-icon"><a href="#--product-icon"><code>--product-icon</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>) and <em>print</em> (<code>cargo wix print</code>)
 subcommands.</p>
-<p>Sets the path to an image file that will be display as an icon in the
+<p>Sets the path to a 16x16 image file (.ico) that will be display as an icon in the
 Add/Remove Programs (ARP) control panel for the installed application.</p>
 <h4 id="--product-name"><a href="#--product-name"><code>--product-name</code></a></h4>
 <p>Available for the <em>init</em> (<code>cargo wix init</code>), <em>print</em> (<code>cargo wix print</code>),

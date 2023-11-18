@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["license","wxs"]};
+window.SIDEBAR_ITEMS = {"mod":["license","wxs"],"struct":["RenderOutput"]};

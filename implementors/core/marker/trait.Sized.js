@@ -1,3 +1,3 @@
 (function() {var implementors = {
-"wix":[["impl !<a class=\"trait\" href=\"https://doc.rust-lang.org/1.70.0/core/marker/trait.Sized.html\" title=\"trait core::marker::Sized\">Sized</a> for <a class=\"struct\" href=\"wix/struct.StoredPath.html\" title=\"struct wix::StoredPath\">StoredPath</a>",1,["wix::StoredPath"]]]
+"wix":[["impl !<a class=\"trait\" href=\"https://doc.rust-lang.org/1.74.0/core/marker/trait.Sized.html\" title=\"trait core::marker::Sized\">Sized</a> for <a class=\"struct\" href=\"wix/stored_path/struct.StoredPath.html\" title=\"struct wix::stored_path::StoredPath\">StoredPath</a>",1,["wix::stored_path::StoredPath"]]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
