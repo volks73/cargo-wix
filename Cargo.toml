@@ -1,7 +1,7 @@
 [package]
 name = "cargo-wix"
 description = "Build Windows installers using the WiX Toolset"
-version = "0.3.7"
+version = "0.3.8"
 authors = ["Christopher Field <cfield2@gmail.com>"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/volks73/cargo-wix"
