@@ -1733,16 +1733,13 @@ mod tests {
             b.output(Some(EXPECTED_OUTPUT));
             b.version(Some(EXPECTED_VERSION));
             let execution = b.build();
-            assert_eq!(
-                execution.bin_path,
-                Some(EXPECTED_BIN_PATH).map(PathBuf::from)
-            );
+            assert_eq!(execution.bin_path, Some(PathBuf::from(EXPECTED_BIN_PATH)));
             assert!(!execution.capture_output);
             assert_eq!(
                 execution.compiler_args,
                 Some(vec![String::from(EXPECTED_COMPILER_ARGS)])
             );
-            assert_eq!(execution.culture, Some(EXPECTED_CULTURE).map(String::from));
+            assert_eq!(execution.culture, Some(String::from(EXPECTED_CULTURE)));
             assert!(execution.debug_build);
             assert!(execution.debug_name);
             assert_eq!(
@@ -1754,11 +1751,11 @@ mod tests {
                 execution.linker_args,
                 Some(vec![String::from(EXPECTED_LINKER_ARGS)])
             );
-            assert_eq!(execution.locale, Some(EXPECTED_LOCALE).map(PathBuf::from));
-            assert_eq!(execution.name, Some(EXPECTED_NAME).map(String::from));
+            assert_eq!(execution.locale, Some(PathBuf::from(EXPECTED_LOCALE)));
+            assert_eq!(execution.name, Some(String::from(EXPECTED_NAME)));
             assert!(execution.no_build);
-            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(String::from));
-            assert_eq!(execution.version, Some(EXPECTED_VERSION).map(String::from));
+            assert_eq!(execution.output, Some(String::from(EXPECTED_OUTPUT)));
+            assert_eq!(execution.version, Some(String::from(EXPECTED_VERSION)));
         }
     }
 

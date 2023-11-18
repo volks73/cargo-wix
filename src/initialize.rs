@@ -734,39 +734,39 @@ mod tests {
             );
             assert_eq!(
                 execution.copyright_year,
-                Some(EXPECTED_COPYRIGHT_YEAR).map(String::from)
+                Some(String::from(EXPECTED_COPYRIGHT_YEAR))
             );
             assert_eq!(
                 execution.copyright_holder,
-                Some(EXPECTED_COPYRIGHT_HOLDER).map(String::from)
+                Some(String::from(EXPECTED_COPYRIGHT_HOLDER))
             );
             assert_eq!(
                 execution.description,
-                Some(EXPECTED_DESCRIPTION).map(String::from)
+                Some(String::from(EXPECTED_DESCRIPTION))
             );
-            assert_eq!(execution.eula, Some(EXPECTED_EULA).map(StoredPathBuf::from));
+            assert_eq!(execution.eula, Some(StoredPathBuf::from(EXPECTED_EULA)));
             assert!(execution.force);
-            assert_eq!(execution.help_url, Some(EXPECTED_URL).map(String::from));
-            assert_eq!(execution.input, Some(EXPECTED_INPUT).map(PathBuf::from));
+            assert_eq!(execution.help_url, Some(String::from(EXPECTED_URL)));
+            assert_eq!(execution.input, Some(PathBuf::from(EXPECTED_INPUT)));
             assert_eq!(
                 execution.license,
-                Some(EXPECTED_LICENSE).map(StoredPathBuf::from)
+                Some(StoredPathBuf::from(EXPECTED_LICENSE))
             );
             assert_eq!(
                 execution.manufacturer,
-                Some(EXPECTED_MANUFACTURER).map(String::from)
+                Some(String::from(EXPECTED_MANUFACTURER))
             );
-            assert_eq!(execution.output, Some(EXPECTED_OUTPUT).map(PathBuf::from));
-            assert_eq!(execution.path_guid, Some(PATH_GUID).map(String::from));
+            assert_eq!(execution.output, Some(PathBuf::from(EXPECTED_OUTPUT)));
+            assert_eq!(execution.path_guid, Some(String::from(PATH_GUID)));
             assert_eq!(
                 execution.product_icon,
-                Some(EXPECTED_PRODUCT_ICON).map(StoredPathBuf::from)
+                Some(StoredPathBuf::from(EXPECTED_PRODUCT_ICON))
             );
             assert_eq!(
                 execution.product_name,
-                Some(EXPECTED_PRODUCT_NAME).map(String::from)
+                Some(String::from(EXPECTED_PRODUCT_NAME))
             );
-            assert_eq!(execution.upgrade_guid, Some(UPGRADE_GUID).map(String::from));
+            assert_eq!(execution.upgrade_guid, Some(String::from(UPGRADE_GUID)));
         }
     }
 
