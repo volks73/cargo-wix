@@ -1,3 +1,3 @@
 (function() {var implementors = {
-"wix":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.74.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"wix/enum.Error.html\" title=\"enum wix::Error\">Error</a>"]]
+"wix":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.70.0/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"wix/enum.Error.html\" title=\"enum wix::Error\">Error</a>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
