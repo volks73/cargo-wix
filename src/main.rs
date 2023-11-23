@@ -729,10 +729,12 @@
 //!
 //! ```toml
 //! [package.metadata.wix]
+//! banner = "path\to\banner.png"
 //! compiler-args = ["-nologo", "-wn"]
 //! culture = "Fr-Fr"
 //! dbg-build = false
 //! dbg-name = false
+//! dialog = "path\to\dialog.png"
 //! eula = "path\to\eula.rtf"
 //! include = ["Path\to\WIX\Source\File\One.wxs", "Path\to\WIX\Source\File\Two.wxs"]
 //! license = "path\to\license.txt"
@@ -742,6 +744,7 @@
 //! no-build = false
 //! output = "Path\and\file\name\for\installer.msi"
 //! path-guid = "BFD25009-65A4-4D1E-97F1-0030465D90D6"
+//! product-icon = "path\to\product_icon.ico"
 //! upgrade-guid = "B36177BE-EA4D-44FB-B05C-EDDABDAA95CA"
 //! version = "2.1.0"
 //! ```
