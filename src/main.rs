@@ -1723,7 +1723,7 @@ fn main() {
                         .short('o')
                         .num_args(1))
                     .arg(owner)
-                    .arg(package)
+                    .arg(package.clone())
                     .arg(path_guid)
                     .arg(product_icon)
                     .arg(product_name.clone())
@@ -1793,8 +1793,10 @@ fn main() {
                         .long_help("By default, this subcommand captures, or \
                             hides, all output from the signer. Use this flag to \
                             show the output.")
-                        .long("nocapture"))
+                        .long("nocapture")
+                        .action(ArgAction::SetTrue))
                     .arg(product_name)
+                    .arg(package)
                     .arg(Arg::new("timestamp")
                         .help("An alias or URL to a timestamp server")
                         .long_help("Either an alias or URL can be used. Aliases \
