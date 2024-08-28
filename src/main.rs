@@ -2015,8 +2015,18 @@ fn main() {
             create.version(matches.get_one("install-version").map(String::as_str));
             create.package(matches.get_one("package").map(String::as_str));
             create.target(matches.get_one("target").map(String::as_str));
-            create.toolset(matches.get_one("toolset").cloned().unwrap_or(WixToolset::Default));
-            create.toolset_upgrade(matches.get_one("toolset-upgrade").cloned().unwrap_or(WixToolsetUpgrade::None));
+            create.toolset(
+                matches
+                    .get_one("toolset")
+                    .cloned()
+                    .unwrap_or(WixToolset::Default),
+            );
+            create.toolset_upgrade(
+                matches
+                    .get_one("toolset-upgrade")
+                    .cloned()
+                    .unwrap_or(WixToolsetUpgrade::None),
+            );
             create.build().run()
         }
     };
