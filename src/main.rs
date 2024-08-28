@@ -1208,12 +1208,14 @@
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
+use clap::builder::EnumValueParser;
 use clap::{Arg, ArgAction, Command};
 
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
 
 use log::{Level, LevelFilter};
+use wix::create::{WixToolset, WixToolsetUpgrade};
 
 use std::io::Write;
 
@@ -1680,6 +1682,34 @@ fn main() {
                     .long("output")
                     .short('o')
                     .num_args(1))
+                .arg(Arg::new("toolset")
+                    .help("Toolset to use for wix related operations")
+                    .long_help(
+                        "Before WiX4 the binaries that were used to build the installer were light.exe and candle.exe.\
+                         The WiX toolset now uses a single binary, wix.exe, that performs all the previous operations.\
+                         In addition WiX3 did not have a unified package installation method, where-as WiX4 and beyond \
+                         can be installed via `dotnet install`. \
+                         This argument can be used to opt-in to the modern toolset, however it is important to note that \
+                         while WiX4+ are backwards compatible, WiX3 .wxs files are not compatible and must be converted \
+                         to WiX4 semantics. Luckily the modern wix toolsets contain a convert tool, however there are \
+                         several key differences after WiX3 that must be addressed before the files may be built. \
+                         If the `toolset-upgrade` argument is provided in addition to this command, cargo-wix can ensure \
+                         that the included wix source files are updated to the modern format and that the dependencies used \
+                         in those source files are installed in the current context. This also provides the benefit between \
+                         WiX4+ versions, as the wix toolset extensions now depend on the WiX toolset version, `cargo-wix` \
+                         can ensure that before the build starts all wix extensions are up to date.")
+                    .value_parser(EnumValueParser::<WixToolset>::new())
+                )
+                .arg(Arg::new("toolset-upgrade")
+                    .help("Toolset upgrade mode to use before building the installer")
+                    .long_help(
+                        "(Only applied if --toolset is set to modern) 
+                        When enabled, this will perform checks to ensure that the current wix environment \
+                        is up to date before attempting to build the installer which includes, \
+                            1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting \
+                            2) Installing extensions that are required to build the installer \
+                        There are several modes that can be used with inplace being the simplest and sxs being the least destructive")
+                        .value_parser(EnumValueParser::<WixToolsetUpgrade>::new()))
                 .arg(package.clone())
                 .subcommand(Command::new("print")
                     .version(PKG_VERSION)
@@ -1985,6 +2015,8 @@ fn main() {
             create.version(matches.get_one("install-version").map(String::as_str));
             create.package(matches.get_one("package").map(String::as_str));
             create.target(matches.get_one("target").map(String::as_str));
+            create.toolset(matches.get_one("toolset").cloned().unwrap_or(WixToolset::Default));
+            create.toolset_upgrade(matches.get_one("toolset-upgrade").cloned().unwrap_or(WixToolsetUpgrade::None));
             create.build().run()
         }
     };
