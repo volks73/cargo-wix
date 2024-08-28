@@ -72,7 +72,7 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                 let exts = exts
                     .iter()
                     .filter(|e| e.prefix() != "xml")
-                    .map(|e| WxsExtDependency::from(e))
+                    .map(WxsExtDependency::from)
                     .collect();
 
                 let wix_version = match default {
@@ -113,7 +113,7 @@ impl WixUpgrade {
         if wix_version_output.status.success() && !wix_version_output.stdout.is_empty() {
             let output = String::from_utf8(wix_version_output.stdout)?;
 
-            let version = semver::Version::parse(&output.trim())?;
+            let version = semver::Version::parse(output.trim())?;
 
             let mut upgrade = Self {
                 wix_version: version,
@@ -137,11 +137,13 @@ impl WixUpgrade {
     ///
     /// Analyzes the *.wxs file to determine if the source requires conversion
     ///
-    /// Returns an error if
+    /// Returns an error if the *.wxs file is not valid XML
     pub fn add_wxs_source(&mut self, source: PathBuf) -> crate::Result<()> {
-        if !self.wxs_sources.contains_key(&source) {
-            let wix_source = open_wxs_source(source.clone())?;
-            self.wxs_sources.insert(source, wix_source);
+        if let std::collections::btree_map::Entry::Vacant(e) =
+            self.wxs_sources.entry(source.clone())
+        {
+            let wix_source = open_wxs_source(source)?;
+            e.insert(wix_source);
         }
         Ok(())
     }
@@ -273,11 +275,6 @@ impl std::fmt::Debug for WixSource {
             .finish()
     }
 }
-#[test]
-fn test_wix_upgrade() {
-    let upgrade = WixUpgrade::try_start_upgrade().unwrap();
-    eprintln!("{upgrade:?}");
-}
 
 pub(crate) mod wix_exts {
     use std::{
@@ -374,13 +371,13 @@ pub(crate) mod wix_exts {
                 (DIRECTX_NS_PREFIX, DIRECTX_NS_URI) => Box::new(WellKnownExtentions::DirectX),
                 (FIREWALL_NS_PREFIX, FIREWALL_NS_URI) => Box::new(WellKnownExtentions::Firewall),
                 (HTTP_NS_PREFIX, HTTP_NS_URI) => Box::new(WellKnownExtentions::Http),
-                (IIS_NS_PREFIX, IIS_NS_URI) => Box::new(WellKnownExtentions::IIS),
-                (MSMQ_NS_PREFIX, MSMQ_NS_URI) => Box::new(WellKnownExtentions::MSMQ),
+                (IIS_NS_PREFIX, IIS_NS_URI) => Box::new(WellKnownExtentions::Iis),
+                (MSMQ_NS_PREFIX, MSMQ_NS_URI) => Box::new(WellKnownExtentions::Msmq),
                 (NETFX_NS_PREFIX, NETFX_NS_URI) => Box::new(WellKnownExtentions::Netfx),
                 (POWERSHELL_NS_PREFIX, POWERSHELL_NS_URI) => {
                     Box::new(WellKnownExtentions::Powershell)
                 }
-                (SQL_NS_PREFIX, SQL_NS_URI) => Box::new(WellKnownExtentions::SQL),
+                (SQL_NS_PREFIX, SQL_NS_URI) => Box::new(WellKnownExtentions::Sql),
                 (UI_NS_PREFIX, UI_NS_URI) => Box::new(WellKnownExtentions::UI),
                 (UTIL_NS_PREFIX, UTIL_NS_URI) => Box::new(WellKnownExtentions::Util),
                 (VS_NS_PREFIX, VS_NS_URI) => Box::new(WellKnownExtentions::VS),
@@ -455,10 +452,10 @@ pub(crate) mod wix_exts {
         Http,
         /// WiX Toolset Internet Information Services Extension
         /// Docs: https://wixtoolset.org/docs/schema/iis/
-        IIS,
+        Iis,
         /// WiX Toolset MSMQ Extension
         /// Docs: https://wixtoolset.org/docs/schema/msmq/
-        MSMQ,
+        Msmq,
         /// WiX Toolset .NET Framework Extension
         /// Docs: https://wixtoolset.org/docs/schema/netfx/
         Netfx,
@@ -467,7 +464,7 @@ pub(crate) mod wix_exts {
         Powershell,
         /// WiX Toolset SQL Server Extension
         /// Docs: https://wixtoolset.org/docs/schema/sql/
-        SQL,
+        Sql,
         /// WiX Toolset UI Extension
         /// Docs: https://wixtoolset.org/docs/schema/ui/
         UI,
@@ -488,11 +485,11 @@ pub(crate) mod wix_exts {
                 WellKnownExtentions::DirectX => DIRECTX_EXT,
                 WellKnownExtentions::Firewall => FIREWALL_EXT,
                 WellKnownExtentions::Http => HTTP_EXT,
-                WellKnownExtentions::IIS => IIS_EXT,
-                WellKnownExtentions::MSMQ => MSMQ_EXT,
+                WellKnownExtentions::Iis => IIS_EXT,
+                WellKnownExtentions::Msmq => MSMQ_EXT,
                 WellKnownExtentions::Netfx => NETFX_EXT,
                 WellKnownExtentions::Powershell => POWERSHELL_EXT,
-                WellKnownExtentions::SQL => SQL_EXT,
+                WellKnownExtentions::Sql => SQL_EXT,
                 WellKnownExtentions::UI => UI_EXT,
                 WellKnownExtentions::Util => UTIL_EXT,
                 WellKnownExtentions::VS => VS_EXT,
@@ -508,11 +505,11 @@ pub(crate) mod wix_exts {
                 WellKnownExtentions::DirectX => DIRECTX_NS_PREFIX,
                 WellKnownExtentions::Firewall => FIREWALL_NS_PREFIX,
                 WellKnownExtentions::Http => HTTP_NS_PREFIX,
-                WellKnownExtentions::IIS => IIS_NS_PREFIX,
-                WellKnownExtentions::MSMQ => MSMQ_NS_PREFIX,
+                WellKnownExtentions::Iis => IIS_NS_PREFIX,
+                WellKnownExtentions::Msmq => MSMQ_NS_PREFIX,
                 WellKnownExtentions::Netfx => NETFX_NS_PREFIX,
                 WellKnownExtentions::Powershell => POWERSHELL_NS_PREFIX,
-                WellKnownExtentions::SQL => SQL_NS_PREFIX,
+                WellKnownExtentions::Sql => SQL_NS_PREFIX,
                 WellKnownExtentions::UI => UI_NS_PREFIX,
                 WellKnownExtentions::Util => UTIL_NS_PREFIX,
                 WellKnownExtentions::VS => VS_NS_PREFIX,
@@ -527,11 +524,11 @@ pub(crate) mod wix_exts {
                 WellKnownExtentions::DirectX => DIRECTX_NS_URI,
                 WellKnownExtentions::Firewall => FIREWALL_NS_URI,
                 WellKnownExtentions::Http => HTTP_NS_URI,
-                WellKnownExtentions::IIS => IIS_NS_URI,
-                WellKnownExtentions::MSMQ => MSMQ_NS_URI,
+                WellKnownExtentions::Iis => IIS_NS_URI,
+                WellKnownExtentions::Msmq => MSMQ_NS_URI,
                 WellKnownExtentions::Netfx => NETFX_NS_URI,
                 WellKnownExtentions::Powershell => POWERSHELL_NS_URI,
-                WellKnownExtentions::SQL => SQL_NS_URI,
+                WellKnownExtentions::Sql => SQL_NS_URI,
                 WellKnownExtentions::UI => UI_NS_URI,
                 WellKnownExtentions::Util => UTIL_NS_URI,
                 WellKnownExtentions::VS => VS_NS_URI,

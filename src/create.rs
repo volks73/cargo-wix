@@ -108,7 +108,7 @@ impl<'a> Builder<'a> {
             target: None,
             version: None,
             toolset: WixToolset::Default,
-            toolset_upgrade: WixToolsetUpgrade::None
+            toolset_upgrade: WixToolsetUpgrade::None,
         }
     }
 
@@ -438,7 +438,7 @@ pub struct Execution {
 }
 
 /// Enumeration of wix-toolset options
-/// 
+///
 /// This controls which wix build binaries are used by cargo-wix
 #[derive(ValueEnum, Copy, Clone, Debug)]
 pub enum WixToolset {
@@ -449,9 +449,9 @@ pub enum WixToolset {
 }
 
 /// Enumeration of wix-toolset upgrade patterns that can be applied
-/// 
+///
 /// WiX toolset upgrading consists of two parts,
-/// 
+///
 /// 1) Convert Wix3 and below *.wxs files to the modern format
 /// 2) Detect and install wix extensions required by *.wxs files
 #[derive(ValueEnum, Copy, Clone, Debug)]
@@ -462,12 +462,12 @@ pub enum WixToolsetUpgrade {
     #[clap(name = "inplace")]
     Inplace,
     /// Upgrade files in place, but use "vendoring" when installing wix extensions.
-    /// 
+    ///
     /// This will install wix extensions in the current directory.
     #[clap(name = "inplace-vendor")]
     InplaceVendored,
     /// Upgrade source files in a SxS manner
-    /// 
+    ///
     /// This will copy *.wxs files to a versioned folder and continue to use that folder to install wix extensions.
     #[clap(name = "sxs")]
     SideBySide,
@@ -599,8 +599,10 @@ impl Execution {
             match &self.wix_toolset_upgrade {
                 WixToolsetUpgrade::None => {
                     debug!("No toolset upgrade mode is set");
-                },
-                WixToolsetUpgrade::Inplace | WixToolsetUpgrade::InplaceVendored | WixToolsetUpgrade::SideBySide => {
+                }
+                WixToolsetUpgrade::Inplace
+                | WixToolsetUpgrade::InplaceVendored
+                | WixToolsetUpgrade::SideBySide => {
                     debug!("Starting toolset upgrade checks");
                     let mut upgrade = crate::upgrade::WixUpgrade::try_start_upgrade()?;
 
@@ -609,25 +611,30 @@ impl Execution {
                     }
 
                     debug!("Starting source file conversions");
-                    upgrade.convert(if matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::SideBySide) {
-                        let current = std::env::current_dir()?;
-                        let sxs_folder = current.join(upgrade.sxs_folder_name());
-                        std::fs::create_dir_all(&sxs_folder)?;
-                        Some(sxs_folder)
-                    } else { 
-                        None
-                    })?;
+                    upgrade.convert(
+                        if matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::SideBySide) {
+                            let current = std::env::current_dir()?;
+                            let sxs_folder = current.join(upgrade.sxs_folder_name());
+                            std::fs::create_dir_all(&sxs_folder)?;
+                            Some(sxs_folder)
+                        } else {
+                            None
+                        },
+                    )?;
 
                     debug!("Installing any missing extensions");
-                    upgrade.install_extensions(matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::Inplace), if matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::SideBySide) {
-                        let current = std::env::current_dir()?;
-                        let sxs_folder = current.join(upgrade.sxs_folder_name());
-                        std::fs::create_dir_all(&sxs_folder)?;
-                        Some(sxs_folder)
-                    } else { 
-                        None
-                    })?;
-                },
+                    upgrade.install_extensions(
+                        matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::Inplace),
+                        if matches!(self.wix_toolset_upgrade, WixToolsetUpgrade::SideBySide) {
+                            let current = std::env::current_dir()?;
+                            let sxs_folder = current.join(upgrade.sxs_folder_name());
+                            std::fs::create_dir_all(&sxs_folder)?;
+                            Some(sxs_folder)
+                        } else {
+                            None
+                        },
+                    )?;
+                }
             }
         }
 
@@ -636,7 +643,7 @@ impl Execution {
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        compiler.arg("-arch").arg(&wix_arch.to_string());
+        compiler.arg("-arch").arg(wix_arch.to_string());
 
         // Modern wix does not requires `-ext` flags
         if !self.wix_toolset.is_modern() {
@@ -879,30 +886,26 @@ impl Execution {
     fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
-        } else if let Some(pkg_meta_wix_debug_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
     fn debug_name(&self, metadata: &Value) -> bool {
         if self.debug_name {
             true
-        } else if let Some(pkg_meta_wix_debug_name) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-name"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_name
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-name"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
@@ -1111,15 +1114,13 @@ impl Execution {
     fn no_build(&self, metadata: &Value) -> bool {
         if self.no_build {
             true
-        } else if let Some(pkg_meta_wix_no_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("no-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_no_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("no-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
