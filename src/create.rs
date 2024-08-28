@@ -107,7 +107,7 @@ impl<'a> Builder<'a> {
             package: None,
             target: None,
             version: None,
-            toolset: WixToolset::Default,
+            toolset: WixToolset::Legacy,
             toolset_upgrade: WixToolsetUpgrade::None,
         }
     }
@@ -443,7 +443,7 @@ pub struct Execution {
 #[derive(ValueEnum, Copy, Clone, Debug)]
 pub enum WixToolset {
     /// The default wix toolset uses "candle.exe" and "light.exe" to build the installer
-    Default,
+    Legacy,
     /// Modern wix toolsets use just "wix.exe" to build the installer
     Modern,
 }
@@ -474,9 +474,24 @@ pub enum WixToolsetUpgrade {
 }
 
 impl WixToolset {
+    /// Returns true if the toolset in use is legacy
+    pub fn is_legacy(&self) -> bool {
+        matches!(self, WixToolset::Legacy)
+    }
+
     /// Returns true if the toolset in use is modern
     pub fn is_modern(&self) -> bool {
         matches!(self, WixToolset::Modern)
+    }
+
+    /// Returns an error if the modern toolset is not found from PATH
+    pub fn check_modern_toolset_installed() -> crate::Result<()> {
+        let output = Command::new("wix").arg("--help").output()?;
+        if !output.status.success() {
+            Err("Modern toolset (wix.exe) could not be found from PATH, ensure that Wix4 or above is installed".into())
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -585,16 +600,20 @@ impl Execution {
         // Compile the installer
         info!("Compiling the installer");
 
-        let mut compiler = if !self.wix_toolset.is_modern() {
+        // Legacy toolset uses `candle` and `light` (compile and link)
+        // Modern toolset only uses `wix build`
+        let mut compiler = if self.wix_toolset.is_legacy() {
             self.compiler()?
         } else {
             debug!("Using modern wix build tools");
+            WixToolset::check_modern_toolset_installed()?;
             let mut wix = Command::new("wix");
             wix.arg("build");
             wix
         };
         debug!("compiler = {:?}", compiler);
 
+        // Toolset upgrading only makes sense if the modern toolset is being used
         if self.wix_toolset.is_modern() {
             match &self.wix_toolset_upgrade {
                 WixToolsetUpgrade::None => {
@@ -646,7 +665,7 @@ impl Execution {
         compiler.arg("-arch").arg(wix_arch.to_string());
 
         // Modern wix does not requires `-ext` flags
-        if !self.wix_toolset.is_modern() {
+        if self.wix_toolset.is_legacy() {
             compiler.arg("-ext").arg("WixUtilExtension");
         }
 
@@ -720,7 +739,7 @@ impl Execution {
         debug!("installer_destination = {:?}", installer_destination);
 
         // Modern wix no longer requires `light`
-        if !self.wix_toolset.is_modern() {
+        if self.wix_toolset.is_legacy() {
             // Link the installer
             info!("Linking the installer");
             let mut linker = self.linker()?;

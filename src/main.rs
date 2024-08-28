@@ -2019,7 +2019,7 @@ fn main() {
                 matches
                     .get_one("toolset")
                     .cloned()
-                    .unwrap_or(WixToolset::Default),
+                    .unwrap_or(WixToolset::Legacy),
             );
             create.toolset_upgrade(
                 matches
