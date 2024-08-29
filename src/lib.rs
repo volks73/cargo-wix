@@ -73,7 +73,8 @@ pub mod purge;
 pub mod sign;
 pub mod stored_path;
 mod templates;
-mod upgrade;
+pub mod toolset;
+pub mod setup;
 
 use camino::Utf8Path;
 use log::debug;
