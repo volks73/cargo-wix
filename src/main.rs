@@ -1215,7 +1215,7 @@ use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
 
 use log::{Level, LevelFilter};
-use wix::create::{WixToolset, WixToolsetUpgrade};
+use wix::toolset::{Toolset, ToolsetSetupMode};
 
 use std::io::Write;
 
@@ -1356,6 +1356,19 @@ fn main() {
         .long("owner")
         .short('O')
         .num_args(1);
+    // The package option for `create` or `setup`
+    let include = Arg::new("include")
+        .help("Include an additional WiX Source (wxs) file")
+        .long_help(
+            "Includes a WiX source (wxs) file for a project, \
+        where the wxs file is not located in the default location, \
+        i.e. 'wix'. Use this option multiple times to include \
+        multiple wxs files.",
+        )
+        .long("include")
+        .short('I')
+        .num_args(1)
+        .action(ArgAction::Append);
     // The package option for the `create`, `init`, and `print` subcommands
     let package = Arg::new("package")
         .help("The name of the package in the current workspace")
@@ -1533,16 +1546,7 @@ fn main() {
                     .long("dbg-name")
                     .short('D')
                     .action(ArgAction::SetTrue))
-                .arg(Arg::new("include")
-                    .help("Include an additional WiX Source (wxs) file")
-                    .long_help("Includes a WiX source (wxs) file for a project, \
-                        where the wxs file is not located in the default location, \
-                        i.e. 'wix'. Use this option multiple times to include \
-                        multiple wxs files.")
-                    .long("include")
-                    .short('I')
-                    .num_args(1)
-                    .action(ArgAction::Append))
+                .arg(include.clone())
                 .subcommand(Command::new("init")
                     .version(PKG_VERSION)
                     .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
@@ -1683,33 +1687,39 @@ fn main() {
                     .short('o')
                     .num_args(1))
                 .arg(Arg::new("toolset")
+                    .long("toolset")
                     .help("Toolset to use for wix related operations")
                     .long_help(
-                        "Before WiX4 the binaries that were used to build the installer were light.exe and candle.exe.\
-                         The WiX toolset now uses a single binary, wix.exe, that performs all the previous operations.\
-                         In addition WiX3 did not have a unified package installation method, where-as WiX4 and beyond \
-                         can be installed via `dotnet install`. \
-                         This argument can be used to opt-in to the modern toolset, however it is important to note that \
-                         while WiX4+ are backwards compatible, WiX3 .wxs files are not compatible and must be converted \
-                         to WiX4 semantics. Luckily the modern wix toolsets contain a convert tool, however there are \
-                         several key differences after WiX3 that must be addressed before the files may be built. \
-                         If the `toolset-upgrade` argument is provided in addition to this command, cargo-wix can ensure \
-                         that the included wix source files are updated to the modern format and that the dependencies used \
-                         in those source files are installed in the current context. This also provides the benefit between \
-                         WiX4+ versions, as the wix toolset extensions now depend on the WiX toolset version, `cargo-wix` \
+                        "Before WiX4 the binaries that were used to build the installer were light.exe and candle.exe.\n\
+                         The WiX toolset now uses a single binary, wix.exe, that performs all the previous operations.\n\
+                         In addition WiX3 did not have a unified package installation method, where-as WiX4 and beyond\n\
+                         can be installed via `dotnet install`.\n\
+                         \n\
+                         This argument can be used to opt-in to the modern toolset, however it is important to note that\n\
+                         while WiX4+ are backwards compatible, WiX3 .wxs files are not compatible and must be converted\n\
+                         to WiX4 semantics. Luckily the modern wix toolsets contain a convert tool, however there are\n\
+                         several key differences after WiX3 that must be addressed before the files may be built.\n\
+                         If the `toolset-upgrade` argument is provided in addition to this command, cargo-wix can ensure\n\
+                         that the included wix source files are updated to the modern format and that the dependencies used\n\
+                         in those source files are installed in the current context. This also provides the benefit between\n\
+                         WiX4+ versions, as the wix toolset extensions now depend on the WiX toolset version, `cargo-wix`\n\
                          can ensure that before the build starts all wix extensions are up to date.")
-                    .value_parser(EnumValueParser::<WixToolset>::new())
+                    .value_parser(EnumValueParser::<Toolset>::new())
+                    .required(false)
+                    .num_args(1)
                 )
-                .arg(Arg::new("toolset-upgrade")
-                    .help("Toolset upgrade mode to use before building the installer")
+                .arg(Arg::new("setup")
+                    .long("setup")
+                    .help("Toolset setup mode to use before building the installer")
                     .long_help(
-                        "(Only applied if --toolset is set to modern) 
-                        When enabled, this will perform checks to ensure that the current wix environment \
-                        is up to date before attempting to build the installer which includes, \
-                            1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting \
-                            2) Installing extensions that are required to build the installer \
+                        "(Only applied if `--toolset modern` is present)\n\
+                        When enabled, this will perform checks to ensure that the current wix environment\n\
+                        is up to date before attempting to build the installer which includes:\n\
+                        \t1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting\n\
+                        \t2) Installing extensions that are required to build the installer\n\
                         There are several modes that can be used with inplace being the simplest and sxs being the least destructive")
-                        .value_parser(EnumValueParser::<WixToolsetUpgrade>::new()))
+                        .value_parser(EnumValueParser::<ToolsetSetupMode>::new())
+                        .num_args(1))
                 .arg(package.clone())
                 .subcommand(Command::new("print")
                     .version(PKG_VERSION)
@@ -1826,7 +1836,7 @@ fn main() {
                         .long("nocapture")
                         .action(ArgAction::SetTrue))
                     .arg(product_name)
-                    .arg(package)
+                    .arg(package.clone())
                     .arg(Arg::new("timestamp")
                         .help("An alias or URL to a timestamp server")
                         .long_help("Either an alias or URL can be used. Aliases \
@@ -1835,6 +1845,78 @@ fn main() {
                         .long("timestamp")
                         .num_args(1))
                     .arg(verbose.clone()))
+                .subcommand(Command::new("setup")
+                        .version(PKG_VERSION)
+                        .about("WiX project setup utilities")
+                        .long_about(
+                            "Perform various wix setup operations such as: converting from WiX3 wxs files to Wix4 format or\n\
+                            restoring wix extension packages by analyzing extension dependencies found in wxs files.\n\
+                            Can also enable vendoring of wix dependencies for offline build\n\
+                            \n\
+                            If no additional setup flags are passed such as: `--restore`, `--upgrade`, `--sxs`, or `--vendor`\n\
+                            and no mode is set via `-m` or `--mode`\n\
+                            Then this will apply to 'project' setup mode, meaning all wxs files will be converted in place\n\
+                            and wix extensions will be installed globally")
+                        .arg(Arg::new("INPUT")
+                            .help("Path to a package's manifest (Cargo.toml) file.")
+                            .long_help(
+                                "If no value is provided, then the current\n\
+                                working directory (CWD) will be used to locate a package's\n\
+                                manifest. An error will occur if a manifest cannot be\n\
+                                found. A relative or absolute path to a package's manifest\n\
+                                (Cargo.toml) file can be used. Only one manifest is\n\
+                                allowed. The creation of an installer will be relative to\n\
+                                the specified manifest.")
+                            .required(false)
+                            .index(1))
+                        .arg(package)
+                        .arg(include)
+                        .arg(Arg::new("restore")
+                            .long("restore")
+                            .help("Will only restore dependencies from wxs source files in the modern (WiX4+) format.")
+                            .long_help(
+                                "May be combined with --vendor but will be ignored if --sxs is passed.\n\
+                                \n\
+                                If `--restore --vendor` are used, equivalent to `-m restore-vendor` or `--mode restore-vendor`\n\
+                                \n\
+                                Otherwise, if `--restore` is used alone equivalent to `-m restore` or `--mode restore")
+                            .action(ArgAction::SetTrue))
+                        .arg(Arg::new("upgrade")
+                            .long("upgrade")
+                            .help("Will only upgrade legacy wxs files to the modern (WiX4+) format")
+                            .long_help(
+                                "May be combined with --sxs but will be ignored if --vendor is passed.\n\
+                                \n\
+                                If `--upgrade --sxs` are used, this would be equivalent to `-m upgrade-sxs` or `--mode upgrade-sxs`\n\
+                                \n\
+                                Otherwise, if `--upgrade` is used alone Equivalent to `-m upgrade` or `--mode upgrade`")
+                            .action(ArgAction::SetTrue))
+                        .arg(Arg::new("sxs")
+                            .long("sxs")
+                            .help("Will enable side-by-side setup strategy")
+                            .long_help(
+                                "By using side-by-side mode, all setup all setup operations\n\
+                                will be executed in a folder corresponding to the major wix version detected. (Ex. \\wix4\\..)\n\
+                                This is suited for complex wix projects where bake\n\
+                                time maybe needed between major wix versions. Implicitly vendors dependencies in the same folder.\n\
+                                \n\
+                                Equivalent to `-m vendor` or `--mode vendor`")
+                            .action(ArgAction::SetTrue))
+                        .arg(Arg::new("vendor")
+                            .long("vendor")
+                            .help("Will enable vendoring setup strategy")
+                            .long_help(
+                                "By using vendoring mode, all extension dependencies will be installed in the current directory\n\
+                                This is suited for proejcts that must be built in environments without network access and/or\n\
+                                If tracking extension packages in SVC is desired\n\
+                                \n\
+                                Equivalent to `-m vendor` or `--mode vendor`")
+                            .action(ArgAction::SetTrue))
+                        .arg(Arg::new("mode")
+                            .long("mode")
+                            .short('m')
+                            .help("Will explicitly configure the setup mode. Note: Using `none` will not have any effect with the setup command.")
+                            .value_parser(EnumValueParser::<ToolsetSetupMode>::new())))
                 .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
@@ -2019,13 +2101,13 @@ fn main() {
                 matches
                     .get_one("toolset")
                     .cloned()
-                    .unwrap_or(WixToolset::Legacy),
+                    .unwrap_or(Toolset::Legacy),
             );
             create.toolset_upgrade(
                 matches
                     .get_one("toolset-upgrade")
                     .cloned()
-                    .unwrap_or(WixToolsetUpgrade::None),
+                    .unwrap_or(ToolsetSetupMode::None),
             );
             create.build().run()
         }
