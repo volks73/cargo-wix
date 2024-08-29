@@ -1216,9 +1216,7 @@ use env_logger::Builder;
 
 use log::{Level, LevelFilter};
 use wix::toolset::{Toolset, ToolsetSetupMode};
-
 use std::io::Write;
-
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 use wix::clean;
@@ -1226,6 +1224,7 @@ use wix::create;
 use wix::initialize;
 use wix::print;
 use wix::purge;
+use wix::setup;
 use wix::sign;
 use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
@@ -2063,6 +2062,57 @@ fn main() {
             sign.product_name(m.get_one("product-name").map(String::as_str));
             sign.timestamp(m.get_one("timestamp").map(String::as_str));
             sign.build().run()
+        }
+        Some(("setup", m)) => {
+            let mut setup = setup::Builder::new();
+            setup.input(
+                m.get_one("INPUT")
+                    .map(String::as_str)
+                    .or(matches.get_one("INPUT").map(String::as_str)),
+            );
+            setup.package(
+                m.get_one("package")
+                    .map(String::as_str)
+                    .or(matches.get_one("package").map(String::as_str)),
+            );
+            setup.includes(
+                m.get_many("include")
+                    .map(|v| v.map(String::as_str).collect())
+                    .or(matches
+                        .get_many("include")
+                        .map(|v| v.map(String::as_str).collect())),
+            );
+            if let Some(mode) = m.get_one::<ToolsetSetupMode>("mode") {
+                match mode {
+                    ToolsetSetupMode::None | ToolsetSetupMode::Project => {}
+                    ToolsetSetupMode::Vendor => {
+                        setup.vendor(true);
+                    }
+                    ToolsetSetupMode::SideBySide => {
+                        setup.sxs(true);
+                    }
+                    ToolsetSetupMode::RestoreOnly => {
+                        setup.restore_only(true);
+                    }
+                    ToolsetSetupMode::RestoreVendorOnly => {
+                        setup.restore_only(true);
+                        setup.vendor(true);
+                    }
+                    ToolsetSetupMode::UpgradeOnly => {
+                        setup.upgrade_only(true);
+                    }
+                    ToolsetSetupMode::UpgradeSideBySideOnly => {
+                        setup.upgrade_only(true);
+                        setup.sxs(true);
+                    }
+                }
+            } else {
+                setup.sxs(m.get_flag("sxs"));
+                setup.upgrade_only(m.get_flag("upgrade"));
+                setup.restore_only(m.get_flag("restore"));
+                setup.vendor(m.get_flag("vendor"));
+            }
+            setup.build().run()
         }
         _ => {
             let mut create = create::Builder::new();
