@@ -36,6 +36,19 @@ pub struct Builder<'a> {
 }
 
 impl<'a> Builder<'a> {
+    /// Creates a new Builder
+    pub fn new() -> Self {
+        Self {
+            input: None,
+            package: None,
+            includes: None,
+            restore_only: false,
+            upgrade_only: false,
+            sxs: false,
+            vendor: false,
+        }
+    }
+
     /// Sets the path to a package's manifest (Cargo.toml) file.
     ///
     /// A package's manifest is used to create an installer. If no path is
@@ -47,6 +60,20 @@ impl<'a> Builder<'a> {
     /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
     pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
         self.input = i;
+        self
+    }
+
+    /// Adds multiple WiX Source (wxs) files to the creation of an installer.
+    ///
+    /// By default, any `.wxs` file located in the project's `wix` folder will
+    /// be included in the creation of an installer for the project. This method
+    /// adds, or appends, to the list of `.wxs` files. The value is a relative
+    /// or absolute path.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
+    pub fn includes(&mut self, i: Option<Vec<&'a str>>) -> &mut Self {
+        self.includes = i;
         self
     }
 
@@ -95,8 +122,8 @@ impl<'a> Builder<'a> {
     /// Consumes the builder and returns the upgrade execution context
     ///
     /// Will resolve toolset setup mode from the provided flags
-    pub fn build(self) -> crate::Result<Execution> {
-        Ok(Execution {
+    pub fn build(self) -> Execution {
+        Execution {
             input: self.input.map(PathBuf::from),
             package: self.package.map(String::from),
             includes: self
@@ -122,7 +149,7 @@ impl<'a> Builder<'a> {
             } else {
                 ToolsetSetupMode::Project
             },
-        })
+        }
     }
 }
 
