@@ -1915,7 +1915,8 @@ fn main() {
                             .long("mode")
                             .short('m')
                             .help("Will explicitly configure the setup mode. Note: Using `none` will not have any effect with the setup command.")
-                            .value_parser(EnumValueParser::<ToolsetSetupMode>::new())))
+                            .value_parser(EnumValueParser::<ToolsetSetupMode>::new()))
+                        .arg(verbose.clone()))
                 .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
@@ -1924,6 +1925,7 @@ fn main() {
         Some(("init", m)) => m,
         Some(("print", m)) => m,
         Some(("purge", m)) => m,
+        Some(("setup", m)) => m,
         _ => matches,
     }
     .get_count("verbose");
