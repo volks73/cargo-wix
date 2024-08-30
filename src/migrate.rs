@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! The implementation for the `setup` command. The default behavior will use the
+//! The implementation for the `migrate` command. The default behavior will use the
 //! "Project" setup mode, which will update any *.wxs source files to the modern format as well
 //! as install the extension packages to the global cache.
 //!
@@ -23,7 +23,7 @@ use crate::toolset::*;
 use log::debug;
 use std::path::PathBuf;
 
-/// A builder for running the `cargo wix setup` subcommand.
+/// A builder for running the `cargo wix migrate` subcommand.
 #[derive(Debug, Clone)]
 pub struct Builder<'a> {
     input: Option<&'a str>,
@@ -121,7 +121,7 @@ impl<'a> Builder<'a> {
 
     /// Consumes the builder and returns the upgrade execution context
     ///
-    /// Will resolve toolset setup mode from the provided flags
+    /// Will resolve toolset migration setup mode from the provided flags
     pub fn build(self) -> Execution {
         Execution {
             input: self.input.map(PathBuf::from),
@@ -153,7 +153,7 @@ impl<'a> Builder<'a> {
     }
 }
 
-/// A context for setting up a WiX project
+/// A context for setting up a WiX project migration to a new toolset
 #[derive(Debug)]
 pub struct Execution {
     input: Option<PathBuf>,
@@ -163,7 +163,7 @@ pub struct Execution {
 }
 
 impl Execution {
-    /// Consumes the execution context and performs the setup
+    /// Consumes the execution context and performs the migration setup
     pub fn run(self) -> crate::Result<()> {
         debug!("self.input = {:?}", self.input);
         debug!("self.package = {:?}", self.package);
@@ -179,7 +179,7 @@ impl Execution {
 
         debug!("Evaluating project and beginning setup");
         let project = self.create_project(&package)?;
-        self.toolset_setup_mode.setup(project)?;
+        self.toolset_setup_mode.migrate(project)?;
         Ok(())
     }
 }

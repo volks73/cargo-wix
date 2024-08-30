@@ -34,14 +34,14 @@ const WIX4_NAMESPACE_URI: &str = "http://wixtoolset.org/schemas/v4/wxs";
 
 const WIX_ROOT_ELEMENT_XPATH: &str = "/*[local-name()='Wix']";
 
-/// Enumerations of wix versions
+/// Enumerations of wix namespaces
 #[derive(Debug)]
-pub enum WixVersion {
+pub enum WixNamespace {
     /// Wix3 is not compatible with Wix4 and must always be upgraded
     V3,
     /// Wix4, Wix5 these versions are backwards compatible and share the same namespace
     ///
-    /// If the V4 namespace is detected, then upgrade is not required
+    /// If the V4 namespace is detected, then a wxs format upgrade is not required
     Modern,
     /// Unsupported wix version
     Unsupported,
@@ -74,9 +74,9 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                     .collect();
 
                 let wix_version = match default {
-                    Some(WIX3_NAMESPACE_URI) => WixVersion::V3,
-                    Some(WIX4_NAMESPACE_URI) => WixVersion::Modern,
-                    _ => WixVersion::Unsupported,
+                    Some(WIX3_NAMESPACE_URI) => WixNamespace::V3,
+                    Some(WIX4_NAMESPACE_URI) => WixNamespace::Modern,
+                    _ => WixNamespace::Unsupported,
                 };
 
                 Ok(WixSource {

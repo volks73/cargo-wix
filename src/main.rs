@@ -1224,7 +1224,7 @@ use wix::create;
 use wix::initialize;
 use wix::print;
 use wix::purge;
-use wix::setup;
+use wix::migrate;
 use wix::sign;
 use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
@@ -1355,7 +1355,7 @@ fn main() {
         .long("owner")
         .short('O')
         .num_args(1);
-    // The package option for `create` or `setup`
+    // The package option for `create` or `migrate`
     let include = Arg::new("include")
         .help("Include an additional WiX Source (wxs) file")
         .long_help(
@@ -1707,11 +1707,11 @@ fn main() {
                     .required(false)
                     .num_args(1)
                 )
-                .arg(Arg::new("setup")
-                    .long("setup")
-                    .help("Toolset setup mode to use before building the installer")
+                .arg(Arg::new("migrate")
+                    .long("migrate")
+                    .help("Toolset migration setup mode to use before building the installer")
                     .long_help(
-                        "(Only applied if `--toolset modern` is present)\n\
+                        "Note: Only applied if `--toolset modern` is present, if not migration setup is required this will have no additional effect\n\
                         When enabled, this will perform checks to ensure that the current wix environment\n\
                         is up to date before attempting to build the installer which includes:\n\
                         \t1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting\n\
@@ -1844,18 +1844,20 @@ fn main() {
                         .long("timestamp")
                         .num_args(1))
                     .arg(verbose.clone()))
-                .subcommand(Command::new("setup")
+                .subcommand(Command::new("migrate")
                         .version(PKG_VERSION)
-                        .about("WiX project setup utilities")
+                        .about("WiX project migration setup utilities")
                         .long_about(
-                            "Perform various wix setup operations such as: converting from WiX3 wxs files to Wix4 format or\n\
-                            restoring wix extension packages by analyzing extension dependencies found in wxs files.\n\
-                            Can also enable vendoring of wix dependencies for offline build\n\
+                            "Perform various wix toolset migration setup operations such as:\n\
+                            - Converting wxs files to the modern WiX toolset format\n\
+                            - Restoring wix extension packages by analyzing extension dependencies found in wxs files.\n\
+                            - Enable vendoring of wix extension dependencies for offline builds\n\
                             \n\
-                            If no additional setup flags are passed such as: `--restore`, `--upgrade`, `--sxs`, or `--vendor`\n\
+                            If no additional flags are passed such as: `--restore`, `--upgrade`, `--sxs`, or `--vendor`\n\
                             and no mode is set via `-m` or `--mode`\n\
-                            Then this will apply to 'project' setup mode, meaning all wxs files will be converted in place\n\
-                            and wix extensions will be installed globally")
+                            Then this will apply the 'project' setup mode, meaning:\n\
+                            - all wxs files will be converted in place\n\
+                            - all wix extensions will be installed globally")
                         .arg(Arg::new("INPUT")
                             .help("Path to a package's manifest (Cargo.toml) file.")
                             .long_help(
@@ -1892,18 +1894,18 @@ fn main() {
                             .action(ArgAction::SetTrue))
                         .arg(Arg::new("sxs")
                             .long("sxs")
-                            .help("Will enable side-by-side setup strategy")
+                            .help("Will enable side-by-side migration strategy")
                             .long_help(
-                                "By using side-by-side mode, all setup all setup operations\n\
+                                "By using side-by-side mode, all migration setup operations\n\
                                 will be executed in a folder corresponding to the major wix version detected. (Ex. \\wix4\\..)\n\
                                 This is suited for complex wix projects where bake\n\
                                 time maybe needed between major wix versions. Implicitly vendors dependencies in the same folder.\n\
                                 \n\
-                                Equivalent to `-m vendor` or `--mode vendor`")
+                                Equivalent to `-m sxs` or `--mode sxs`")
                             .action(ArgAction::SetTrue))
                         .arg(Arg::new("vendor")
                             .long("vendor")
-                            .help("Will enable vendoring setup strategy")
+                            .help("Will enable vendoring, Note: This is the implicit behavior of `sxs`")
                             .long_help(
                                 "By using vendoring mode, all extension dependencies will be installed in the current directory\n\
                                 This is suited for proejcts that must be built in environments without network access and/or\n\
@@ -1914,7 +1916,7 @@ fn main() {
                         .arg(Arg::new("mode")
                             .long("mode")
                             .short('m')
-                            .help("Will explicitly configure the setup mode. Note: Using `none` will not have any effect with the setup command.")
+                            .help("Will explicitly configure the migration setup mode. Note: Using `none` will not have any effect with the `migrate` command.")
                             .value_parser(EnumValueParser::<ToolsetSetupMode>::new()))
                         .arg(verbose.clone()))
                 .arg(verbose)
@@ -1925,7 +1927,7 @@ fn main() {
         Some(("init", m)) => m,
         Some(("print", m)) => m,
         Some(("purge", m)) => m,
-        Some(("setup", m)) => m,
+        Some(("migrate", m)) => m,
         _ => matches,
     }
     .get_count("verbose");
@@ -2065,8 +2067,8 @@ fn main() {
             sign.timestamp(m.get_one("timestamp").map(String::as_str));
             sign.build().run()
         }
-        Some(("setup", m)) => {
-            let mut setup = setup::Builder::new();
+        Some(("migrate", m)) => {
+            let mut setup = migrate::Builder::new();
             setup.input(
                 m.get_one("INPUT")
                     .map(String::as_str)
@@ -2155,9 +2157,9 @@ fn main() {
                     .cloned()
                     .unwrap_or(Toolset::Legacy),
             );
-            create.toolset_upgrade(
+            create.toolset_migration(
                 matches
-                    .get_one("toolset-upgrade")
+                    .get_one("migrate")
                     .cloned()
                     .unwrap_or(ToolsetSetupMode::None),
             );

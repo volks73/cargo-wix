@@ -134,8 +134,8 @@ impl Toolset {
 }
 
 impl ToolsetSetupMode {
-    /// Applies setup operations to a project
-    pub fn setup(self, mut project: Project) -> crate::Result<()> {
+    /// Applies migration setup operation on the Project
+    pub fn migrate(self, mut project: Project) -> crate::Result<()> {
         match self {
             ToolsetSetupMode::None => {}
             _ => {
