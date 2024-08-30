@@ -22,28 +22,33 @@
 use super::ext::PackageCache;
 use super::source::WixSource;
 use std::{collections::BTreeMap, path::PathBuf, process::Command};
+use clap::ValueEnum;
 use log::debug;
 use sxd_document::parser;
 use sxd_xpath::{evaluate_xpath, Value};
 
 /// Wix3 XML Namespace URI
-const WIX3_NAMESPACE_URI: &str = "http://schemas.microsoft.com/wix/2006/wi";
+const LEGACY_NAMESPACE_URI: &str = "http://schemas.microsoft.com/wix/2006/wi";
 
-/// Wix4 XML Namespace
-const WIX4_NAMESPACE_URI: &str = "http://wixtoolset.org/schemas/v4/wxs";
+/// Wix4+ XML Namespace URI
+pub const V4_NAMESPACE_URI: &str = "http://wixtoolset.org/schemas/v4/wxs";
 
+/// XPATH query for the root `<Wix/>` element
 const WIX_ROOT_ELEMENT_XPATH: &str = "/*[local-name()='Wix']";
 
-/// Enumerations of wix namespaces
-#[derive(Debug)]
-pub enum WixNamespace {
+/// Enumerations of wix wxs schemas
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum WxsSchema {
     /// Wix3 is not compatible with Wix4 and must always be upgraded
-    V3,
+    #[clap(name = "2006")]
+    Legacy,
     /// Wix4, Wix5 these versions are backwards compatible and share the same namespace
     ///
     /// If the V4 namespace is detected, then a wxs format upgrade is not required
-    Modern,
-    /// Unsupported wix version
+    #[clap(name = "v4")]
+    V4,
+    /// Unsupported wxs schema
+    #[clap(skip)]
     Unsupported,
 }
 
@@ -74,9 +79,9 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                     .collect();
 
                 let wix_version = match default {
-                    Some(WIX3_NAMESPACE_URI) => WixNamespace::V3,
-                    Some(WIX4_NAMESPACE_URI) => WixNamespace::Modern,
-                    _ => WixNamespace::Unsupported,
+                    Some(LEGACY_NAMESPACE_URI) => WxsSchema::Legacy,
+                    Some(V4_NAMESPACE_URI) => WxsSchema::V4,
+                    _ => WxsSchema::Unsupported,
                 };
 
                 Ok(WixSource {
