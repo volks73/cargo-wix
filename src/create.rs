@@ -82,7 +82,7 @@ pub struct Builder<'a> {
     target: Option<&'a str>,
     version: Option<&'a str>,
     toolset: Toolset,
-    toolset_upgrade: ToolsetSetupMode,
+    toolset_setup_mode: ToolsetSetupMode,
     // toolset_restore: bool,
 }
 
@@ -110,7 +110,7 @@ impl<'a> Builder<'a> {
             target: None,
             version: None,
             toolset: Toolset::Legacy,
-            toolset_upgrade: ToolsetSetupMode::None,
+            toolset_setup_mode: ToolsetSetupMode::None,
         }
     }
 
@@ -359,9 +359,9 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Sets the wix toolset upgrade mode
-    pub fn toolset_upgrade(&mut self, v: ToolsetSetupMode) -> &mut Self {
-        self.toolset_upgrade = v;
+    /// Sets the wix toolset migration setup mode
+    pub fn toolset_migration(&mut self, setup: ToolsetSetupMode) -> &mut Self {
+        self.toolset_setup_mode = setup;
         self
     }
 
@@ -390,8 +390,8 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
-            wix_toolset: self.toolset,
-            wix_toolset_setup_mode: self.toolset_upgrade,
+            toolset: self.toolset,
+            toolset_setup_mode: self.toolset_setup_mode,
             target_bin_dir: self.target_bin_dir.map(PathBuf::from),
             install: self.install,
             output: self.output.map(String::from),
@@ -430,8 +430,8 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
-    wix_toolset: Toolset,
-    wix_toolset_setup_mode: ToolsetSetupMode,
+    toolset: Toolset,
+    toolset_setup_mode: ToolsetSetupMode,
     install: bool,
     output: Option<String>,
     package: Option<String>,
@@ -546,13 +546,13 @@ impl Execution {
 
         // Legacy toolset uses `candle` and `light` (compile and link)
         // Modern toolset only uses `wix build`
-        let mut compiler = if self.wix_toolset.is_legacy() {
+        let mut compiler = if self.toolset.is_legacy() {
             self.compiler()?
         } else {
             debug!("Using modern wix build tools");
             // If a setup mode is **NOT** enabled, we perform this check here,
             // Otherwise, the check will be performed when the toolset setup is applied
-            if !self.wix_toolset_setup_mode.is_enabled() {
+            if !self.toolset_setup_mode.is_enabled() {
                 Toolset::check_modern_toolset_installed()?;
             }
             let mut wix = Command::new("wix");
@@ -562,15 +562,15 @@ impl Execution {
         debug!("compiler = {:?}", compiler);
 
         // Toolset upgrading only makes sense if the modern toolset is being used
-        if self.wix_toolset.is_modern() {
-            match &self.wix_toolset_setup_mode {
+        if self.toolset.is_modern() {
+            match &self.toolset_setup_mode {
                 ToolsetSetupMode::None => {
                     debug!("No toolset upgrade mode is set");
                 }
                 _ => {
                     debug!("Starting toolset upgrade checks");
                     let project = self.create_project(&package)?;
-                    self.wix_toolset_setup_mode.setup(project)?;
+                    self.toolset_setup_mode.migrate(project)?;
                 }
             }
         }
@@ -583,7 +583,7 @@ impl Execution {
         compiler.arg("-arch").arg(wix_arch.to_string());
 
         // Modern wix does not requires `-ext` flags
-        if self.wix_toolset.is_legacy() {
+        if self.toolset.is_legacy() {
             compiler.arg("-ext").arg("WixUtilExtension");
         }
 
@@ -657,7 +657,7 @@ impl Execution {
         debug!("installer_destination = {:?}", installer_destination);
 
         // Modern wix no longer requires `light`
-        if self.wix_toolset.is_legacy() {
+        if self.toolset.is_legacy() {
             // Link the installer
             info!("Linking the installer");
             let mut linker = self.linker()?;

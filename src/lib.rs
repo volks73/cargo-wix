@@ -74,7 +74,7 @@ pub mod sign;
 pub mod stored_path;
 mod templates;
 pub mod toolset;
-pub mod setup;
+pub mod migrate;
 
 use camino::Utf8Path;
 use log::debug;
