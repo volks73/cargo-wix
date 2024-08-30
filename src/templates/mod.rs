@@ -70,6 +70,9 @@ lazy_static! {
         Template::Wxs.id().to_owned(),
         Template::Wxs.id().to_lowercase(),
         Template::WxsV4.id().to_lowercase(),
+        // Added for convenience instead of http://wixtoolset.org/schemas/v4/wxs
+        String::from("wxs4"),
+        String::from("WXS4")
     ];
 }
 
@@ -125,6 +128,8 @@ impl Template {
     ///         "WXS".to_owned(),
     ///         "wxs".to_owned()
     ///         crate::toolset::project::V4_NAMESPACE_URI.to_owned(),
+    ///         "wxs4".to_owned(),
+    ///         "WXS4".to_owned
     ///     ]
     /// );
     /// ```
@@ -183,7 +188,7 @@ impl FromStr for Template {
             "gpl-3.0" => Ok(Template::Gpl3),
             "mit" => Ok(Template::Mit),
             "wxs" => Ok(Template::Wxs),
-            crate::toolset::project::V4_NAMESPACE_URI => Ok(Template::WxsV4),
+            crate::toolset::project::V4_NAMESPACE_URI | "wxs4" | "WXS4" => Ok(Template::WxsV4),
             _ => Err(Error::Generic(format!(
                 "Cannot convert from '{s}' to a Template variant"
             ))),
