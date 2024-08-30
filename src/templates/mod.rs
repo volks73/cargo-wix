@@ -20,6 +20,11 @@ use std::str::FromStr;
 /// The WiX Source (wxs) template.
 static WIX_SOURCE_TEMPLATE: &str = include_str!("main.wxs.mustache");
 
+/// The V4 Schema WiX Source (wxs) template.
+/// 
+/// Note: Used by both Wix4 and Wix5 toolsets
+static WIX_V4_SOURCE_TEMPLATE: &str = include_str!("v4/main.wxs.mustache");
+
 /// The Apache-2.0 Rich Text Format (RTF) license template.
 static APACHE2_LICENSE_TEMPLATE: &str = include_str!("Apache-2.0.rtf.mustache");
 
@@ -48,6 +53,10 @@ pub enum Template {
     ///
     /// [Wix Source (wxs)]: http://wixtoolset.org/documentation/manual/v3/overview/files.html
     Wxs,
+    /// A [Modern Wix Source (wxs)] file.
+    /// 
+    /// [Modern Wix Source (wxs)]: https://wixtoolset.org/docs/schema/wxs/
+    WxsV4,
 }
 
 lazy_static! {
@@ -60,6 +69,7 @@ lazy_static! {
         Template::Mit.id().to_lowercase(),
         Template::Wxs.id().to_owned(),
         Template::Wxs.id().to_lowercase(),
+        Template::WxsV4.id().to_lowercase(),
     ];
 }
 
@@ -79,6 +89,7 @@ impl Template {
     /// assert_eq!(Template::Gpl3.id(), "GPL-3.0");
     /// assert_eq!(Template::Mit.id(), "MIT");
     /// assert_eq!(Template::Wxs.id(), "WXS");
+    /// assert_eq!(Template::WxsModern.id(), crate::toolset::project::V4_NAMESPACE_URI);
     /// ```
     ///
     /// [SPDX ID]: https://spdx.org/licenses/
@@ -88,6 +99,7 @@ impl Template {
             Template::Gpl3 => "GPL-3.0",
             Template::Mit => "MIT",
             Template::Wxs => "WXS",
+            Template::WxsV4 => crate::toolset::project::V4_NAMESPACE_URI
         }
     }
 
@@ -112,6 +124,7 @@ impl Template {
     ///         "mit".to_owned(),
     ///         "WXS".to_owned(),
     ///         "wxs".to_owned()
+    ///         crate::toolset::project::V4_NAMESPACE_URI.to_owned(),
     ///     ]
     /// );
     /// ```
@@ -150,6 +163,7 @@ impl Template {
             Template::Gpl3 => GPL3_LICENSE_TEMPLATE,
             Template::Mit => MIT_LICENSE_TEMPLATE,
             Template::Wxs => WIX_SOURCE_TEMPLATE,
+            Template::WxsV4 => WIX_V4_SOURCE_TEMPLATE,
         }
     }
 }
@@ -169,6 +183,7 @@ impl FromStr for Template {
             "gpl-3.0" => Ok(Template::Gpl3),
             "mit" => Ok(Template::Mit),
             "wxs" => Ok(Template::Wxs),
+            crate::toolset::project::V4_NAMESPACE_URI => Ok(Template::WxsV4),
             _ => Err(Error::Generic(format!(
                 "Cannot convert from '{s}' to a Template variant"
             ))),

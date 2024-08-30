@@ -1215,16 +1215,17 @@ use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
 
 use log::{Level, LevelFilter};
-use wix::toolset::{Toolset, ToolsetSetupMode};
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use wix::toolset::project::WxsSchema;
+use wix::toolset::{Toolset, ToolsetSetupMode};
 
 use wix::clean;
 use wix::create;
 use wix::initialize;
+use wix::migrate;
 use wix::print;
 use wix::purge;
-use wix::migrate;
 use wix::sign;
 use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
 
@@ -1591,7 +1592,16 @@ fn main() {
                     .arg(upgrade_guid.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
-                    .arg(year.clone()))
+                    .arg(year.clone())
+                    .arg(Arg::new("schema")
+                        .long("schema")
+                        .help("The schema version of wxs source to render")
+                        .long_help(
+                            "Between Wix3 and Wix4, wxs files have differing schemas.\n\
+                            This setting allows initialization to render the corresponding schema \n\
+                            The default setting is the legacy format (Supported by Wix3)")
+                        .num_args(1)
+                        .value_parser(EnumValueParser::<WxsSchema>::new())))
                 .arg(Arg::new("INPUT")
                      .help("Path to a package's manifest (Cargo.toml) file.")
                      .long_help("If no value is provided, then the current \
@@ -2007,6 +2017,7 @@ fn main() {
             init.product_icon(m.get_one("product-icon").map(String::as_str));
             init.product_name(m.get_one("product-name").map(String::as_str));
             init.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
+            init.schema(m.get_one::<WxsSchema>("schema").copied());
             init.build().run()
         }
         Some(("print", m)) => {
@@ -2016,7 +2027,7 @@ fn main() {
                 .parse::<Template>()
                 .unwrap();
             match template {
-                Template::Wxs => {
+                Template::Wxs | Template::WxsV4 => {
                     let mut print = print::wxs::Builder::new();
                     print.banner(m.get_one("banner").map(String::as_str));
                     print.binaries(
@@ -2036,6 +2047,9 @@ fn main() {
                     print.product_icon(m.get_one("product-icon").map(String::as_str));
                     print.product_name(m.get_one("product-name").map(String::as_str));
                     print.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
+                    if matches!(template, Template::WxsV4) {
+                        print.schema(Some(WxsSchema::V4));
+                    }
                     print.build().run()
                 }
                 t => {

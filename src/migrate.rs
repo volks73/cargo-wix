@@ -189,3 +189,9 @@ impl Includes for Execution {
         self.includes.as_ref()
     }
 }
+
+impl<'a> Default for Builder<'a> {
+    fn default() -> Self {
+        Self::new()
+    }
+}

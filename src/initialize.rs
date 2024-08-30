@@ -27,6 +27,7 @@ use cargo_metadata::Package;
 
 use crate::print;
 use crate::stored_path::StoredPathBuf;
+use crate::toolset::project::WxsSchema;
 use crate::Error;
 use crate::Result;
 use crate::WIX;
@@ -59,6 +60,7 @@ pub struct Builder<'a> {
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
     upgrade_guid: Option<&'a str>,
+    schema: Option<WxsSchema>,
 }
 
 impl<'a> Builder<'a> {
@@ -83,6 +85,7 @@ impl<'a> Builder<'a> {
             product_icon: None,
             product_name: None,
             upgrade_guid: None,
+            schema: None,
         }
     }
 
@@ -366,6 +369,14 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the Wxs Schema
+    /// 
+    /// Wix3 follows the "v3" schema, where as Wix4 and beyond use the "Modern" schema uri.
+    pub fn schema(&mut self, schema: Option<WxsSchema>) -> &mut Self {
+        self.schema = schema;
+        self
+    }
+
     /// Builds a read-only initialization execution.
     pub fn build(&mut self) -> Execution {
         Execution {
@@ -390,6 +401,7 @@ impl<'a> Builder<'a> {
             product_icon: self.product_icon.map(StoredPathBuf::from),
             product_name: self.product_name.map(String::from),
             upgrade_guid: self.upgrade_guid.map(String::from),
+            schema: self.schema.unwrap_or(WxsSchema::Legacy)
         }
     }
 }
@@ -421,6 +433,7 @@ pub struct Execution {
     product_icon: Option<StoredPathBuf>,
     product_name: Option<String>,
     upgrade_guid: Option<String>,
+    schema: WxsSchema,
 }
 
 impl Execution {
@@ -480,6 +493,7 @@ impl Execution {
             wxs_printer.product_icon(self.product_icon.as_ref().map(|s| s.as_str()));
             wxs_printer.product_name(self.product_name.as_ref().map(String::as_ref));
             wxs_printer.upgrade_guid(self.upgrade_guid.as_ref().map(String::as_ref));
+            wxs_printer.schema(Some(self.schema));
 
             wxs_printer.build().run()?;
         }

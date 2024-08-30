@@ -15,14 +15,14 @@
 use std::{path::PathBuf, process::Command};
 use log::debug;
 
-use super::project::{open_wxs_source, WixNamespace};
+use super::project::{open_wxs_source, WxsSchema};
 use super::ext::{PackageCache, WxsDependency};
 
 
 /// Struct containing information about a wxs source file
 pub struct WixSource {
     /// WiX toolset version
-    pub(super) wix_version: WixNamespace,
+    pub(super) wix_version: WxsSchema,
     /// Path to this *.wxs file
     pub(super) path: PathBuf,
     /// Extensions this wix source is dependent on
@@ -33,15 +33,18 @@ impl WixSource {
     /// Returns true if the format of this *.wxs source can be upgraded
     pub fn can_upgrade(&self) -> bool {
         match self.wix_version {
-            WixNamespace::V3 => true,
-            WixNamespace::Modern => false,
-            WixNamespace::Unsupported => false,
+            WxsSchema::Legacy => true,
+            WxsSchema::V4 => false,
+            WxsSchema::Unsupported => false,
         }
     }
 
     /// Returns true if this source is in the modern format
+    /// 
+    /// This is relevant because in the modern formats, extensions are namespaced. Knowing
+    /// if the wxs format is "modern" indicates that extensions can be derived programatically.
     pub fn is_modern(&self) -> bool {
-        matches!(self.wix_version, WixNamespace::Modern)
+        matches!(self.wix_version, WxsSchema::V4)
     }
 
     /// Checks that the dependencies required by this *.wxs file exist in the package cache
