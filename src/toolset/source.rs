@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{path::PathBuf, process::Command};
-use log::debug;
+use std::path::PathBuf;
+use log::warn;
 
 use super::project::{open_wxs_source, WxsSchema};
 use super::ext::{PackageCache, WxsDependency};
+use super::Toolset;
 
 
 /// Struct containing information about a wxs source file
@@ -27,6 +28,8 @@ pub struct WixSource {
     pub(super) path: PathBuf,
     /// Extensions this wix source is dependent on
     pub(super) exts: Vec<WxsDependency>,
+    /// Toolset this source is using
+    pub(super) toolset: Toolset,
 }
 
 impl WixSource {
@@ -52,7 +55,7 @@ impl WixSource {
         for ext in self
             .exts
             .iter()
-            .filter(|e| package_cache.installed(*e))
+            .filter(|e| !package_cache.installed(*e))
             .collect::<Vec<_>>()
         {
             package_cache.add_missing(ext.package_name());
@@ -62,13 +65,10 @@ impl WixSource {
     /// Upgrades the current wix source file using `wix convert` if applicable
     ///
     /// Returns an updated WixSource object if the conversion and dependent ext install is successful
-    pub fn upgrade(&self, modify: bool) -> crate::Result<Self> {
-        let mut convert = Command::new("wix");
-        let convert = convert.arg("convert");
-        let converted_path = if modify {
-            convert.arg(&self.path);
-            self.path.clone()
-        } else {
+    pub fn upgrade(&self, work_dir: Option<&PathBuf>) -> crate::Result<Self> {
+        let mut convert = self.toolset.wix("convert")?;
+        let converted_path = if work_dir.is_some() {
+            // If a work dir is specified, do not modify the input file directly
             let temp = std::env::temp_dir().join(
                 self.path
                     .file_name()
@@ -77,39 +77,31 @@ impl WixSource {
             std::fs::copy(&self.path, &temp)?;
             convert.arg(&temp);
             temp
+        } else {
+            convert.arg(&self.path);
+            self.path.clone()
         };
 
         let output = convert.output()?;
-        
-        // Regardless of success, if debug is enabled and stderr isn't empty log to debug
-        if log::log_enabled!(log::Level::Debug) && !output.stderr.is_empty() {
-            let std_err = String::from_utf8(output.stderr)?;
-            for line in std_err.lines() {
-                debug!("upgrade({:?}): {line}", &converted_path);
-            }
-        }
 
         if output.status.success() {
+            // The converted_path must be a valid file name
+            let converted_path = if let Some((work_dir, file_name)) = work_dir.zip(converted_path.file_name()) {
+                // FIXNOW: Update the shim so that the program args are passed in to simplify this logic
+                let dest = work_dir.join(file_name);
+                if !dest.exists() {
+                    std::fs::copy(converted_path, &dest)?;
+                } else {
+                    warn!("An existing file exists at destination `{dest:?}`, skip copying intermediate file");
+                }
+                dest
+            } else {
+                converted_path
+            };
             open_wxs_source(converted_path)
         } else {
             Err("Could not convert wix source".into())
         }
-    }
-
-    /// Copies the source file over to a different directory and re-opens the *.wxs file
-    pub fn copy_to(&self, dir: PathBuf) -> crate::Result<Self> {
-        if !dir.is_dir() {
-            return Err(format!("{dir:?} is not a directory").as_str().into());
-        }
-
-        let dest = dir.join(
-            self.path
-                .file_name()
-                .expect("should have a file name because requires opening to create type"),
-        );
-
-        std::fs::copy(&self.path, &dest)?;
-        open_wxs_source(dest)
     }
 }
 

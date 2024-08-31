@@ -133,7 +133,7 @@ pub trait IncludesExt : Includes {
         debug!("wxs_sources = {wxs_sources:#?}");
 
         debug!("Trying to create new project");
-        let mut project = Project::try_new()?;
+        let mut project = Project::try_new(crate::toolset::Toolset::Modern)?;
         debug!("project = {project:#?}");
 
         for src in wxs_sources {

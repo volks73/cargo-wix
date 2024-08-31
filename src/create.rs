@@ -390,7 +390,7 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
-            toolset: self.toolset,
+            toolset: self.toolset.clone(),
             toolset_setup_mode: self.toolset_setup_mode,
             target_bin_dir: self.target_bin_dir.map(PathBuf::from),
             install: self.install,
@@ -547,16 +547,11 @@ impl Execution {
         // Legacy toolset uses `candle` and `light` (compile and link)
         // Modern toolset only uses `wix build`
         let mut compiler = if self.toolset.is_legacy() {
-            self.compiler()?
+            debug!("Using legacy wix build tools");
+            self.toolset.compiler(self.bin_path.clone())?
         } else {
             debug!("Using modern wix build tools");
-            // If a setup mode is **NOT** enabled, we perform this check here,
-            // Otherwise, the check will be performed when the toolset setup is applied
-            if !self.toolset_setup_mode.is_enabled() {
-                Toolset::check_modern_toolset_installed()?;
-            }
-            let mut wix = Command::new("wix");
-            wix.arg("build");
+            let wix = self.toolset.wix("build")?;
             wix
         };
         debug!("compiler = {:?}", compiler);
@@ -734,60 +729,6 @@ impl Execution {
         }
 
         Ok(())
-    }
-
-    fn compiler(&self) -> Result<Command> {
-        if let Some(mut path) = self.bin_path.as_ref().map(|s| {
-            let mut p = PathBuf::from(s);
-            trace!(
-                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
-                p.display(),
-                BINARY_FOLDER_NAME
-            );
-            p.push(WIX_COMPILER);
-            p.set_extension(EXE_FILE_EXTENSION);
-            p
-        }) {
-            if !path.exists() {
-                path.pop(); // Remove the `candle` application from the path
-                Err(Error::Generic(format!(
-                    "The compiler application ('{}') does not exist at the '{}' path specified via \
-                    the '-b,--bin-path' command line argument. Please check the path is correct and \
-                    the compiler application exists at the path.",
-                    WIX_COMPILER,
-                    path.display()
-                )))
-            } else {
-                Ok(Command::new(path))
-            }
-        } else if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-            let mut p = PathBuf::from(s);
-            trace!(
-                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
-                p.display(),
-                BINARY_FOLDER_NAME
-            );
-            p.push(BINARY_FOLDER_NAME);
-            p.push(WIX_COMPILER);
-            p.set_extension(EXE_FILE_EXTENSION);
-            p
-        }) {
-            if !path.exists() {
-                path.pop(); // Remove the `candle` application from the path
-                Err(Error::Generic(format!(
-                    "The compiler application ('{}') does not exist at the '{}' path specified \
-                     via the {} environment variable. Please check the path is correct and the \
-                     compiler application exists at the path.",
-                    WIX_COMPILER,
-                    path.display(),
-                    WIX_PATH_KEY
-                )))
-            } else {
-                Ok(Command::new(path))
-            }
-        } else {
-            Ok(Command::new(WIX_COMPILER))
-        }
     }
 
     fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
@@ -2105,25 +2046,6 @@ mod tests {
 
             let target_bin_dir = execution.target_bin_dir(&target_directory, &target, &profile);
             assert_eq!(target_bin_dir, PathBuf::from(EXPECTED));
-        }
-
-        #[test]
-        #[cfg(windows)]
-        fn compiler_is_correct_with_defaults() {
-            let expected = Command::new(
-                env::var_os(WIX_PATH_KEY)
-                    .map(|s| {
-                        let mut p = PathBuf::from(s);
-                        p.push(BINARY_FOLDER_NAME);
-                        p.push(WIX_COMPILER);
-                        p.set_extension(EXE_FILE_EXTENSION);
-                        p
-                    })
-                    .unwrap(),
-            );
-            let e = Execution::default();
-            let actual = e.compiler().unwrap();
-            assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
         }
 
         #[test]

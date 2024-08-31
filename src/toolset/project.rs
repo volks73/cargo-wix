@@ -13,17 +13,17 @@
 // limitations under the License.
 
 //! # Project Module
-//! 
+//!
 //! This module orchestrates project state hydration by analyzing *.wxs files and
 //! determining the current wix toolset installation state.
-//! 
+//!
 //! The `Project` type is the entrypoint for all major utilities provided by the toolset module.
 
-use super::ext::PackageCache;
 use super::source::WixSource;
-use std::{collections::BTreeMap, path::PathBuf, process::Command};
+use super::{ext::PackageCache, Toolset};
 use clap::ValueEnum;
 use log::debug;
+use std::{collections::BTreeMap, path::PathBuf};
 use sxd_document::parser;
 use sxd_xpath::{evaluate_xpath, Value};
 
@@ -88,6 +88,11 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                     wix_version,
                     path,
                     exts,
+                    toolset: if matches!(wix_version, WxsSchema::Legacy) {
+                        Toolset::Legacy
+                    } else {
+                        Toolset::Modern
+                    },
                 })
             } else {
                 Err("Corrupted .wxs file".into())
@@ -106,14 +111,16 @@ pub struct Project {
     wxs_sources: BTreeMap<PathBuf, WixSource>,
     /// Extension package cache
     package_cache: PackageCache,
+    /// Toolset
+    toolset: Toolset,
 }
 
 impl Project {
     /// Tries to create a new WiX project context
-    /// 
+    ///
     /// Returns an error if the modern wix toolset is not installed
-    pub fn try_new() -> crate::Result<Self> {
-        let wix_version_output = Command::new("wix").arg("--version").output()?;
+    pub fn try_new(toolset: Toolset) -> crate::Result<Self> {
+        let wix_version_output = toolset.wix("--version")?.output()?;
 
         if wix_version_output.status.success() && !wix_version_output.stdout.is_empty() {
             let output = String::from_utf8(wix_version_output.stdout)?;
@@ -123,7 +130,8 @@ impl Project {
             let mut upgrade = Self {
                 wix_version: version,
                 wxs_sources: BTreeMap::new(),
-                package_cache: PackageCache::default(),
+                package_cache: PackageCache::from(toolset.clone()),
+                toolset,
             };
 
             upgrade.load_ext_cache()?;
@@ -148,7 +156,8 @@ impl Project {
             self.wxs_sources.entry(source.clone())
         {
             debug!("Opening and parsing wxs source file to insert into project");
-            let wix_source = open_wxs_source(source)?;
+            let mut wix_source = open_wxs_source(source)?;
+            wix_source.toolset = self.toolset.clone();
             debug!("Inserting wix_source={wix_source:?}");
             e.insert(wix_source);
         }
@@ -163,20 +172,15 @@ impl Project {
         for (path, src) in self.wxs_sources.iter().collect::<Vec<_>>() {
             if src.can_upgrade() {
                 log::debug!("Upgrading {path:?}");
-                let modify = work_dir.is_some();
-                let converted_src = src.upgrade(modify)?;
+                // Upgrade will not modify the original file if a work_dir is provided
+                let converted_src = src.upgrade(work_dir)?;
 
                 // Finds missing dependencies in the package cache
                 converted_src.check_deps(&mut self.package_cache);
 
                 // If target_dir is enabled, conversion will not modify the original files and will instead
                 // convert and copy the files to the target_dir
-                if let Some(target_dir) = work_dir.as_ref() {
-                    let created = converted_src.copy_to(target_dir.to_path_buf())?;
-                    converted.insert(created.path.clone(), created);
-                } else {
-                    converted.insert(converted_src.path.clone(), converted_src);
-                }
+                converted.insert(converted_src.path.clone(), converted_src);
             } else {
                 log::debug!("Skipping upgrade for {path:?}");
                 if src.is_modern() {
@@ -217,26 +221,101 @@ impl Project {
                     }
                 }
 
-                if log::log_enabled!(log::Level::Debug) && !output.stderr.is_empty() {
-                    let std_err = String::from_utf8(output.stderr)?;
-                    for line in std_err.lines() {
-                        debug!("{line}");
-                    }
-                }
                 Ok(())
             } else {
                 Err("Could not load installed WiX extensions".into())
             }
         }
 
-        let wix_ext_list = Command::new("wix").args(["extension", "list"]).output()?;
+        let wix_ext_list = self.toolset.wix("extension list")?.output()?;
         build_package_cache(wix_ext_list, &mut self.package_cache)?;
 
-        let wix_ext_list_global = Command::new("wix")
-            .args(["extension", "list", "--global"])
-            .output()?;
+        let wix_ext_list_global = self.toolset.wix("extension list --global")?.output()?;
         build_package_cache(wix_ext_list_global, &mut self.package_cache)?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::Project;
+    use crate::toolset::{
+        ext::WellKnownExtentions,
+        test::{self, ok_stdout},
+        ToolsetAction,
+    };
+
+    #[test]
+    fn test_project_create() {
+        let shim = test::toolset(|a: &ToolsetAction| match a {
+            ToolsetAction::ListExtension => ok_stdout("WixToolset.PowerShell.wixext 0.0.0"),
+            ToolsetAction::ListGlobalExtension => ok_stdout("WixToolset.VisualStudio.wixext 0.0.0"),
+            ToolsetAction::Version => ok_stdout("0.0.0"),
+            _ => {
+                unreachable!("Should only be executing version and list actions")
+            }
+        });
+
+        let project = Project::try_new(shim).unwrap();
+        assert!(project
+            .package_cache
+            .installed(&WellKnownExtentions::Powershell));
+        assert!(project.package_cache.installed(&WellKnownExtentions::VS));
+    }
+
+    #[test]
+    fn test_project_upgrade() {
+        // Define test shim to do the "conversion" which is copying over a pre-baked converted file
+        let shim = test::toolset(|a: &ToolsetAction| match a {
+            ToolsetAction::Convert => {
+                std::fs::copy(
+                    PathBuf::from("tests")
+                        .join("common")
+                        .join("post_v4")
+                        .join("main.wxs"),
+                    PathBuf::from(".test_project_migrate").join("main.wxs"),
+                )
+                .unwrap();
+                ok_stdout("")
+            }
+            ToolsetAction::ListExtension => ok_stdout("WixToolset.PowerShell.wixext 0.0.0"),
+            ToolsetAction::ListGlobalExtension => ok_stdout("WixToolset.VisualStudio.wixext 0.0.0"),
+            ToolsetAction::Version => ok_stdout("0.0.0"),
+            _ => {
+                unreachable!("Should only be executing version and list actions")
+            }
+        });
+
+        // Prepare test directory
+        let test_dir = PathBuf::from(".test_project_migrate");
+        if test_dir.exists() {
+            std::fs::remove_dir_all(&test_dir).unwrap();
+        }
+        std::fs::create_dir_all(&test_dir).unwrap();
+        std::fs::copy(
+            PathBuf::from("tests")
+                .join("common")
+                .join("pre_v4")
+                .join("main.wxs"),
+            test_dir.join("main.wxs"),
+        )
+        .unwrap();
+
+        let mut project = Project::try_new(shim).unwrap();
+        assert!(project
+            .package_cache
+            .installed(&WellKnownExtentions::Powershell));
+        assert!(project.package_cache.installed(&WellKnownExtentions::VS));
+
+        project.add_wxs(test_dir.join("main.wxs")).unwrap();
+        project
+            .upgrade(Some(&test_dir))
+            .expect("should be able to convert");
+
+        let missing = project.package_cache.iter_missing().next().unwrap();
+        assert_eq!("WixToolset.UI.wixext", missing);
     }
 }
