@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use semver::Version;
 use std::{
     collections::{BTreeMap, BTreeSet},
     path::PathBuf,
-    process::Command,
 };
-use log::debug;
-use semver::Version;
+
+use super::{Toolset, ToolsetAction};
 
 /// Type-alias for .wxs extension dependency
 pub type WxsDependency = Box<dyn WixExtension>;
@@ -34,12 +34,14 @@ pub trait WixExtension {
 }
 
 /// Contains a map of locally/globally installed packages
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct PackageCache {
     /// Installed packages
     installed: BTreeMap<String, Version>,
     /// Packages that are indicated as missing from the package cache
     missing: BTreeSet<String>,
+    /// Toolset in used with this package cache
+    toolset: Toolset,
 }
 
 impl PackageCache {
@@ -70,10 +72,7 @@ impl PackageCache {
         version: Version,
         work_dir: Option<&PathBuf>,
     ) -> crate::Result<()> {
-        let mut wix = Command::new("wix");
-        {
-            wix.arg("extension").arg("add");
-        }
+        let mut wix = self.toolset.wix("extension add")?;
 
         if let Some(work_dir) = work_dir {
             wix.current_dir(work_dir);
@@ -81,6 +80,7 @@ impl PackageCache {
 
         if global_cache {
             wix.arg("--global");
+            wix.action = ToolsetAction::AddGlobalExtension;
         }
 
         for m in self.missing.iter() {
@@ -90,15 +90,19 @@ impl PackageCache {
 
         let output = wix.output()?;
         if output.status.success() {
-            if log::log_enabled!(log::Level::Debug) && !output.stderr.is_empty() {
-                let std_err = String::from_utf8(output.stderr)?;
-                for line in std_err.lines() {
-                    debug!("{line}");
-                }
-            }
             Ok(())
         } else {
             Err("Could not install missing dependencies".into())
+        }
+    }
+}
+
+impl From<Toolset> for PackageCache {
+    fn from(toolset: Toolset) -> Self {
+        Self {
+            installed: Default::default(),
+            missing: Default::default(),
+            toolset,
         }
     }
 }
@@ -120,22 +124,16 @@ impl WixExtension for WxsDependency {
 impl<'a> From<&sxd_document::dom::Namespace<'a>> for WxsDependency {
     fn from(value: &sxd_document::dom::Namespace<'a>) -> Self {
         match (value.prefix(), value.uri()) {
-            (BAL_NS_PREFIX, BAL_NS_URI) => {
-                Box::new(WellKnownExtentions::BootstrapperApplications)
-            }
+            (BAL_NS_PREFIX, BAL_NS_URI) => Box::new(WellKnownExtentions::BootstrapperApplications),
             (COMPLUS_NS_PREFIX, COMPLUS_NS_URI) => Box::new(WellKnownExtentions::ComPlus),
-            (DEPENDENCY_NS_PREFIX, DEPENDENCY_NS_URI) => {
-                Box::new(WellKnownExtentions::Dependency)
-            }
+            (DEPENDENCY_NS_PREFIX, DEPENDENCY_NS_URI) => Box::new(WellKnownExtentions::Dependency),
             (DIRECTX_NS_PREFIX, DIRECTX_NS_URI) => Box::new(WellKnownExtentions::DirectX),
             (FIREWALL_NS_PREFIX, FIREWALL_NS_URI) => Box::new(WellKnownExtentions::Firewall),
             (HTTP_NS_PREFIX, HTTP_NS_URI) => Box::new(WellKnownExtentions::Http),
             (IIS_NS_PREFIX, IIS_NS_URI) => Box::new(WellKnownExtentions::Iis),
             (MSMQ_NS_PREFIX, MSMQ_NS_URI) => Box::new(WellKnownExtentions::Msmq),
             (NETFX_NS_PREFIX, NETFX_NS_URI) => Box::new(WellKnownExtentions::Netfx),
-            (POWERSHELL_NS_PREFIX, POWERSHELL_NS_URI) => {
-                Box::new(WellKnownExtentions::Powershell)
-            }
+            (POWERSHELL_NS_PREFIX, POWERSHELL_NS_URI) => Box::new(WellKnownExtentions::Powershell),
             (SQL_NS_PREFIX, SQL_NS_URI) => Box::new(WellKnownExtentions::Sql),
             (UI_NS_PREFIX, UI_NS_URI) => Box::new(WellKnownExtentions::UI),
             (UTIL_NS_PREFIX, UTIL_NS_URI) => Box::new(WellKnownExtentions::Util),
@@ -336,3 +334,72 @@ const UTIL_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/util";
 const VS_EXT: &str = "WixToolset.VisualStudio.wixext";
 const VS_NS_PREFIX: &str = "vs";
 const VS_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/vs";
+
+#[cfg(test)]
+mod tests {
+    use crate::toolset::{ext::WellKnownExtentions, test, ToolsetAction};
+    use super::PackageCache;
+    use semver::Version;
+
+    #[test]
+    fn test_package_cache_installed() {
+        let mut package = PackageCache {
+            installed: Default::default(),
+            missing: Default::default(),
+            toolset: crate::toolset::Toolset::Modern,
+        };
+
+        package.add("WixToolset.Util.wixext", Version::new(0, 0, 0));
+        assert!(package.installed(&WellKnownExtentions::Util));
+    }
+
+    #[test]
+    fn test_package_cache_install_missing_non_global() {
+        let test_shim = test::toolset((
+            |a: &ToolsetAction| match a {
+                ToolsetAction::AddExtension => test::ok_stdout(""),
+                _ => {
+                    unreachable!("Only extension add should be evaluated")
+                }
+            },
+            || {
+                let mut c = std::process::Command::new("wix");
+                c.arg("extension").arg("add").arg("Test.wixext/0.0.0");
+                c
+            },
+        ));
+
+        let mut package = PackageCache::from(test_shim);
+
+        package.add_missing("Test.wixext");
+        package
+            .install_missing(false, Version::new(0, 0, 0), None)
+            .unwrap();
+    }
+
+    #[test]
+    fn test_package_cache_install_missing_global() {
+        let test_shim = test::toolset((
+            |a: &ToolsetAction| match a {
+                ToolsetAction::AddExtension => test::ok_stdout(""),
+                _ => {
+                    unreachable!("Only extension add should be evaluated")
+                }
+            },
+            || {
+                let mut c = std::process::Command::new("wix");
+                c.arg("extension")
+                    .arg("add")
+                    .arg("--global")
+                    .arg("Test.wixext/0.0.0");
+                c
+            },
+        ));
+
+        let mut package = PackageCache::from(test_shim);
+        package.add_missing("Test.wixext");
+        package
+            .install_missing(true, Version::new(0, 0, 0), None)
+            .unwrap();
+    }
+}
