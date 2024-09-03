@@ -1,4 +1,16 @@
-use log::debug;
+// Copyright (C) 2017 Christopher R. Field.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 use super::{Toolset, ToolsetAction};
 use std::{fmt::Debug, sync::Arc};
@@ -13,13 +25,14 @@ pub struct ToolsetTest {
     pub success: bool,
     pub stdout: String,
     pub stderr: String,
-    pub shim: Option<SharedTestShim>,
 }
 
+/// Returns an ok status and the provided string as stdout
 pub fn ok_stdout(out: impl Into<String>) -> ToolsetTest {
     test::<true>(out, "")
 }
 
+/// Returns a failure status and the provided string as stdout
 pub fn fail_stdout(out: impl Into<String>) -> ToolsetTest {
     test::<false>(out, "")
 }
@@ -30,18 +43,13 @@ fn test<const SUCCESS: bool>(out: impl Into<String>, err: impl Into<String>) -> 
         success: SUCCESS,
         stdout: out.into(),
         stderr: err.into(),
-        shim: None,
     }
 }
 
 /// This shim allows unit test code without requiring dependencies to be installed on the test machine
 pub trait TestShim {
-    /// Intercept a command execution to return a toolset test based on a specific action
-    ///
-    /// Allows for logic that has multiple command executions using the same toolset
-    fn on_command(&self, action: &ToolsetAction) -> ToolsetTest;
-
-    fn on_output(&self, cmd: &std::process::Command);
+    /// Called when `.output()` is called
+    fn on_output(&self, action: &ToolsetAction, cmd: &std::process::Command) -> ToolsetTest;
 }
 
 /// Boxes a test shim, is_legacy will return false
@@ -62,32 +70,55 @@ pub fn legacy_toolset(shim: impl TestShim + 'static) -> Toolset {
 
 impl<T> TestShim for T
 where
-    T: Fn(&ToolsetAction) -> ToolsetTest + Clone + 'static,
+    T: Fn(&ToolsetAction, &std::process::Command) -> ToolsetTest + Clone + 'static,
 {
-    fn on_command(&self, action: &ToolsetAction) -> ToolsetTest {
-        let mut test = self(action);
-        test.shim = Some(Arc::new(self.clone()));
-        test
-    }
-
-    fn on_output(&self, _: &std::process::Command) {}
-}
-
-impl<T, C> TestShim for (T, C)
-where
-    T: Fn(&ToolsetAction) -> ToolsetTest + Clone + 'static,
-    C: Fn() -> std::process::Command + Clone + 'static
-{
-    fn on_command(&self, action: &ToolsetAction) -> ToolsetTest {
-        let mut test = self.0(action);
-        test.shim = Some(Arc::new(self.clone()));
-        test
-    }
-
-    fn on_output(&self, cmd: &std::process::Command) {
-        let expected = self.1();
-        debug!("Comparing {} == {:?}", format!("{:?}", cmd), expected);
-        assert_eq!(format!("{:?}", cmd), format!("{:?}", expected))
+    fn on_output(&self, action: &ToolsetAction, cmd: &std::process::Command) -> ToolsetTest {
+        match action {
+            ToolsetAction::Compile { .. } => {
+                assert_eq!("candle", cmd.get_program());
+            }
+            ToolsetAction::Convert => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(["convert"], &cmd.get_args().take(1).collect::<Vec<_>>()[..]);
+            }
+            ToolsetAction::Build => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(["build"], &cmd.get_args().take(1).collect::<Vec<_>>()[..]);
+            }
+            ToolsetAction::AddExtension => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(
+                    ["extension", "add"],
+                    &cmd.get_args().take(2).collect::<Vec<_>>()[..]
+                );
+            }
+            ToolsetAction::AddGlobalExtension => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(
+                    ["extension", "add", "--global"],
+                    &cmd.get_args().take(3).collect::<Vec<_>>()[..]
+                );
+            }
+            ToolsetAction::ListExtension => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(
+                    ["extension", "list"],
+                    &cmd.get_args().collect::<Vec<_>>()[..]
+                );
+            }
+            ToolsetAction::ListGlobalExtension => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(
+                    ["extension", "list", "--global"],
+                    &cmd.get_args().collect::<Vec<_>>()[..]
+                );
+            }
+            ToolsetAction::Version => {
+                assert_eq!("wix", cmd.get_program());
+                assert_eq!(["--version"], &cmd.get_args().collect::<Vec<_>>()[..]);
+            }
+        }
+        self(action, cmd)
     }
 }
 

@@ -331,7 +331,7 @@ impl<'a> Builder<'a> {
     }
 
     /// Sets the Wxs Schema
-    /// 
+    ///
     /// Wix3 follows the "v3" schema, where as Wix4 and beyond use the "Modern" schema uri.
     pub fn schema(&mut self, schema: Option<WxsSchema>) -> &mut Self {
         self.schema = schema;

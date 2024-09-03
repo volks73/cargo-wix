@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::PathBuf;
+use crate::{Error, WIX, WIX_SOURCE_FILE_EXTENSION};
 use cargo_metadata::Package;
 use log::{debug, trace};
-use crate::{Error, WIX, WIX_SOURCE_FILE_EXTENSION};
+use std::path::PathBuf;
 
 use super::Project;
 
@@ -121,9 +121,9 @@ pub trait Includes {
 }
 
 /// Extension functions for implementations of Include
-pub trait IncludesExt : Includes {
+pub trait IncludesExt: Includes {
     /// Derives a project from a Package and the current `impl Includes`
-    /// 
+    ///
     /// Returns an error if the *.wxs sources cannot be enumerated, if
     /// a modern WiX toolset is not installed and available from PATH, or
     /// if a .wxs file has invalid XML

@@ -68,13 +68,13 @@ pub mod clean;
 pub mod create;
 pub mod initialize;
 mod licenses;
+pub mod migrate;
 pub mod print;
 pub mod purge;
 pub mod sign;
 pub mod stored_path;
 mod templates;
 pub mod toolset;
-pub mod migrate;
 
 use camino::Utf8Path;
 use log::debug;
