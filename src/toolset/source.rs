@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::PathBuf;
-use log::warn;
-
-use super::project::{open_wxs_source, WxsSchema};
 use super::ext::{PackageCache, WxsDependency};
+use super::project::{open_wxs_source, WxsSchema};
 use super::Toolset;
-
+use std::path::PathBuf;
 
 /// Struct containing information about a wxs source file
 pub struct WixSource {
@@ -43,7 +40,7 @@ impl WixSource {
     }
 
     /// Returns true if this source is in the modern format
-    /// 
+    ///
     /// This is relevant because in the modern formats, extensions are namespaced. Knowing
     /// if the wxs format is "modern" indicates that extensions can be derived programatically.
     pub fn is_modern(&self) -> bool {
@@ -86,18 +83,14 @@ impl WixSource {
 
         if output.status.success() {
             // The converted_path must be a valid file name
-            let converted_path = if let Some((work_dir, file_name)) = work_dir.zip(converted_path.file_name()) {
-                // FIXNOW: Update the shim so that the program args are passed in to simplify this logic
-                let dest = work_dir.join(file_name);
-                if !dest.exists() {
+            let converted_path =
+                if let Some((work_dir, file_name)) = work_dir.zip(converted_path.file_name()) {
+                    let dest = work_dir.join(file_name);
                     std::fs::copy(converted_path, &dest)?;
+                    dest
                 } else {
-                    warn!("An existing file exists at destination `{dest:?}`, skip copying intermediate file");
-                }
-                dest
-            } else {
-                converted_path
-            };
+                    converted_path
+                };
             open_wxs_source(converted_path)
         } else {
             Err("Could not convert wix source".into())

@@ -21,7 +21,7 @@ use std::str::FromStr;
 static WIX_V3_SOURCE_TEMPLATE: &str = include_str!("main.v3.wxs.mustache");
 
 /// The V4 Schema WiX Source (wxs) template.
-/// 
+///
 /// Note: Used by both Wix4 and Wix5 toolsets
 static WIX_V4_SOURCE_TEMPLATE: &str = include_str!("main.v4.wxs.mustache");
 
@@ -50,13 +50,13 @@ pub enum Template {
     /// [MIT]: https://opensource.org/licenses/MIT
     Mit,
     /// A [WiX Source (wxs)] file.
-    /// 
+    ///
     /// **Note**: This follows teh V3 wxs schema
     ///
     /// [Wix Source (wxs)]: http://wixtoolset.org/documentation/manual/v3/overview/files.html
     WxsV3,
     /// A [Modern Wix Source (wxs)] file.
-    /// 
+    ///
     /// [Modern Wix Source (wxs)]: https://wixtoolset.org/docs/schema/wxs/
     WxsV4,
 }
@@ -104,7 +104,7 @@ impl Template {
             Template::Gpl3 => "GPL-3.0",
             Template::Mit => "MIT",
             Template::WxsV3 => "WXS",
-            Template::WxsV4 => crate::toolset::project::V4_NAMESPACE_URI
+            Template::WxsV4 => crate::toolset::project::V4_NAMESPACE_URI,
         }
     }
 

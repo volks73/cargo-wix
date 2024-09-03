@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_project_create() {
-        let shim = test::toolset(|a: &ToolsetAction| match a {
+        let shim = test::toolset(|a: &ToolsetAction, _: &std::process::Command| match a {
             ToolsetAction::ListExtension => ok_stdout("WixToolset.PowerShell.wixext 0.0.0"),
             ToolsetAction::ListGlobalExtension => ok_stdout("WixToolset.VisualStudio.wixext 0.0.0"),
             ToolsetAction::Version => ok_stdout("0.0.0"),
@@ -269,14 +269,16 @@ mod tests {
     #[test]
     fn test_project_upgrade() {
         // Define test shim to do the "conversion" which is copying over a pre-baked converted file
-        let shim = test::toolset(|a: &ToolsetAction| match a {
+        let shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
             ToolsetAction::Convert => {
+                let args = cmd.get_args();
+                let dest = args.last().expect("should be the dest");
                 std::fs::copy(
                     PathBuf::from("tests")
                         .join("common")
                         .join("post_v4")
                         .join("main.wxs"),
-                    PathBuf::from(".test_project_migrate").join("main.wxs"),
+                    PathBuf::from(dest),
                 )
                 .unwrap();
                 ok_stdout("")
@@ -315,7 +317,11 @@ mod tests {
             .upgrade(Some(&test_dir))
             .expect("should be able to convert");
 
-        let missing = project.package_cache.iter_missing().next().unwrap();
+        let missing = project
+            .package_cache
+            .iter_missing()
+            .next()
+            .expect("should have a missing package");
         assert_eq!("WixToolset.UI.wixext", missing);
     }
 }

@@ -337,8 +337,8 @@ const VS_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/vs";
 
 #[cfg(test)]
 mod tests {
-    use crate::toolset::{ext::WellKnownExtentions, test, ToolsetAction};
     use super::PackageCache;
+    use crate::toolset::{ext::WellKnownExtentions, test, ToolsetAction};
     use semver::Version;
 
     #[test]
@@ -355,19 +355,21 @@ mod tests {
 
     #[test]
     fn test_package_cache_install_missing_non_global() {
-        let test_shim = test::toolset((
-            |a: &ToolsetAction| match a {
-                ToolsetAction::AddExtension => test::ok_stdout(""),
-                _ => {
-                    unreachable!("Only extension add should be evaluated")
-                }
-            },
-            || {
-                let mut c = std::process::Command::new("wix");
-                c.arg("extension").arg("add").arg("Test.wixext/0.0.0");
-                c
-            },
-        ));
+        let test_shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
+            ToolsetAction::AddExtension => {
+                let mut expected = std::process::Command::new("wix");
+                expected
+                    .arg("extension")
+                    .arg("add")
+                    .arg("Test.wixext/0.0.0");
+                assert_eq!(format!("{:?}", cmd), format!("{:?}", expected));
+
+                test::ok_stdout("")
+            }
+            _ => {
+                unreachable!("Only extension add should be evaluated")
+            }
+        });
 
         let mut package = PackageCache::from(test_shim);
 
@@ -379,22 +381,22 @@ mod tests {
 
     #[test]
     fn test_package_cache_install_missing_global() {
-        let test_shim = test::toolset((
-            |a: &ToolsetAction| match a {
-                ToolsetAction::AddExtension => test::ok_stdout(""),
-                _ => {
-                    unreachable!("Only extension add should be evaluated")
-                }
-            },
-            || {
-                let mut c = std::process::Command::new("wix");
-                c.arg("extension")
+        let test_shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
+            ToolsetAction::AddExtension => {
+                let mut expected = std::process::Command::new("wix");
+                expected
+                    .arg("extension")
                     .arg("add")
                     .arg("--global")
                     .arg("Test.wixext/0.0.0");
-                c
-            },
-        ));
+                assert_eq!(format!("{:?}", cmd), format!("{:?}", expected));
+
+                test::ok_stdout("")
+            }
+            _ => {
+                unreachable!("Only extension add should be evaluated")
+            }
+        });
 
         let mut package = PackageCache::from(test_shim);
         package.add_missing("Test.wixext");

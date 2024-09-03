@@ -66,7 +66,10 @@ impl std::fmt::Debug for Toolset {
             Self::Legacy => write!(f, "Legacy"),
             Self::Modern => write!(f, "Modern"),
             #[cfg(test)]
-            Self::Test { is_legacy: allow_legacy, .. } => f.debug_tuple("Test").field(allow_legacy).finish(),
+            Self::Test {
+                is_legacy: allow_legacy,
+                ..
+            } => f.debug_tuple("Test").field(allow_legacy).finish(),
         }
     }
 }
@@ -74,12 +77,11 @@ impl std::fmt::Debug for Toolset {
 /// Wrapper over std::process::Command
 ///
 /// Allows for checking args state and centralizes debug logging logic
-#[derive(Debug)]
 pub struct ToolsetCommand {
     pub(crate) inner: Command,
     action: ToolsetAction,
     #[cfg(test)]
-    test: test::ToolsetTest,
+    test: Option<test::SharedTestShim>,
 }
 
 /// Enumeration of toolset actions used by this module
@@ -177,11 +179,23 @@ pub enum ToolsetSetupMode {
 impl Toolset {
     /// Returns true if the toolset in use is legacy
     pub fn is_legacy(&self) -> bool {
-        matches!(self, Toolset::Test { is_legacy: true, .. } | Toolset::Legacy)
+        matches!(
+            self,
+            Toolset::Test {
+                is_legacy: true,
+                ..
+            } | Toolset::Legacy
+        )
     }
 
     pub fn is_modern(&self) -> bool {
-        matches!(self, Toolset::Test { is_legacy: false, .. } | Toolset::Modern)
+        matches!(
+            self,
+            Toolset::Test {
+                is_legacy: false,
+                ..
+            } | Toolset::Modern
+        )
     }
 }
 
@@ -206,7 +220,7 @@ impl Toolset {
 
             #[cfg(test)]
             if let Toolset::Test { shim, .. } = self {
-                command.test = shim.on_command(&command.action);
+                command.test = Some(shim.clone());
             }
 
             #[cfg(not(test))]
@@ -222,10 +236,10 @@ impl Toolset {
         if self.is_legacy() {
             #[cfg(test)]
             let mut command: ToolsetCommand = ToolsetAction::Compile { bin_path }.try_into()?;
-            
+
             #[cfg(test)]
             if let Toolset::Test { shim, .. } = self {
-                command.test = shim.on_command(&command.action);
+                command.test = Some(shim.clone());
             }
 
             #[cfg(not(test))]
@@ -363,26 +377,28 @@ impl ToolsetCommand {
     /// Test shim for converting test parameters into an output
     #[cfg(test)]
     fn test_output(&self) -> Output {
-        #[cfg(windows)]
-        use std::os::windows::process::ExitStatusExt;
+        if let Some(shim) = self.test.as_ref() {
+            let test = shim.on_output(&self.action, &self.inner);
 
-        #[cfg(unix)]
-        use std::os::unix::process::ExitStatusExt;
+            #[cfg(windows)]
+            use std::os::windows::process::ExitStatusExt;
 
-        let status = if self.test.success {
-            std::process::ExitStatus::from_raw(0)
+            #[cfg(unix)]
+            use std::os::unix::process::ExitStatusExt;
+
+            let status = if test.success {
+                std::process::ExitStatus::from_raw(0)
+            } else {
+                std::process::ExitStatus::from_raw(1)
+            };
+
+            Output {
+                status,
+                stdout: test.stdout.as_bytes().to_vec(),
+                stderr: test.stderr.as_bytes().to_vec(),
+            }
         } else {
-            std::process::ExitStatus::from_raw(1)
-        };
-
-        if let Some(shim) = self.test.shim.as_ref() {
-            shim.on_output(&self.inner);
-        }
-
-        Output {
-            status,
-            stdout: self.test.stdout.clone().into_bytes(),
-            stderr: self.test.stderr.clone().into_bytes(),
+            todo!()
         }
     }
 }
@@ -393,7 +409,7 @@ impl Default for ToolsetCommand {
             inner: Command::new("wix"),
             action: ToolsetAction::Version,
             #[cfg(test)]
-            test: test::ToolsetTest::default(),
+            test: None,
         }
     }
 }
@@ -406,7 +422,7 @@ impl From<std::process::Command> for ToolsetCommand {
             inner: value,
             action,
             #[cfg(test)]
-            test: test::ToolsetTest::default(),
+            test: None,
         }
     }
 }
@@ -462,12 +478,12 @@ impl TryFrom<ToolsetAction> for ToolsetCommand {
             }
             ToolsetAction::AddGlobalExtension => {
                 command.action = value;
-                command.args(["extension", "list", "--global"]);
+                command.args(["extension", "add", "--global"]);
                 Ok(command)
             }
             ToolsetAction::ListGlobalExtension => {
                 command.action = value;
-                command.args(["extension", "add", "--global"]);
+                command.args(["extension", "list", "--global"]);
                 Ok(command)
             }
             ToolsetAction::Version => {
@@ -501,7 +517,7 @@ impl TryFrom<ToolsetAction> for ToolsetCommand {
                             inner: Command::new(path),
                             action: ToolsetAction::Compile { bin_path },
                             #[cfg(test)]
-                            test: test::ToolsetTest::default(),
+                            test: None,
                         })
                     }
                 } else if let Some(mut path) = std::env::var_os(WIX_PATH_KEY).map(|s| {
@@ -531,7 +547,7 @@ impl TryFrom<ToolsetAction> for ToolsetCommand {
                             inner: Command::new(path),
                             action: ToolsetAction::Compile { bin_path: None },
                             #[cfg(test)]
-                            test: test::ToolsetTest::default(),
+                            test: None,
                         })
                     }
                 } else {
@@ -539,11 +555,20 @@ impl TryFrom<ToolsetAction> for ToolsetCommand {
                         inner: Command::new(WIX_COMPILER),
                         action: ToolsetAction::Compile { bin_path: None },
                         #[cfg(test)]
-                        test: test::ToolsetTest::default(),
+                        test: None,
                     })
                 }
             }
         }
+    }
+}
+
+impl std::fmt::Debug for ToolsetCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ToolsetCommand")
+            .field("inner", &self.inner)
+            .field("action", &self.action)
+            .finish()
     }
 }
 
@@ -600,16 +625,19 @@ mod tests {
 
     #[test]
     fn test_toolset_wix_action() {
-        let toolset = super::test::toolset(|action: &ToolsetAction| match action {
-            ToolsetAction::Compile { .. } => test::fail_stdout("out"),
-            ToolsetAction::Convert => test::ok_stdout("converted"),
-            ToolsetAction::Build => test::ok_stdout("built"),
-            ToolsetAction::AddExtension => test::ok_stdout("added"),
-            ToolsetAction::AddGlobalExtension => test::ok_stdout("added_global"),
-            ToolsetAction::ListExtension => test::ok_stdout("list_ext"),
-            ToolsetAction::ListGlobalExtension => test::ok_stdout("list_global_ext"),
-            ToolsetAction::Version => test::ok_stdout("version"),
-        });
+        let toolset =
+            super::test::toolset(
+                |action: &ToolsetAction, _: &std::process::Command| match action {
+                    ToolsetAction::Compile { .. } => test::fail_stdout("out"),
+                    ToolsetAction::Convert => test::ok_stdout("converted"),
+                    ToolsetAction::Build => test::ok_stdout("built"),
+                    ToolsetAction::AddExtension => test::ok_stdout("added"),
+                    ToolsetAction::AddGlobalExtension => test::ok_stdout("added_global"),
+                    ToolsetAction::ListExtension => test::ok_stdout("list_ext"),
+                    ToolsetAction::ListGlobalExtension => test::ok_stdout("list_global_ext"),
+                    ToolsetAction::Version => test::ok_stdout("version"),
+                },
+            );
 
         let output = toolset.wix("convert").unwrap();
         assert_eq!(&b"converted"[..], &output.output().unwrap().stdout[..]);
@@ -638,22 +666,36 @@ mod tests {
         let output = toolset.wix("--version").unwrap();
         assert_eq!(&b"version"[..], &output.output().unwrap().stdout[..]);
 
-        toolset.compiler(None).expect_err("should not be allowed to create a compiler command if toolset is not legacy");
+        toolset.compiler(None).expect_err(
+            "should not be allowed to create a compiler command if toolset is not legacy",
+        );
     }
 
     #[test]
     fn test_toolset_legacy_action() {
-        let toolset = super::test::legacy_toolset(|action: &ToolsetAction| match action {
-            ToolsetAction::Compile { bin_path: None } => test::ok_stdout("compile_bin_path_none"),
-            ToolsetAction::Compile { bin_path: Some(..) } => unreachable!("should fail before this can be executed"),
-            _ => {
-                panic!("should not execute non-legacy actions")
-            }
-        });
+        let toolset =
+            super::test::legacy_toolset(|action: &ToolsetAction, _: &std::process::Command| {
+                match action {
+                    ToolsetAction::Compile { bin_path: None } => {
+                        test::ok_stdout("compile_bin_path_none")
+                    }
+                    ToolsetAction::Compile { bin_path: Some(..) } => {
+                        unreachable!("should fail before this can be executed")
+                    }
+                    _ => {
+                        panic!("should not execute non-legacy actions")
+                    }
+                }
+            });
 
         let output = toolset.compiler(None).unwrap();
-        assert_eq!(&b"compile_bin_path_none"[..], &output.output().unwrap().stdout[..]);
+        assert_eq!(
+            &b"compile_bin_path_none"[..],
+            &output.output().unwrap().stdout[..]
+        );
 
-        toolset.compiler(Some(PathBuf::new())).expect_err("should not have candle in an empty dir");
+        toolset
+            .compiler(Some(PathBuf::new()))
+            .expect_err("should not have candle in an empty dir");
     }
 }

@@ -370,7 +370,7 @@ impl<'a> Builder<'a> {
     }
 
     /// Sets the Wxs Schema
-    /// 
+    ///
     /// Wix3 follows the "v3" schema, where as Wix4 and beyond use the "Modern" schema uri.
     pub fn schema(&mut self, schema: Option<WxsSchema>) -> &mut Self {
         self.schema = schema;
@@ -401,7 +401,7 @@ impl<'a> Builder<'a> {
             product_icon: self.product_icon.map(StoredPathBuf::from),
             product_name: self.product_name.map(String::from),
             upgrade_guid: self.upgrade_guid.map(String::from),
-            schema: self.schema.unwrap_or(WxsSchema::Legacy)
+            schema: self.schema.unwrap_or(WxsSchema::Legacy),
         }
     }
 }
