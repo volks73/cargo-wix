@@ -2027,7 +2027,7 @@ fn main() {
                 .parse::<Template>()
                 .unwrap();
             match template {
-                Template::Wxs | Template::WxsV4 => {
+                Template::WxsV3 | Template::WxsV4 => {
                     let mut print = print::wxs::Builder::new();
                     print.banner(m.get_one("banner").map(String::as_str));
                     print.binaries(
