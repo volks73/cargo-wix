@@ -513,7 +513,7 @@ impl Execution {
             let data = map.build();
             let main_destination = self.output.clone();
             let wxs_template = match self.schema {
-                WxsSchema::Legacy => Template::Wxs.to_str(),
+                WxsSchema::Legacy => Template::WxsV3.to_str(),
                 WxsSchema::V4 => Template::WxsV4.to_str(),
                 _ => {
                     unreachable!("should always have one of the above valid schemas set")
