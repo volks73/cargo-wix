@@ -288,7 +288,9 @@ const COMPLUS_NS_PREFIX: &str = "complus";
 const COMPLUS_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/complus";
 
 const DEPENDENCY_EXT: &str = "WixToolset.Dependency.wixext";
-const DEPENDENCY_NS_PREFIX: &str = "dependency";
+/// Source of namespace prefix:
+/// https://github.com/wixtoolset/wix/blob/dd2fe20d9fe58719445411524bd730495140d02f/src/wix/test/WixToolsetTest.Converters/DependencyFixture.cs#L19
+const DEPENDENCY_NS_PREFIX: &str = "dep";
 const DEPENDENCY_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/dependency";
 
 const DIRECTX_EXT: &str = "WixToolset.DirectX.wixext";
@@ -296,7 +298,9 @@ const DIRECTX_NS_PREFIX: &str = "directx";
 const DIRECTX_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/directx";
 
 const FIREWALL_EXT: &str = "WixToolset.Firewall.wixext";
-const FIREWALL_NS_PREFIX: &str = "firewall";
+/// Source of namespace prefix:
+/// https://github.com/wixtoolset/wix/blob/dd2fe20d9fe58719445411524bd730495140d02f/src/wix/test/WixToolsetTest.Converters/FirewallExtensionFixture.cs#L19
+const FIREWALL_NS_PREFIX: &str = "fw";
 const FIREWALL_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/firewall";
 
 const HTTP_EXT: &str = "WixToolset.Http.wixext";
