@@ -75,7 +75,7 @@ where
     fn on_output(&self, action: &ToolsetAction, cmd: &std::process::Command) -> ToolsetTest {
         match action {
             ToolsetAction::Compile { .. } => {
-                assert_eq!("candle", cmd.get_program());
+                assert!(cmd.get_program().to_string_lossy().to_string().ends_with("candle.exe"));
             }
             ToolsetAction::Convert => {
                 assert_eq!("wix", cmd.get_program());

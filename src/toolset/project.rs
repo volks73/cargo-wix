@@ -324,4 +324,57 @@ mod tests {
             .expect("should have a missing package");
         assert_eq!("WixToolset.UI.wixext", missing);
     }
+
+    #[test]
+    fn test_project_upgrade_extension_detection() {
+        // Define test shim to do the "conversion" which is copying over a pre-baked converted file
+        let shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
+            ToolsetAction::Convert => {
+                let args = cmd.get_args();
+                let dest = args.last().expect("should be the dest");
+                std::fs::copy(
+                    PathBuf::from("tests")
+                        .join("common")
+                        .join("well_known_exts")
+                        .join("main.wxs"),
+                    PathBuf::from(dest),
+                )
+                .unwrap();
+                ok_stdout("")
+            }
+            ToolsetAction::ListExtension => ok_stdout(""),
+            ToolsetAction::ListGlobalExtension => ok_stdout(""),
+            ToolsetAction::Version => ok_stdout("0.0.0"),
+            _ => {
+                unreachable!("Should only be executing version and list actions")
+            }
+        });
+
+        // Prepare test directory
+        let test_dir = PathBuf::from(".test_project_upgrade_extension_detection");
+        if test_dir.exists() {
+            std::fs::remove_dir_all(&test_dir).unwrap();
+        }
+        std::fs::create_dir_all(&test_dir).unwrap();
+        std::fs::copy(
+            PathBuf::from("tests")
+                .join("common")
+                .join("pre_v4")
+                .join("main.wxs"),
+            test_dir.join("main.wxs"),
+        )
+        .unwrap();
+
+        let mut project = Project::try_new(shim).unwrap();
+
+        project.add_wxs(test_dir.join("main.wxs")).unwrap();
+        project
+            .upgrade(Some(&test_dir))
+            .expect("should be able to convert");
+
+        assert_eq!(
+            r#"{".test_project_upgrade_extension_detection\\main.wxs": WixSource { wix_version: V4, path: ".test_project_upgrade_extension_detection\\main.wxs", exts: [("WixToolset.BootstrapperApplications.wixext", "bal", "http://wixtoolset.org/schemas/v4/wxs/bal"), ("WixToolset.ComPlus.wixext", "complus", "http://wixtoolset.org/schemas/v4/wxs/complus"), ("WixToolset.Dependency.wixext", "dependency", "http://wixtoolset.org/schemas/v4/wxs/dependency"), ("WixToolset.DirectX.wixext", "directx", "http://wixtoolset.org/schemas/v4/wxs/directx"), ("WixToolset.Firewall.wixext", "firewall", "http://wixtoolset.org/schemas/v4/wxs/firewall"), ("WixToolset.Http.wixext", "http", "http://wixtoolset.org/schemas/v4/wxs/http"), ("WixToolset.Iis.wixext", "iis", "http://wixtoolset.org/schemas/v4/wxs/iis"), ("WixToolset.Msmq.wixext", "msmq", "http://wixtoolset.org/schemas/v4/wxs/msmq"), ("WixToolset.Netfx.wixext", "netfx", "http://wixtoolset.org/schemas/v4/wxs/netfx"), ("WixToolset.PowerShell.wixext", "powershell", "http://wixtoolset.org/schemas/v4/wxs/powershell"), ("WixToolset.Sql.wixext", "sql", "http://wixtoolset.org/schemas/v4/wxs/sql"), ("WixToolset.UI.wixext", "ui", "http://wixtoolset.org/schemas/v4/wxs/ui"), ("WixToolset.Util.wixext", "util", "http://wixtoolset.org/schemas/v4/wxs/util"), ("WixToolset.VisualStudio.wixext", "vs", "http://wixtoolset.org/schemas/v4/wxs/vs")] }}"#,
+            format!("{:?}", project.wxs_sources),
+        );
+    }
 }

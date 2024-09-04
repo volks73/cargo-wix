@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use itertools::Itertools;
+use log::{debug, warn};
+
 use super::ext::{PackageCache, WxsDependency};
 use super::project::{open_wxs_source, WxsSchema};
 use super::Toolset;
@@ -55,7 +58,22 @@ impl WixSource {
             .filter(|e| !package_cache.installed(*e))
             .collect::<Vec<_>>()
         {
-            package_cache.add_missing(ext.package_name());
+            // Package names are known ahead of time because they map to a well known extension uri
+            // If a package name returns as empty, it means that tooling is not aware of it
+            if !ext.package_name().is_empty() {
+                debug!(
+                    "Missing extension, xmlns:{}='{}'",
+                    ext.namespace_prefix(),
+                    ext.namespace_uri()
+                );
+                package_cache.add_missing(ext.package_name());
+            } else {
+                warn!(
+                    "Unknown extension, xmlns:{}='{}'",
+                    ext.namespace_prefix(),
+                    ext.namespace_uri()
+                );
+            }
         }
     }
 
@@ -98,6 +116,27 @@ impl WixSource {
     }
 }
 
+#[cfg(test)]
+impl std::fmt::Debug for WixSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WixSource")
+            .field("wix_version", &self.wix_version)
+            .field("path", &self.path)
+            // This is handy for validating state in tests
+            .field(
+                "exts",
+                &self
+                    .exts
+                    .iter()
+                    .map(|e| (e.package_name(), e.namespace_prefix(), e.namespace_uri()))
+                    .sorted()
+                    .collect::<Vec<_>>(),
+            )
+            .finish()
+    }
+}
+
+#[cfg(not(test))]
 impl std::fmt::Debug for WixSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("WixSource")

@@ -337,6 +337,8 @@ const VS_NS_URI: &str = "http://wixtoolset.org/schemas/v4/wxs/vs";
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::PackageCache;
     use crate::toolset::{ext::WellKnownExtentions, test, ToolsetAction};
     use semver::Version;
@@ -382,7 +384,7 @@ mod tests {
     #[test]
     fn test_package_cache_install_missing_global() {
         let test_shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
-            ToolsetAction::AddExtension => {
+            ToolsetAction::AddGlobalExtension => {
                 let mut expected = std::process::Command::new("wix");
                 expected
                     .arg("extension")
@@ -393,8 +395,8 @@ mod tests {
 
                 test::ok_stdout("")
             }
-            _ => {
-                unreachable!("Only extension add should be evaluated")
+            a => {
+                unreachable!("Only extension add should be evaluated, tried to eval {a:?}")
             }
         });
 
@@ -402,6 +404,33 @@ mod tests {
         package.add_missing("Test.wixext");
         package
             .install_missing(true, Version::new(0, 0, 0), None)
+            .unwrap();
+    }
+    
+    #[test]
+    fn test_package_cache_install_missing_work_dir() {
+        let test_shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
+            ToolsetAction::AddGlobalExtension => {
+                let mut expected = std::process::Command::new("wix");
+                expected
+                    .arg("extension")
+                    .arg("add")
+                    .arg("--global")
+                    .arg("Test.wixext/0.0.0");
+                assert_eq!(format!("{:?}", cmd), format!("{:?}", expected));
+                assert_eq!("test_work_dir", cmd.get_current_dir().unwrap().as_os_str());
+
+                test::ok_stdout("")
+            }
+            a => {
+                unreachable!("Only extension add should be evaluated, tried to eval {a:?}")
+            }
+        });
+
+        let mut package = PackageCache::from(test_shim);
+        package.add_missing("Test.wixext");
+        package
+            .install_missing(true, Version::new(0, 0, 0), Some(&PathBuf::from("test_work_dir")))
             .unwrap();
     }
 }
