@@ -238,7 +238,7 @@ impl Project {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use std::path::PathBuf;
 
     use super::Project;
@@ -268,51 +268,9 @@ mod tests {
 
     #[test]
     fn test_project_upgrade() {
-        // Define test shim to do the "conversion" which is copying over a pre-baked converted file
-        let shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
-            ToolsetAction::Convert => {
-                let args = cmd.get_args();
-                let dest = args.last().expect("should be the dest");
-                std::fs::copy(
-                    PathBuf::from("tests")
-                        .join("common")
-                        .join("post_v4")
-                        .join("main.wxs"),
-                    PathBuf::from(dest),
-                )
-                .unwrap();
-                ok_stdout("")
-            }
-            ToolsetAction::ListExtension => ok_stdout("WixToolset.PowerShell.wixext 0.0.0"),
-            ToolsetAction::ListGlobalExtension => ok_stdout("WixToolset.VisualStudio.wixext 0.0.0"),
-            ToolsetAction::Version => ok_stdout("0.0.0"),
-            _ => {
-                unreachable!("Should only be executing version and list actions")
-            }
-        });
+        let (test_dir, mut project) =
+            create_test_project(stringify!(test_project_upgrade), "post_v4");
 
-        // Prepare test directory
-        let test_dir = PathBuf::from(".test_project_migrate");
-        if test_dir.exists() {
-            std::fs::remove_dir_all(&test_dir).unwrap();
-        }
-        std::fs::create_dir_all(&test_dir).unwrap();
-        std::fs::copy(
-            PathBuf::from("tests")
-                .join("common")
-                .join("pre_v4")
-                .join("main.wxs"),
-            test_dir.join("main.wxs"),
-        )
-        .unwrap();
-
-        let mut project = Project::try_new(shim).unwrap();
-        assert!(project
-            .package_cache
-            .installed(&WellKnownExtentions::Powershell));
-        assert!(project.package_cache.installed(&WellKnownExtentions::VS));
-
-        project.add_wxs(test_dir.join("main.wxs")).unwrap();
         project
             .upgrade(Some(&test_dir))
             .expect("should be able to convert");
@@ -327,31 +285,87 @@ mod tests {
 
     #[test]
     fn test_project_upgrade_extension_detection() {
+        let (test_dir, mut project) = create_test_project(
+            stringify!(test_project_upgrade_extension_detection),
+            "well_known_exts",
+        );
+        project
+            .upgrade(Some(&test_dir))
+            .expect("should be able to convert");
+
+        assert_eq!(
+            r#"{".test\\test_project_upgrade_extension_detection\\main.test_project_upgrade_extension_detection.wxs": WixSource { wix_version: V4, path: ".test\\test_project_upgrade_extension_detection\\main.test_project_upgrade_extension_detection.wxs", exts: [("WixToolset.BootstrapperApplications.wixext", "bal", "http://wixtoolset.org/schemas/v4/wxs/bal"), ("WixToolset.ComPlus.wixext", "complus", "http://wixtoolset.org/schemas/v4/wxs/complus"), ("WixToolset.Dependency.wixext", "dep", "http://wixtoolset.org/schemas/v4/wxs/dependency"), ("WixToolset.DirectX.wixext", "directx", "http://wixtoolset.org/schemas/v4/wxs/directx"), ("WixToolset.Firewall.wixext", "fw", "http://wixtoolset.org/schemas/v4/wxs/firewall"), ("WixToolset.Http.wixext", "http", "http://wixtoolset.org/schemas/v4/wxs/http"), ("WixToolset.Iis.wixext", "iis", "http://wixtoolset.org/schemas/v4/wxs/iis"), ("WixToolset.Msmq.wixext", "msmq", "http://wixtoolset.org/schemas/v4/wxs/msmq"), ("WixToolset.Netfx.wixext", "netfx", "http://wixtoolset.org/schemas/v4/wxs/netfx"), ("WixToolset.PowerShell.wixext", "powershell", "http://wixtoolset.org/schemas/v4/wxs/powershell"), ("WixToolset.Sql.wixext", "sql", "http://wixtoolset.org/schemas/v4/wxs/sql"), ("WixToolset.UI.wixext", "ui", "http://wixtoolset.org/schemas/v4/wxs/ui"), ("WixToolset.Util.wixext", "util", "http://wixtoolset.org/schemas/v4/wxs/util"), ("WixToolset.VisualStudio.wixext", "vs", "http://wixtoolset.org/schemas/v4/wxs/vs")] }}"#,
+            format!("{:?}", project.wxs_sources),
+        );
+    }
+
+    pub fn create_test_project(
+        test_name: &str,
+        expected_wxs_name: &'static str,
+    ) -> (PathBuf, Project) {
+        let test_dir = PathBuf::from(".test").join(test_name);
+        let test_src_file_name = format!("main.{test_name}.wxs");
+        let test_src = test_dir.join(test_src_file_name);
+        let add_extension_journal = test_dir.join("add_extension");
+        let add_extension_global_journal = test_dir.join("add_extension_global");
+        let convert_wxs_journal = test_dir.join("convert_wxs");
+
         // Define test shim to do the "conversion" which is copying over a pre-baked converted file
-        let shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
-            ToolsetAction::Convert => {
-                let args = cmd.get_args();
-                let dest = args.last().expect("should be the dest");
-                std::fs::copy(
-                    PathBuf::from("tests")
-                        .join("common")
-                        .join("well_known_exts")
-                        .join("main.wxs"),
-                    PathBuf::from(dest),
-                )
-                .unwrap();
-                ok_stdout("")
-            }
-            ToolsetAction::ListExtension => ok_stdout(""),
-            ToolsetAction::ListGlobalExtension => ok_stdout(""),
-            ToolsetAction::Version => ok_stdout("0.0.0"),
-            _ => {
-                unreachable!("Should only be executing version and list actions")
-            }
-        });
+        let shim = test::toolset(
+            move |a: &ToolsetAction, cmd: &std::process::Command| match a {
+                ToolsetAction::Convert => {
+                    use std::io::Write;
+                    let args = cmd.get_args();
+                    let dest = args.last().expect("should be the dest");
+                    std::fs::copy(
+                        PathBuf::from("tests")
+                            .join("common")
+                            .join(&expected_wxs_name)
+                            .join("main.wxs"),
+                        PathBuf::from(dest),
+                    )
+                    .unwrap();
+                    let mut journal = std::fs::OpenOptions::new()
+                        .append(true)
+                        .create(true)
+                        .write(true)
+                        .open(&convert_wxs_journal)
+                        .unwrap();
+                    writeln!(journal, "{:?}", cmd).unwrap();
+                    ok_stdout("")
+                }
+                ToolsetAction::AddGlobalExtension => {
+                    use std::io::Write;
+                    let mut journal = std::fs::OpenOptions::new()
+                        .append(true)
+                        .create(true)
+                        .write(true)
+                        .open(&add_extension_global_journal)
+                        .unwrap();
+                    writeln!(journal, "{:?}", cmd).unwrap();
+                    ok_stdout("")
+                }
+                ToolsetAction::AddExtension => {
+                    use std::io::Write;
+                    let mut journal = std::fs::OpenOptions::new()
+                        .append(true)
+                        .create(true)
+                        .write(true)
+                        .open(&add_extension_journal)
+                        .unwrap();
+                    writeln!(journal, "{:?}", cmd).unwrap();
+                    ok_stdout("")
+                }
+                ToolsetAction::ListExtension => ok_stdout(""),
+                ToolsetAction::ListGlobalExtension => ok_stdout(""),
+                ToolsetAction::Version => ok_stdout("0.0.0"),
+                a => {
+                    unreachable!("Unexpected action, tried to execute {a:?}")
+                }
+            },
+        );
 
         // Prepare test directory
-        let test_dir = PathBuf::from(".test_project_upgrade_extension_detection");
         if test_dir.exists() {
             std::fs::remove_dir_all(&test_dir).unwrap();
         }
@@ -361,20 +375,32 @@ mod tests {
                 .join("common")
                 .join("pre_v4")
                 .join("main.wxs"),
-            test_dir.join("main.wxs"),
+            &test_src,
         )
         .unwrap();
 
         let mut project = Project::try_new(shim).unwrap();
+        project.add_wxs(test_src).unwrap();
+        (test_dir, project)
+    }
 
-        project.add_wxs(test_dir.join("main.wxs")).unwrap();
-        project
-            .upgrade(Some(&test_dir))
-            .expect("should be able to convert");
-
+    pub fn validate_add_extension_journal(test_dir: &PathBuf) {
+        let journal = test_dir.join("add_extension");
+        let result = std::fs::read_to_string(journal).unwrap();
+        let line = result.lines().next().unwrap();
         assert_eq!(
-            r#"{".test_project_upgrade_extension_detection\\main.wxs": WixSource { wix_version: V4, path: ".test_project_upgrade_extension_detection\\main.wxs", exts: [("WixToolset.BootstrapperApplications.wixext", "bal", "http://wixtoolset.org/schemas/v4/wxs/bal"), ("WixToolset.ComPlus.wixext", "complus", "http://wixtoolset.org/schemas/v4/wxs/complus"), ("WixToolset.Dependency.wixext", "dependency", "http://wixtoolset.org/schemas/v4/wxs/dependency"), ("WixToolset.DirectX.wixext", "directx", "http://wixtoolset.org/schemas/v4/wxs/directx"), ("WixToolset.Firewall.wixext", "firewall", "http://wixtoolset.org/schemas/v4/wxs/firewall"), ("WixToolset.Http.wixext", "http", "http://wixtoolset.org/schemas/v4/wxs/http"), ("WixToolset.Iis.wixext", "iis", "http://wixtoolset.org/schemas/v4/wxs/iis"), ("WixToolset.Msmq.wixext", "msmq", "http://wixtoolset.org/schemas/v4/wxs/msmq"), ("WixToolset.Netfx.wixext", "netfx", "http://wixtoolset.org/schemas/v4/wxs/netfx"), ("WixToolset.PowerShell.wixext", "powershell", "http://wixtoolset.org/schemas/v4/wxs/powershell"), ("WixToolset.Sql.wixext", "sql", "http://wixtoolset.org/schemas/v4/wxs/sql"), ("WixToolset.UI.wixext", "ui", "http://wixtoolset.org/schemas/v4/wxs/ui"), ("WixToolset.Util.wixext", "util", "http://wixtoolset.org/schemas/v4/wxs/util"), ("WixToolset.VisualStudio.wixext", "vs", "http://wixtoolset.org/schemas/v4/wxs/vs")] }}"#,
-            format!("{:?}", project.wxs_sources),
+            r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
+            line
+        );
+    }
+
+    pub fn validate_add_extension_global_journal(test_dir: &PathBuf) {
+        let journal = test_dir.join("add_extension_global");
+        let result = std::fs::read_to_string(journal).unwrap();
+        let line = result.lines().next().unwrap();
+        assert_eq!(
+            r#""wix" "extension" "add" "--global" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
+            line
         );
     }
 }

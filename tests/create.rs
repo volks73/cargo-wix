@@ -948,6 +948,7 @@ fn compiler_args_options_works() {
         .assert(predicate::path::exists());
 }
 
+#[ignore = "currently requires a binary to be installed"]
 #[test]
 #[serial]
 fn linker_args_flags_only_works() {
