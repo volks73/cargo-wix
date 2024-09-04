@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use itertools::Itertools;
 use log::{debug, warn};
 
 use super::ext::{PackageCache, WxsDependency};
@@ -125,11 +124,10 @@ impl std::fmt::Debug for WixSource {
             // This is handy for validating state in tests
             .field(
                 "exts",
-                &self
+                &itertools::Itertools::sorted(self
                     .exts
                     .iter()
-                    .map(|e| (e.package_name(), e.namespace_prefix(), e.namespace_uri()))
-                    .sorted()
+                    .map(|e| (e.package_name(), e.namespace_prefix(), e.namespace_uri())))
                     .collect::<Vec<_>>(),
             )
             .finish()

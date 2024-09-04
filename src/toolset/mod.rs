@@ -589,9 +589,11 @@ impl DerefMut for ToolsetCommand {
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
-
+    use serial_test::serial;
+    use crate::toolset::Toolset;
     use super::test;
     use super::ToolsetAction;
+    use super::ToolsetSetupMode;
 
     #[test]
     #[cfg(windows)]
@@ -697,5 +699,70 @@ mod tests {
         toolset
             .compiler(Some(PathBuf::new()))
             .expect_err("should not have candle in an empty dir");
+    }
+
+    #[test]
+    fn test_toolset_fmt_debug() {
+        assert_eq!("Legacy", format!("{:?}", Toolset::Legacy));
+        assert_eq!("Modern", format!("{:?}", Toolset::Modern));
+    }
+
+    #[test]
+    fn test_toolset_wix_command_err_on_modern() {
+        Toolset::Legacy
+            .wix(ToolsetAction::Version)
+            .expect_err("should not be able to use modern actions with legacy toolset");
+    }
+
+    #[test]
+    #[serial]
+    fn test_toolset_migrate_project_mode() {
+        let (test_dir, project) = super::project::tests::create_test_project(
+            stringify!(test_toolset_setup_mode_migrate),
+            "well_known_exts",
+        );
+        ToolsetSetupMode::Project
+            .migrate(project)
+            .expect("should work");
+
+        super::project::tests::validate_add_extension_global_journal(&test_dir);
+    }
+
+    #[test]
+    #[serial]
+    fn test_toolset_migrate_sxs_mode() {
+        let sxs_folder = PathBuf::from("wix0");
+        let sxs_wxs = sxs_folder.join("main.test_toolset_migrate_sxs_mode.wxs");
+        let _ = std::fs::remove_dir_all(&sxs_folder);
+
+        let (test_dir, project) = super::project::tests::create_test_project(
+            stringify!(test_toolset_migrate_sxs_mode),
+            "well_known_exts",
+        );
+        ToolsetSetupMode::SideBySide
+            .migrate(project)
+            .expect("should work");
+
+        assert!(sxs_folder.exists());
+        assert!(sxs_folder.is_dir());
+
+        assert!(sxs_wxs.exists());
+        assert!(sxs_wxs.is_file());
+
+        super::project::tests::validate_add_extension_journal(&test_dir);
+     }
+
+    #[test]
+    #[serial]
+    fn test_toolset_migrate_vendor_mode() {
+        let (test_dir, project) = super::project::tests::create_test_project(
+            stringify!(test_toolset_migrate_vendor_mode),
+            "well_known_exts",
+        );
+        ToolsetSetupMode::Vendor
+            .migrate(project)
+            .expect("should work");
+
+        super::project::tests::validate_add_extension_journal(&test_dir);
     }
 }
