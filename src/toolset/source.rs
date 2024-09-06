@@ -22,7 +22,7 @@ use std::path::PathBuf;
 /// Struct containing information about a wxs source file
 pub struct WixSource {
     /// WiX toolset version
-    pub(super) wix_version: WxsSchema,
+    pub(super) wxs_schema: WxsSchema,
     /// Path to this *.wxs file
     pub(super) path: PathBuf,
     /// Extensions this wix source is dependent on
@@ -34,10 +34,16 @@ pub struct WixSource {
 impl WixSource {
     /// Returns true if the format of this *.wxs source can be upgraded
     pub fn can_upgrade(&self) -> bool {
-        match self.wix_version {
-            WxsSchema::Legacy => true,
-            WxsSchema::V4 => false,
-            WxsSchema::Unsupported => false,
+        match (self.wxs_schema, &self.toolset) {
+            (WxsSchema::Legacy, Toolset::Modern) => true,
+            #[cfg(test)]
+            (
+                WxsSchema::Legacy,
+                Toolset::Test {
+                    is_legacy: false, ..
+                },
+            ) => true,
+            _ => false,
         }
     }
 
@@ -46,7 +52,7 @@ impl WixSource {
     /// This is relevant because in the modern formats, extensions are namespaced. Knowing
     /// if the wxs format is "modern" indicates that extensions can be derived programatically.
     pub fn is_modern(&self) -> bool {
-        matches!(self.wix_version, WxsSchema::V4)
+        matches!(self.wxs_schema, WxsSchema::V4)
     }
 
     /// Checks that the dependencies required by this *.wxs file exist in the package cache
@@ -115,31 +121,78 @@ impl WixSource {
     }
 }
 
-#[cfg(test)]
 impl std::fmt::Debug for WixSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("WixSource")
-            .field("wix_version", &self.wix_version)
+            .field("wxs_schema", &self.wxs_schema)
             .field("path", &self.path)
-            // This is handy for validating state in tests
-            .field(
-                "exts",
-                &itertools::Itertools::sorted(self
-                    .exts
-                    .iter()
-                    .map(|e| (e.package_name(), e.namespace_prefix(), e.namespace_uri())))
-                    .collect::<Vec<_>>(),
-            )
             .finish()
     }
 }
 
-#[cfg(not(test))]
-impl std::fmt::Debug for WixSource {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WixSource")
-            .field("wix_version", &self.wix_version)
-            .field("path", &self.path)
-            .finish()
+mod tests {
+
+    #[test]
+    fn test_source_can_upgrade() {
+        use crate::toolset::{project::WxsSchema, source::WixSource};
+        use std::path::PathBuf;
+
+        assert_eq!(
+            false,
+            WixSource {
+                wxs_schema: WxsSchema::Legacy,
+                path: PathBuf::new(),
+                exts: vec![],
+                toolset: crate::toolset::Toolset::Legacy
+            }
+            .can_upgrade(),
+            "should not be able to upgrade legacy w/ legacy toolset"
+        );
+
+        assert_eq!(
+            true,
+            WixSource {
+                wxs_schema: WxsSchema::Legacy,
+                path: PathBuf::new(),
+                exts: vec![],
+                toolset: crate::toolset::Toolset::Modern
+            }
+            .can_upgrade(),
+            "should be able to upgrade legacy w/ modern toolset"
+        );
+
+        assert_eq!(
+            false,
+            WixSource {
+                wxs_schema: WxsSchema::V4,
+                path: PathBuf::new(),
+                exts: vec![],
+                toolset: crate::toolset::Toolset::Modern
+            }
+            .can_upgrade(),
+            "should not be able to upgrade from v4"
+        );
+    }
+
+    #[test]
+    fn test_skip_add_unknown_ext_to_package_cache() {
+        use super::WixSource;
+        use crate::toolset::ext::{PackageCache, UnknownExtNamespace};
+        use std::path::PathBuf;
+
+        let source = WixSource {
+            wxs_schema: crate::toolset::project::WxsSchema::V4,
+            path: PathBuf::new(),
+            exts: vec![Box::new(UnknownExtNamespace {
+                prefix: String::from("test"),
+                uri: String::from("test_uri"),
+            })],
+            toolset: crate::toolset::Toolset::Modern,
+        };
+
+        let mut package_cache = PackageCache::from(crate::toolset::Toolset::Modern);
+        source.check_deps(&mut package_cache);
+
+        assert_eq!(0, package_cache.iter_missing().count());
     }
 }

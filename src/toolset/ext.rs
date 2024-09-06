@@ -147,8 +147,8 @@ impl<'a> From<&sxd_document::dom::Namespace<'a>> for WxsDependency {
 }
 /// Struct containing information on an unknown extension found in the `<Wix/>` element
 pub struct UnknownExtNamespace {
-    prefix: String,
-    uri: String,
+    pub(crate) prefix: String,
+    pub(crate) uri: String,
 }
 
 impl WixExtension for UnknownExtNamespace {

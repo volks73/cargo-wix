@@ -37,7 +37,7 @@ pub const V4_NAMESPACE_URI: &str = "http://wixtoolset.org/schemas/v4/wxs";
 const WIX_ROOT_ELEMENT_XPATH: &str = "/*[local-name()='Wix']";
 
 /// Enumerations of wix wxs schemas
-#[derive(Debug, Clone, Copy, ValueEnum)]
+#[derive(Debug, Clone, Copy, ValueEnum, PartialEq)]
 pub enum WxsSchema {
     /// Wix3 is not compatible with Wix4 and must always be upgraded
     #[clap(name = "2006")]
@@ -85,7 +85,7 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                 };
 
                 Ok(WixSource {
-                    wix_version,
+                    wxs_schema: wix_version,
                     path,
                     exts,
                     toolset: if matches!(wix_version, WxsSchema::Legacy) {
@@ -241,9 +241,12 @@ impl Project {
 pub(crate) mod tests {
     use std::path::PathBuf;
 
+    use itertools::Itertools;
+
     use super::Project;
     use crate::toolset::{
         ext::WellKnownExtentions,
+        project::WxsSchema,
         test::{self, ok_stdout},
         ToolsetAction,
     };
@@ -293,10 +296,87 @@ pub(crate) mod tests {
             .upgrade(Some(&test_dir))
             .expect("should be able to convert");
 
-        assert_eq!(
-            r#"{".test\\test_project_upgrade_extension_detection\\main.test_project_upgrade_extension_detection.wxs": WixSource { wix_version: V4, path: ".test\\test_project_upgrade_extension_detection\\main.test_project_upgrade_extension_detection.wxs", exts: [("WixToolset.BootstrapperApplications.wixext", "bal", "http://wixtoolset.org/schemas/v4/wxs/bal"), ("WixToolset.ComPlus.wixext", "complus", "http://wixtoolset.org/schemas/v4/wxs/complus"), ("WixToolset.Dependency.wixext", "dep", "http://wixtoolset.org/schemas/v4/wxs/dependency"), ("WixToolset.DirectX.wixext", "directx", "http://wixtoolset.org/schemas/v4/wxs/directx"), ("WixToolset.Firewall.wixext", "fw", "http://wixtoolset.org/schemas/v4/wxs/firewall"), ("WixToolset.Http.wixext", "http", "http://wixtoolset.org/schemas/v4/wxs/http"), ("WixToolset.Iis.wixext", "iis", "http://wixtoolset.org/schemas/v4/wxs/iis"), ("WixToolset.Msmq.wixext", "msmq", "http://wixtoolset.org/schemas/v4/wxs/msmq"), ("WixToolset.Netfx.wixext", "netfx", "http://wixtoolset.org/schemas/v4/wxs/netfx"), ("WixToolset.PowerShell.wixext", "powershell", "http://wixtoolset.org/schemas/v4/wxs/powershell"), ("WixToolset.Sql.wixext", "sql", "http://wixtoolset.org/schemas/v4/wxs/sql"), ("WixToolset.UI.wixext", "ui", "http://wixtoolset.org/schemas/v4/wxs/ui"), ("WixToolset.Util.wixext", "util", "http://wixtoolset.org/schemas/v4/wxs/util"), ("WixToolset.VisualStudio.wixext", "vs", "http://wixtoolset.org/schemas/v4/wxs/vs")] }}"#,
-            format!("{:?}", project.wxs_sources),
-        );
+        let test_wxs = test_dir.join("main.test_project_upgrade_extension_detection.wxs");
+        let wxs_source = project
+            .wxs_sources
+            .get(&test_wxs)
+            .expect("should have been added to the project");
+
+        assert_eq!(WxsSchema::V4, wxs_source.wxs_schema);
+        assert_eq!(test_wxs, wxs_source.path);
+        assert!(wxs_source.toolset.is_modern());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.BootstrapperApplications.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.ComPlus.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Dependency.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.DirectX.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Firewall.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Http.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Iis.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Msmq.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Netfx.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.PowerShell.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Sql.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.UI.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.Util.wixext")
+            .is_some());
+        assert!(wxs_source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == "WixToolset.VisualStudio.wixext")
+            .is_some());
+
+        validate_convert_journal(&test_dir, &test_wxs);
     }
 
     pub fn create_test_project(
@@ -402,5 +482,14 @@ pub(crate) mod tests {
             r#""wix" "extension" "add" "--global" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
             line
         );
+    }
+
+    pub fn validate_convert_journal(test_dir: &PathBuf, wxs_path: &PathBuf) {
+        let journal = test_dir.join("convert_wxs");
+        let result = std::fs::read_to_string(journal).unwrap();
+        let line = result.lines().next().unwrap();
+        let args = line.split(' ').collect_vec();
+        assert_eq!(&["\"wix\"", "\"convert\""], &args[..2]);
+        assert!(args[2].contains(&wxs_path.file_name().unwrap().to_string_lossy().to_string()));
     }
 }
