@@ -245,8 +245,9 @@ pub(crate) mod tests {
 
     use super::Project;
     use crate::toolset::{
-        ext::WellKnownExtentions,
+        ext::{WellKnownExtentions, WixExtension},
         project::WxsSchema,
+        source::WixSource,
         test::{self, ok_stdout},
         ToolsetAction,
     };
@@ -305,77 +306,20 @@ pub(crate) mod tests {
         assert_eq!(WxsSchema::V4, wxs_source.wxs_schema);
         assert_eq!(test_wxs, wxs_source.path);
         assert!(wxs_source.toolset.is_modern());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.BootstrapperApplications.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.ComPlus.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Dependency.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.DirectX.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Firewall.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Http.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Iis.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Msmq.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Netfx.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.PowerShell.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Sql.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.UI.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.Util.wixext")
-            .is_some());
-        assert!(wxs_source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == "WixToolset.VisualStudio.wixext")
-            .is_some());
-
+        validate_wxs_ext(wxs_source, WellKnownExtentions::BootstrapperApplications);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::ComPlus);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Dependency);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::DirectX);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Firewall);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Http);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Iis);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Msmq);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Netfx);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Powershell);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Sql);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::UI);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::Util);
+        validate_wxs_ext(wxs_source, WellKnownExtentions::VS);
         validate_convert_journal(&test_dir, &test_wxs);
     }
 
@@ -397,6 +341,7 @@ pub(crate) mod tests {
                     use std::io::Write;
                     let args = cmd.get_args();
                     let dest = args.last().expect("should be the dest");
+                    
                     std::fs::copy(
                         PathBuf::from("tests")
                             .join("common")
@@ -434,6 +379,9 @@ pub(crate) mod tests {
                         .open(&add_extension_journal)
                         .unwrap();
                     writeln!(journal, "{:?}", cmd).unwrap();
+                    if let Some(cd) = cmd.get_current_dir() {
+                        writeln!(journal, "{:?}", cd).unwrap();
+                    }
                     ok_stdout("")
                 }
                 ToolsetAction::ListExtension => ok_stdout(""),
@@ -464,14 +412,38 @@ pub(crate) mod tests {
         (test_dir, project)
     }
 
-    pub fn validate_add_extension_journal(test_dir: &PathBuf) {
+    pub fn validate_add_extension_journal(test_dir: &PathBuf, is_sxs: bool) {
         let journal = test_dir.join("add_extension");
         let result = std::fs::read_to_string(journal).unwrap();
-        let line = result.lines().next().unwrap();
-        assert_eq!(
-            r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
-            line
-        );
+        let mut lines = result.lines();
+        let line = lines.next().unwrap();
+
+        match  std::env::consts::OS {
+            "windows" => {
+                assert_eq!(
+                    r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
+                    line
+                );
+                if is_sxs {
+                    assert!(!lines.next().expect("should have the current directory").is_empty());
+                }
+            },
+            _ => {
+                let cmd = if is_sxs {
+                    let (cwd, cmd) = line.split_once("&&").expect("should have a leading cd command");
+                    assert!(cwd.contains("cd"), "first command should be a change directory");
+                    assert!(cwd.contains("wix0"), "also should be changing to wix0 for sxs");
+                    cmd
+                } else {
+                    line
+                };
+                
+                assert_eq!(
+                    r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
+                    cmd
+                );
+            }
+        }
     }
 
     pub fn validate_add_extension_global_journal(test_dir: &PathBuf) {
@@ -491,5 +463,15 @@ pub(crate) mod tests {
         let args = line.split(' ').collect_vec();
         assert_eq!(&["\"wix\"", "\"convert\""], &args[..2]);
         assert!(args[2].contains(&wxs_path.file_name().unwrap().to_string_lossy().to_string()));
+    }
+
+    pub fn validate_wxs_ext(source: &WixSource, ext: impl WixExtension) {
+        assert!(source
+            .exts
+            .iter()
+            .find(|e| e.package_name() == ext.package_name()
+                && e.namespace_prefix() == ext.namespace_prefix()
+                && e.namespace_uri() == ext.namespace_uri())
+            .is_some());
     }
 }
