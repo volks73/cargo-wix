@@ -749,7 +749,7 @@ mod tests {
         assert!(sxs_wxs.exists());
         assert!(sxs_wxs.is_file());
 
-        super::project::tests::validate_add_extension_journal(&test_dir);
+        super::project::tests::validate_add_extension_journal(&test_dir, true);
      }
 
     #[test]
@@ -763,6 +763,6 @@ mod tests {
             .migrate(project)
             .expect("should work");
 
-        super::project::tests::validate_add_extension_journal(&test_dir);
+        super::project::tests::validate_add_extension_journal(&test_dir, false);
     }
 }

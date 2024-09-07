@@ -93,8 +93,8 @@ impl Template {
     /// assert_eq!(Template::Apache2.id(), "Apache-2.0");
     /// assert_eq!(Template::Gpl3.id(), "GPL-3.0");
     /// assert_eq!(Template::Mit.id(), "MIT");
-    /// assert_eq!(Template::Wxs.id(), "WXS");
-    /// assert_eq!(Template::WxsModern.id(), crate::toolset::project::V4_NAMESPACE_URI);
+    /// assert_eq!(Template::WxsV3.id(), "WXS");
+    /// assert_eq!(Template::WxsV4.id(), wix::toolset::project::V4_NAMESPACE_URI);
     /// ```
     ///
     /// [SPDX ID]: https://spdx.org/licenses/
@@ -128,10 +128,10 @@ impl Template {
     ///         "MIT".to_owned(),
     ///         "mit".to_owned(),
     ///         "WXS".to_owned(),
-    ///         "wxs".to_owned()
-    ///         crate::toolset::project::V4_NAMESPACE_URI.to_owned(),
+    ///         "wxs".to_owned(),
+    ///         wix::toolset::project::V4_NAMESPACE_URI.to_owned(),
     ///         "wxs4".to_owned(),
-    ///         "WXS4".to_owned
+    ///         "WXS4".to_owned()
     ///     ]
     /// );
     /// ```
