@@ -764,15 +764,13 @@ impl Execution {
     fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
-        } else if let Some(pkg_meta_wix_debug_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 
