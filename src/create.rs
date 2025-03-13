@@ -992,15 +992,13 @@ impl Execution {
     fn no_build(&self, metadata: &Value) -> bool {
         if self.no_build {
             true
-        } else if let Some(pkg_meta_wix_no_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("no-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_no_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("no-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 
