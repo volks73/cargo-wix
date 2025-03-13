@@ -491,7 +491,7 @@ impl PartialEq for Error {
     }
 }
 
-impl<'a> From<&'a str> for Error {
+impl From<&str> for Error {
     fn from(s: &str) -> Self {
         Error::Generic(s.to_string())
     }
