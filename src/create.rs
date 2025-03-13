@@ -22,6 +22,10 @@
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
 
+use crate::toolset::Includes;
+use crate::toolset::IncludesExt;
+use crate::toolset::Toolset;
+use crate::toolset::ToolsetSetupMode;
 use crate::Cultures;
 use crate::Error;
 use crate::Result;
@@ -36,8 +40,6 @@ use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
-use crate::WIX_SOURCE_FILE_EXTENSION;
-
 use log::{debug, info, trace, warn};
 
 use semver::Version;
@@ -79,6 +81,9 @@ pub struct Builder<'a> {
     package: Option<&'a str>,
     target: Option<&'a str>,
     version: Option<&'a str>,
+    toolset: Toolset,
+    toolset_setup_mode: ToolsetSetupMode,
+    // toolset_restore: bool,
 }
 
 impl<'a> Builder<'a> {
@@ -104,6 +109,8 @@ impl<'a> Builder<'a> {
             package: None,
             target: None,
             version: None,
+            toolset: Toolset::Legacy,
+            toolset_setup_mode: ToolsetSetupMode::None,
         }
     }
 
@@ -346,6 +353,18 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the wix toolset to use
+    pub fn toolset(&mut self, v: Toolset) -> &mut Self {
+        self.toolset = v;
+        self
+    }
+
+    /// Sets the wix toolset migration setup mode
+    pub fn toolset_migration(&mut self, setup: ToolsetSetupMode) -> &mut Self {
+        self.toolset_setup_mode = setup;
+        self
+    }
+
     /// Builds a context for creating, or building, the installer.
     pub fn build(&mut self) -> Execution {
         Execution {
@@ -371,6 +390,8 @@ impl<'a> Builder<'a> {
             locale: self.locale.map(PathBuf::from),
             name: self.name.map(String::from),
             no_build: self.no_build,
+            toolset: self.toolset.clone(),
+            toolset_setup_mode: self.toolset_setup_mode,
             target_bin_dir: self.target_bin_dir.map(PathBuf::from),
             install: self.install,
             output: self.output.map(String::from),
@@ -409,6 +430,8 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
+    toolset: Toolset,
+    toolset_setup_mode: ToolsetSetupMode,
     install: bool,
     output: Option<String>,
     package: Option<String>,
@@ -520,18 +543,45 @@ impl Execution {
 
         // Compile the installer
         info!("Compiling the installer");
-        let mut compiler = self.compiler()?;
+
+        // Legacy toolset uses `candle` and `light` (compile and link)
+        // Modern toolset only uses `wix build`
+        let mut compiler = if self.toolset.is_legacy() {
+            debug!("Using legacy wix build tools");
+            self.toolset.compiler(self.bin_path.clone())?
+        } else {
+            debug!("Using modern wix build tools");
+            let wix = self.toolset.wix("build")?;
+            wix
+        };
         debug!("compiler = {:?}", compiler);
+
+        // Toolset upgrading only makes sense if the modern toolset is being used
+        if self.toolset.is_modern() {
+            match &self.toolset_setup_mode {
+                ToolsetSetupMode::None => {
+                    debug!("No toolset upgrade mode is set");
+                }
+                _ => {
+                    debug!("Starting toolset upgrade checks");
+                    let project = self.create_project(&package)?;
+                    self.toolset_setup_mode.migrate(project)?;
+                }
+            }
+        }
+
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_COMPILER);
             compiler.stdout(Stdio::null());
             compiler.stderr(Stdio::null());
         }
-        compiler
-            .arg("-arch")
-            .arg(&wix_arch.to_string())
-            .arg("-ext")
-            .arg("WixUtilExtension");
+        compiler.arg("-arch").arg(wix_arch.to_string());
+
+        // Modern wix does not requires `-ext` flags
+        if self.toolset.is_legacy() {
+            compiler.arg("-ext").arg("WixUtilExtension");
+        }
+
         if let Some(vendor) = &cfg.target_vendor {
             compiler.arg(format!("-dTargetVendor={vendor}"));
         }
@@ -580,6 +630,7 @@ impl Execution {
                 self.capture_output,
             ));
         }
+
         let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
         debug!("wixobj_sources = {:?}", wixobj_sources);
         let installer_kind = InstallerKind::try_from(
@@ -600,63 +651,66 @@ impl Execution {
         );
         debug!("installer_destination = {:?}", installer_destination);
 
-        // Link the installer
-        info!("Linking the installer");
-        let mut linker = self.linker()?;
-        debug!("linker = {:?}", linker);
-        let base_path = manifest_path.parent().ok_or_else(|| {
-            Error::Generic(String::from("The base path for the linker is invalid"))
-        })?;
-        debug!("base_path = {:?}", base_path);
-        if self.capture_output {
-            trace!("Capturing the '{}' output", WIX_LINKER);
-            linker.stdout(Stdio::null());
-            linker.stderr(Stdio::null());
-        }
-        linker
-            .arg("-spdb")
-            .arg("-ext")
-            .arg("WixUIExtension")
-            .arg("-ext")
-            .arg("WixUtilExtension")
-            .arg(format!("-cultures:{culture}"))
-            .arg("-out")
-            .arg(&installer_destination)
-            .arg("-b")
-            .arg(base_path);
-        if let Some(l) = locale {
-            trace!("Using the a WiX localization file");
-            linker.arg("-loc").arg(l);
-        }
-        if let InstallerKind::Exe = installer_kind {
-            trace!("Adding the WixBalExtension for the bundle-based installer");
-            linker.arg("-ext").arg("WixBalExtension");
-        }
-        if let Some(args) = &linker_args {
-            trace!("Appending linker arguments");
-            linker.args(args);
-        }
-        linker.args(&wixobj_sources);
-        debug!("command = {:?}", linker);
-        let status = linker.status().map_err(|err| {
-            if err.kind() == ErrorKind::NotFound {
-                Error::Generic(format!(
-                    "The linker application ({WIX_LINKER}) could not be found in the PATH environment \
-                     variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
-                     installed and check the WiX Toolset's '{BINARY_FOLDER_NAME}' folder has been added to the PATH \
-                     environment variable, the {WIX_PATH_KEY} system environment variable exists, or use the \
-                     '-b,--bin-path' command line argument."
-                ))
-            } else {
-                err.into()
+        // Modern wix no longer requires `light`
+        if self.toolset.is_legacy() {
+            // Link the installer
+            info!("Linking the installer");
+            let mut linker = self.linker()?;
+            debug!("linker = {:?}", linker);
+            let base_path = manifest_path.parent().ok_or_else(|| {
+                Error::Generic(String::from("The base path for the linker is invalid"))
+            })?;
+            debug!("base_path = {:?}", base_path);
+            if self.capture_output {
+                trace!("Capturing the '{}' output", WIX_LINKER);
+                linker.stdout(Stdio::null());
+                linker.stderr(Stdio::null());
             }
-        })?;
-        if !status.success() {
-            return Err(Error::Command(
-                WIX_LINKER,
-                status.code().unwrap_or(100),
-                self.capture_output,
-            ));
+            linker
+                .arg("-spdb")
+                .arg("-ext")
+                .arg("WixUIExtension")
+                .arg("-ext")
+                .arg("WixUtilExtension")
+                .arg(format!("-cultures:{culture}"))
+                .arg("-out")
+                .arg(&installer_destination)
+                .arg("-b")
+                .arg(base_path);
+            if let Some(l) = locale {
+                trace!("Using the a WiX localization file");
+                linker.arg("-loc").arg(l);
+            }
+            if let InstallerKind::Exe = installer_kind {
+                trace!("Adding the WixBalExtension for the bundle-based installer");
+                linker.arg("-ext").arg("WixBalExtension");
+            }
+            if let Some(args) = &linker_args {
+                trace!("Appending linker arguments");
+                linker.args(args);
+            }
+            linker.args(&wixobj_sources);
+            debug!("command = {:?}", linker);
+            let status = linker.status().map_err(|err| {
+                if err.kind() == ErrorKind::NotFound {
+                    Error::Generic(format!(
+                        "The linker application ({WIX_LINKER}) could not be found in the PATH environment \
+                         variable. Please check the WiX Toolset (http://wixtoolset.org/) is \
+                         installed and check the WiX Toolset's '{BINARY_FOLDER_NAME}' folder has been added to the PATH \
+                         environment variable, the {WIX_PATH_KEY} system environment variable exists, or use the \
+                         '-b,--bin-path' command line argument."
+                    ))
+                } else {
+                    err.into()
+                }
+            })?;
+            if !status.success() {
+                return Err(Error::Command(
+                    WIX_LINKER,
+                    status.code().unwrap_or(100),
+                    self.capture_output,
+                ));
+            }
         }
 
         // Launch the installer
@@ -675,60 +729,6 @@ impl Execution {
         }
 
         Ok(())
-    }
-
-    fn compiler(&self) -> Result<Command> {
-        if let Some(mut path) = self.bin_path.as_ref().map(|s| {
-            let mut p = PathBuf::from(s);
-            trace!(
-                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
-                p.display(),
-                BINARY_FOLDER_NAME
-            );
-            p.push(WIX_COMPILER);
-            p.set_extension(EXE_FILE_EXTENSION);
-            p
-        }) {
-            if !path.exists() {
-                path.pop(); // Remove the `candle` application from the path
-                Err(Error::Generic(format!(
-                    "The compiler application ('{}') does not exist at the '{}' path specified via \
-                    the '-b,--bin-path' command line argument. Please check the path is correct and \
-                    the compiler application exists at the path.",
-                    WIX_COMPILER,
-                    path.display()
-                )))
-            } else {
-                Ok(Command::new(path))
-            }
-        } else if let Some(mut path) = env::var_os(WIX_PATH_KEY).map(|s| {
-            let mut p = PathBuf::from(s);
-            trace!(
-                "Using the '{}' path to the WiX Toolset's '{}' folder for the compiler",
-                p.display(),
-                BINARY_FOLDER_NAME
-            );
-            p.push(BINARY_FOLDER_NAME);
-            p.push(WIX_COMPILER);
-            p.set_extension(EXE_FILE_EXTENSION);
-            p
-        }) {
-            if !path.exists() {
-                path.pop(); // Remove the `candle` application from the path
-                Err(Error::Generic(format!(
-                    "The compiler application ('{}') does not exist at the '{}' path specified \
-                     via the {} environment variable. Please check the path is correct and the \
-                     compiler application exists at the path.",
-                    WIX_COMPILER,
-                    path.display(),
-                    WIX_PATH_KEY
-                )))
-            } else {
-                Ok(Command::new(path))
-            }
-        } else {
-            Ok(Command::new(WIX_COMPILER))
-        }
     }
 
     fn compiler_args(&self, metadata: &Value) -> Option<Vec<String>> {
@@ -764,30 +764,26 @@ impl Execution {
     fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
-        } else if let Some(pkg_meta_wix_debug_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
     fn debug_name(&self, metadata: &Value) -> bool {
         if self.debug_name {
             true
-        } else if let Some(pkg_meta_wix_debug_name) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-name"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_name
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-name"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
@@ -996,15 +992,13 @@ impl Execution {
     fn no_build(&self, metadata: &Value) -> bool {
         if self.no_build {
             true
-        } else if let Some(pkg_meta_wix_no_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("no-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_no_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("no-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or_default()
         }
     }
 
@@ -1097,100 +1091,6 @@ impl Execution {
             Err(Error::Generic(String::from("No WiX object files found.")))
         } else {
             Ok(wixobj_sources)
-        }
-    }
-
-    fn wxs_sources(&self, package: &Package) -> Result<Vec<PathBuf>> {
-        let project_wix_dir = package
-            .manifest_path
-            .parent()
-            .ok_or_else(|| {
-                Error::Generic(format!(
-                    "The '{}' path for the package's manifest file is invalid",
-                    package.manifest_path
-                ))
-            })
-            .map(|d| PathBuf::from(d).join(WIX))?;
-        let mut wix_sources = {
-            if project_wix_dir.exists() {
-                std::fs::read_dir(project_wix_dir)?
-                    .filter(|r| r.is_ok())
-                    .map(|r| r.unwrap().path())
-                    .filter(|p| {
-                        p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
-                    })
-                    .collect()
-            } else {
-                Vec::new()
-            }
-        };
-        if let Some(paths) = self.includes.as_ref() {
-            for p in paths {
-                if p.exists() {
-                    if p.is_dir() {
-                        return Err(Error::Generic(format!(
-                            "The '{}' path is not a file. Please check the path and ensure it is to \
-                            a WiX Source (wxs) file.",
-                            p.display()
-                        )));
-                    } else {
-                        trace!("Using the '{}' WiX source file", p.display());
-                    }
-                } else {
-                    return Err(Error::Generic(format!(
-                        "The '{0}' file does not exist. Consider using the 'cargo \
-                         wix print WXS > {0}' command to create it.",
-                        p.display()
-                    )));
-                }
-            }
-            wix_sources.extend(paths.clone());
-        } else if let Some(pkg_meta_wix_sources) = package
-            .metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("include"))
-            .and_then(|i| i.as_array())
-            .map(|a| {
-                a.iter()
-                    .map(|s| s.as_str().map(PathBuf::from).unwrap())
-                    .collect::<Vec<PathBuf>>()
-            })
-        {
-            for pkg_meta_wix_source in &pkg_meta_wix_sources {
-                if pkg_meta_wix_source.exists() {
-                    if pkg_meta_wix_source.is_dir() {
-                        return Err(Error::Generic(format!(
-                            "The '{}' path is not a file. Please check the path and \
-                             ensure it is to a WiX Source (wxs) file in the \
-                             'package.metadata.wix' section of the package's manifest \
-                             (Cargo.toml).",
-                            pkg_meta_wix_source.display()
-                        )));
-                    } else {
-                        trace!(
-                            "Using the '{}' WiX source file from the \
-                             'package.metadata.wix' section in the package's \
-                             manifest.",
-                            pkg_meta_wix_source.display()
-                        );
-                    }
-                } else {
-                    return Err(Error::Generic(format!(
-                        "The '{0}' file does not exist. Consider using the \
-                         'cargo wix print WXS > {0} command to create it.",
-                        pkg_meta_wix_source.display()
-                    )));
-                }
-            }
-            wix_sources.extend(pkg_meta_wix_sources);
-        }
-        if wix_sources.is_empty() {
-            Err(Error::Generic(String::from(
-                "There are no WXS files to create an installer",
-            )))
-        } else {
-            Ok(wix_sources)
         }
     }
 
@@ -1297,6 +1197,12 @@ impl Execution {
                 version.major, version.minor, version.patch
             ))
         }
+    }
+}
+
+impl Includes for Execution {
+    fn includes(&self) -> Option<&Vec<PathBuf>> {
+        self.includes.as_ref()
     }
 }
 
@@ -2140,25 +2046,6 @@ mod tests {
 
             let target_bin_dir = execution.target_bin_dir(&target_directory, &target, &profile);
             assert_eq!(target_bin_dir, PathBuf::from(EXPECTED));
-        }
-
-        #[test]
-        #[cfg(windows)]
-        fn compiler_is_correct_with_defaults() {
-            let expected = Command::new(
-                env::var_os(WIX_PATH_KEY)
-                    .map(|s| {
-                        let mut p = PathBuf::from(s);
-                        p.push(BINARY_FOLDER_NAME);
-                        p.push(WIX_COMPILER);
-                        p.set_extension(EXE_FILE_EXTENSION);
-                        p
-                    })
-                    .unwrap(),
-            );
-            let e = Execution::default();
-            let actual = e.compiler().unwrap();
-            assert_eq!(format!("{actual:?}"), format!("{expected:?}"));
         }
 
         #[test]

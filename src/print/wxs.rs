@@ -20,6 +20,7 @@ use crate::manifest;
 use crate::package;
 use crate::product_name;
 use crate::stored_path::StoredPathBuf;
+use crate::toolset::project::WxsSchema;
 use crate::Error;
 use crate::Result;
 use crate::Template;
@@ -59,6 +60,7 @@ pub struct Builder<'a> {
     product_icon: Option<&'a str>,
     product_name: Option<&'a str>,
     upgrade_guid: Option<&'a str>,
+    schema: Option<WxsSchema>,
 }
 
 impl<'a> Builder<'a> {
@@ -82,6 +84,7 @@ impl<'a> Builder<'a> {
             product_icon: None,
             product_name: None,
             upgrade_guid: None,
+            schema: None,
         }
     }
 
@@ -327,6 +330,14 @@ impl<'a> Builder<'a> {
         self
     }
 
+    /// Sets the Wxs Schema
+    ///
+    /// Wix3 follows the "v3" schema, where as Wix4 and beyond use the "Modern" schema uri.
+    pub fn schema(&mut self, schema: Option<WxsSchema>) -> &mut Self {
+        self.schema = schema;
+        self
+    }
+
     /// Builds an execution context for printing a template.
     pub fn build(&self) -> Execution {
         Execution {
@@ -350,6 +361,7 @@ impl<'a> Builder<'a> {
             product_icon: self.product_icon.map(StoredPathBuf::from),
             product_name: self.product_name.map(String::from),
             upgrade_guid: self.upgrade_guid.map(String::from),
+            schema: self.schema.unwrap_or(WxsSchema::Legacy),
         }
     }
 }
@@ -380,6 +392,7 @@ pub struct Execution {
     product_icon: Option<StoredPathBuf>,
     product_name: Option<String>,
     upgrade_guid: Option<String>,
+    schema: WxsSchema,
 }
 
 /// All the possible output files of [`Execution::render`][].
@@ -499,7 +512,14 @@ impl Execution {
         let wxs = {
             let data = map.build();
             let main_destination = self.output.clone();
-            let template = mustache::compile_str(Template::Wxs.to_str())?;
+            let wxs_template = match self.schema {
+                WxsSchema::Legacy => Template::WxsV3.to_str(),
+                WxsSchema::V4 => Template::WxsV4.to_str(),
+                _ => {
+                    unreachable!("should always have one of the above valid schemas set")
+                }
+            };
+            let template = mustache::compile_str(wxs_template)?;
             let rendered = template.render_data_to_string(&data).map_err(Error::from)?;
             RenderOutput {
                 path: main_destination,

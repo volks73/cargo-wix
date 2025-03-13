@@ -2,3 +2,7 @@
 **/*.rs.bk
 /wix/
 .lock
+.wix/
+.test**
+wix0/
+**.profraw
