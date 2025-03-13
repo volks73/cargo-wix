@@ -777,15 +777,13 @@ impl Execution {
     fn debug_name(&self, metadata: &Value) -> bool {
         if self.debug_name {
             true
-        } else if let Some(pkg_meta_wix_debug_name) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-name"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_name
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-name"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 
