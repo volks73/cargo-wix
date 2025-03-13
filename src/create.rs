@@ -386,7 +386,7 @@ impl<'a> Builder<'a> {
     }
 }
 
-impl<'a> Default for Builder<'a> {
+impl Default for Builder<'_> {
     fn default() -> Self {
         Builder::new()
     }
@@ -529,7 +529,7 @@ impl Execution {
         }
         compiler
             .arg("-arch")
-            .arg(&wix_arch.to_string())
+            .arg(wix_arch.to_string())
             .arg("-ext")
             .arg("WixUtilExtension");
         if let Some(vendor) = &cfg.target_vendor {
@@ -764,30 +764,26 @@ impl Execution {
     fn debug_build(&self, metadata: &Value) -> bool {
         if self.debug_build {
             true
-        } else if let Some(pkg_meta_wix_debug_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 
     fn debug_name(&self, metadata: &Value) -> bool {
         if self.debug_name {
             true
-        } else if let Some(pkg_meta_wix_debug_name) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("dbg-name"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_debug_name
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("dbg-name"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 
@@ -996,15 +992,13 @@ impl Execution {
     fn no_build(&self, metadata: &Value) -> bool {
         if self.no_build {
             true
-        } else if let Some(pkg_meta_wix_no_build) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("no-build"))
-            .and_then(|c| c.as_bool())
-        {
-            pkg_meta_wix_no_build
         } else {
-            false
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("no-build"))
+                .and_then(|c| c.as_bool())
+                .unwrap_or(false)
         }
     }
 

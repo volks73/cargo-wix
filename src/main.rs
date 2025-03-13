@@ -434,32 +434,32 @@
 //! - `TargetTriple` = The rustc target triple name as seen with the `rustc
 //!   --print target-list` command
 //! - `TargetEnv` = The rustc target environment, as seen with the output from
-//! the `rustc --print cfg` command as `target_env`. On Windows, this typically
-//! either `msvc` or `gnu` depending on the toolchain downloaded and installed.
+//!   the `rustc --print cfg` command as `target_env`. On Windows, this typically
+//!   either `msvc` or `gnu` depending on the toolchain downloaded and installed.
 //! - `TargetVendor` = The rustc target vendor, as seen with the output from the
-//! `rustc --print cfg` command as `target_vendor`. This is typically `pc`, but Rust
-//! does support other vendors, like `uwp`.
+//!   `rustc --print cfg` command as `target_vendor`. This is typically `pc`, but Rust
+//!   does support other vendors, like `uwp`.
 //! - `CargoTargetBinDir` = The complete path to the binary (exe). The default
-//! would be `target\release\<BINARY_NAME>.exe` where `<BINARY_NAME>` is replaced
-//! with the name of each binary target defined in the package's manifest
-//! (Cargo.toml). If a different rustc target triple is used than the host, i.e.
-//! cross-compiling, then the default path would be
-//! `target\<CARGO_TARGET>\<CARGO_PROFILE>\<BINARY_NAME>.exe`, where
-//! `<CARGO_TARGET>` is replaced with the `CargoTarget` variable value and
-//! `<CARGO_PROFILE>` is replaced with the value from the `CargoProfile` variable.
+//!   would be `target\release\<BINARY_NAME>.exe` where `<BINARY_NAME>` is replaced
+//!   with the name of each binary target defined in the package's manifest
+//!   (Cargo.toml). If a different rustc target triple is used than the host, i.e.
+//!   cross-compiling, then the default path would be
+//!   `target\<CARGO_TARGET>\<CARGO_PROFILE>\<BINARY_NAME>.exe`, where
+//!   `<CARGO_TARGET>` is replaced with the `CargoTarget` variable value and
+//!   `<CARGO_PROFILE>` is replaced with the value from the `CargoProfile` variable.
 //! - `CargoTargetDir` = The path to the directory for the build artifacts, i.e.
-//! `target`.
+//!   `target`.
 //! - `CargoProfile` = Either `debug` or `release` depending on the build
-//! profile. The default is `release`.
+//!   profile. The default is `release`.
 //! - `Platform` = (Deprecated) Either `x86`, `x64`, `arm`, or `arm64`. See the
-//! documentation for the WiX Toolset compiler (candle.exe) `-arch` option.
-//! Note, this variable is deprecated and will eventually be removed because it is
-//! ultimately redundant to the `$(sys.BUILDARCH)` variable that is already provided
-//! by the WiX Toolset compiler. Existing projects should replace usage of
-//! `$(var.Platform)` with `$(sys.BUILDARCH)`. No action is needed for new projects.
+//!   documentation for the WiX Toolset compiler (candle.exe) `-arch` option.
+//!   Note, this variable is deprecated and will eventually be removed because it is
+//!   ultimately redundant to the `$(sys.BUILDARCH)` variable that is already provided
+//!   by the WiX Toolset compiler. Existing projects should replace usage of
+//!   `$(var.Platform)` with `$(sys.BUILDARCH)`. No action is needed for new projects.
 //! - `Profile` = (Deprecated) See `CargoProfile`.
 //! - `Version` = The version for the installer. The default is the
-//! `Major.Minor.Fix` semantic versioning number of the Rust package.
+//!   `Major.Minor.Fix` semantic versioning number of the Rust package.
 //!
 //! Additional, user-defined variables for custom WXS files can be passed to the
 //! WiX Toolset compiler (candle.exe) using the cargo-wix subcommand

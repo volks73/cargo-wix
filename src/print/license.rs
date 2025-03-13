@@ -117,7 +117,7 @@ impl<'a> Builder<'a> {
     }
 }
 
-impl<'a> Default for Builder<'a> {
+impl Default for Builder<'_> {
     fn default() -> Self {
         Builder::new()
     }
@@ -172,7 +172,6 @@ impl Execution {
     fn copyright_year(&self) -> String {
         self.copyright_year
             .clone()
-            .map(String::from)
             .unwrap_or_else(|| Utc::now().year().to_string())
     }
 }
