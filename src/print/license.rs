@@ -172,7 +172,6 @@ impl Execution {
     fn copyright_year(&self) -> String {
         self.copyright_year
             .clone()
-            .map(String::from)
             .unwrap_or_else(|| Utc::now().year().to_string())
     }
 }
