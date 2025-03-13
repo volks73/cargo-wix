@@ -159,7 +159,7 @@ impl<'a> Builder<'a> {
     }
 }
 
-impl<'a> Default for Builder<'a> {
+impl Default for Builder<'_> {
     fn default() -> Self {
         Builder::new()
     }
