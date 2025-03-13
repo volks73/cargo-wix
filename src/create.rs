@@ -529,7 +529,7 @@ impl Execution {
         }
         compiler
             .arg("-arch")
-            .arg(&wix_arch.to_string())
+            .arg(wix_arch.to_string())
             .arg("-ext")
             .arg("WixUtilExtension");
         if let Some(vendor) = &cfg.target_vendor {
