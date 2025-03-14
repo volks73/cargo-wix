@@ -36,6 +36,7 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 use cargo_metadata::Package;
+use serde_json::Value;
 
 /// A builder for creating an execution context to sign an installer.
 #[derive(Debug, Clone)]
@@ -195,7 +196,11 @@ impl Execution {
         let manifest = super::manifest(self.input.as_ref())?;
         debug!("target_directory = {:?}", manifest.target_directory);
         let package = super::package(&manifest, self.package.as_deref())?;
+        let metadata = package.metadata.clone();
+        debug!("metadata = {:?}", metadata);
         let product_name = super::product_name(self.product_name.as_ref(), &package);
+        let timestamp = self.timestamp(&metadata);
+        debug!("timestamp = {:?}", timestamp);
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
             trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
             format!("{product_name} - {d}")
@@ -223,7 +228,7 @@ impl Execution {
             trace!("Using the '{}' URL for the expanded description", h);
             signer.arg("/du").arg(h);
         }
-        if let Some(t) = self.timestamp {
+        if let Some(t) = timestamp {
             let server = TimestampServer::from_str(&t)?;
             trace!(
                 "Using the '{}' timestamp server to sign the installer",
@@ -340,6 +345,22 @@ impl Execution {
             }
         } else {
             Ok(Command::new(SIGNTOOL))
+        }
+    }
+
+    fn timestamp(&self, metadata: &Value) -> Option<String> {
+        if let Some(timestamp) = &self.timestamp {
+            Some(timestamp.to_owned())
+        } else if let Some(pkg_meta_wix_timestamp) = metadata
+            .get("wix")
+            .and_then(|w| w.as_object())
+            .and_then(|t| t.get("timestamp"))
+            .and_then(|l| l.as_str())
+            .map(String::from)
+        {
+            Some(pkg_meta_wix_timestamp)
+        } else {
+            None
         }
     }
 }
