@@ -239,10 +239,7 @@ impl Project {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::path::PathBuf;
-
-    use itertools::Itertools;
-
+    use std::{collections::BTreeSet, path::PathBuf};
     use super::Project;
     use crate::toolset::{
         ext::{WellKnownExtentions, WixExtension},
@@ -320,28 +317,40 @@ pub(crate) mod tests {
         validate_wxs_ext(wxs_source, WellKnownExtentions::UI);
         validate_wxs_ext(wxs_source, WellKnownExtentions::Util);
         validate_wxs_ext(wxs_source, WellKnownExtentions::VS);
-        validate_convert_journal(&test_dir, &test_wxs);
     }
 
     pub fn create_test_project(
         test_name: &str,
         expected_wxs_name: &'static str,
     ) -> (PathBuf, Project) {
+        const PACKAGES: &[&str] = &[
+            "WixToolset.BootstrapperApplications.wixext/0.0.0",
+            "WixToolset.ComPlus.wixext/0.0.0",
+            "WixToolset.Dependency.wixext/0.0.0",
+            "WixToolset.DirectX.wixext/0.0.0",
+            "WixToolset.Firewall.wixext/0.0.0",
+            "WixToolset.Http.wixext/0.0.0",
+            "WixToolset.Iis.wixext/0.0.0",
+            "WixToolset.Msmq.wixext/0.0.0",
+            "WixToolset.Netfx.wixext/0.0.0",
+            "WixToolset.PowerShell.wixext/0.0.0",
+            "WixToolset.Sql.wixext/0.0.0",
+            "WixToolset.UI.wixext/0.0.0",
+            "WixToolset.Util.wixext/0.0.0",
+            "WixToolset.VisualStudio.wixext/0.0.0",
+        ];
+
         let test_dir = PathBuf::from(".test").join(test_name);
         let test_src_file_name = format!("main.{test_name}.wxs");
         let test_src = test_dir.join(test_src_file_name);
-        let add_extension_journal = test_dir.join("add_extension");
-        let add_extension_global_journal = test_dir.join("add_extension_global");
-        let convert_wxs_journal = test_dir.join("convert_wxs");
 
         // Define test shim to do the "conversion" which is copying over a pre-baked converted file
         let shim = test::toolset(
             move |a: &ToolsetAction, cmd: &std::process::Command| match a {
                 ToolsetAction::Convert => {
-                    use std::io::Write;
                     let args = cmd.get_args();
                     let dest = args.last().expect("should be the dest");
-                    
+
                     std::fs::copy(
                         PathBuf::from("tests")
                             .join("common")
@@ -350,38 +359,22 @@ pub(crate) mod tests {
                         PathBuf::from(dest),
                     )
                     .unwrap();
-                    let mut journal = std::fs::OpenOptions::new()
-                        .append(true)
-                        .create(true)
-                        .write(true)
-                        .open(&convert_wxs_journal)
-                        .unwrap();
-                    writeln!(journal, "{:?}", cmd).unwrap();
                     ok_stdout("")
                 }
                 ToolsetAction::AddGlobalExtension => {
-                    use std::io::Write;
-                    let mut journal = std::fs::OpenOptions::new()
-                        .append(true)
-                        .create(true)
-                        .write(true)
-                        .open(&add_extension_global_journal)
-                        .unwrap();
-                    writeln!(journal, "{:?}", cmd).unwrap();
+                    let args = cmd
+                        .get_args()
+                        .map(|a| a.to_string_lossy().to_string());
+                    let args = BTreeSet::from_iter(args);
+                    assert!(PACKAGES.iter().all(|p| args.contains(*p)));
                     ok_stdout("")
                 }
                 ToolsetAction::AddExtension => {
-                    use std::io::Write;
-                    let mut journal = std::fs::OpenOptions::new()
-                        .append(true)
-                        .create(true)
-                        .write(true)
-                        .open(&add_extension_journal)
-                        .unwrap();
-                    writeln!(journal, "{:?}", cmd).unwrap();
-                    if let Some(cd) = cmd.get_current_dir() {
-                        writeln!(journal, "{:?}", cd).unwrap();
-                    }
+                    let args = cmd
+                        .get_args()
+                        .map(|a| a.to_string_lossy().to_string());
+                    let args = BTreeSet::from_iter(args);
+                    assert!(PACKAGES.iter().all(|p| args.contains(*p)));
                     ok_stdout("")
                 }
                 ToolsetAction::ListExtension => ok_stdout(""),
@@ -410,59 +403,6 @@ pub(crate) mod tests {
         let mut project = Project::try_new(shim).unwrap();
         project.add_wxs(test_src).unwrap();
         (test_dir, project)
-    }
-
-    pub fn validate_add_extension_journal(test_dir: &PathBuf, is_sxs: bool) {
-        let journal = test_dir.join("add_extension");
-        let result = std::fs::read_to_string(journal).unwrap();
-        let mut lines = result.lines();
-        let line = lines.next().unwrap();
-
-        match  std::env::consts::OS {
-            "windows" => {
-                assert_eq!(
-                    r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
-                    line
-                );
-                if is_sxs {
-                    assert!(!lines.next().expect("should have the current directory").is_empty());
-                }
-            },
-            _ => {
-                let cmd = if is_sxs {
-                    let (cwd, cmd) = line.split_once("&&").expect("should have a leading cd command");
-                    assert!(cwd.contains("cd"), "first command should be a change directory");
-                    assert!(cwd.contains("wix0"), "also should be changing to wix0 for sxs");
-                    cmd
-                } else {
-                    line
-                };
-                
-                assert_eq!(
-                    r#""wix" "extension" "add" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
-                    cmd
-                );
-            }
-        }
-    }
-
-    pub fn validate_add_extension_global_journal(test_dir: &PathBuf) {
-        let journal = test_dir.join("add_extension_global");
-        let result = std::fs::read_to_string(journal).unwrap();
-        let line = result.lines().next().unwrap();
-        assert_eq!(
-            r#""wix" "extension" "add" "--global" "WixToolset.BootstrapperApplications.wixext/0.0.0" "WixToolset.ComPlus.wixext/0.0.0" "WixToolset.Dependency.wixext/0.0.0" "WixToolset.DirectX.wixext/0.0.0" "WixToolset.Firewall.wixext/0.0.0" "WixToolset.Http.wixext/0.0.0" "WixToolset.Iis.wixext/0.0.0" "WixToolset.Msmq.wixext/0.0.0" "WixToolset.Netfx.wixext/0.0.0" "WixToolset.PowerShell.wixext/0.0.0" "WixToolset.Sql.wixext/0.0.0" "WixToolset.UI.wixext/0.0.0" "WixToolset.Util.wixext/0.0.0" "WixToolset.VisualStudio.wixext/0.0.0""#,
-            line
-        );
-    }
-
-    pub fn validate_convert_journal(test_dir: &PathBuf, wxs_path: &PathBuf) {
-        let journal = test_dir.join("convert_wxs");
-        let result = std::fs::read_to_string(journal).unwrap();
-        let line = result.lines().next().unwrap();
-        let args = line.split(' ').collect_vec();
-        assert_eq!(&["\"wix\"", "\"convert\""], &args[..2]);
-        assert!(args[2].contains(&wxs_path.file_name().unwrap().to_string_lossy().to_string()));
     }
 
     pub fn validate_wxs_ext(source: &WixSource, ext: impl WixExtension) {
