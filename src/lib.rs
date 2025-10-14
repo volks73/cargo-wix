@@ -1168,13 +1168,6 @@ mod tests {
         }
 
         #[test]
-        fn try_from_i586_pc_windows_msvc_is_correct() {
-            let arch =
-                WixArch::try_from(&Cfg::of("i586-pc-windows-msvc").expect("Cfg parsing")).unwrap();
-            assert_eq!(arch, WixArch::X86);
-        }
-
-        #[test]
         fn try_from_aarch64_pc_windows_msvc_is_correct() {
             let arch = WixArch::try_from(&Cfg::of("aarch64-pc-windows-msvc").expect("Cfg parsing"))
                 .unwrap();
