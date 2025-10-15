@@ -38,8 +38,11 @@ use crate::MSI_FILE_EXTENSION;
 use crate::WIX;
 use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
+use crate::WIX_MODERN_TOOLSET;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
+use itertools::Itertools;
+use log::error;
 use log::{debug, info, trace, warn};
 
 use semver::Version;
@@ -577,39 +580,74 @@ impl Execution {
         }
         compiler.arg("-arch").arg(wix_arch.to_string());
 
-        // Modern wix does not requires `-ext` flags
         if self.toolset.is_legacy() {
             compiler.arg("-ext").arg("WixUtilExtension");
+
+            if let Some(vendor) = &cfg.target_vendor {
+                compiler.arg(format!("-dTargetVendor={vendor}"));
+            }
+            compiler
+                .arg(format!("-dVersion={version}"))
+                .arg(format!("-dPlatform={wix_arch}"))
+                .arg(format!("-dProfile={}", profile.name))
+                .arg(format!("-dTargetEnv={}", cfg.target_env))
+                .arg(format!("-dTargetTriple={}", target.triple))
+                .arg(format!("-dCargoProfile={}", profile.name))
+                .arg({
+                    let mut s = OsString::from("-dCargoTargetDir=");
+                    s.push(&manifest.target_directory);
+                    s
+                })
+                .arg({
+                    let mut s = OsString::from("-dCargoTargetBinDir=");
+                    s.push(&target_bin_dir);
+                    s
+                })
+                .arg("-o")
+                .arg(&wixobj_destination);
+        } else {
+            if let Some(vendor) = &cfg.target_vendor {
+                compiler.arg("-d").arg(format!("TargetVendor={vendor}"));
+            }
+            compiler
+                .arg("-d")
+                .arg(format!("Version={version}"))
+                .arg("-d")
+                .arg(format!("Platform={wix_arch}"))
+                .arg("-d")
+                .arg(format!("Profile={}", profile.name))
+                .arg("-d")
+                .arg(format!("TargetEnv={}", cfg.target_env))
+                .arg("-d")
+                .arg(format!("TargetTriple={}", target.triple))
+                .arg("-d")
+                .arg(format!("CargoProfile={}", profile.name))
+                .arg("-d")
+                .arg({
+                    let mut s = OsString::from("CargoTargetDir=");
+                    s.push(&manifest.target_directory);
+                    s
+                })
+                .arg("-d")
+                .arg({
+                    let mut s = OsString::from("CargoTargetBinDir=");
+                    s.push(&target_bin_dir);
+                    s
+                })
+                .arg("-ext")
+                .arg("WixToolset.UI.wixext")
+                .args(["-pdbtype", "none"]); // Analagous to light.exe -spdb
+
+            // compiler.arg("-o").arg(&installer_destination);
         }
 
-        if let Some(vendor) = &cfg.target_vendor {
-            compiler.arg(format!("-dTargetVendor={vendor}"));
-        }
-        compiler
-            .arg(format!("-dVersion={version}"))
-            .arg(format!("-dPlatform={wix_arch}"))
-            .arg(format!("-dProfile={}", profile.name))
-            .arg(format!("-dTargetEnv={}", cfg.target_env))
-            .arg(format!("-dTargetTriple={}", target.triple))
-            .arg(format!("-dCargoProfile={}", profile.name))
-            .arg({
-                let mut s = OsString::from("-dCargoTargetDir=");
-                s.push(&manifest.target_directory);
-                s
-            })
-            .arg({
-                let mut s = OsString::from("-dCargoTargetBinDir=");
-                s.push(&target_bin_dir);
-                s
-            })
-            .arg("-o")
-            .arg(&wixobj_destination);
         if let Some(args) = &compiler_args {
             trace!("Appending compiler arguments");
             compiler.args(args);
         }
         compiler.args(&wxs_sources);
         debug!("command = {:?}", compiler);
+
         let status = compiler.status().map_err(|err| {
             if err.kind() == ErrorKind::NotFound {
                 Error::Generic(format!(
@@ -624,35 +662,63 @@ impl Execution {
             }
         })?;
         if !status.success() {
+            error!(
+                "Could not execute {}",
+                compiler
+                    .inner
+                    .get_args()
+                    .filter_map(|a| a.to_str())
+                    .join(" ")
+            );
             return Err(Error::Command(
-                WIX_COMPILER,
+                if self.toolset.is_legacy() {
+                    WIX_COMPILER
+                } else {
+                    WIX_MODERN_TOOLSET
+                },
                 status.code().unwrap_or(100),
                 self.capture_output,
             ));
         }
 
-        let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
-        debug!("wixobj_sources = {:?}", wixobj_sources);
-        let installer_kind = InstallerKind::try_from(
-            wixobj_sources
-                .iter()
-                .map(WixObjKind::try_from)
-                .collect::<Result<Vec<WixObjKind>>>()?,
-        )?;
-        debug!("installer_kind = {:?}", installer_kind);
-        let installer_destination = self.installer_destination(
-            &name,
-            &version,
-            &cfg,
-            debug_name,
-            &installer_kind,
-            &package,
-            manifest.target_directory.as_std_path(),
-        );
-        debug!("installer_destination = {:?}", installer_destination);
+        if self.toolset.is_modern() {
+            // Since `build` no longer includes a compile/link phase, the installer type cannot be determined from a .wixobj
+            // wix will now just determine the output type from the .wxs itself
+            let project = self.create_project(&package)?;
+            for s in project.sources() {
+                s.try_move_to_installer_destination(
+                    &name,
+                    &version,
+                    &cfg,
+                    debug_name,
+                    manifest.target_directory.as_std_path(),
+                    self.output.as_ref(),
+                )?;
+            }
+        }
 
         // Modern wix no longer requires `light`
         if self.toolset.is_legacy() {
+            let wixobj_sources = self.wixobj_sources(&wixobj_destination)?;
+            debug!("wixobj_sources = {:?}", wixobj_sources);
+            let installer_kind = InstallerKind::try_from(
+                wixobj_sources
+                    .iter()
+                    .map(WixObjKind::try_from)
+                    .collect::<Result<Vec<WixObjKind>>>()?,
+            )?;
+            debug!("installer_kind = {:?}", installer_kind);
+            let installer_destination = self.installer_destination(
+                &name,
+                &version,
+                &cfg,
+                debug_name,
+                &installer_kind,
+                &package,
+                manifest.target_directory.as_std_path(),
+            );
+            debug!("installer_destination = {:?}", installer_destination);
+
             // Link the installer
             info!("Linking the installer");
             let mut linker = self.linker()?;
@@ -711,20 +777,20 @@ impl Execution {
                     self.capture_output,
                 ));
             }
-        }
 
-        // Launch the installer
-        if self.install {
-            info!("Launching the installer");
-            let mut installer = Command::new(MSIEXEC);
-            installer.arg("/i").arg(&installer_destination);
-            let status = installer.status()?;
-            if !status.success() {
-                return Err(Error::Command(
-                    MSIEXEC,
-                    status.code().unwrap_or(100),
-                    self.capture_output,
-                ));
+            // Launch the installer
+            if self.install {
+                info!("Launching the installer");
+                let mut installer = Command::new(MSIEXEC);
+                installer.arg("/i").arg(&installer_destination);
+                let status = installer.status()?;
+                if !status.success() {
+                    return Err(Error::Command(
+                        MSIEXEC,
+                        status.code().unwrap_or(100),
+                        self.capture_output,
+                    ));
+                }
             }
         }
 

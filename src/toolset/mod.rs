@@ -268,13 +268,13 @@ impl ToolsetSetupMode {
                     None
                 };
 
-                debug!("Starting project upgrade");
                 if self.can_upgrade() {
+                    debug!("Starting project upgrade");
                     project.upgrade(work_dir.as_ref())?;
                 }
 
-                debug!("Restoring any missing extension packages");
                 if self.can_restore() {
+                    debug!("Restoring any missing extension packages");
                     project.restore(self.use_global(), work_dir.as_ref())?;
                 }
             }
@@ -352,6 +352,10 @@ impl ToolsetCommand {
             }
             Ok(output)
         } else {
+            if let ToolsetAction::Convert = self.action {
+                // This is expected because `wix convert` will always return a non-zero exit code
+                return Ok(output);
+            }
             Err(match self.action {
                 ToolsetAction::Convert => "(wix.exe) Could not convert wxs file",
                 ToolsetAction::Build => "(wix.exe) Could not build installer",
@@ -588,12 +592,12 @@ impl DerefMut for ToolsetCommand {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-    use serial_test::serial;
-    use crate::toolset::Toolset;
     use super::test;
     use super::ToolsetAction;
     use super::ToolsetSetupMode;
+    use crate::toolset::Toolset;
+    use serial_test::serial;
+    use std::path::PathBuf;
 
     #[test]
     #[cfg(windows)]
@@ -746,7 +750,7 @@ mod tests {
 
         assert!(sxs_wxs.exists());
         assert!(sxs_wxs.is_file());
-     }
+    }
 
     #[test]
     #[serial]

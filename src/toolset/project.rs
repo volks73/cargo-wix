@@ -24,8 +24,7 @@ use super::{ext::PackageCache, Toolset};
 use clap::ValueEnum;
 use log::debug;
 use std::{collections::BTreeMap, path::PathBuf};
-use sxd_document::parser;
-use sxd_xpath::{evaluate_xpath, Value};
+use sxd_xpath::{evaluate_xpath, Context, Factory, Value};
 
 /// Wix3 XML Namespace URI
 const LEGACY_NAMESPACE_URI: &str = "http://schemas.microsoft.com/wix/2006/wi";
@@ -35,6 +34,8 @@ pub const V4_NAMESPACE_URI: &str = "http://wixtoolset.org/schemas/v4/wxs";
 
 /// XPATH query for the root `<Wix/>` element
 const WIX_ROOT_ELEMENT_XPATH: &str = "/*[local-name()='Wix']";
+
+const WIX_PACKAGE_ROOT_ELEMENT_XPATH: &str = "//w:Package";
 
 /// Enumerations of wix wxs schemas
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq)]
@@ -61,10 +62,11 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
         return Err(format!("Source file {path:?} has an xml header with encoding `windows-1252`. This must be changed to `utf-8` otherwise subsequent tooling will silently fail.").as_str().into());
     }
 
-    let package = parser::parse(&source)?;
-
+    debug!("Trying to parse xml document");
+    let package = sxd_document::parser::parse(source.trim_start_matches('\u{FEFF}'))?;
     let document = package.as_document();
-    let root = evaluate_xpath(&document, WIX_ROOT_ELEMENT_XPATH).unwrap();
+
+    let root = evaluate_xpath(&document, WIX_ROOT_ELEMENT_XPATH)?;
     match root {
         Value::Nodeset(ns) => {
             if let Some((default, exts)) = ns
@@ -84,7 +86,22 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                     _ => WxsSchema::Unsupported,
                 };
 
+                let is_package = match default {
+                    Some(ns) => {
+                        let mut context = Context::new();
+                        context.set_namespace("w", ns);
+                        let factory = Factory::new();
+                        if let Ok(Some(xpath)) = factory.build(WIX_PACKAGE_ROOT_ELEMENT_XPATH) {
+                            let value = xpath.evaluate(&context, document.root())?;
+                            matches!(value, Value::Nodeset(ns) if ns.size() > 0)
+                        } else {
+                            false
+                        }
+                    }
+                    _ => false,
+                };
                 Ok(WixSource {
+                    is_package,
                     wxs_schema: wix_version,
                     path,
                     exts,
@@ -196,9 +213,16 @@ impl Project {
     }
 
     /// Restores any missing extensions
+    #[inline]
     pub fn restore(&mut self, use_global: bool, work_dir: Option<&PathBuf>) -> crate::Result<()> {
         self.package_cache
             .install_missing(use_global, self.wix_version.clone(), work_dir)
+    }
+
+    /// Returns an iterator over wix sources
+    #[inline]
+    pub fn sources(&self) -> impl Iterator<Item = &WixSource> {
+        self.wxs_sources.values()
     }
 
     /// Load installed ext cache
@@ -227,8 +251,24 @@ impl Project {
             }
         }
 
-        let wix_ext_list = self.toolset.wix("extension list")?.output()?;
-        build_package_cache(wix_ext_list, &mut self.package_cache)?;
+        match self.toolset.wix("extension list")?.output() {
+            Ok(wix_ext_list) => {
+                build_package_cache(wix_ext_list, &mut self.package_cache)?;
+            }
+            Err(err) => {
+                // If this returns an error check to see if a local extension cache exists
+                // Docs: https://docs.firegiant.com/wix/development/wips/6184-command-line-extension-acquisition-and-cache/
+                // The path is always .wix\extensions in the current directory
+                if std::env::current_dir()?
+                    .join(".wix")
+                    .join("extensions")
+                    .exists()
+                {
+                    log::error!("Could not list extensions {err}");
+                    return Err("Listing local extensions failed".into());
+                }
+            }
+        }
 
         let wix_ext_list_global = self.toolset.wix("extension list --global")?.output()?;
         build_package_cache(wix_ext_list_global, &mut self.package_cache)?;
@@ -239,15 +279,26 @@ impl Project {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::{collections::BTreeSet, path::PathBuf};
     use super::Project;
     use crate::toolset::{
         ext::{WellKnownExtentions, WixExtension},
-        project::WxsSchema,
+        project::{open_wxs_source, WxsSchema},
         source::WixSource,
         test::{self, ok_stdout},
         ToolsetAction,
     };
+    use std::{collections::BTreeSet, path::PathBuf};
+
+    #[test]
+    fn test_open_wxs() {
+        let main = open_wxs_source(PathBuf::from("./tests/common/post_v4/main.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(main.is_package);
+
+        let fragment = open_wxs_source(PathBuf::from("./tests/common/post_v4/fragment.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(!fragment.is_package);
+    }
 
     #[test]
     fn test_project_create() {
@@ -362,17 +413,13 @@ pub(crate) mod tests {
                     ok_stdout("")
                 }
                 ToolsetAction::AddGlobalExtension => {
-                    let args = cmd
-                        .get_args()
-                        .map(|a| a.to_string_lossy().to_string());
+                    let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
                     let args = BTreeSet::from_iter(args);
                     assert!(PACKAGES.iter().all(|p| args.contains(*p)));
                     ok_stdout("")
                 }
                 ToolsetAction::AddExtension => {
-                    let args = cmd
-                        .get_args()
-                        .map(|a| a.to_string_lossy().to_string());
+                    let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
                     let args = BTreeSet::from_iter(args);
                     assert!(PACKAGES.iter().all(|p| args.contains(*p)));
                     ok_stdout("")
@@ -401,7 +448,9 @@ pub(crate) mod tests {
         .unwrap();
 
         let mut project = Project::try_new(shim).unwrap();
-        project.add_wxs(test_src).unwrap();
+        project
+            .add_wxs(test_src)
+            .expect("Must be able to add src to project");
         (test_dir, project)
     }
 

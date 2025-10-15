@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use log::debug;
 use semver::Version;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -72,6 +73,10 @@ impl PackageCache {
         version: Version,
         work_dir: Option<&PathBuf>,
     ) -> crate::Result<()> {
+        if self.missing.is_empty() {
+            debug!("No missing extensions, skipping extension restore");
+            return Ok(())
+        }
         let mut wix = self.toolset.wix("extension add")?;
 
         if let Some(work_dir) = work_dir {
@@ -85,6 +90,7 @@ impl PackageCache {
 
         for m in self.missing.iter() {
             let ext_ref = format!("{m}/{}.{}.{}", version.major, version.minor, version.patch);
+            debug!("Installing missing ext {ext_ref}");
             wix.arg(ext_ref);
         }
 

@@ -133,6 +133,9 @@ pub const WIX_COMPILER: &str = "candle";
 /// Windows installer.
 pub const WIX_LINKER: &str = "light";
 
+/// The application name of the modern toolset binary
+pub const WIX_MODERN_TOOLSET: &str = "wix";
+
 /// The application name without the file extension of the `msiexec` utility.
 pub const MSIEXEC: &str = "msiexec";
 

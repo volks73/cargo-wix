@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use log::{debug, warn};
+use log::{debug, error, trace, warn};
 
 use super::ext::{PackageCache, WxsDependency};
 use super::project::{open_wxs_source, WxsSchema};
 use super::Toolset;
+use std::ffi::OsStr;
 use std::path::PathBuf;
 
 /// Struct containing information about a wxs source file
@@ -29,6 +30,13 @@ pub struct WixSource {
     pub(super) exts: Vec<WxsDependency>,
     /// Toolset this source is using
     pub(super) toolset: Toolset,
+    /// True if this source defines a package
+    ///
+    /// Wix v4 unified the top-level root such that if the .wxs file will have either <Package> or <Fragment>
+    /// Whether a .msi or .exe is created depends on the inner definition of <Package>
+    ///
+    /// By including this flag, after `wix build` is called, we can move the files to the appropriate output directory
+    pub(super) is_package: bool,
 }
 
 impl WixSource {
@@ -102,22 +110,107 @@ impl WixSource {
             self.path.clone()
         };
 
+        let content = std::fs::read_to_string(&converted_path)?;
+        let has_bom = content.starts_with('\u{FEFF}');
+
         let output = convert.output()?;
 
-        if output.status.success() {
-            // The converted_path must be a valid file name
-            let converted_path =
-                if let Some((work_dir, file_name)) = work_dir.zip(converted_path.file_name()) {
-                    let dest = work_dir.join(file_name);
-                    std::fs::copy(converted_path, &dest)?;
-                    dest
-                } else {
-                    converted_path
-                };
-            open_wxs_source(converted_path)
-        } else {
-            Err("Could not convert wix source".into())
+        if !output.status.success() {
+            // This is expected, `wix convert`` decided to always return a non-zero exit code because
+            // it will output a log of the changes it made
+            if log::log_enabled!(log::Level::Debug) && !output.stderr.is_empty() {
+                let std_err = String::from_utf8(output.stderr.clone())?;
+                for line in std_err.lines() {
+                    debug!("{line}");
+                }
+            }
         }
+
+        // The converted_path must be a valid file name
+        let converted_path =
+            if let Some((work_dir, file_name)) = work_dir.zip(converted_path.file_name()) {
+                let dest = work_dir.join(file_name);
+                std::fs::copy(converted_path, &dest)?;
+                dest
+            } else {
+                converted_path
+            };
+        if !has_bom {
+            // Strip the BOM if the previous file did not have a BOM
+            let content = std::fs::read_to_string(&converted_path)?;
+            let has_bom = content.starts_with('\u{FEFF}');
+            if has_bom {
+                debug!(
+                    "Detected BOM, previous file did not have a BOM, removing to preserve tooling"
+                );
+                std::fs::write(&converted_path, content.trim_start_matches('\u{FEFF}'))?;
+            }
+        }
+        open_wxs_source(converted_path)
+    }
+
+    pub fn try_move_to_installer_destination(
+        &self,
+        name: &str,
+        version: &str,
+        cfg: &rustc_cfg::Cfg,
+        debug_name: bool,
+        target_directory: &std::path::Path,
+        output: Option<&String>,
+    ) -> crate::Result<()> {
+        if !self.is_package {
+            return Ok(());
+        }
+
+        // Won't know the extension until we scan for the file
+        // Capture what we need to do to create the filename
+        // TODO: This would have been easier to just use PathBuf::add_extension, but it requires 1.91
+        let file_name_with_ext = |ext: &str| -> PathBuf {
+            let name = if self.is_main() {
+                name
+            } else {
+                self.path
+                    .file_stem()
+                    .and_then(|f| f.to_str())
+                    .unwrap_or(name)
+            };
+            let filename = if debug_name {
+                format!("{}-{}-{}-debug.{}", name, version, cfg.target_arch, ext)
+            } else {
+                format!("{}-{}-{}.{}", name, version, cfg.target_arch, ext)
+            };
+            let filename = if let Some(path_str) = output {
+                trace!("Using the explicitly specified output path for the MSI destination");
+                let path = std::path::Path::new(path_str);
+                if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
+                    path.join(filename)
+                } else {
+                    path.to_owned()
+                }
+            } else {
+                trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
+                target_directory.join(crate::WIX).join(filename)
+            };
+            filename
+        };
+
+        let mut path = self.path.clone();
+        for output_type in ["msi", "exe"] {
+            path.set_extension(output_type);
+            if path.exists() {
+                let filename = file_name_with_ext(output_type);
+                std::fs::rename(&path, &filename)?;
+                debug!("Moving {path:?} to {filename:?}");
+                return Ok(());
+            }
+        }
+
+        error!("Expected {:?} to have output files", self.path);
+        Err("Could not find package output for source".into())
+    }
+
+    fn is_main(&self) -> bool {
+        self.path.file_stem() == Some(OsStr::new("main"))
     }
 }
 
@@ -140,6 +233,7 @@ mod tests {
         assert_eq!(
             false,
             WixSource {
+                is_package: false,
                 wxs_schema: WxsSchema::Legacy,
                 path: PathBuf::new(),
                 exts: vec![],
@@ -152,6 +246,7 @@ mod tests {
         assert_eq!(
             true,
             WixSource {
+                is_package: false,
                 wxs_schema: WxsSchema::Legacy,
                 path: PathBuf::new(),
                 exts: vec![],
@@ -164,6 +259,7 @@ mod tests {
         assert_eq!(
             false,
             WixSource {
+                is_package: false,
                 wxs_schema: WxsSchema::V4,
                 path: PathBuf::new(),
                 exts: vec![],
@@ -181,6 +277,7 @@ mod tests {
         use std::path::PathBuf;
 
         let source = WixSource {
+            is_package: true,
             wxs_schema: crate::toolset::project::WxsSchema::V4,
             path: PathBuf::new(),
             exts: vec![Box::new(UnknownExtNamespace {

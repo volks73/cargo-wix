@@ -175,10 +175,11 @@ impl Execution {
         debug!("{manifest:?}");
         debug!("Resolving package");
         let package = crate::package(&manifest, self.package.as_deref())?;
-        debug!("{package:?}");
 
         debug!("Evaluating project and beginning setup");
         let project = self.create_project(&package)?;
+
+        debug!("Migrating project");
         self.toolset_setup_mode.migrate(project)?;
         Ok(())
     }
