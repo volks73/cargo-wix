@@ -31,11 +31,6 @@ pub struct WixSource {
     /// Toolset this source is using
     pub(super) toolset: Toolset,
     /// True if this source defines a package
-    ///
-    /// Wix v4 unified the top-level root such that if the .wxs file will have either <Package> or <Fragment>
-    /// Whether a .msi or .exe is created depends on the inner definition of <Package>
-    ///
-    /// By including this flag, after `wix build` is called, we can move the files to the appropriate output directory
     pub(super) is_package: bool,
 }
 
