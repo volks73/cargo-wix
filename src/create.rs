@@ -622,13 +622,22 @@ impl Execution {
                     s.push(&target_bin_dir);
                     s
                 });
-            
-            // Applies all `-ext` flags
-            project.configure_toolset_extensions(
-                &mut compiler,
-            )?;
 
-            compiler.args(["-pdbtype", "none"]); // Analagous to light.exe -spdb
+            // "Linker" flags
+            compiler
+                // Analagous to light.exe -spdb
+                .args(["-pdbtype", "none"])
+                // Replaces light.exe -cultures:{culture}
+                .arg("-culture")
+                .arg(culture.to_string());
+
+            // Applies all `-ext` flags
+            project.configure_toolset_extensions(&mut compiler)?;
+
+            if let Some(ref l) = locale {
+                trace!("Using the a WiX localization file");
+                compiler.arg("-loc").arg(l);
+            }
         }
 
         if let Some(args) = &compiler_args {
