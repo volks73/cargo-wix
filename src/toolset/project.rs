@@ -19,10 +19,13 @@
 //!
 //! The `Project` type is the entrypoint for all major utilities provided by the toolset module.
 
+use crate::toolset::ToolsetCommand;
+
 use super::source::WixSource;
 use super::{ext::PackageCache, Toolset};
 use clap::ValueEnum;
 use log::debug;
+use std::collections::BTreeSet;
 use std::{collections::BTreeMap, path::PathBuf};
 use sxd_xpath::{evaluate_xpath, Context, Factory, Value};
 
@@ -86,6 +89,7 @@ pub fn open_wxs_source(path: PathBuf) -> crate::Result<WixSource> {
                     _ => WxsSchema::Unsupported,
                 };
 
+                // Check if this .wxs file is a "package"
                 let is_package = match default {
                     Some(ns) => {
                         let mut context = Context::new();
@@ -136,6 +140,7 @@ impl Project {
     /// Tries to create a new WiX project context
     ///
     /// Returns an error if the modern wix toolset is not installed
+    #[inline]
     pub fn try_new(toolset: Toolset) -> crate::Result<Self> {
         let wix_version_output = toolset.wix("--version")?.output()?;
 
@@ -158,9 +163,24 @@ impl Project {
         }
     }
 
-    /// Returns the Side-by-Side (sxs) folder name
-    pub fn sxs_folder_name(&self) -> String {
-        format!("wix{}", self.wix_version.major)
+    /// Configures a toolset command from project state
+    #[inline]
+    pub fn configure_toolset_extensions(&self, toolset: &mut ToolsetCommand) -> crate::Result<()> {
+        // Find all Wix extensions being used
+        let ext_flags = self
+            .sources()
+            .flat_map(|s| s.exts.iter().map(|e| e.package_name()))
+            .fold(BTreeSet::new(), |mut acc, p| {
+                acc.insert(p);
+                acc
+            });
+
+        // Apply all required `-ext` flags to toolset command
+        for ext in ext_flags.iter() {
+            toolset.args(["-ext", ext]);
+        }
+
+        Ok(())
     }
 
     /// Adds a *.wxs source to the upgrade context
@@ -168,6 +188,7 @@ impl Project {
     /// Analyzes the *.wxs file to determine if the source requires conversion
     ///
     /// Returns an error if the *.wxs file is not valid XML
+    #[inline]
     pub fn add_wxs(&mut self, source: PathBuf) -> crate::Result<()> {
         if let std::collections::btree_map::Entry::Vacant(e) =
             self.wxs_sources.entry(source.clone())
@@ -184,6 +205,7 @@ impl Project {
     /// Converts all of the source files that are part of the upgrade
     ///
     /// If a target directory is provided, none of the original source files will be updated
+    #[inline]
     pub fn upgrade(&mut self, work_dir: Option<&PathBuf>) -> crate::Result<()> {
         let mut converted = BTreeMap::new();
         for (path, src) in self.wxs_sources.iter().collect::<Vec<_>>() {
@@ -216,7 +238,8 @@ impl Project {
     #[inline]
     pub fn restore(&mut self, use_global: bool, work_dir: Option<&PathBuf>) -> crate::Result<()> {
         self.package_cache
-            .install_missing(use_global, self.wix_version.clone(), work_dir)
+            .install_missing(use_global, self.wix_version.clone(), work_dir)?;
+        Ok(())
     }
 
     /// Returns an iterator over wix sources
@@ -226,6 +249,7 @@ impl Project {
     }
 
     /// Load installed ext cache
+    #[inline]
     fn load_ext_cache(&mut self) -> crate::Result<()> {
         fn build_package_cache(
             output: std::process::Output,
@@ -279,13 +303,19 @@ impl Project {
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use assert_fs::TempDir;
+    use cargo_metadata::Package;
+
     use super::Project;
-    use crate::toolset::{
-        ext::{WellKnownExtentions, WixExtension},
-        project::{open_wxs_source, WxsSchema},
-        source::WixSource,
-        test::{self, ok_stdout},
-        ToolsetAction,
+    use crate::{
+        tests::setup_project,
+        toolset::{
+            ext::{WellKnownExtentions, WixExtension},
+            project::{open_wxs_source, WxsSchema},
+            source::WixSource,
+            test::{self, ok_stdout},
+            Includes, ProjectProvider, Toolset, ToolsetAction,
+        },
     };
     use std::{collections::BTreeSet, path::PathBuf};
 
@@ -320,11 +350,10 @@ pub(crate) mod tests {
 
     #[test]
     fn test_project_upgrade() {
-        let (test_dir, mut project) =
-            create_test_project(stringify!(test_project_upgrade), "post_v4");
-
+        let test_toolset = TestProject::new(stringify!(test_project_upgrade), "post_v4");
+        let mut project = test_toolset.create_project(&test_toolset.package).unwrap();
         project
-            .upgrade(Some(&test_dir))
+            .upgrade(test_toolset.work_dir().as_ref())
             .expect("should be able to convert");
 
         let missing = project
@@ -337,15 +366,16 @@ pub(crate) mod tests {
 
     #[test]
     fn test_project_upgrade_extension_detection() {
-        let (test_dir, mut project) = create_test_project(
+        let test_toolset = TestProject::new(
             stringify!(test_project_upgrade_extension_detection),
             "well_known_exts",
         );
+        let mut project = test_toolset.create_project(&test_toolset.package).unwrap();
         project
-            .upgrade(Some(&test_dir))
+            .upgrade(test_toolset.work_dir().as_ref())
             .expect("should be able to convert");
 
-        let test_wxs = test_dir.join("main.test_project_upgrade_extension_detection.wxs");
+        let test_wxs = test_toolset.work_dir().unwrap().join("main.test_project_upgrade_extension_detection.wxs");
         let wxs_source = project
             .wxs_sources
             .get(&test_wxs)
@@ -370,90 +400,6 @@ pub(crate) mod tests {
         validate_wxs_ext(wxs_source, WellKnownExtentions::VS);
     }
 
-    pub fn create_test_project(
-        test_name: &str,
-        expected_wxs_name: &'static str,
-    ) -> (PathBuf, Project) {
-        const PACKAGES: &[&str] = &[
-            "WixToolset.BootstrapperApplications.wixext/0.0.0",
-            "WixToolset.ComPlus.wixext/0.0.0",
-            "WixToolset.Dependency.wixext/0.0.0",
-            "WixToolset.DirectX.wixext/0.0.0",
-            "WixToolset.Firewall.wixext/0.0.0",
-            "WixToolset.Http.wixext/0.0.0",
-            "WixToolset.Iis.wixext/0.0.0",
-            "WixToolset.Msmq.wixext/0.0.0",
-            "WixToolset.Netfx.wixext/0.0.0",
-            "WixToolset.PowerShell.wixext/0.0.0",
-            "WixToolset.Sql.wixext/0.0.0",
-            "WixToolset.UI.wixext/0.0.0",
-            "WixToolset.Util.wixext/0.0.0",
-            "WixToolset.VisualStudio.wixext/0.0.0",
-        ];
-
-        let test_dir = PathBuf::from(".test").join(test_name);
-        let test_src_file_name = format!("main.{test_name}.wxs");
-        let test_src = test_dir.join(test_src_file_name);
-
-        // Define test shim to do the "conversion" which is copying over a pre-baked converted file
-        let shim = test::toolset(
-            move |a: &ToolsetAction, cmd: &std::process::Command| match a {
-                ToolsetAction::Convert => {
-                    let args = cmd.get_args();
-                    let dest = args.last().expect("should be the dest");
-
-                    std::fs::copy(
-                        PathBuf::from("tests")
-                            .join("common")
-                            .join(&expected_wxs_name)
-                            .join("main.wxs"),
-                        PathBuf::from(dest),
-                    )
-                    .unwrap();
-                    ok_stdout("")
-                }
-                ToolsetAction::AddGlobalExtension => {
-                    let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
-                    let args = BTreeSet::from_iter(args);
-                    assert!(PACKAGES.iter().all(|p| args.contains(*p)));
-                    ok_stdout("")
-                }
-                ToolsetAction::AddExtension => {
-                    let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
-                    let args = BTreeSet::from_iter(args);
-                    assert!(PACKAGES.iter().all(|p| args.contains(*p)));
-                    ok_stdout("")
-                }
-                ToolsetAction::ListExtension => ok_stdout(""),
-                ToolsetAction::ListGlobalExtension => ok_stdout(""),
-                ToolsetAction::Version => ok_stdout("0.0.0"),
-                a => {
-                    unreachable!("Unexpected action, tried to execute {a:?}")
-                }
-            },
-        );
-
-        // Prepare test directory
-        if test_dir.exists() {
-            std::fs::remove_dir_all(&test_dir).unwrap();
-        }
-        std::fs::create_dir_all(&test_dir).unwrap();
-        std::fs::copy(
-            PathBuf::from("tests")
-                .join("common")
-                .join("pre_v4")
-                .join("main.wxs"),
-            &test_src,
-        )
-        .unwrap();
-
-        let mut project = Project::try_new(shim).unwrap();
-        project
-            .add_wxs(test_src)
-            .expect("Must be able to add src to project");
-        (test_dir, project)
-    }
-
     pub fn validate_wxs_ext(source: &WixSource, ext: impl WixExtension) {
         assert!(source
             .exts
@@ -462,5 +408,113 @@ pub(crate) mod tests {
                 && e.namespace_prefix() == ext.namespace_prefix()
                 && e.namespace_uri() == ext.namespace_uri())
             .is_some());
+    }
+
+    pub struct TestProject {
+        test_dir: TempDir,
+        expected_wxs_name: &'static str,
+        includes: Vec<PathBuf>,
+        pub(crate) package: Package,
+    }
+    const MIN_MANIFEST: &str = r#"[package]
+            name = "Example"
+            version = "0.1.0"
+            authors = ["First Last <first.last@example.com>"]
+        "#;
+
+    impl TestProject {
+        /// Creates a new test toolset
+        pub fn new(test_name: &str, expected_wxs_name: &'static str) -> Self {
+            let project = setup_project(MIN_MANIFEST);
+            let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+            let package = crate::package(&manifest, None).unwrap();
+            let test_dir = project.path().to_path_buf();
+            let test_src_file_name = format!("main.{test_name}.wxs");
+            let test_src = test_dir.join(test_src_file_name);
+            std::fs::copy(
+                PathBuf::from("tests")
+                    .join("common")
+                    .join("pre_v4")
+                    .join("main.wxs"),
+                &test_src,
+            )
+            .unwrap();
+            Self {
+                test_dir: project,
+                expected_wxs_name,
+                includes: vec![test_src],
+                package,
+            }
+        }
+    }
+
+    impl Includes for TestProject {
+        fn includes(&self) -> Option<&Vec<PathBuf>> {
+            Some(&self.includes)
+        }
+    }
+
+    impl ProjectProvider for TestProject {
+        fn work_dir(&self) -> Option<PathBuf> {
+            Some(self.test_dir.path().to_path_buf().clone())
+        }
+
+        fn toolset(&self) -> Toolset {
+            const PACKAGES: &[&str] = &[
+                "WixToolset.BootstrapperApplications.wixext/0.0.0",
+                "WixToolset.ComPlus.wixext/0.0.0",
+                "WixToolset.Dependency.wixext/0.0.0",
+                "WixToolset.DirectX.wixext/0.0.0",
+                "WixToolset.Firewall.wixext/0.0.0",
+                "WixToolset.Http.wixext/0.0.0",
+                "WixToolset.Iis.wixext/0.0.0",
+                "WixToolset.Msmq.wixext/0.0.0",
+                "WixToolset.Netfx.wixext/0.0.0",
+                "WixToolset.PowerShell.wixext/0.0.0",
+                "WixToolset.Sql.wixext/0.0.0",
+                "WixToolset.UI.wixext/0.0.0",
+                "WixToolset.Util.wixext/0.0.0",
+                "WixToolset.VisualStudio.wixext/0.0.0",
+            ];
+
+            let expected_wxs_name = self.expected_wxs_name;
+            // Define test shim to do the "conversion" which is copying over a pre-baked converted file
+            test::toolset(
+                move |a: &ToolsetAction, cmd: &std::process::Command| match a {
+                    ToolsetAction::Convert => {
+                        let args = cmd.get_args();
+                        let dest = args.last().expect("should be the dest");
+
+                        std::fs::copy(
+                            PathBuf::from("tests")
+                                .join("common")
+                                .join(&expected_wxs_name)
+                                .join("main.wxs"),
+                            PathBuf::from(dest),
+                        )
+                        .unwrap();
+                        ok_stdout("")
+                    }
+                    ToolsetAction::AddGlobalExtension => {
+                        let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
+                        let args = BTreeSet::from_iter(args);
+                        assert!(PACKAGES.iter().all(|p| args.contains(*p)));
+                        ok_stdout("")
+                    }
+                    ToolsetAction::AddExtension => {
+                        let args = cmd.get_args().map(|a| a.to_string_lossy().to_string());
+                        let args = BTreeSet::from_iter(args);
+                        assert!(PACKAGES.iter().all(|p| args.contains(*p)));
+                        ok_stdout("")
+                    }
+                    ToolsetAction::ListExtension => ok_stdout(""),
+                    ToolsetAction::ListGlobalExtension => ok_stdout(""),
+                    ToolsetAction::Version => ok_stdout("0.0.0"),
+                    a => {
+                        unreachable!("Unexpected action, tried to execute {a:?}")
+                    }
+                },
+            )
+        }
     }
 }

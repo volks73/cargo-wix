@@ -1863,9 +1863,9 @@ fn main() {
                             - Restoring wix extension packages by analyzing extension dependencies found in wxs files.\n\
                             - Enable vendoring of wix extension dependencies for offline builds\n\
                             \n\
-                            If no additional flags are passed such as: `--restore`, `--upgrade`, `--sxs`, or `--vendor`\n\
+                            If no additional flags are passed such as `--vendor`\n\
                             and no mode is set via `-m` or `--mode`\n\
-                            Then this will apply the 'project' setup mode, meaning:\n\
+                            Then this will apply the 'global' setup mode, meaning:\n\
                             - all wxs files will be converted in place\n\
                             - all wix extensions will be installed globally")
                         .arg(Arg::new("INPUT")
@@ -1882,40 +1882,9 @@ fn main() {
                             .index(1))
                         .arg(package)
                         .arg(include)
-                        .arg(Arg::new("restore")
-                            .long("restore")
-                            .help("Will only restore dependencies from wxs source files in the modern (WiX4+) format.")
-                            .long_help(
-                                "May be combined with --vendor but will be ignored if --sxs is passed.\n\
-                                \n\
-                                If `--restore --vendor` are used, equivalent to `-m restore-vendor` or `--mode restore-vendor`\n\
-                                \n\
-                                Otherwise, if `--restore` is used alone equivalent to `-m restore` or `--mode restore")
-                            .action(ArgAction::SetTrue))
-                        .arg(Arg::new("upgrade")
-                            .long("upgrade")
-                            .help("Will only upgrade legacy wxs files to the modern (WiX4+) format")
-                            .long_help(
-                                "May be combined with --sxs but will be ignored if --vendor is passed.\n\
-                                \n\
-                                If `--upgrade --sxs` are used, this would be equivalent to `-m upgrade-sxs` or `--mode upgrade-sxs`\n\
-                                \n\
-                                Otherwise, if `--upgrade` is used alone Equivalent to `-m upgrade` or `--mode upgrade`")
-                            .action(ArgAction::SetTrue))
-                        .arg(Arg::new("sxs")
-                            .long("sxs")
-                            .help("Will enable side-by-side migration strategy")
-                            .long_help(
-                                "By using side-by-side mode, all migration setup operations\n\
-                                will be executed in a folder corresponding to the major wix version detected. (Ex. \\wix4\\..)\n\
-                                This is suited for complex wix projects where bake\n\
-                                time maybe needed between major wix versions. Implicitly vendors dependencies in the same folder.\n\
-                                \n\
-                                Equivalent to `-m sxs` or `--mode sxs`")
-                            .action(ArgAction::SetTrue))
                         .arg(Arg::new("vendor")
                             .long("vendor")
-                            .help("Will enable vendoring, Note: This is the implicit behavior of `sxs`")
+                            .help("Will enable vendoring when installing WiX extensions")
                             .long_help(
                                 "By using vendoring mode, all extension dependencies will be installed in the current directory\n\
                                 This is suited for proejcts that must be built in environments without network access and/or\n\
@@ -2102,32 +2071,12 @@ fn main() {
             );
             if let Some(mode) = m.get_one::<ToolsetSetupMode>("mode") {
                 match mode {
-                    ToolsetSetupMode::None | ToolsetSetupMode::Project => {}
+                    ToolsetSetupMode::None | ToolsetSetupMode::Global => {}
                     ToolsetSetupMode::Vendor => {
                         setup.vendor(true);
                     }
-                    ToolsetSetupMode::SideBySide => {
-                        setup.sxs(true);
-                    }
-                    ToolsetSetupMode::RestoreOnly => {
-                        setup.restore_only(true);
-                    }
-                    ToolsetSetupMode::RestoreVendorOnly => {
-                        setup.restore_only(true);
-                        setup.vendor(true);
-                    }
-                    ToolsetSetupMode::UpgradeOnly => {
-                        setup.upgrade_only(true);
-                    }
-                    ToolsetSetupMode::UpgradeSideBySideOnly => {
-                        setup.upgrade_only(true);
-                        setup.sxs(true);
-                    }
                 }
             } else {
-                setup.sxs(m.get_flag("sxs"));
-                setup.upgrade_only(m.get_flag("upgrade"));
-                setup.restore_only(m.get_flag("restore"));
                 setup.vendor(m.get_flag("vendor"));
             }
             setup.build().run()

@@ -24,8 +24,9 @@ pub mod project;
 pub mod source;
 #[cfg(test)]
 pub(crate) mod test;
+use cargo_metadata::Package;
 pub use includes::Includes;
-pub use includes::IncludesExt;
+pub use includes::ProjectProvider;
 pub use project::Project;
 
 use crate::BINARY_FOLDER_NAME;
@@ -51,7 +52,7 @@ pub enum Toolset {
     Legacy,
     /// Modern wix toolsets use just "wix.exe" to build the installer
     Modern,
-    /// Test toolkit, used to test code without needing any toolkit installed
+    /// Test toolset, used to test code without needing any toolkit installed
     #[cfg(test)]
     #[clap(skip)]
     Test {
@@ -108,24 +109,30 @@ pub enum ToolsetAction {
 
 /// Enumeration of wix-toolset project setup patterns that can be applied
 ///
-/// WiX toolset project setup consists of two major-operation, **upgrade** or **restore**.
+/// WiX toolset project setup consists of two major-operations, **upgrade** or **restore**.
 ///
 /// - **upgrade**: Convert Wix3 and below *.wxs files to the modern WiX format. Technically only needs to be executed once,
-///                but the setup will try and do the smart thing and upgrade on an as-needed basis.
-/// - **restore**: Detect and install wix extensions required by *.wxs files. Requires all source files to be upgraded.
+///                but the setup will try and do the smart thing and upgrade on an as-needed basis
+/// - **restore**: Detect and install wix extensions required by *.wxs files. Requires all source files to be upgraded
+///
+/// The toolset setup mode indicates whether or not to apply `upgrade` and `restore`.
+///
+/// `upgrade` has the same behavior for all setup modes, however for `restore` there is the option of restoring extensions
+/// in the current directory (vendoring) or restoring extensions globally.
 #[derive(ValueEnum, Copy, Clone, Debug, Default)]
 pub enum ToolsetSetupMode {
     /// Do not apply any setup logic. (Default)
     #[default]
     None,
+    /// Setup project in "global" mode.
+    ///
     /// Upgrade source files in place and install extensions to the global extension cache
     ///
     /// This option is suited to simple one file installer projects, where build pipeline network access will not be
     /// an issue and wix will likely be installed on a dev machine or during the build pipeline on demand.
-    #[clap(name = "project")]
-    Project,
+    #[clap(name = "global")]
+    Global,
     /// Setup project in "vendored" mode.
-    ///
     ///
     /// Upgrade source files in place and install extensions to the current directory
     ///
@@ -133,46 +140,6 @@ pub enum ToolsetSetupMode {
     /// the build will happen in an offline environment
     #[clap(name = "vendor")]
     Vendor,
-    /// Upgrade files side by side and install extensions to the sxs folder
-    ///
-    /// This will copy *.wxs files to a versioned folder with the format `wix{maj}` where `{maj}` is the major version value of wix
-    ///
-    /// This option is suited to tracking changes with source version control systems such as git with
-    /// concise control when migrating to major WiX toolsets. For example, if time to bake is required when
-    /// moving to wix toolsets, versioning in this manner seperates *.wxs and associated extensions into seperate folders
-    /// so that they are unable to cross contaminate
-    #[clap(name = "sxs")]
-    SideBySide,
-    /// Only Restore any missing extensions to the global WiX extension cache
-    ///
-    /// This option is suited for build pipelines where network access is not an issue when building
-    /// the installer
-    #[clap(name = "restore")]
-    RestoreOnly,
-    /// Only Restore any missing extensions to the current directory
-    ///
-    /// This option is suited for setting up build pipelines where network access is unavailable, and
-    /// offline building is required
-    #[clap(name = "restore-vendor")]
-    RestoreVendorOnly,
-    /// Upgrade files in place
-    ///
-    /// Upgrades all *.wxs files that are in the legacy format to the modern format. Only required to be executed once assuming
-    /// all included *.wxs files remain constant
-    ///
-    /// This option is suited for debugging upgrades of simple legacy WiX projects
-    #[clap(name = "upgrade")]
-    UpgradeOnly,
-    /// Upgrade source files in a SxS manner
-    ///
-    /// This will copy *.wxs files to a versioned folder with the format `wix{maj}` where `{maj}` is the major version value of wix
-    ///
-    /// Upgrades all *.wxs files that are in the legacy format to the modern format. Only required to be executed once assuming
-    /// all included *.wxs files remain constant
-    ///
-    /// This option is suited for debugging upgrades of complex legacy WiX projects
-    #[clap(name = "upgrade-sxs")]
-    UpgradeSideBySideOnly,
 }
 
 #[cfg(test)]
@@ -252,78 +219,52 @@ impl Toolset {
 }
 
 impl ToolsetSetupMode {
-    /// Applies migration setup operation on the Project
-    pub fn migrate(self, mut project: Project) -> crate::Result<()> {
+    /// Returns a project and applies any required project setup required
+    ///
+    /// If vendor mode is enabled, this will ensure a local extension cache folder has been created
+    ///
+    /// If the current toolset setup mode is not `ToolsetSetupMode::None`, this will also apply project migration before returning the project
+    #[inline]
+    pub fn setup(
+        &self,
+        provider: &impl ProjectProvider,
+        package: &Package,
+        work_dir: Option<PathBuf>,
+    ) -> crate::Result<Project> {
+        if matches!(self, ToolsetSetupMode::Vendor) {
+            debug!("Vendored mode is enabled, check for the local extension cache");
+            let work_dir = work_dir.unwrap_or(std::env::current_dir()?);
+
+            let local_ext_dir = work_dir.join(".wix").join("extensions");
+            if !local_ext_dir.exists() {
+                debug!("Vendored mode is enabled, check for the local extension cache");
+                std::fs::create_dir_all(local_ext_dir)?;
+            }
+        }
+
+        let mut project = provider.create_project(package)?;
         match self {
             ToolsetSetupMode::None => {}
             _ => {
-                debug!("Starting toolset upgrade checks");
-                let work_dir = if self.use_sxs() {
-                    let current = std::env::current_dir()?;
-                    let sxs_folder = current.join(project.sxs_folder_name());
-                    debug!("Using SxS folder as work_dir: {sxs_folder:?}");
-                    std::fs::create_dir_all(&sxs_folder)?;
-                    Some(sxs_folder)
-                } else {
-                    None
-                };
-
-                if self.can_upgrade() {
-                    debug!("Starting project upgrade");
-                    project.upgrade(work_dir.as_ref())?;
-                }
-
-                if self.can_restore() {
-                    debug!("Restoring any missing extension packages");
-                    project.restore(self.use_global(), work_dir.as_ref())?;
-                }
+                debug!("Starting project upgrade");
+                project.upgrade(None)?;
+                debug!("Restoring any missing extension packages");
+                project.restore(self.use_global(), None)?;
             }
         }
-        Ok(())
+        Ok(project)
     }
 
     /// Returns true if setup is enabled
+    #[inline]
     pub fn is_enabled(&self) -> bool {
         !matches!(self, ToolsetSetupMode::None)
     }
 
-    /// Returns true if restore is allowed according to the toolset mode
-    fn can_restore(&self) -> bool {
-        matches!(
-            self,
-            ToolsetSetupMode::RestoreOnly
-                | ToolsetSetupMode::Project
-                | ToolsetSetupMode::Vendor
-                | ToolsetSetupMode::SideBySide
-        )
-    }
-
-    /// Returns true if convert is allowed according to the toolset mode
-    fn can_upgrade(&self) -> bool {
-        matches!(
-            self,
-            ToolsetSetupMode::UpgradeOnly
-                | ToolsetSetupMode::UpgradeSideBySideOnly
-                | ToolsetSetupMode::Project
-                | ToolsetSetupMode::Vendor
-                | ToolsetSetupMode::SideBySide
-        )
-    }
-
     /// Returns true if the global extension package cache should be used
-    fn use_global(&self) -> bool {
-        matches!(
-            self,
-            ToolsetSetupMode::Project | ToolsetSetupMode::RestoreOnly
-        )
-    }
-
-    /// Returns true if SxS mode should be used
-    fn use_sxs(&self) -> bool {
-        matches!(
-            self,
-            ToolsetSetupMode::UpgradeSideBySideOnly | ToolsetSetupMode::SideBySide
-        )
+    #[inline]
+    pub fn use_global(&self) -> bool {
+        matches!(self, ToolsetSetupMode::Global)
     }
 }
 
@@ -592,11 +533,13 @@ impl DerefMut for ToolsetCommand {
 
 #[cfg(test)]
 mod tests {
+    use serial_test::serial;
+
     use super::test;
     use super::ToolsetAction;
-    use super::ToolsetSetupMode;
+    use crate::toolset::ProjectProvider;
     use crate::toolset::Toolset;
-    use serial_test::serial;
+    use crate::toolset::ToolsetSetupMode;
     use std::path::PathBuf;
 
     #[test]
@@ -720,47 +663,60 @@ mod tests {
 
     #[test]
     #[serial]
-    fn test_toolset_migrate_project_mode() {
-        let (_, project) = super::project::tests::create_test_project(
+    fn test_toolset_migrate_global_mode() {
+        let test_toolset = super::project::tests::TestProject::new(
             stringify!(test_toolset_setup_mode_migrate),
             "well_known_exts",
         );
-        ToolsetSetupMode::Project
-            .migrate(project)
+        let project = ToolsetSetupMode::Global
+            .setup(
+                &test_toolset,
+                &test_toolset.package,
+                test_toolset.work_dir(),
+            )
             .expect("should work");
-    }
-
-    #[test]
-    #[serial]
-    fn test_toolset_migrate_sxs_mode() {
-        let sxs_folder = PathBuf::from("wix0");
-        let sxs_wxs = sxs_folder.join("main.test_toolset_migrate_sxs_mode.wxs");
-        let _ = std::fs::remove_dir_all(&sxs_folder);
-
-        let (_, project) = super::project::tests::create_test_project(
-            stringify!(test_toolset_migrate_sxs_mode),
-            "well_known_exts",
+        assert!(
+            !test_toolset
+                .work_dir()
+                .unwrap()
+                .join(".wix")
+                .join("extensions")
+                .exists(),
+            "Ensure local extension cache was not created, since global uses global extension cache"
         );
-        ToolsetSetupMode::SideBySide
-            .migrate(project)
-            .expect("should work");
-
-        assert!(sxs_folder.exists());
-        assert!(sxs_folder.is_dir());
-
-        assert!(sxs_wxs.exists());
-        assert!(sxs_wxs.is_file());
+        for s in project.sources() {
+            // Check source was upgraded
+            assert!(s.is_modern());
+        }
     }
 
     #[test]
     #[serial]
     fn test_toolset_migrate_vendor_mode() {
-        let (_, project) = super::project::tests::create_test_project(
+        let test_toolset = super::project::tests::TestProject::new(
             stringify!(test_toolset_migrate_vendor_mode),
             "well_known_exts",
         );
-        ToolsetSetupMode::Vendor
-            .migrate(project)
+        let project = ToolsetSetupMode::Vendor
+            .setup(
+                &test_toolset,
+                &test_toolset.package,
+                test_toolset.work_dir(),
+            )
             .expect("should work");
+        assert!(
+            test_toolset
+                .work_dir()
+                .unwrap()
+                .join(".wix")
+                .join("extensions")
+                .exists(),
+            "Must create local wix extension cache in vendor mode"
+        );
+
+        for s in project.sources() {
+            // Check source was upgraded
+            assert!(s.is_modern());
+        }
     }
 }

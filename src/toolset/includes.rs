@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{Error, WIX, WIX_SOURCE_FILE_EXTENSION};
+use crate::{toolset::Toolset, Error, WIX, WIX_SOURCE_FILE_EXTENSION};
 use cargo_metadata::Package;
 use log::{debug, trace};
 use std::path::PathBuf;
@@ -121,7 +121,15 @@ pub trait Includes {
 }
 
 /// Extension functions for implementations of Include
-pub trait IncludesExt: Includes {
+pub trait ProjectProvider: Includes {
+    /// Returns a working directory override
+    fn work_dir(&self) -> Option<PathBuf> {
+        None
+    }
+
+    /// Return the toolset to use when creating projects
+    fn toolset(&self) -> Toolset;
+
     /// Derives a project from a Package and the current `impl Includes`
     ///
     /// Returns an error if the *.wxs sources cannot be enumerated, if
@@ -133,7 +141,7 @@ pub trait IncludesExt: Includes {
         debug!("wxs_sources = {wxs_sources:#?}");
 
         debug!("Trying to create new project");
-        let mut project = Project::try_new(crate::toolset::Toolset::Modern)?;
+        let mut project = Project::try_new(self.toolset())?;
         debug!("project = {project:#?}");
 
         for src in wxs_sources {
@@ -146,4 +154,13 @@ pub trait IncludesExt: Includes {
     }
 }
 
-impl<I: Includes> IncludesExt for I {}
+impl ProjectProvider for crate::create::Execution {
+    fn toolset(&self) -> Toolset {
+        self.toolset.clone()
+    }
+}
+impl ProjectProvider for crate::migrate::Execution {
+    fn toolset(&self) -> Toolset {
+        Toolset::Modern
+    }
+}

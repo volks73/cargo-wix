@@ -29,9 +29,6 @@ pub struct Builder<'a> {
     input: Option<&'a str>,
     package: Option<&'a str>,
     includes: Option<Vec<&'a str>>,
-    restore_only: bool,
-    upgrade_only: bool,
-    sxs: bool,
     vendor: bool,
 }
 
@@ -42,9 +39,6 @@ impl<'a> Builder<'a> {
             input: None,
             package: None,
             includes: None,
-            restore_only: false,
-            upgrade_only: false,
-            sxs: false,
             vendor: false,
         }
     }
@@ -87,33 +81,7 @@ impl<'a> Builder<'a> {
         self
     }
 
-    /// Will only upgrade any legacy *.wxs files
-    pub fn upgrade_only(&mut self, upgrade: bool) -> &mut Self {
-        self.upgrade_only = upgrade;
-        self
-    }
-
-    /// Will only restore any missing packages, and will not try to convert any source files.
-    ///
-    /// However, if source files are not upgraded to the modern format dependencies cannot be detected.
-    pub fn restore_only(&mut self, restore: bool) -> &mut Self {
-        self.restore_only = restore;
-        self
-    }
-
-    /// Will enable side by side mode
-    ///
-    /// Can be used with `--upgrade-only` but is ignored if combined with `--restore-only`, otherwise if neither
-    /// flag is used will apply both upgrade and restore on the project
-    pub fn sxs(&mut self, enable_side_by_side: bool) -> &mut Self {
-        self.sxs = enable_side_by_side;
-        self
-    }
-
-    /// Will enable vendor mode
-    ///
-    /// Can be used with `--restore-only` but will be ignored if `--upgrade-only` is applied, otherwise if neither
-    /// flag is used will apply both upgrade and restore on the project
+    /// Enables vendored mode when restoring Wix extensions
     pub fn vendor(&mut self, vendored: bool) -> &mut Self {
         self.vendor = vendored;
         self
@@ -130,24 +98,10 @@ impl<'a> Builder<'a> {
                 .includes
                 .as_ref()
                 .map(|v| v.iter().map(&PathBuf::from).collect()),
-            toolset_setup_mode: if self.restore_only {
-                if self.vendor {
-                    ToolsetSetupMode::RestoreVendorOnly
-                } else {
-                    ToolsetSetupMode::RestoreOnly
-                }
-            } else if self.upgrade_only {
-                if self.sxs {
-                    ToolsetSetupMode::UpgradeSideBySideOnly
-                } else {
-                    ToolsetSetupMode::UpgradeOnly
-                }
-            } else if self.sxs {
-                ToolsetSetupMode::SideBySide
-            } else if self.vendor {
+            toolset_setup_mode: if self.vendor {
                 ToolsetSetupMode::Vendor
             } else {
-                ToolsetSetupMode::Project
+                ToolsetSetupMode::Global
             },
         }
     }
@@ -177,10 +131,7 @@ impl Execution {
         let package = crate::package(&manifest, self.package.as_deref())?;
 
         debug!("Evaluating project and beginning setup");
-        let project = self.create_project(&package)?;
-
-        debug!("Migrating project");
-        self.toolset_setup_mode.migrate(project)?;
+        self.toolset_setup_mode.setup(&self, &package, None)?;
         Ok(())
     }
 }

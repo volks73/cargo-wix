@@ -23,7 +23,7 @@
 //! can be set with the `input` method using the `Builder` struct.
 
 use crate::toolset::Includes;
-use crate::toolset::IncludesExt;
+use crate::toolset::ProjectProvider;
 use crate::toolset::Toolset;
 use crate::toolset::ToolsetSetupMode;
 use crate::Cultures;
@@ -433,7 +433,7 @@ pub struct Execution {
     locale: Option<PathBuf>,
     name: Option<String>,
     no_build: bool,
-    toolset: Toolset,
+    pub(crate) toolset: Toolset,
     toolset_setup_mode: ToolsetSetupMode,
     install: bool,
     output: Option<String>,
@@ -559,20 +559,6 @@ impl Execution {
         };
         debug!("compiler = {:?}", compiler);
 
-        // Toolset upgrading only makes sense if the modern toolset is being used
-        if self.toolset.is_modern() {
-            match &self.toolset_setup_mode {
-                ToolsetSetupMode::None => {
-                    debug!("No toolset upgrade mode is set");
-                }
-                _ => {
-                    debug!("Starting toolset upgrade checks");
-                    let project = self.create_project(&package)?;
-                    self.toolset_setup_mode.migrate(project)?;
-                }
-            }
-        }
-
         if self.capture_output {
             trace!("Capturing the '{}' output", WIX_COMPILER);
             compiler.stdout(Stdio::null());
@@ -606,6 +592,8 @@ impl Execution {
                 .arg("-o")
                 .arg(&wixobj_destination);
         } else {
+            let project = self.toolset_setup_mode.setup(&self, &package, None)?;
+
             if let Some(vendor) = &cfg.target_vendor {
                 compiler.arg("-d").arg(format!("TargetVendor={vendor}"));
             }
@@ -633,12 +621,14 @@ impl Execution {
                     let mut s = OsString::from("CargoTargetBinDir=");
                     s.push(&target_bin_dir);
                     s
-                })
-                .arg("-ext")
-                .arg("WixToolset.UI.wixext")
-                .args(["-pdbtype", "none"]); // Analagous to light.exe -spdb
+                });
+            
+            // Applies all `-ext` flags
+            project.configure_toolset_extensions(
+                &mut compiler,
+            )?;
 
-            // compiler.arg("-o").arg(&installer_destination);
+            compiler.args(["-pdbtype", "none"]); // Analagous to light.exe -spdb
         }
 
         if let Some(args) = &compiler_args {

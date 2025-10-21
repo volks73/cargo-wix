@@ -47,28 +47,45 @@ pub struct PackageCache {
 
 impl PackageCache {
     /// Add an installed package to the cache
+    #[inline]
     pub fn add(&mut self, name: impl Into<String>, version: Version) {
         self.installed.insert(name.into(), version);
     }
 
     /// Returns true if an ext is installed matching the
+    #[inline]
     pub fn installed(&self, ext: &impl WixExtension) -> bool {
-        self.installed.contains_key(ext.package_name())
+        self.installed_package_name(ext.package_name())
+    }
+
+    /// Returns true if an installed package_name exists
+    #[inline]
+    pub fn installed_package_name(&self, package_name: &str) -> bool {
+        self.installed.contains_key(package_name)
     }
 
     /// Returns an iterator over missing extensions
+    #[inline]
     pub fn iter_missing(&self) -> impl Iterator<Item = &String> {
         self.missing.iter()
     }
 
+    /// Returns an iterator over installed extensions
+    #[inline]
+    pub fn iter_installed(&self) -> impl Iterator<Item = (&String, &Version)> {
+        self.installed.iter()
+    }
+
     /// Add's a missing package to the package cache for later installation
+    #[inline]
     pub fn add_missing(&mut self, name: impl Into<String>) {
         self.missing.insert(name.into());
     }
 
     /// Installs all missing packages
+    #[inline]
     pub fn install_missing(
-        &mut self,
+        &self,
         global_cache: bool,
         version: Version,
         work_dir: Option<&PathBuf>,
