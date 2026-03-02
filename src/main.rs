@@ -1766,7 +1766,7 @@ fn main() {
                     .long("migrate")
                     .help("Toolset migration setup mode to use before building the installer")
                     .long_help(
-                        "Note: Only applied if `--toolset modern` is present, if not migration setup is required this will have no additional effect\n\
+                        "Note: Only applied if `--toolset modern` is present, if no migration setup is required this will have no additional effect\n\
                         When enabled, this will perform checks to ensure that the current wix environment\n\
                         is up to date before attempting to build the installer which includes:\n\
                         \t1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting\n\
