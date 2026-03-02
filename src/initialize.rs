@@ -555,6 +555,7 @@ mod tests {
             assert!(actual.product_icon.is_none());
             assert!(actual.product_name.is_none());
             assert!(actual.upgrade_guid.is_none());
+            assert!(actual.schema.is_none());
         }
 
         #[test]
@@ -691,6 +692,22 @@ mod tests {
         }
 
         #[test]
+        fn schema_works() {
+            use crate::toolset::project::WxsSchema;
+            let mut actual = Builder::new();
+            actual.schema(Some(WxsSchema::V4));
+            assert_eq!(actual.schema, Some(WxsSchema::V4));
+        }
+
+        #[test]
+        fn schema_defaults_to_legacy_in_execution() {
+            use crate::toolset::project::WxsSchema;
+            let mut b = Builder::new();
+            let execution = b.build();
+            assert!(matches!(execution.schema, WxsSchema::Legacy));
+        }
+
+        #[test]
         fn build_with_defaults_works() {
             let mut b = Builder::new();
             let default_execution = b.build();
@@ -708,6 +725,10 @@ mod tests {
             assert!(default_execution.product_icon.is_none());
             assert!(default_execution.product_name.is_none());
             assert!(default_execution.upgrade_guid.is_none());
+            assert!(matches!(
+                default_execution.schema,
+                crate::toolset::project::WxsSchema::Legacy
+            ));
         }
 
         #[test]

@@ -147,3 +147,84 @@ impl<'a> Default for Builder<'a> {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builder_defaults() {
+        let builder = Builder::new();
+        assert!(builder.input.is_none());
+        assert!(builder.package.is_none());
+        assert!(builder.includes.is_none());
+        assert!(!builder.vendor);
+    }
+
+    #[test]
+    fn builder_input_works() {
+        let mut builder = Builder::new();
+        builder.input(Some("path/to/Cargo.toml"));
+        assert_eq!(builder.input, Some("path/to/Cargo.toml"));
+    }
+
+    #[test]
+    fn builder_package_works() {
+        let mut builder = Builder::new();
+        builder.package(Some("my-package"));
+        assert_eq!(builder.package, Some("my-package"));
+    }
+
+    #[test]
+    fn builder_includes_works() {
+        let mut builder = Builder::new();
+        builder.includes(Some(vec!["a.wxs", "b.wxs"]));
+        assert_eq!(builder.includes, Some(vec!["a.wxs", "b.wxs"]));
+    }
+
+    #[test]
+    fn builder_vendor_works() {
+        let mut builder = Builder::new();
+        builder.vendor(true);
+        assert!(builder.vendor);
+    }
+
+    #[test]
+    fn build_sets_global_mode_by_default() {
+        let execution = Builder::new().build();
+        assert!(matches!(
+            execution.toolset_setup_mode,
+            ToolsetSetupMode::Global
+        ));
+    }
+
+    #[test]
+    fn build_sets_vendor_mode_when_vendor_enabled() {
+        let mut builder = Builder::new();
+        builder.vendor(true);
+        let execution = builder.build();
+        assert!(matches!(
+            execution.toolset_setup_mode,
+            ToolsetSetupMode::Vendor
+        ));
+    }
+
+    #[test]
+    fn build_converts_input_to_pathbuf() {
+        let mut builder = Builder::new();
+        builder.input(Some("some/path"));
+        let execution = builder.build();
+        assert_eq!(execution.input, Some(PathBuf::from("some/path")));
+    }
+
+    #[test]
+    fn build_converts_includes_to_pathbufs() {
+        let mut builder = Builder::new();
+        builder.includes(Some(vec!["a.wxs", "b.wxs"]));
+        let execution = builder.build();
+        assert_eq!(
+            execution.includes,
+            Some(vec![PathBuf::from("a.wxs"), PathBuf::from("b.wxs")])
+        );
+    }
+}

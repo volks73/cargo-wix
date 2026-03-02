@@ -21,6 +21,11 @@
 //! (`light.exe`). By default, it looks for a `wix\main.wxs` file relative to
 //! the root of the package's manifest (Cargo.toml). A different WiX Source file
 //! can be set with the `input` method using the `Builder` struct.
+//!
+//! When using the modern WiX Toolset (v4+) via `--toolset modern`, the build
+//! uses `wix build` instead of the separate compile and link steps. The
+//! `--migrate` flag can be used to automatically convert WiX v3 source files
+//! and install required extension packages before building.
 
 use crate::toolset::Includes;
 use crate::toolset::ProjectProvider;
@@ -594,6 +599,42 @@ impl Execution {
         } else {
             let project = self.toolset_setup_mode.setup(&self, &package, None)?;
 
+            // Determine installer type from wxs content before building
+            let pkg_count = project.package_count();
+            debug!("pkg_count = {:?}", pkg_count);
+            if pkg_count == 0 && !project.is_bundle() {
+                return Err(Error::Generic(String::from(
+                    "No WiX <Package> or <Bundle> definition was found in any of the \
+                     source files. There needs to be at least one package or bundle \
+                     definition for the installer to be created."
+                )));
+            }
+            // `wix build` produces a single output file per invocation.
+            // Multiple `<Package>` definitions across source files is not supported.
+            if pkg_count > 1 {
+                return Err(Error::Generic(format!(
+                    "Found {pkg_count} WiX package definitions across the source files. \
+                     The modern WiX toolset (wix build) can only produce one installer per \
+                     invocation. Please separate your WiX sources so that only one source \
+                     file defines a <Package> element, or build each package source separately."
+                )));
+            }
+
+            let installer_kind = project.installer_kind();
+            debug!("installer_kind = {:?}", installer_kind);
+            let installer_destination = self.installer_destination(
+                &name,
+                &version,
+                &cfg,
+                debug_name,
+                &installer_kind,
+                &package,
+                manifest.target_directory.as_std_path(),
+            );
+            debug!("installer_destination = {:?}", installer_destination);
+
+            // In WiX v4+, `-d` is a separate flag from the key=value pair
+            // (two args: `-d Key=Value`). Legacy candle.exe uses a single arg: `-dKey=Value`.
             if let Some(vendor) = &cfg.target_vendor {
                 compiler.arg("-d").arg(format!("TargetVendor={vendor}"));
             }
@@ -624,12 +665,17 @@ impl Execution {
                 });
 
             // "Linker" flags
+            // In WiX v4+, `-pdbtype none` replaces the legacy `light.exe -spdb`
+            // flag to suppress PDB generation. The `-culture` flag replaces the legacy `-cultures:{v}`
+            // colon-delimited syntax.
             compiler
-                // Analagous to light.exe -spdb
                 .args(["-pdbtype", "none"])
-                // Replaces light.exe -cultures:{culture}
                 .arg("-culture")
                 .arg(culture.to_string());
+
+            // `wix build -o <path>` infers the output type (msi vs exe) from
+            // the file extension. This is unlike legacy `light.exe -out` which accepts a directory.
+            compiler.arg("-o").arg(&installer_destination);
 
             // Applies all `-ext` flags
             project.configure_toolset_extensions(&mut compiler)?;
@@ -643,6 +689,12 @@ impl Execution {
         if let Some(args) = &compiler_args {
             trace!("Appending compiler arguments");
             compiler.args(args);
+        }
+        if self.toolset.is_modern() {
+            if let Some(args) = &linker_args {
+                trace!("Appending linker arguments to wix build");
+                compiler.args(args);
+            }
         }
         compiler.args(&wxs_sources);
         debug!("command = {:?}", compiler);
@@ -681,18 +733,44 @@ impl Execution {
         }
 
         if self.toolset.is_modern() {
-            // Since `build` no longer includes a compile/link phase, the installer type cannot be determined from a .wixobj
-            // wix will now just determine the output type from the .wxs itself
-            let project = self.create_project(&package)?;
-            for s in project.sources() {
-                s.try_move_to_installer_destination(
+            // Launch the installer (modern path)
+            if self.install {
+                info!("Launching the installer");
+                let project = self.create_project(&package)?;
+                let installer_kind = project.installer_kind();
+                let dest = self.installer_destination(
                     &name,
                     &version,
                     &cfg,
                     debug_name,
+                    &installer_kind,
+                    &package,
                     manifest.target_directory.as_std_path(),
-                    self.output.as_ref(),
-                )?;
+                );
+                let status = match installer_kind {
+                    InstallerKind::Exe => {
+                        // Bundles produce .exe files that are launched directly
+                        debug!("Launching bundle installer: {:?}", dest);
+                        Command::new(&dest).status()?
+                    }
+                    InstallerKind::Msi => {
+                        // MSI packages are installed via msiexec
+                        debug!("Launching MSI installer via msiexec: {:?}", dest);
+                        let mut installer = Command::new(MSIEXEC);
+                        installer.arg("/i").arg(&dest);
+                        installer.status()?
+                    }
+                };
+                if !status.success() {
+                    return Err(Error::Command(
+                        match installer_kind {
+                            InstallerKind::Exe => "bundle",
+                            InstallerKind::Msi => MSIEXEC,
+                        },
+                        status.code().unwrap_or(100),
+                        self.capture_output,
+                    ));
+                }
             }
         }
 

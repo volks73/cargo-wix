@@ -58,6 +58,17 @@ impl WixSource {
         matches!(self.wxs_schema, WxsSchema::V4)
     }
 
+    /// Returns true if this source uses the bootstrapper applications (bal) namespace,
+    /// indicating it produces a bundle (.exe) rather than an MSI package.
+    ///
+    /// The `bal` (WixBalExtension) namespace is required for bootstrapper bundles,
+    /// so its presence reliably indicates a bundle.
+    pub fn is_bundle(&self) -> bool {
+        self.exts
+            .iter()
+            .any(|e| e.namespace_prefix() == "bal")
+    }
+
     /// Checks that the dependencies required by this *.wxs file exist in the package cache
     pub fn check_deps(&self, package_cache: &mut PackageCache) {
         for ext in self
@@ -286,5 +297,39 @@ mod tests {
         source.check_deps(&mut package_cache);
 
         assert_eq!(0, package_cache.iter_missing().count());
+    }
+
+    #[test]
+    fn test_source_is_bundle() {
+        use super::WixSource;
+        use crate::toolset::ext::WellKnownExtentions;
+        use std::path::PathBuf;
+
+        let source_with_bal = WixSource {
+            is_package: true,
+            wxs_schema: crate::toolset::project::WxsSchema::V4,
+            path: PathBuf::new(),
+            exts: vec![Box::new(WellKnownExtentions::BootstrapperApplications)],
+            toolset: crate::toolset::Toolset::Modern,
+        };
+        assert!(source_with_bal.is_bundle(), "source with bal namespace should be a bundle");
+
+        let source_without_bal = WixSource {
+            is_package: true,
+            wxs_schema: crate::toolset::project::WxsSchema::V4,
+            path: PathBuf::new(),
+            exts: vec![Box::new(WellKnownExtentions::UI)],
+            toolset: crate::toolset::Toolset::Modern,
+        };
+        assert!(!source_without_bal.is_bundle(), "source without bal namespace should not be a bundle");
+
+        let source_no_exts = WixSource {
+            is_package: true,
+            wxs_schema: crate::toolset::project::WxsSchema::V4,
+            path: PathBuf::new(),
+            exts: vec![],
+            toolset: crate::toolset::Toolset::Modern,
+        };
+        assert!(!source_no_exts.is_bundle(), "source with no exts should not be a bundle");
     }
 }

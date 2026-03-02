@@ -39,8 +39,8 @@ pub trait Includes {
         let mut wix_sources = {
             if project_wix_dir.exists() {
                 std::fs::read_dir(project_wix_dir)?
-                    .filter(|r| r.is_ok())
-                    .map(|r| r.unwrap().path())
+                    .filter_map(|r| r.ok())
+                    .map(|e| e.path())
                     .filter(|p| {
                         p.extension().and_then(|s| s.to_str()) == Some(WIX_SOURCE_FILE_EXTENSION)
                     })
@@ -70,18 +70,24 @@ pub trait Includes {
                 }
             }
             wix_sources.extend(paths.clone());
-        } else if let Some(pkg_meta_wix_sources) = package
+        } else if let Some(pkg_meta_wix_include) = package
             .metadata
             .get("wix")
             .and_then(|w| w.as_object())
             .and_then(|t| t.get("include"))
             .and_then(|i| i.as_array())
-            .map(|a| {
-                a.iter()
-                    .map(|s| s.as_str().map(PathBuf::from).unwrap())
-                    .collect::<Vec<PathBuf>>()
-            })
         {
+            let pkg_meta_wix_sources: Vec<PathBuf> = pkg_meta_wix_include
+                .iter()
+                .map(|s| {
+                    s.as_str().map(PathBuf::from).ok_or_else(|| {
+                        Error::Generic(format!(
+                            "Invalid value in 'package.metadata.wix.include': \
+                             expected a string path, found '{s}'"
+                        ))
+                    })
+                })
+                .collect::<crate::Result<Vec<PathBuf>>>()?;
             for pkg_meta_wix_source in &pkg_meta_wix_sources {
                 if pkg_meta_wix_source.exists() {
                     if pkg_meta_wix_source.is_dir() {
@@ -108,6 +114,7 @@ pub trait Includes {
                     )));
                 }
             }
+
             wix_sources.extend(pkg_meta_wix_sources);
         }
         if wix_sources.is_empty() {
@@ -162,5 +169,123 @@ impl ProjectProvider for crate::create::Execution {
 impl ProjectProvider for crate::migrate::Execution {
     fn toolset(&self) -> Toolset {
         Toolset::Modern
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    /// Minimal Includes implementation for testing the default wxs_sources method
+    struct NoIncludes;
+    impl Includes for NoIncludes {
+        fn includes(&self) -> Option<&Vec<PathBuf>> {
+            None
+        }
+    }
+
+    /// Helper to create a Package from JSON
+    fn package_from_json(json: &str) -> cargo_metadata::Package {
+        serde_json::from_str(json).expect("valid package JSON")
+    }
+
+    const PACKAGE_TEMPLATE: &str = r#"{
+        "name": "Example",
+        "version": "0.1.0",
+        "authors": ["First Last <first.last@example.com>"],
+        "license": "XYZ",
+        "id": "",
+        "dependencies": [],
+        "targets": [],
+        "features": {},
+        "manifest_path": "C:\\Cargo.toml"
+    }"#;
+
+    #[test]
+    fn non_string_metadata_include_errors() {
+        let json = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
+            "license": "XYZ",
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": "C:\\Cargo.toml",
+            "metadata": {
+                "wix": {
+                    "include": [42]
+                }
+            }
+        }"#;
+        let pkg = package_from_json(json);
+        let result = NoIncludes.wxs_sources(&pkg);
+        assert!(result.is_err(), "Non-string include value should produce an error");
+        let err = format!("{}", result.unwrap_err());
+        assert!(
+            err.contains("expected a string path"),
+            "Error should mention expected string, got: {err}"
+        );
+    }
+
+    #[test]
+    fn mixed_valid_and_invalid_metadata_include_errors() {
+        let json = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
+            "license": "XYZ",
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": "C:\\Cargo.toml",
+            "metadata": {
+                "wix": {
+                    "include": ["valid.wxs", null, "other.wxs"]
+                }
+            }
+        }"#;
+        let pkg = package_from_json(json);
+        let result = NoIncludes.wxs_sources(&pkg);
+        assert!(result.is_err(), "Array with null value should produce an error");
+    }
+
+    #[test]
+    fn empty_metadata_include_array_errors_no_sources() {
+        let json = r#"{
+            "name": "Example",
+            "version": "0.1.0",
+            "authors": ["First Last <first.last@example.com>"],
+            "license": "XYZ",
+            "id": "",
+            "dependencies": [],
+            "targets": [],
+            "features": {},
+            "manifest_path": "C:\\Cargo.toml",
+            "metadata": {
+                "wix": {
+                    "include": []
+                }
+            }
+        }"#;
+        let pkg = package_from_json(json);
+        let result = NoIncludes.wxs_sources(&pkg);
+        // Empty include array means no sources, should error with "no WXS files"
+        assert!(result.is_err());
+        let err = format!("{}", result.unwrap_err());
+        assert!(
+            err.contains("no WXS files"),
+            "Empty include should error about no WXS files, got: {err}"
+        );
+    }
+
+    #[test]
+    fn no_metadata_no_wix_dir_errors() {
+        let pkg = package_from_json(PACKAGE_TEMPLATE);
+        let result = NoIncludes.wxs_sources(&pkg);
+        assert!(result.is_err(), "No wix dir and no metadata should error");
     }
 }

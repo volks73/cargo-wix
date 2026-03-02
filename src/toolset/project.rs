@@ -20,6 +20,7 @@
 //! The `Project` type is the entrypoint for all major utilities provided by the toolset module.
 
 use crate::toolset::ToolsetCommand;
+use crate::create::InstallerKind;
 
 use super::source::WixSource;
 use super::{ext::PackageCache, Toolset};
@@ -177,6 +178,7 @@ impl Project {
 
         // Apply all required `-ext` flags to toolset command
         for ext in ext_flags.iter() {
+            debug!("Adding WiX extension flag: -ext {}", ext);
             toolset.args(["-ext", ext]);
         }
 
@@ -204,9 +206,32 @@ impl Project {
 
     /// Converts all of the source files that are part of the upgrade
     ///
-    /// If a target directory is provided, none of the original source files will be updated
+    /// If a target directory is provided, none of the original source files will be updated.
+    /// Returns an error if multiple source files share the same file name under different
+    /// directories, since the work_dir copy would cause collisions.
     #[inline]
     pub fn upgrade(&mut self, work_dir: Option<&PathBuf>) -> crate::Result<()> {
+        if work_dir.is_some() {
+            // Check for duplicate file names across different directories
+            let mut seen: BTreeMap<std::ffi::OsString, &std::path::Path> = BTreeMap::new();
+            for path in self.wxs_sources.keys() {
+                if let Some(name) = path.file_name() {
+                    if let Some(prev) = seen.get(name) {
+                        return Err(crate::Error::Generic(format!(
+                            "Multiple WiX source files share the file name '{}' \
+                             (found in '{}' and '{}'). The migrate command does not support \
+                             duplicate file names across different directories. Please rename \
+                             one of the files before running migrate.",
+                            name.to_string_lossy(),
+                            prev.display(),
+                            path.display(),
+                        )));
+                    }
+                    seen.insert(name.to_os_string(), path.as_path());
+                }
+            }
+        }
+
         let mut converted = BTreeMap::new();
         for (path, src) in self.wxs_sources.iter().collect::<Vec<_>>() {
             if src.can_upgrade() {
@@ -246,6 +271,27 @@ impl Project {
     #[inline]
     pub fn sources(&self) -> impl Iterator<Item = &WixSource> {
         self.wxs_sources.values()
+    }
+
+    /// Returns the number of package sources (wxs files that define a `<Package>`)
+    #[inline]
+    pub fn package_count(&self) -> usize {
+        self.wxs_sources.values().filter(|s| s.is_package).count()
+    }
+
+    /// Determines whether the project produces a bundle (.exe) or a package (.msi)
+    ///
+    /// If any source uses the bootstrapper applications (bal) namespace, this is a bundle.
+    /// Otherwise it defaults to an MSI package.
+    #[inline]
+    pub fn is_bundle(&self) -> bool {
+        self.wxs_sources.values().any(|s| s.is_bundle())
+    }
+
+    /// Returns the installer kind for this project (Exe for bundles, Msi otherwise)
+    #[inline]
+    pub fn installer_kind(&self) -> InstallerKind {
+        if self.is_bundle() { InstallerKind::Exe } else { InstallerKind::Msi }
     }
 
     /// Load installed ext cache
@@ -318,6 +364,7 @@ pub(crate) mod tests {
         },
     };
     use std::{collections::BTreeSet, path::PathBuf};
+    use serial_test::serial;
 
     #[test]
     fn test_open_wxs() {
@@ -516,5 +563,143 @@ pub(crate) mod tests {
                 },
             )
         }
+    }
+
+    #[test]
+    fn test_project_package_count() {
+        let test_toolset = TestProject::new(stringify!(test_project_package_count), "post_v4");
+        let project = test_toolset.create_project(&test_toolset.package).unwrap();
+        // The includes list only has the pre_v4 source (no <Package> element)
+        assert_eq!(0, project.package_count());
+    }
+
+    #[test]
+    fn test_project_installer_kind_msi() {
+        let test_toolset = TestProject::new(stringify!(test_project_installer_ext_msi), "post_v4");
+        let project = test_toolset.create_project(&test_toolset.package).unwrap();
+        // post_v4 has no bal namespace, so should produce msi
+        assert_eq!(crate::create::InstallerKind::Msi, project.installer_kind());
+        assert!(!project.is_bundle());
+    }
+
+    #[test]
+    fn test_project_installer_extension_from_well_known_exts() {
+        // Open well_known_exts directly (which has bal namespace) and verify is_bundle
+        let source = open_wxs_source(PathBuf::from("./tests/common/well_known_exts/main.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(source.is_bundle(), "well_known_exts has bal namespace and should be a bundle");
+    }
+
+    #[test]
+    #[serial]
+    fn test_upgrade_duplicate_filenames_errors() {
+        let project = setup_project(MIN_MANIFEST);
+        let manifest = crate::manifest(Some(&project.path().join("Cargo.toml"))).unwrap();
+        let package = crate::package(&manifest, None).unwrap();
+        let test_dir = project.path().to_path_buf();
+
+        // Create two wxs files with the same name under different subdirs
+        let sub_a = test_dir.join("a");
+        let sub_b = test_dir.join("b");
+        std::fs::create_dir_all(&sub_a).unwrap();
+        std::fs::create_dir_all(&sub_b).unwrap();
+
+        let src_a = sub_a.join("main.wxs");
+        let src_b = sub_b.join("main.wxs");
+        std::fs::copy(
+            PathBuf::from("tests").join("common").join("pre_v4").join("main.wxs"),
+            &src_a,
+        ).unwrap();
+        std::fs::copy(
+            PathBuf::from("tests").join("common").join("pre_v4").join("main.wxs"),
+            &src_b,
+        ).unwrap();
+
+        struct DupProvider {
+            includes: Vec<PathBuf>,
+            work_dir: PathBuf,
+        }
+        impl Includes for DupProvider {
+            fn includes(&self) -> Option<&Vec<PathBuf>> {
+                Some(&self.includes)
+            }
+        }
+        impl ProjectProvider for DupProvider {
+            fn work_dir(&self) -> Option<PathBuf> {
+                Some(self.work_dir.clone())
+            }
+            fn toolset(&self) -> Toolset {
+                test::toolset(|a: &ToolsetAction, _: &std::process::Command| match a {
+                    ToolsetAction::ListExtension => ok_stdout(""),
+                    ToolsetAction::ListGlobalExtension => ok_stdout(""),
+                    ToolsetAction::Version => ok_stdout("0.0.0"),
+                    _ => ok_stdout(""),
+                })
+            }
+        }
+
+        let provider = DupProvider {
+            includes: vec![src_a, src_b],
+            work_dir: test_dir.clone(),
+        };
+        let mut proj = provider.create_project(&package).unwrap();
+        let result = proj.upgrade(Some(&test_dir));
+        assert!(result.is_err(), "Should error on duplicate file names with work_dir");
+        let err = format!("{}", result.unwrap_err());
+        assert!(err.contains("duplicate file names"), "Error message should mention duplicate file names, got: {err}");
+    }
+
+    #[test]
+    fn test_project_package_count_multiple() {
+        // Create a project with two wxs files that both define <Package>
+        let test_toolset = TestProject::new(stringify!(test_project_pkg_count_multi), "post_v4");
+        let mut project = test_toolset.create_project(&test_toolset.package).unwrap();
+
+        // Add two sources that have <Package>
+        let first_pkg = open_wxs_source(PathBuf::from("./tests/common/post_v4/main.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(first_pkg.is_package);
+        let second_pkg = open_wxs_source(PathBuf::from("./tests/common/post_v4/main.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(second_pkg.is_package);
+
+        project.wxs_sources.insert(PathBuf::from("first_main.wxs"), first_pkg);
+        project.wxs_sources.insert(PathBuf::from("second_main.wxs"), second_pkg);
+        assert_eq!(2, project.package_count());
+    }
+
+    #[test]
+    fn test_project_fragment_only_has_zero_packages() {
+        // A project with only fragment sources should have package_count == 0
+        let test_toolset = TestProject::new(stringify!(test_project_fragment_only), "post_v4");
+        let mut project = test_toolset.create_project(&test_toolset.package).unwrap();
+
+        // Replace all sources with just a fragment (no <Package>)
+        project.wxs_sources.clear();
+        let fragment = open_wxs_source(PathBuf::from("./tests/common/post_v4/fragment.wxs"))
+            .expect("must be able to open wxs file");
+        assert!(!fragment.is_package, "fragment.wxs should not be a package");
+        project.wxs_sources.insert(PathBuf::from("fragment.wxs"), fragment);
+
+        assert_eq!(0, project.package_count());
+        assert!(!project.is_bundle());
+        // This is the condition that triggers the "no Package or Bundle" error in create.rs
+        assert_eq!(crate::create::InstallerKind::Msi, project.installer_kind());
+    }
+
+    #[test]
+    fn test_project_bundle_installer_kind() {
+        // A project with a bal-namespace source should return InstallerKind::Exe
+        let test_toolset = TestProject::new(stringify!(test_project_bundle_kind), "post_v4");
+        let mut project = test_toolset.create_project(&test_toolset.package).unwrap();
+
+        // Replace sources with well_known_exts which has bal namespace
+        project.wxs_sources.clear();
+        let bundle = open_wxs_source(PathBuf::from("./tests/common/well_known_exts/main.wxs"))
+            .expect("must be able to open wxs file");
+        project.wxs_sources.insert(PathBuf::from("bundle.wxs"), bundle);
+
+        assert!(project.is_bundle());
+        assert_eq!(crate::create::InstallerKind::Exe, project.installer_kind());
     }
 }

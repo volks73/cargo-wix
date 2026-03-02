@@ -861,6 +861,27 @@ mod tests {
             actual.upgrade_guid(Some(&expected));
             assert_eq!(actual.upgrade_guid, Some(expected.as_ref()));
         }
+
+        #[test]
+        fn schema_default_is_none() {
+            let actual = Builder::new();
+            assert_eq!(actual.schema, None);
+        }
+
+        #[test]
+        fn schema_v4_works() {
+            use crate::toolset::project::WxsSchema;
+            let mut actual = Builder::new();
+            actual.schema(Some(WxsSchema::V4));
+            assert_eq!(actual.schema, Some(WxsSchema::V4));
+        }
+
+        #[test]
+        fn schema_defaults_to_legacy_in_execution() {
+            use crate::toolset::project::WxsSchema;
+            let execution = Builder::new().build();
+            assert!(matches!(execution.schema, WxsSchema::Legacy));
+        }
     }
 
     mod execution {

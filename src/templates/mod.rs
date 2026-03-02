@@ -197,3 +197,71 @@ impl FromStr for Template {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+
+    #[test]
+    fn from_str_wxs_returns_v3() {
+        assert_eq!(Template::from_str("wxs").unwrap(), Template::WxsV3);
+    }
+
+    #[test]
+    fn from_str_wxs_uppercase_returns_v3() {
+        assert_eq!(Template::from_str("WXS").unwrap(), Template::WxsV3);
+    }
+
+    #[test]
+    fn from_str_wxs4_returns_v4() {
+        assert_eq!(Template::from_str("wxs4").unwrap(), Template::WxsV4);
+    }
+
+    #[test]
+    fn from_str_wxs4_uppercase_returns_v4() {
+        assert_eq!(Template::from_str("WXS4").unwrap(), Template::WxsV4);
+    }
+
+    #[test]
+    fn from_str_v4_namespace_uri_returns_v4() {
+        assert_eq!(
+            Template::from_str(crate::toolset::project::V4_NAMESPACE_URI).unwrap(),
+            Template::WxsV4
+        );
+    }
+
+    #[test]
+    fn from_str_unknown_fails() {
+        assert!(Template::from_str("unknown_template").is_err());
+    }
+
+    #[test]
+    fn wxs_v3_to_str_is_not_empty() {
+        assert!(!Template::WxsV3.to_str().is_empty());
+    }
+
+    #[test]
+    fn wxs_v4_to_str_is_not_empty() {
+        assert!(!Template::WxsV4.to_str().is_empty());
+    }
+
+    #[test]
+    fn wxs_v4_to_str_contains_v4_namespace() {
+        assert!(
+            Template::WxsV4
+                .to_str()
+                .contains(crate::toolset::project::V4_NAMESPACE_URI),
+            "V4 template should contain the v4 namespace URI"
+        );
+    }
+
+    #[test]
+    fn possible_values_contains_wxs4() {
+        let values = Template::possible_values();
+        assert!(
+            values.iter().any(|v| v == "wxs4"),
+            "possible_values should include wxs4"
+        );
+    }
+}

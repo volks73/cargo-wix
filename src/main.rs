@@ -65,6 +65,51 @@
 //! Windows installer (msi). A variety of artifact files will be created in the
 //! `target\wix` folder. These can be ignored and/or deleted.
 //!
+//! ### Using WiX Toolset v4 and Newer (Modern Toolset)
+//!
+//! WiX Toolset v4 and newer use a single `wix.exe` binary instead of the
+//! separate `candle.exe` and `light.exe` tools. To use the modern toolset,
+//! install WiX v4+ via `dotnet tool install --global wix` and use the
+//! `--toolset modern` flag:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix --toolset modern
+//! ```
+//!
+//! If your project has existing WiX v3 source files (`.wxs`), they must be
+//! converted to the v4 format before building. The `--migrate` flag automates
+//! this conversion and installs any required WiX extension packages:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix --toolset modern --migrate global
+//! ```
+//!
+//! The `--migrate` flag accepts two modes:
+//!
+//! - `global` — Converts `.wxs` files in place and installs extensions to the
+//!   global WiX extension cache. Best for simple projects and CI pipelines with
+//!   network access.
+//! - `vendor` — Converts `.wxs` files in place and installs extensions to a
+//!   local `.wix/extensions` folder. Best for offline builds or when tracking
+//!   extension packages in version control.
+//!
+//! Alternatively, migration can be performed as a standalone step using the
+//! `migrate` subcommand:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix migrate
+//! ```
+//!
+//! After migration, the `--migrate` flag is no longer needed for subsequent
+//! builds.
+//!
+//! For new projects starting with WiX v4, use `--schema v4` when initializing
+//! to generate a v4-format `.wxs` file directly:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix init --schema v4
+//! ```
+//!
 //! The created installer will install the executable file in a `bin` folder
 //! within the destination selected by the user during installation. It will add
 //! a license file to the same folder as the `bin` folder, and it will add the
