@@ -898,7 +898,7 @@
 //!
 //! Available for the default _create_ (`cargo wix`) subcommand.
 //!
-//! Sets the culture for localization. Use with the [`-l,--locale`] option. See
+//! Sets the culture for localization. Use with the `-l,--locale` option. See
 //! the [WixUI localization documentation] for more information about acceptable
 //! culture codes. The codes are case insensitive.
 //!
@@ -1048,7 +1048,7 @@
 //! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Sets the path to a WiX localization file (wxl) which contains localized
-//! strings. Use in conjunction with the [`-c,--culture`] option.
+//! strings. Use in conjunction with the `-c,--culture` option.
 //!
 //! ### `-m,--manufacturer`
 //!

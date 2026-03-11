@@ -136,12 +136,12 @@ impl StoredPath {
         self
     }
 
-    /// Extracts the extension part of the [`self.file_name`][]
+    /// Extracts the extension part of the `self.file_name`
     pub fn extension(&self) -> Option<&str> {
         self.stem_and_extension().1
     }
 
-    /// Extracts the stem (non-extension) part of the [`self.file_name`][].
+    /// Extracts the stem (non-extension) part of the `self.file_name`.
     pub fn file_stem(&self) -> Option<&str> {
         self.stem_and_extension().0
     }

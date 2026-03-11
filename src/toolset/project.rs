@@ -19,8 +19,8 @@
 //!
 //! The `Project` type is the entrypoint for all major utilities provided by the toolset module.
 
-use crate::toolset::ToolsetCommand;
 use crate::create::InstallerKind;
+use crate::toolset::ToolsetCommand;
 
 use super::source::WixSource;
 use super::{ext::PackageCache, Toolset};
@@ -291,7 +291,11 @@ impl Project {
     /// Returns the installer kind for this project (Exe for bundles, Msi otherwise)
     #[inline]
     pub fn installer_kind(&self) -> InstallerKind {
-        if self.is_bundle() { InstallerKind::Exe } else { InstallerKind::Msi }
+        if self.is_bundle() {
+            InstallerKind::Exe
+        } else {
+            InstallerKind::Msi
+        }
     }
 
     /// Load installed ext cache
@@ -363,8 +367,8 @@ pub(crate) mod tests {
             Includes, ProjectProvider, Toolset, ToolsetAction,
         },
     };
-    use std::{collections::BTreeSet, path::PathBuf};
     use serial_test::serial;
+    use std::{collections::BTreeSet, path::PathBuf};
 
     #[test]
     fn test_open_wxs() {
@@ -422,7 +426,10 @@ pub(crate) mod tests {
             .upgrade(test_toolset.work_dir().as_ref())
             .expect("should be able to convert");
 
-        let test_wxs = test_toolset.work_dir().unwrap().join("main.test_project_upgrade_extension_detection.wxs");
+        let test_wxs = test_toolset
+            .work_dir()
+            .unwrap()
+            .join("main.test_project_upgrade_extension_detection.wxs");
         let wxs_source = project
             .wxs_sources
             .get(&test_wxs)
@@ -535,7 +542,7 @@ pub(crate) mod tests {
                         std::fs::copy(
                             PathBuf::from("tests")
                                 .join("common")
-                                .join(&expected_wxs_name)
+                                .join(expected_wxs_name)
                                 .join("main.wxs"),
                             PathBuf::from(dest),
                         )
@@ -587,7 +594,10 @@ pub(crate) mod tests {
         // Open well_known_exts directly (which has bal namespace) and verify is_bundle
         let source = open_wxs_source(PathBuf::from("./tests/common/well_known_exts/main.wxs"))
             .expect("must be able to open wxs file");
-        assert!(source.is_bundle(), "well_known_exts has bal namespace and should be a bundle");
+        assert!(
+            source.is_bundle(),
+            "well_known_exts has bal namespace and should be a bundle"
+        );
     }
 
     #[test]
@@ -607,13 +617,21 @@ pub(crate) mod tests {
         let src_a = sub_a.join("main.wxs");
         let src_b = sub_b.join("main.wxs");
         std::fs::copy(
-            PathBuf::from("tests").join("common").join("pre_v4").join("main.wxs"),
+            PathBuf::from("tests")
+                .join("common")
+                .join("pre_v4")
+                .join("main.wxs"),
             &src_a,
-        ).unwrap();
+        )
+        .unwrap();
         std::fs::copy(
-            PathBuf::from("tests").join("common").join("pre_v4").join("main.wxs"),
+            PathBuf::from("tests")
+                .join("common")
+                .join("pre_v4")
+                .join("main.wxs"),
             &src_b,
-        ).unwrap();
+        )
+        .unwrap();
 
         struct DupProvider {
             includes: Vec<PathBuf>,
@@ -644,9 +662,15 @@ pub(crate) mod tests {
         };
         let mut proj = provider.create_project(&package).unwrap();
         let result = proj.upgrade(Some(&test_dir));
-        assert!(result.is_err(), "Should error on duplicate file names with work_dir");
+        assert!(
+            result.is_err(),
+            "Should error on duplicate file names with work_dir"
+        );
         let err = format!("{}", result.unwrap_err());
-        assert!(err.contains("duplicate file names"), "Error message should mention duplicate file names, got: {err}");
+        assert!(
+            err.contains("duplicate file names"),
+            "Error message should mention duplicate file names, got: {err}"
+        );
     }
 
     #[test]
@@ -663,8 +687,12 @@ pub(crate) mod tests {
             .expect("must be able to open wxs file");
         assert!(second_pkg.is_package);
 
-        project.wxs_sources.insert(PathBuf::from("first_main.wxs"), first_pkg);
-        project.wxs_sources.insert(PathBuf::from("second_main.wxs"), second_pkg);
+        project
+            .wxs_sources
+            .insert(PathBuf::from("first_main.wxs"), first_pkg);
+        project
+            .wxs_sources
+            .insert(PathBuf::from("second_main.wxs"), second_pkg);
         assert_eq!(2, project.package_count());
     }
 
@@ -679,7 +707,9 @@ pub(crate) mod tests {
         let fragment = open_wxs_source(PathBuf::from("./tests/common/post_v4/fragment.wxs"))
             .expect("must be able to open wxs file");
         assert!(!fragment.is_package, "fragment.wxs should not be a package");
-        project.wxs_sources.insert(PathBuf::from("fragment.wxs"), fragment);
+        project
+            .wxs_sources
+            .insert(PathBuf::from("fragment.wxs"), fragment);
 
         assert_eq!(0, project.package_count());
         assert!(!project.is_bundle());
@@ -697,7 +727,9 @@ pub(crate) mod tests {
         project.wxs_sources.clear();
         let bundle = open_wxs_source(PathBuf::from("./tests/common/well_known_exts/main.wxs"))
             .expect("must be able to open wxs file");
-        project.wxs_sources.insert(PathBuf::from("bundle.wxs"), bundle);
+        project
+            .wxs_sources
+            .insert(PathBuf::from("bundle.wxs"), bundle);
 
         assert!(project.is_bundle());
         assert_eq!(crate::create::InstallerKind::Exe, project.installer_kind());

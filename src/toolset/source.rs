@@ -64,9 +64,7 @@ impl WixSource {
     /// The `bal` (WixBalExtension) namespace is required for bootstrapper bundles,
     /// so its presence reliably indicates a bundle.
     pub fn is_bundle(&self) -> bool {
-        self.exts
-            .iter()
-            .any(|e| e.namespace_prefix() == "bal")
+        self.exts.iter().any(|e| e.namespace_prefix() == "bal")
     }
 
     /// Checks that the dependencies required by this *.wxs file exist in the package cache
@@ -236,9 +234,8 @@ mod tests {
         use crate::toolset::{project::WxsSchema, source::WixSource};
         use std::path::PathBuf;
 
-        assert_eq!(
-            false,
-            WixSource {
+        assert!(
+            !WixSource {
                 is_package: false,
                 wxs_schema: WxsSchema::Legacy,
                 path: PathBuf::new(),
@@ -249,8 +246,7 @@ mod tests {
             "should not be able to upgrade legacy w/ legacy toolset"
         );
 
-        assert_eq!(
-            true,
+        assert!(
             WixSource {
                 is_package: false,
                 wxs_schema: WxsSchema::Legacy,
@@ -262,9 +258,8 @@ mod tests {
             "should be able to upgrade legacy w/ modern toolset"
         );
 
-        assert_eq!(
-            false,
-            WixSource {
+        assert!(
+            !WixSource {
                 is_package: false,
                 wxs_schema: WxsSchema::V4,
                 path: PathBuf::new(),
@@ -312,7 +307,10 @@ mod tests {
             exts: vec![Box::new(WellKnownExtentions::BootstrapperApplications)],
             toolset: crate::toolset::Toolset::Modern,
         };
-        assert!(source_with_bal.is_bundle(), "source with bal namespace should be a bundle");
+        assert!(
+            source_with_bal.is_bundle(),
+            "source with bal namespace should be a bundle"
+        );
 
         let source_without_bal = WixSource {
             is_package: true,
@@ -321,7 +319,10 @@ mod tests {
             exts: vec![Box::new(WellKnownExtentions::UI)],
             toolset: crate::toolset::Toolset::Modern,
         };
-        assert!(!source_without_bal.is_bundle(), "source without bal namespace should not be a bundle");
+        assert!(
+            !source_without_bal.is_bundle(),
+            "source without bal namespace should not be a bundle"
+        );
 
         let source_no_exts = WixSource {
             is_package: true,
@@ -330,6 +331,9 @@ mod tests {
             exts: vec![],
             toolset: crate::toolset::Toolset::Modern,
         };
-        assert!(!source_no_exts.is_bundle(), "source with no exts should not be a bundle");
+        assert!(
+            !source_no_exts.is_bundle(),
+            "source with no exts should not be a bundle"
+        );
     }
 }

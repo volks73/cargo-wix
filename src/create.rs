@@ -559,8 +559,7 @@ impl Execution {
             self.toolset.compiler(self.bin_path.clone())?
         } else {
             debug!("Using modern wix build tools");
-            let wix = self.toolset.wix("build")?;
-            wix
+            self.toolset.wix("build")?
         };
         debug!("compiler = {:?}", compiler);
 
@@ -606,7 +605,7 @@ impl Execution {
                 return Err(Error::Generic(String::from(
                     "No WiX <Package> or <Bundle> definition was found in any of the \
                      source files. There needs to be at least one package or bundle \
-                     definition for the installer to be created."
+                     definition for the installer to be created.",
                 )));
             }
             // `wix build` produces a single output file per invocation.

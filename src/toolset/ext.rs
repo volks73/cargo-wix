@@ -92,7 +92,7 @@ impl PackageCache {
     ) -> crate::Result<()> {
         if self.missing.is_empty() {
             debug!("No missing extensions, skipping extension restore");
-            return Ok(())
+            return Ok(());
         }
         let mut wix = self.toolset.wix("extension add")?;
 
@@ -195,50 +195,50 @@ impl WixExtension for UnknownExtNamespace {
 /// This enables `cargo-wix` to identify which extensions are required to be installed in order for `wix build` to succeed after a V3 project has been upgraded
 /// to a V4 project.
 ///
-/// Source: https://wixtoolset.org/docs/tools/wixext/
+/// Source: <https://wixtoolset.org/docs/tools/wixext/>
 #[derive(Clone, Copy)]
 pub enum WellKnownExtentions {
     /// WiX Toolset Bootstrapper Applications Extension
-    /// Docs: https://wixtoolset.org/docs/schema/bal/
+    /// Docs: <https://wixtoolset.org/docs/schema/bal/>
     BootstrapperApplications,
     /// WiX Toolset COM+ Extension
-    /// Docs: https://wixtoolset.org/docs/schema/complus/
+    /// Docs: <https://wixtoolset.org/docs/schema/complus/>
     ComPlus,
     /// WiX Toolset Dependency Extension
-    /// Docs: https://wixtoolset.org/docs/schema/dependency/
+    /// Docs: <https://wixtoolset.org/docs/schema/dependency/>
     Dependency,
     /// WiX Toolset DirectX Extension
-    /// Docs: https://wixtoolset.org/docs/schema/directx/
+    /// Docs: <https://wixtoolset.org/docs/schema/directx/>
     DirectX,
     /// WiX Toolset Firewall Extension
-    /// Docs: https://wixtoolset.org/docs/schema/firewall/
+    /// Docs: <https://wixtoolset.org/docs/schema/firewall/>
     Firewall,
     /// Windows Installer XML Toolset Http Extension
-    /// Docs: https://wixtoolset.org/docs/schema/http/
+    /// Docs: <https://wixtoolset.org/docs/schema/http/>
     Http,
     /// WiX Toolset Internet Information Services Extension
-    /// Docs: https://wixtoolset.org/docs/schema/iis/
+    /// Docs: <https://wixtoolset.org/docs/schema/iis/>
     Iis,
     /// WiX Toolset MSMQ Extension
-    /// Docs: https://wixtoolset.org/docs/schema/msmq/
+    /// Docs: <https://wixtoolset.org/docs/schema/msmq/>
     Msmq,
     /// WiX Toolset .NET Framework Extension
-    /// Docs: https://wixtoolset.org/docs/schema/netfx/
+    /// Docs: <https://wixtoolset.org/docs/schema/netfx/>
     Netfx,
     /// WiX Toolset PowerShell Extension
-    /// Docs: https://wixtoolset.org/docs/schema/powershell/
+    /// Docs: <https://wixtoolset.org/docs/schema/powershell/>
     Powershell,
     /// WiX Toolset SQL Server Extension
-    /// Docs: https://wixtoolset.org/docs/schema/sql/
+    /// Docs: <https://wixtoolset.org/docs/schema/sql/>
     Sql,
     /// WiX Toolset UI Extension
-    /// Docs: https://wixtoolset.org/docs/schema/ui/
+    /// Docs: <https://wixtoolset.org/docs/schema/ui/>
     UI,
     /// WiX Toolset Utility Extension
-    /// Docs: https://wixtoolset.org/docs/schema/util/
+    /// Docs: <https://wixtoolset.org/docs/schema/util/>
     Util,
     /// WiX Toolset Visual Studio Extension
-    /// Docs: https://wixtoolset.org/docs/schema/vs/
+    /// Docs: <https://wixtoolset.org/docs/schema/vs/>
     VS,
 }
 
@@ -433,7 +433,7 @@ mod tests {
             .install_missing(true, Version::new(0, 0, 0), None)
             .unwrap();
     }
-    
+
     #[test]
     fn test_package_cache_install_missing_work_dir() {
         let test_shim = test::toolset(|a: &ToolsetAction, cmd: &std::process::Command| match a {
@@ -443,7 +443,8 @@ mod tests {
                     .arg("extension")
                     .arg("add")
                     .arg("--global")
-                    .arg("Test.wixext/0.0.0");
+                    .arg("Test.wixext/0.0.0")
+                    .current_dir("test_work_dir");
                 assert_eq!(format!("{:?}", cmd), format!("{:?}", expected));
                 assert_eq!("test_work_dir", cmd.get_current_dir().unwrap().as_os_str());
 
@@ -457,7 +458,11 @@ mod tests {
         let mut package = PackageCache::from(test_shim);
         package.add_missing("Test.wixext");
         package
-            .install_missing(true, Version::new(0, 0, 0), Some(&PathBuf::from("test_work_dir")))
+            .install_missing(
+                true,
+                Version::new(0, 0, 0),
+                Some(&PathBuf::from("test_work_dir")),
+            )
             .unwrap();
     }
 }

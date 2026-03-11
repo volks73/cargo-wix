@@ -112,7 +112,7 @@ pub enum ToolsetAction {
 /// WiX toolset project setup consists of two major-operations, **upgrade** or **restore**.
 ///
 /// - **upgrade**: Convert Wix3 and below *.wxs files to the modern WiX format. Technically only needs to be executed once,
-///                but the setup will try and do the smart thing and upgrade on an as-needed basis
+///   but the setup will try and do the smart thing and upgrade on an as-needed basis
 /// - **restore**: Detect and install wix extensions required by *.wxs files. Requires all source files to be upgraded
 ///
 /// The toolset setup mode indicates whether or not to apply `upgrade` and `restore`.
@@ -372,7 +372,7 @@ impl From<std::process::Command> for ToolsetCommand {
     }
 }
 
-impl<'a> FromStr for ToolsetCommand {
+impl FromStr for ToolsetCommand {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -390,7 +390,7 @@ impl<'a> From<&'a str> for ToolsetAction {
             "extension list" => ToolsetAction::ListExtension,
             "extension add --global" => ToolsetAction::AddGlobalExtension,
             "extension list --global" => ToolsetAction::ListGlobalExtension,
-            "--version" | _ => ToolsetAction::Version,
+            _ => ToolsetAction::Version,
         }
     }
 }

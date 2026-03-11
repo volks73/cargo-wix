@@ -222,7 +222,10 @@ mod tests {
         }"#;
         let pkg = package_from_json(json);
         let result = NoIncludes.wxs_sources(&pkg);
-        assert!(result.is_err(), "Non-string include value should produce an error");
+        assert!(
+            result.is_err(),
+            "Non-string include value should produce an error"
+        );
         let err = format!("{}", result.unwrap_err());
         assert!(
             err.contains("expected a string path"),
@@ -250,7 +253,10 @@ mod tests {
         }"#;
         let pkg = package_from_json(json);
         let result = NoIncludes.wxs_sources(&pkg);
-        assert!(result.is_err(), "Array with null value should produce an error");
+        assert!(
+            result.is_err(),
+            "Array with null value should produce an error"
+        );
     }
 
     #[test]
