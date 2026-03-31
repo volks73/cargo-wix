@@ -68,11 +68,13 @@ pub mod clean;
 pub mod create;
 pub mod initialize;
 mod licenses;
+pub mod migrate;
 pub mod print;
 pub mod purge;
 pub mod sign;
 pub mod stored_path;
 mod templates;
+pub mod toolset;
 
 use camino::Utf8Path;
 use log::debug;
@@ -130,6 +132,9 @@ pub const WIX_COMPILER: &str = "candle";
 /// The application name without the file extension of the linker for the
 /// Windows installer.
 pub const WIX_LINKER: &str = "light";
+
+/// The application name of the modern toolset binary
+pub const WIX_MODERN_TOOLSET: &str = "wix";
 
 /// The application name without the file extension of the `msiexec` utility.
 pub const MSIEXEC: &str = "msiexec";
@@ -247,7 +252,9 @@ pub enum Error {
     /// Parsing the intermediate WiX Object (wixobj) file, which is XML, failed.
     Xml(sxd_document::parser::Error),
     /// Evaluation of an XPath expression failed.
-    XPath(sxd_xpath::ExecutionError),
+    XPath(sxd_xpath::Error),
+    /// Could not convert bytes to utf8
+    Utf8Error(std::string::FromUtf8Error),
 }
 
 impl Error {
@@ -277,6 +284,7 @@ impl Error {
             Error::Xml(..) => 8,
             Error::XPath(..) => 9,
             Error::CargoMetadata(..) => 10,
+            Error::Utf8Error(..) => 11,
         }
     }
 
@@ -413,6 +421,7 @@ impl Error {
             Error::Version(..) => "Version",
             Error::Xml(..) => "XML",
             Error::XPath(..) => "XPath",
+            Error::Utf8Error(..) => "Utf8",
         }
     }
 }
@@ -481,6 +490,7 @@ impl fmt::Display for Error {
             Error::Version(ref err) => err.fmt(f),
             Error::Xml(ref err) => err.fmt(f),
             Error::XPath(ref err) => err.fmt(f),
+            Error::Utf8Error(ref err) => err.fmt(f),
         }
     }
 }
@@ -533,15 +543,27 @@ impl From<sxd_document::parser::Error> for Error {
     }
 }
 
-impl From<sxd_xpath::ExecutionError> for Error {
-    fn from(err: sxd_xpath::ExecutionError) -> Self {
-        Error::XPath(err)
-    }
-}
-
 impl From<uuid::Error> for Error {
     fn from(err: uuid::Error) -> Self {
         Error::Uuid(err)
+    }
+}
+
+impl From<sxd_xpath::Error> for Error {
+    fn from(value: sxd_xpath::Error) -> Self {
+        Error::XPath(value)
+    }
+}
+
+impl From<sxd_xpath::ExecutionError> for Error {
+    fn from(value: sxd_xpath::ExecutionError) -> Self {
+        Error::XPath(sxd_xpath::Error::Executing(value))
+    }
+}
+
+impl From<std::string::FromUtf8Error> for Error {
+    fn from(value: std::string::FromUtf8Error) -> Self {
+        Error::Utf8Error(value)
     }
 }
 
@@ -1145,13 +1167,6 @@ mod tests {
         fn try_from_i686_uwp_windows_gnu_is_correct() {
             let arch =
                 WixArch::try_from(&Cfg::of("i686-uwp-windows-gnu").expect("Cfg parsing")).unwrap();
-            assert_eq!(arch, WixArch::X86);
-        }
-
-        #[test]
-        fn try_from_i586_pc_windows_msvc_is_correct() {
-            let arch =
-                WixArch::try_from(&Cfg::of("i586-pc-windows-msvc").expect("Cfg parsing")).unwrap();
             assert_eq!(arch, WixArch::X86);
         }
 

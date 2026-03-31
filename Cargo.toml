@@ -23,7 +23,7 @@ name = "wix"
 [dependencies]
 camino = "1"
 chrono = "0.4"
-clap = "4"
+clap = { version = "4", features = ["derive"] }
 encoding_rs_io = "0.1"
 env_logger = "0.10"
 itertools = "0.11"

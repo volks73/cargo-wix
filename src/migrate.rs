@@ -1,0 +1,230 @@
+// Copyright (C) 2017 Christopher R. Field.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! The implementation for the `migrate` command. The default behavior will use the
+//! "Project" setup mode, which will update any *.wxs source files to the modern format as well
+//! as install the extension packages to the global cache.
+//!
+//! Specific information about the different toolset modes can be found in the documentation for
+//! `ToolsetSetupMode`.
+
+use crate::toolset::*;
+use log::debug;
+use std::path::PathBuf;
+
+/// A builder for running the `cargo wix migrate` subcommand.
+#[derive(Debug, Clone)]
+pub struct Builder<'a> {
+    input: Option<&'a str>,
+    package: Option<&'a str>,
+    includes: Option<Vec<&'a str>>,
+    vendor: bool,
+}
+
+impl<'a> Builder<'a> {
+    /// Creates a new Builder
+    pub fn new() -> Self {
+        Self {
+            input: None,
+            package: None,
+            includes: None,
+            vendor: false,
+        }
+    }
+
+    /// Sets the path to a package's manifest (Cargo.toml) file.
+    ///
+    /// A package's manifest is used to create an installer. If no path is
+    /// specified, then the current working directory (CWD) is used. An error
+    /// will occur if there is no `Cargo.toml` file in the CWD or at the
+    /// specified path. Either an absolute or relative path is valid.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
+    pub fn input(&mut self, i: Option<&'a str>) -> &mut Self {
+        self.input = i;
+        self
+    }
+
+    /// Adds multiple WiX Source (wxs) files to the creation of an installer.
+    ///
+    /// By default, any `.wxs` file located in the project's `wix` folder will
+    /// be included in the creation of an installer for the project. This method
+    /// adds, or appends, to the list of `.wxs` files. The value is a relative
+    /// or absolute path.
+    ///
+    /// This value will override any default and skip looking for a value in the
+    /// `[package.metadata.wix]` section of the package's manifest (Cargo.toml).
+    pub fn includes(&mut self, i: Option<Vec<&'a str>>) -> &mut Self {
+        self.includes = i;
+        self
+    }
+
+    /// Sets the package.
+    ///
+    /// If the project is organized using a workspace, this selects the package
+    /// by name to create an installer. If a workspace is not used, then this
+    /// has no effect.
+    pub fn package(&mut self, p: Option<&'a str>) -> &mut Self {
+        self.package = p;
+        self
+    }
+
+    /// Enables vendored mode when restoring Wix extensions
+    pub fn vendor(&mut self, vendored: bool) -> &mut Self {
+        self.vendor = vendored;
+        self
+    }
+
+    /// Consumes the builder and returns the upgrade execution context
+    ///
+    /// Will resolve toolset migration setup mode from the provided flags
+    pub fn build(self) -> Execution {
+        Execution {
+            input: self.input.map(PathBuf::from),
+            package: self.package.map(String::from),
+            includes: self
+                .includes
+                .as_ref()
+                .map(|v| v.iter().map(&PathBuf::from).collect()),
+            toolset_setup_mode: if self.vendor {
+                ToolsetSetupMode::Vendor
+            } else {
+                ToolsetSetupMode::Global
+            },
+        }
+    }
+}
+
+/// A context for setting up a WiX project migration to a new toolset
+#[derive(Debug)]
+pub struct Execution {
+    input: Option<PathBuf>,
+    package: Option<String>,
+    includes: Option<Vec<PathBuf>>,
+    toolset_setup_mode: ToolsetSetupMode,
+}
+
+impl Execution {
+    /// Consumes the execution context and performs the migration setup
+    pub fn run(self) -> crate::Result<()> {
+        debug!("self.input = {:?}", self.input);
+        debug!("self.package = {:?}", self.package);
+        debug!("self.includes = {:?}", self.includes);
+        debug!("self.toolset_upgrade = {:?}", self.toolset_setup_mode);
+
+        debug!("Resolving manifest");
+        let manifest = crate::manifest(self.input.as_ref())?;
+        debug!("{manifest:?}");
+        debug!("Resolving package");
+        let package = crate::package(&manifest, self.package.as_deref())?;
+
+        debug!("Evaluating project and beginning setup");
+        self.toolset_setup_mode.setup(&self, &package, None)?;
+        Ok(())
+    }
+}
+
+impl Includes for Execution {
+    fn includes(&self) -> Option<&Vec<PathBuf>> {
+        self.includes.as_ref()
+    }
+}
+
+impl<'a> Default for Builder<'a> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builder_defaults() {
+        let builder = Builder::new();
+        assert!(builder.input.is_none());
+        assert!(builder.package.is_none());
+        assert!(builder.includes.is_none());
+        assert!(!builder.vendor);
+    }
+
+    #[test]
+    fn builder_input_works() {
+        let mut builder = Builder::new();
+        builder.input(Some("path/to/Cargo.toml"));
+        assert_eq!(builder.input, Some("path/to/Cargo.toml"));
+    }
+
+    #[test]
+    fn builder_package_works() {
+        let mut builder = Builder::new();
+        builder.package(Some("my-package"));
+        assert_eq!(builder.package, Some("my-package"));
+    }
+
+    #[test]
+    fn builder_includes_works() {
+        let mut builder = Builder::new();
+        builder.includes(Some(vec!["a.wxs", "b.wxs"]));
+        assert_eq!(builder.includes, Some(vec!["a.wxs", "b.wxs"]));
+    }
+
+    #[test]
+    fn builder_vendor_works() {
+        let mut builder = Builder::new();
+        builder.vendor(true);
+        assert!(builder.vendor);
+    }
+
+    #[test]
+    fn build_sets_global_mode_by_default() {
+        let execution = Builder::new().build();
+        assert!(matches!(
+            execution.toolset_setup_mode,
+            ToolsetSetupMode::Global
+        ));
+    }
+
+    #[test]
+    fn build_sets_vendor_mode_when_vendor_enabled() {
+        let mut builder = Builder::new();
+        builder.vendor(true);
+        let execution = builder.build();
+        assert!(matches!(
+            execution.toolset_setup_mode,
+            ToolsetSetupMode::Vendor
+        ));
+    }
+
+    #[test]
+    fn build_converts_input_to_pathbuf() {
+        let mut builder = Builder::new();
+        builder.input(Some("some/path"));
+        let execution = builder.build();
+        assert_eq!(execution.input, Some(PathBuf::from("some/path")));
+    }
+
+    #[test]
+    fn build_converts_includes_to_pathbufs() {
+        let mut builder = Builder::new();
+        builder.includes(Some(vec!["a.wxs", "b.wxs"]));
+        let execution = builder.build();
+        assert_eq!(
+            execution.includes,
+            Some(vec![PathBuf::from("a.wxs"), PathBuf::from("b.wxs")])
+        );
+    }
+}

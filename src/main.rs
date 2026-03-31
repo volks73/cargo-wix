@@ -65,6 +65,51 @@
 //! Windows installer (msi). A variety of artifact files will be created in the
 //! `target\wix` folder. These can be ignored and/or deleted.
 //!
+//! ### Using WiX Toolset v4 and Newer (Modern Toolset)
+//!
+//! WiX Toolset v4 and newer use a single `wix.exe` binary instead of the
+//! separate `candle.exe` and `light.exe` tools. To use the modern toolset,
+//! install WiX v4+ via `dotnet tool install --global wix` and use the
+//! `--toolset modern` flag:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix --toolset modern
+//! ```
+//!
+//! If your project has existing WiX v3 source files (`.wxs`), they must be
+//! converted to the v4 format before building. The `--migrate` flag automates
+//! this conversion and installs any required WiX extension packages:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix --toolset modern --migrate global
+//! ```
+//!
+//! The `--migrate` flag accepts two modes:
+//!
+//! - `global` — Converts `.wxs` files in place and installs extensions to the
+//!   global WiX extension cache. Best for simple projects and CI pipelines with
+//!   network access.
+//! - `vendor` — Converts `.wxs` files in place and installs extensions to a
+//!   local `.wix/extensions` folder. Best for offline builds or when tracking
+//!   extension packages in version control.
+//!
+//! Alternatively, migration can be performed as a standalone step using the
+//! `migrate` subcommand:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix migrate
+//! ```
+//!
+//! After migration, the `--migrate` flag is no longer needed for subsequent
+//! builds.
+//!
+//! For new projects starting with WiX v4, use `--schema v4` when initializing
+//! to generate a v4-format `.wxs` file directly:
+//!
+//! ```dos
+//! C:\Path\To\Project\>cargo wix init --schema v4
+//! ```
+//!
 //! The created installer will install the executable file in a `bin` folder
 //! within the destination selected by the user during installation. It will add
 //! a license file to the same folder as the `bin` folder, and it will add the
@@ -853,7 +898,7 @@
 //!
 //! Available for the default _create_ (`cargo wix`) subcommand.
 //!
-//! Sets the culture for localization. Use with the [`-l,--locale`] option. See
+//! Sets the culture for localization. Use with the `-l,--locale` option. See
 //! the [WixUI localization documentation] for more information about acceptable
 //! culture codes. The codes are case insensitive.
 //!
@@ -1003,7 +1048,7 @@
 //! Available for the default _create_ (`cargo wix`) subcommand.
 //!
 //! Sets the path to a WiX localization file (wxl) which contains localized
-//! strings. Use in conjunction with the [`-c,--culture`] option.
+//! strings. Use in conjunction with the `-c,--culture` option.
 //!
 //! ### `-m,--manufacturer`
 //!
@@ -1208,20 +1253,22 @@
 //! [WXS]: ../wix/enum.Template.html
 //! [XML]: https://en.wikipedia.org/wiki/XML
 
+use clap::builder::EnumValueParser;
 use clap::{Arg, ArgAction, Command};
 
 use env_logger::fmt::Color as LogColor;
 use env_logger::Builder;
 
 use log::{Level, LevelFilter};
-
 use std::io::Write;
-
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use wix::toolset::project::WxsSchema;
+use wix::toolset::{Toolset, ToolsetSetupMode};
 
 use wix::clean;
 use wix::create;
 use wix::initialize;
+use wix::migrate;
 use wix::print;
 use wix::purge;
 use wix::sign;
@@ -1354,6 +1401,19 @@ fn main() {
         .long("owner")
         .short('O')
         .num_args(1);
+    // The package option for `create` or `migrate`
+    let include = Arg::new("include")
+        .help("Include an additional WiX Source (wxs) file")
+        .long_help(
+            "Includes a WiX source (wxs) file for a project, \
+        where the wxs file is not located in the default location, \
+        i.e. 'wix'. Use this option multiple times to include \
+        multiple wxs files.",
+        )
+        .long("include")
+        .short('I')
+        .num_args(1)
+        .action(ArgAction::Append);
     // The package option for the `create`, `init`, and `print` subcommands
     let package = Arg::new("package")
         .help("The name of the package in the current workspace")
@@ -1531,16 +1591,7 @@ fn main() {
                     .long("dbg-name")
                     .short('D')
                     .action(ArgAction::SetTrue))
-                .arg(Arg::new("include")
-                    .help("Include an additional WiX Source (wxs) file")
-                    .long_help("Includes a WiX source (wxs) file for a project, \
-                        where the wxs file is not located in the default location, \
-                        i.e. 'wix'. Use this option multiple times to include \
-                        multiple wxs files.")
-                    .long("include")
-                    .short('I')
-                    .num_args(1)
-                    .action(ArgAction::Append))
+                .arg(include.clone())
                 .subcommand(Command::new("init")
                     .version(PKG_VERSION)
                     .about("Generates files from a package's manifest (Cargo.toml) to create an installer")
@@ -1586,7 +1637,16 @@ fn main() {
                     .arg(upgrade_guid.clone())
                     .arg(url.clone())
                     .arg(verbose.clone())
-                    .arg(year.clone()))
+                    .arg(year.clone())
+                    .arg(Arg::new("schema")
+                        .long("schema")
+                        .help("The schema version of wxs source to render")
+                        .long_help(
+                            "Between Wix3 and Wix4, wxs files have differing schemas.\n\
+                            This setting allows initialization to render the corresponding schema \n\
+                            The default setting is the legacy format (Supported by Wix3)")
+                        .num_args(1)
+                        .value_parser(EnumValueParser::<WxsSchema>::new())))
                 .arg(Arg::new("INPUT")
                      .help("Path to a package's manifest (Cargo.toml) file.")
                      .long_help("If no value is provided, then the current \
@@ -1680,6 +1740,40 @@ fn main() {
                     .long("output")
                     .short('o')
                     .num_args(1))
+                .arg(Arg::new("toolset")
+                    .long("toolset")
+                    .help("Toolset to use for wix related operations")
+                    .long_help(
+                        "Before WiX4 the binaries that were used to build the installer were light.exe and candle.exe.\n\
+                         The WiX toolset now uses a single binary, wix.exe, that performs all the previous operations.\n\
+                         In addition WiX3 did not have a unified package installation method, where-as WiX4 and beyond\n\
+                         can be installed via `dotnet install`.\n\
+                         \n\
+                         This argument can be used to opt-in to the modern toolset, however it is important to note that\n\
+                         while WiX4+ are backwards compatible, WiX3 .wxs files are not compatible and must be converted\n\
+                         to WiX4 semantics. Luckily the modern wix toolsets contain a convert tool, however there are\n\
+                         several key differences after WiX3 that must be addressed before the files may be built.\n\
+                         If the `toolset-upgrade` argument is provided in addition to this command, cargo-wix can ensure\n\
+                         that the included wix source files are updated to the modern format and that the dependencies used\n\
+                         in those source files are installed in the current context. This also provides the benefit between\n\
+                         WiX4+ versions, as the wix toolset extensions now depend on the WiX toolset version, `cargo-wix`\n\
+                         can ensure that before the build starts all wix extensions are up to date.")
+                    .value_parser(EnumValueParser::<Toolset>::new())
+                    .required(false)
+                    .num_args(1)
+                )
+                .arg(Arg::new("migrate")
+                    .long("migrate")
+                    .help("Toolset migration setup mode to use before building the installer")
+                    .long_help(
+                        "Note: Only applied if `--toolset modern` is present, if no migration setup is required this will have no additional effect\n\
+                        When enabled, this will perform checks to ensure that the current wix environment\n\
+                        is up to date before attempting to build the installer which includes:\n\
+                        \t1) Ensuring that *.wxs files are in the correct format according to the wix toolset setting\n\
+                        \t2) Installing extensions that are required to build the installer\n\
+                        There are several modes that can be used with inplace being the simplest and sxs being the least destructive")
+                        .value_parser(EnumValueParser::<ToolsetSetupMode>::new())
+                        .num_args(1))
                 .arg(package.clone())
                 .subcommand(Command::new("print")
                     .version(PKG_VERSION)
@@ -1796,7 +1890,7 @@ fn main() {
                         .long("nocapture")
                         .action(ArgAction::SetTrue))
                     .arg(product_name)
-                    .arg(package)
+                    .arg(package.clone())
                     .arg(Arg::new("timestamp")
                         .help("An alias or URL to a timestamp server")
                         .long_help("Either an alias or URL can be used. Aliases \
@@ -1805,6 +1899,50 @@ fn main() {
                         .long("timestamp")
                         .num_args(1))
                     .arg(verbose.clone()))
+                .subcommand(Command::new("migrate")
+                        .version(PKG_VERSION)
+                        .about("WiX project migration setup utilities")
+                        .long_about(
+                            "Perform various wix toolset migration setup operations such as:\n\
+                            - Converting wxs files to the modern WiX toolset format\n\
+                            - Restoring wix extension packages by analyzing extension dependencies found in wxs files.\n\
+                            - Enable vendoring of wix extension dependencies for offline builds\n\
+                            \n\
+                            If no additional flags are passed such as `--vendor`\n\
+                            and no mode is set via `-m` or `--mode`\n\
+                            Then this will apply the 'global' setup mode, meaning:\n\
+                            - all wxs files will be converted in place\n\
+                            - all wix extensions will be installed globally")
+                        .arg(Arg::new("INPUT")
+                            .help("Path to a package's manifest (Cargo.toml) file.")
+                            .long_help(
+                                "If no value is provided, then the current\n\
+                                working directory (CWD) will be used to locate a package's\n\
+                                manifest. An error will occur if a manifest cannot be\n\
+                                found. A relative or absolute path to a package's manifest\n\
+                                (Cargo.toml) file can be used. Only one manifest is\n\
+                                allowed. The creation of an installer will be relative to\n\
+                                the specified manifest.")
+                            .required(false)
+                            .index(1))
+                        .arg(package)
+                        .arg(include)
+                        .arg(Arg::new("vendor")
+                            .long("vendor")
+                            .help("Will enable vendoring when installing WiX extensions")
+                            .long_help(
+                                "By using vendoring mode, all extension dependencies will be installed in the current directory\n\
+                                This is suited for proejcts that must be built in environments without network access and/or\n\
+                                If tracking extension packages in SVC is desired\n\
+                                \n\
+                                Equivalent to `-m vendor` or `--mode vendor`")
+                            .action(ArgAction::SetTrue))
+                        .arg(Arg::new("mode")
+                            .long("mode")
+                            .short('m')
+                            .help("Will explicitly configure the migration setup mode. Note: Using `none` will not have any effect with the `migrate` command.")
+                            .value_parser(EnumValueParser::<ToolsetSetupMode>::new()))
+                        .arg(verbose.clone()))
                 .arg(verbose)
         ).get_matches();
     let matches = matches.subcommand_matches(SUBCOMMAND_NAME).unwrap();
@@ -1813,6 +1951,7 @@ fn main() {
         Some(("init", m)) => m,
         Some(("print", m)) => m,
         Some(("purge", m)) => m,
+        Some(("migrate", m)) => m,
         _ => matches,
     }
     .get_count("verbose");
@@ -1892,6 +2031,7 @@ fn main() {
             init.product_icon(m.get_one("product-icon").map(String::as_str));
             init.product_name(m.get_one("product-name").map(String::as_str));
             init.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
+            init.schema(m.get_one::<WxsSchema>("schema").copied());
             init.build().run()
         }
         Some(("print", m)) => {
@@ -1901,7 +2041,7 @@ fn main() {
                 .parse::<Template>()
                 .unwrap();
             match template {
-                Template::Wxs => {
+                Template::WxsV3 | Template::WxsV4 => {
                     let mut print = print::wxs::Builder::new();
                     print.banner(m.get_one("banner").map(String::as_str));
                     print.binaries(
@@ -1921,6 +2061,9 @@ fn main() {
                     print.product_icon(m.get_one("product-icon").map(String::as_str));
                     print.product_name(m.get_one("product-name").map(String::as_str));
                     print.upgrade_guid(m.get_one("upgrade-guid").map(String::as_str));
+                    if matches!(template, Template::WxsV4) {
+                        print.schema(Some(WxsSchema::V4));
+                    }
                     print.build().run()
                 }
                 t => {
@@ -1951,6 +2094,37 @@ fn main() {
             sign.product_name(m.get_one("product-name").map(String::as_str));
             sign.timestamp(m.get_one("timestamp").map(String::as_str));
             sign.build().run()
+        }
+        Some(("migrate", m)) => {
+            let mut setup = migrate::Builder::new();
+            setup.input(
+                m.get_one("INPUT")
+                    .map(String::as_str)
+                    .or(matches.get_one("INPUT").map(String::as_str)),
+            );
+            setup.package(
+                m.get_one("package")
+                    .map(String::as_str)
+                    .or(matches.get_one("package").map(String::as_str)),
+            );
+            setup.includes(
+                m.get_many("include")
+                    .map(|v| v.map(String::as_str).collect())
+                    .or(matches
+                        .get_many("include")
+                        .map(|v| v.map(String::as_str).collect())),
+            );
+            if let Some(mode) = m.get_one::<ToolsetSetupMode>("mode") {
+                match mode {
+                    ToolsetSetupMode::None | ToolsetSetupMode::Global => {}
+                    ToolsetSetupMode::Vendor => {
+                        setup.vendor(true);
+                    }
+                }
+            } else {
+                setup.vendor(m.get_flag("vendor"));
+            }
+            setup.build().run()
         }
         _ => {
             let mut create = create::Builder::new();
@@ -1985,6 +2159,18 @@ fn main() {
             create.version(matches.get_one("install-version").map(String::as_str));
             create.package(matches.get_one("package").map(String::as_str));
             create.target(matches.get_one("target").map(String::as_str));
+            create.toolset(
+                matches
+                    .get_one("toolset")
+                    .cloned()
+                    .unwrap_or(Toolset::Legacy),
+            );
+            create.toolset_migration(
+                matches
+                    .get_one("migrate")
+                    .cloned()
+                    .unwrap_or(ToolsetSetupMode::None),
+            );
             create.build().run()
         }
     };
