@@ -14,9 +14,9 @@
 
 use log::{debug, error, trace, warn};
 
-use super::ext::{PackageCache, WxsDependency};
-use super::project::{open_wxs_source, WxsSchema};
 use super::Toolset;
+use super::ext::{PackageCache, WxsDependency};
+use super::project::{WxsSchema, open_wxs_source};
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
