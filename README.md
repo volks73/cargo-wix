@@ -36,7 +36,7 @@ automatically when installing the Rust programming language. The
 
 - [Cargo]
 - [Rust v1.78.0 or newer](https://www.rust-lang.org)
-- [WiX Toolset]
+- [WiX Toolset] [v3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm) or [newer](https://github.com/wixtoolset/wix/releases)
 - [Windows SDK] (Optional), needed for signing the installer
 
 After installing and configuring the dependencies, execute the following command
