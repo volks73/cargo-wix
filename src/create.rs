@@ -1127,7 +1127,7 @@ impl Execution {
         {
             pkg_meta_wix_name
         } else {
-            package.name.clone()
+            package.name.to_string()
         }
     }
 
