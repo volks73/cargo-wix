@@ -40,7 +40,7 @@ use toml::{Table, Value};
 
 use wix::create::Builder;
 use wix::initialize;
-use wix::{CARGO_MANIFEST_FILE, Result, WIX};
+use wix::{Result, CARGO_MANIFEST_FILE, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {
@@ -65,7 +65,9 @@ fn run(b: &mut Builder) -> Result<()> {
 /// env variable set to <package path>/target.
 fn run_with_package(b: &mut Builder, package_path: &Path) -> Result<()> {
     // Forcefully set the target dir to its default location
-    env::set_var("CARGO_TARGET_DIR", package_path.join("target"));
+    unsafe {
+        env::set_var("CARGO_TARGET_DIR", package_path.join("target"));
+    }
     b.capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
         .run()
@@ -323,7 +325,7 @@ fn init_with_package_section_fields_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => {
+                    Value::Table(t) => {
                         t.insert(
                             String::from("description"),
                             Value::from("This is a description"),
@@ -1002,7 +1004,9 @@ fn custom_target_dir_works() {
     let expected_msi_file = Path::new(WIX).join(format!("{PACKAGE_NAME}-0.1.0-x86_64.msi"));
     env::set_current_dir(package.path()).unwrap();
     initialize::Execution::default().run().unwrap();
-    env::set_var("CARGO_TARGET_DIR", target_tmpdir.path());
+    unsafe {
+        env::set_var("CARGO_TARGET_DIR", target_tmpdir.path());
+    }
     let result = Builder::default()
         .capture_output(env::var(NO_CAPTURE_VAR_NAME).is_err())
         .build()
