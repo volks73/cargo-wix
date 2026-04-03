@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::stored_path::{StoredPath, StoredPathBuf};
 use crate::Error;
-use crate::Result;
-use crate::Template;
 use crate::LICENSE_FILE_NAME;
 use crate::RTF_FILE_EXTENSION;
+use crate::Result;
+use crate::Template;
+use crate::stored_path::{StoredPath, StoredPathBuf};
 
 use camino::Utf8Path;
 use camino::Utf8PathBuf;

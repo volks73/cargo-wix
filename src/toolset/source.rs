@@ -14,9 +14,9 @@
 
 use log::{debug, error, trace, warn};
 
-use super::ext::{PackageCache, WxsDependency};
-use super::project::{open_wxs_source, WxsSchema};
 use super::Toolset;
+use super::ext::{PackageCache, WxsDependency};
+use super::project::{WxsSchema, open_wxs_source};
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
@@ -183,7 +183,7 @@ impl WixSource {
             } else {
                 format!("{}-{}-{}.{}", name, version, cfg.target_arch, ext)
             };
-            let filename = if let Some(path_str) = output {
+            if let Some(path_str) = output {
                 trace!("Using the explicitly specified output path for the MSI destination");
                 let path = std::path::Path::new(path_str);
                 if path_str.ends_with('/') || path_str.ends_with('\\') || path.is_dir() {
@@ -192,10 +192,11 @@ impl WixSource {
                     path.to_owned()
                 }
             } else {
-                trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
+                trace!(
+                    "Using the package's manifest (Cargo.toml) file path to specify the MSI destination"
+                );
                 target_directory.join(crate::WIX).join(filename)
-            };
-            filename
+            }
         };
 
         let mut path = self.path.clone();

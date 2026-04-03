@@ -535,8 +535,8 @@ impl DerefMut for ToolsetCommand {
 mod tests {
     use serial_test::serial;
 
-    use super::test;
     use super::ToolsetAction;
+    use super::test;
     use crate::toolset::ProjectProvider;
     use crate::toolset::Toolset;
     use crate::toolset::ToolsetSetupMode;
@@ -548,8 +548,8 @@ mod tests {
         use std::{path::PathBuf, process::Command};
 
         use crate::{
-            toolset::{Toolset, ToolsetAction},
             BINARY_FOLDER_NAME, EXE_FILE_EXTENSION, WIX_COMPILER, WIX_PATH_KEY,
+            toolset::{Toolset, ToolsetAction},
         };
 
         let expected = Command::new(

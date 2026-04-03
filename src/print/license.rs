@@ -16,11 +16,11 @@
 
 use chrono::{Datelike, Utc};
 
-use crate::manifest;
-use crate::package;
 use crate::Error;
 use crate::Result;
 use crate::Template;
+use crate::manifest;
+use crate::package;
 
 use log::debug;
 

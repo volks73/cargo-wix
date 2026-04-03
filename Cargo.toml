@@ -10,9 +10,9 @@ categories = ["development-tools"]
 keywords = ["cargo-subcommand", "installer", "wix-toolset", "wix"]
 homepage = "https://github.com/volks73/cargo-wix"
 readme = "README.md"
-edition = "2021"
+edition = "2024"
 exclude = ["/.github"]
-rust-version = "1.78.0"
+rust-version = "1.88.0"
 
 [[bin]]
 name = "cargo-wix"
@@ -25,8 +25,8 @@ camino = "1"
 chrono = "0.4"
 clap = { version = "4", features = ["derive"] }
 encoding_rs_io = "0.1"
-env_logger = "0.10"
-itertools = "0.11"
+env_logger = "0.11"
+itertools = "0.14"
 lazy_static = "1"
 log = "0.4"
 mustache = "0.9"
@@ -37,15 +37,15 @@ sxd-document = "0.3"
 sxd-xpath = "0.4"
 termcolor = "1"
 uuid = { version = "1", features = ["v4"] }
-cargo_metadata = "0.18"
-serde_json = "1.0"
+cargo_metadata = "0.23"
+serde_json = "1"
 
 [dev-dependencies]
-assert_fs = "1.0"
+assert_fs = "1"
 maplit = "1"
 predicates = "3"
-serial_test = "2"
-toml = "0.8"
+serial_test = "3"
+toml = "1"
 
 [workspace]
 members = [

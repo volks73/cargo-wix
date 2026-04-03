@@ -14,6 +14,10 @@
 
 //! The implementation for printing a WiX Source (wxs) file.
 
+use crate::EXE_FILE_EXTENSION;
+use crate::Error;
+use crate::Result;
+use crate::Template;
 use crate::description;
 use crate::licenses::{License, Licenses};
 use crate::manifest;
@@ -21,10 +25,6 @@ use crate::package;
 use crate::product_name;
 use crate::stored_path::StoredPathBuf;
 use crate::toolset::project::WxsSchema;
-use crate::Error;
-use crate::Result;
-use crate::Template;
-use crate::EXE_FILE_EXTENSION;
 
 use camino::Utf8Path;
 use log::{debug, trace, warn};
@@ -34,7 +34,7 @@ use mustache::{self, MapBuilder};
 use std::path::Path;
 use std::{collections::HashMap, str::FromStr};
 
-use cargo_metadata::Package;
+use cargo_metadata::{Package, TargetKind};
 
 use uuid::Uuid;
 
@@ -582,7 +582,7 @@ impl Execution {
             let mut binaries_list = package
                 .targets
                 .iter()
-                .filter(|v| v.kind.iter().any(|v| v == "bin"))
+                .filter(|v| v.kind.iter().any(|v| v == &TargetKind::Bin))
                 .collect::<Vec<_>>();
             binaries_list.sort_by_key(|k| &k.name);
 

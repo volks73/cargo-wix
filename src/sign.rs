@@ -15,14 +15,14 @@
 //! The implementation for the `sign` command. This command focuses on signing
 //! installers using the Windows SDK `signtool` application.
 
-use crate::Error;
-use crate::Result;
-use crate::TimestampServer;
 use crate::BINARY_FOLDER_NAME;
 use crate::EXE_FILE_EXTENSION;
+use crate::Error;
 use crate::MSI_FILE_EXTENSION;
+use crate::Result;
 use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
+use crate::TimestampServer;
 use crate::WIX;
 
 use log::{debug, info, trace};
@@ -197,10 +197,14 @@ impl Execution {
         let package = super::package(&manifest, self.package.as_deref())?;
         let product_name = super::product_name(self.product_name.as_ref(), &package);
         let description = if let Some(d) = super::description(self.description.clone(), &package) {
-            trace!("A description was provided either at the command line or in the package's manifest (Cargo.toml).");
+            trace!(
+                "A description was provided either at the command line or in the package's manifest (Cargo.toml)."
+            );
             format!("{product_name} - {d}")
         } else {
-            trace!("A description was not provided at the command line or in the package's manifest (Cargo.toml).");
+            trace!(
+                "A description was not provided at the command line or in the package's manifest (Cargo.toml)."
+            );
             product_name
         };
         debug!("description = {:?}", description);
@@ -506,9 +510,13 @@ mod tests {
 
         #[test]
         fn signer_with_nonexistent_environment_path_fails() {
-            env::set_var(SIGNTOOL_PATH_KEY, "Example");
+            unsafe {
+                env::set_var(SIGNTOOL_PATH_KEY, "Example");
+            }
             let result = Execution::default().signer();
-            env::remove_var(SIGNTOOL_PATH_KEY);
+            unsafe {
+                env::remove_var(SIGNTOOL_PATH_KEY);
+            }
             assert!(result.is_err());
         }
     }
