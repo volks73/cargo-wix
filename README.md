@@ -42,8 +42,8 @@ dependencies are installed before proceeding.
 - [Windows SDK] (Optional), needed for signing the installer
 
 >[!IMPORTANT]
->The WiX Toolset is available in two different variants: Legacy (v3.14.1) and
->Modern (v4+). The Legacy variant uses a two-stage approach with a compiler,
+>The [WiX Toolset] is available in two different variants: [Legacy] (v3.14.1) and
+>[Modern] (v4+). The Legacy variant uses a two-stage approach with a compiler,
 >`candle.exe`, and a linker, `light.exe`. The Modern variant uses a single stage
 >approach with a single executable, `wix.exe`, and a new XML schema and
 >namespace. The Legacy variant is no longer supported by the WiX Toolset
@@ -53,9 +53,13 @@ dependencies are installed before proceeding.
 
 >[!WARNING]
 >As of April 3rd, 2026, the `windows-latest` GitHub Action image still only
->contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant,
+>contains the [Legacy] variant, v3.14.1, of the WiX Toolset. If the [Modern] variant,
 >v4+, of the WiX Toolset is desired, then a newer version will needed to be
 >explicitly installed as a step in the action _before_ any `cargo wix` commands.
+
+>[!WARNING]
+>The [Legacy] (v3.14.1) variant of the [WiX Toolset] does _not_ support Windows
+>ARM64. Only the [Modern] (v4+) variant supports Windows ARM64.
 
 Once the prerequisites have been installed, execute the following command to
 install the `cargo wix` subcommand.
@@ -205,9 +209,11 @@ information about licensing and copyright.
 [documentation]: https://volks73.github.io/cargo-wix/cargo_wix/index.html
 [firegiant]: https://www.firegiant.com
 [git bash]: https://gitforwindows.org/
+[legacy]: https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm
 [license-apache]: https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE
 [license-mit]: https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT
 [mit license]: https://opensource.org/licenses/MIT
+[modern]: https://github.com/wixtoolset/wix/releases
 [powershell]: https://learn.microsoft.com/en-us/powershell/
 [rust]: https://www.rust-lang.org
 [signtool]: https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool
