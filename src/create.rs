@@ -27,25 +27,25 @@
 //! `--migrate` flag can be used to automatically convert WiX v3 source files
 //! and install required extension packages before building.
 
-use crate::toolset::Includes;
-use crate::toolset::ProjectProvider;
-use crate::toolset::Toolset;
-use crate::toolset::ToolsetSetupMode;
-use crate::Cultures;
-use crate::Error;
-use crate::Result;
-use crate::WixArch;
 use crate::BINARY_FOLDER_NAME;
 use crate::CARGO;
+use crate::Cultures;
 use crate::EXE_FILE_EXTENSION;
-use crate::MSIEXEC;
+use crate::Error;
 use crate::MSI_FILE_EXTENSION;
+use crate::MSIEXEC;
+use crate::Result;
 use crate::WIX;
 use crate::WIX_COMPILER;
 use crate::WIX_LINKER;
 use crate::WIX_MODERN_TOOLSET;
 use crate::WIX_OBJECT_FILE_EXTENSION;
 use crate::WIX_PATH_KEY;
+use crate::WixArch;
+use crate::toolset::Includes;
+use crate::toolset::ProjectProvider;
+use crate::toolset::Toolset;
+use crate::toolset::ToolsetSetupMode;
 use itertools::Itertools;
 use log::error;
 use log::{debug, info, trace, warn};
@@ -1016,7 +1016,9 @@ impl Execution {
                 path.to_owned()
             }
         } else {
-            trace!("Using the package's manifest (Cargo.toml) file path to specify the MSI destination");
+            trace!(
+                "Using the package's manifest (Cargo.toml) file path to specify the MSI destination"
+            );
             target_directory.join(WIX).join(filename)
         }
     }

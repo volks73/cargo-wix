@@ -40,7 +40,7 @@ use toml::{Table, Value};
 
 use wix::create::Builder;
 use wix::initialize;
-use wix::{Result, CARGO_MANIFEST_FILE, WIX};
+use wix::{CARGO_MANIFEST_FILE, Result, WIX};
 
 lazy_static! {
     static ref TARGET_WIX_DIR: PathBuf = {

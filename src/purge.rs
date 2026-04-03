@@ -15,11 +15,11 @@
 //! The implementation for the `purge` command. This command is focused on
 //! removing all files associated with `cargo wix` subcommand.
 
-use crate::clean;
+use crate::CARGO_MANIFEST_FILE;
 use crate::Error;
 use crate::Result;
-use crate::CARGO_MANIFEST_FILE;
 use crate::WIX;
+use crate::clean;
 
 use log::{debug, info, trace, warn};
 

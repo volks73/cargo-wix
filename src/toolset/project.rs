@@ -23,12 +23,12 @@ use crate::create::InstallerKind;
 use crate::toolset::ToolsetCommand;
 
 use super::source::WixSource;
-use super::{ext::PackageCache, Toolset};
+use super::{Toolset, ext::PackageCache};
 use clap::ValueEnum;
 use log::debug;
 use std::collections::BTreeSet;
 use std::{collections::BTreeMap, path::PathBuf};
-use sxd_xpath::{evaluate_xpath, Context, Factory, Value};
+use sxd_xpath::{Context, Factory, Value, evaluate_xpath};
 
 /// Wix3 XML Namespace URI
 const LEGACY_NAMESPACE_URI: &str = "http://schemas.microsoft.com/wix/2006/wi";
@@ -360,11 +360,11 @@ pub(crate) mod tests {
     use crate::{
         tests::setup_project,
         toolset::{
+            Includes, ProjectProvider, Toolset, ToolsetAction,
             ext::{WellKnownExtentions, WixExtension},
-            project::{open_wxs_source, WxsSchema},
+            project::{WxsSchema, open_wxs_source},
             source::WixSource,
             test::{self, ok_stdout},
-            Includes, ProjectProvider, Toolset, ToolsetAction,
         },
     };
     use serial_test::serial;
@@ -393,9 +393,11 @@ pub(crate) mod tests {
         });
 
         let project = Project::try_new(shim).unwrap();
-        assert!(project
-            .package_cache
-            .installed(&WellKnownExtentions::Powershell));
+        assert!(
+            project
+                .package_cache
+                .installed(&WellKnownExtentions::Powershell)
+        );
         assert!(project.package_cache.installed(&WellKnownExtentions::VS));
     }
 
@@ -455,13 +457,15 @@ pub(crate) mod tests {
     }
 
     pub fn validate_wxs_ext(source: &WixSource, ext: impl WixExtension) {
-        assert!(source
-            .exts
-            .iter()
-            .find(|e| e.package_name() == ext.package_name()
-                && e.namespace_prefix() == ext.namespace_prefix()
-                && e.namespace_uri() == ext.namespace_uri())
-            .is_some());
+        assert!(
+            source
+                .exts
+                .iter()
+                .find(|e| e.package_name() == ext.package_name()
+                    && e.namespace_prefix() == ext.namespace_prefix()
+                    && e.namespace_uri() == ext.namespace_uri())
+                .is_some()
+        );
     }
 
     pub struct TestProject {

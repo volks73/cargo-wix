@@ -1256,8 +1256,8 @@
 use clap::builder::EnumValueParser;
 use clap::{Arg, ArgAction, Command};
 
-use env_logger::fmt::style::{AnsiColor as LogColor, Style};
 use env_logger::Builder;
+use env_logger::fmt::style::{AnsiColor as LogColor, Style};
 
 use log::{Level, LevelFilter};
 use std::io::Write;
@@ -1272,7 +1272,7 @@ use wix::migrate;
 use wix::print;
 use wix::purge;
 use wix::sign;
-use wix::{Template, BINARY_FOLDER_NAME, WIX_PATH_KEY};
+use wix::{BINARY_FOLDER_NAME, Template, WIX_PATH_KEY};
 
 pub const PKG_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 pub const PKG_NAME: &str = env!("CARGO_PKG_NAME");

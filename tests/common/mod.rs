@@ -13,8 +13,8 @@ use self::sxd_xpath::{Context, Factory};
 
 use assert_fs::TempDir;
 
-use env_logger::fmt::style::{AnsiColor as LogColor, Style};
 use env_logger::Builder;
+use env_logger::fmt::style::{AnsiColor as LogColor, Style};
 
 use log::{Level, LevelFilter};
 

@@ -367,7 +367,7 @@ mod tests {
     use std::path::PathBuf;
 
     use super::PackageCache;
-    use crate::toolset::{ext::WellKnownExtentions, test, ToolsetAction};
+    use crate::toolset::{ToolsetAction, ext::WellKnownExtentions, test};
     use semver::Version;
 
     #[test]

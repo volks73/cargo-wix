@@ -25,14 +25,14 @@
 use camino::Utf8PathBuf;
 use cargo_metadata::Package;
 
-use crate::print;
-use crate::stored_path::StoredPathBuf;
-use crate::toolset::project::WxsSchema;
 use crate::Error;
 use crate::Result;
 use crate::WIX;
 use crate::WIX_SOURCE_FILE_EXTENSION;
 use crate::WIX_SOURCE_FILE_NAME;
+use crate::print;
+use crate::stored_path::StoredPathBuf;
+use crate::toolset::project::WxsSchema;
 
 use log::{debug, info, trace};
 
@@ -505,7 +505,9 @@ impl Execution {
             trace!("An output path has been explicitly specified");
             Utf8PathBuf::from_path_buf(output.to_owned()).unwrap()
         } else {
-            trace!("An output path has NOT been explicitly specified. Implicitly determine output from manifest location.");
+            trace!(
+                "An output path has NOT been explicitly specified. Implicitly determine output from manifest location."
+            );
             package
                 .manifest_path
                 .parent()

@@ -467,7 +467,10 @@ impl fmt::Display for Error {
             Error::Io(ref err) => match err.kind() {
                 ErrorKind::AlreadyExists => {
                     if let Some(path) = err.get_ref() {
-                        write!(f, "The '{path}' file already exists. Use the '--force' flag to overwrite the contents.")
+                        write!(
+                            f,
+                            "The '{path}' file already exists. Use the '--force' flag to overwrite the contents."
+                        )
                     } else {
                         err.fmt(f)
                     }

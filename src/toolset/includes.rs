@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{toolset::Toolset, Error, WIX, WIX_SOURCE_FILE_EXTENSION};
+use crate::{Error, WIX, WIX_SOURCE_FILE_EXTENSION, toolset::Toolset};
 use cargo_metadata::Package;
 use log::{debug, trace};
 use std::path::PathBuf;

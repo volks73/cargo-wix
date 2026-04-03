@@ -37,7 +37,7 @@ use wix::{
     WIX_SOURCE_FILE_NAME,
 };
 
-use crate::common::{add_license_to_package, init_logging, SUBPACKAGE1_NAME, SUBPACKAGE2_NAME};
+use crate::common::{SUBPACKAGE1_NAME, SUBPACKAGE2_NAME, add_license_to_package, init_logging};
 
 lazy_static! {
     static ref MAIN_WXS: String = WIX_SOURCE_FILE_NAME.to_owned() + "." + WIX_SOURCE_FILE_EXTENSION;
