@@ -21,7 +21,9 @@ C:\Path\To\Project\>cargo wix init
 C:\Path\To\Project\>cargo wix
 ```
 
-The Windows installer (msi) for the project will be in the `C:\Path\To\Project\target\wix` folder. Please see the [Documentation](https://volks73.github.io/cargo-wix/cargo_wix/index.html) for more advanced usage, configuration, and customization.
+The Windows installer (MSI) for the project will be in the
+`C:\Path\To\Project\target\wix` folder. Please see the [Documentation] for more
+advanced usage, configuration, and customization.
 
 ## Installation
 
@@ -114,6 +116,7 @@ PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item En
 The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE) files for more information about licensing and copyright.
 
 [cargo]: http://doc.crates.io/
+[documentation]: https://volks73.github.io/cargo-wix/cargo_wix/index.html
 [rust]: https://www.rust-lang.org
 [signtool]: https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool
 [windows sdk]: https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads
