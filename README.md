@@ -39,6 +39,8 @@ automatically when installing the Rust programming language. The
 - [WiX Toolset] [v3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm) or [newer](https://github.com/wixtoolset/wix/releases)
 - [Windows SDK] (Optional), needed for signing the installer
 
+
+
 After installing and configuring the dependencies, execute the following command
 to install the `cargo-wix` subcommand:
 
@@ -161,9 +163,12 @@ three lines/commands are optional and unsets the three environment variables to
 avoid additional tests from also persisting, logging, and dumping output to the
 terminal/console. 
 
-Note, the `-- --nocapture` option is _not_ needed to display the logging
+[!NOTE]
+The `-- --nocapture` option is _not_ needed to display the logging
 statements or the output from the WiX Toolset compiler (candle.exe) and linker
-(light.exe). Here is the same example with [Powershell]:
+(light.exe). 
+
+Here is the same example with [Powershell]:
 
 ```powershell
 PS C:\Path\to\Cargo\Wix> $env:CARGO_WIX_TEST_PERSIST=1; $env:CARGO_WIX_TEST_LOG=5; $env:CARGO_WIX_TEST_NO_CAPTURE=1; 
