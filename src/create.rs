@@ -689,11 +689,9 @@ impl Execution {
             trace!("Appending compiler arguments");
             compiler.args(args);
         }
-        if self.toolset.is_modern() {
-            if let Some(args) = &linker_args {
+        if self.toolset.is_modern() && let Some(args) = &linker_args {
                 trace!("Appending linker arguments to wix build");
                 compiler.args(args);
-            }
         }
         compiler.args(&wxs_sources);
         debug!("command = {:?}", compiler);
