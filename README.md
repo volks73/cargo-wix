@@ -32,30 +32,30 @@ programming language, but the [WiX Toolset] is Windows only; thus, this project 
 only useful when installed on a Windows machine. Ensure the following
 dependencies are installed before proceeding. 
 
-[!NOTE]
-Cargo is installed automatically when installing the Rust programming language.
-The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
+>[!NOTE]
+>Cargo is installed automatically when installing the Rust programming language.
+>The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
 
 - [Cargo]
 - [Rust v1.78.0 or newer](https://www.rust-lang.org)
 - [WiX Toolset] [v3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm) or [newer](https://github.com/wixtoolset/wix/releases)
 - [Windows SDK] (Optional), needed for signing the installer
 
-[!IMPORTANT]
-The WiX Toolset is available in two different variants: Legacy (v3.14.1) and
-Modern (v4+). The Legacy variant uses a two-stage approach with a compiler,
-`candle.exe`, and a linker, `light.exe`. The Modern variant uses a single stage
-approach with a single executable, `wix.exe`, and a new XML schema and
-namespace. The Legacy variant is no longer support by the WiX Toolset
-developers, [FireGiant]. Both variants are supported by the cargo-wix project
-and the `cargo wix` subcommand, but usage of the Legacy variant is currently the
-default.
+>[!IMPORTANT]
+>The WiX Toolset is available in two different variants: Legacy (v3.14.1) and
+>Modern (v4+). The Legacy variant uses a two-stage approach with a compiler,
+>`candle.exe`, and a linker, `light.exe`. The Modern variant uses a single stage
+>approach with a single executable, `wix.exe`, and a new XML schema and
+>namespace. The Legacy variant is no longer support by the WiX Toolset
+>developers, [FireGiant]. Both variants are supported by the cargo-wix project
+>and the `cargo wix` subcommand, but usage of the Legacy variant is currently the
+>default.
 
-[!WARNING]
-As of April 3rd, 2026, the `windows-latest` GitHub Action image still only
-contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant
-of the WiX Toolset is desired, then a newer version will needed to be explicitly
-installed as a step in the action _before_ any `cargo wix` commands.
+>[!WARNING]
+>As of April 3rd, 2026, the `windows-latest` GitHub Action image still only
+>contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant
+>of the WiX Toolset is desired, then a newer version will needed to be explicitly
+>installed as a step in the action _before_ any `cargo wix` commands.
 
 Once the prerequisites have been installed, execute the following command to
 install the `cargo wix` subcommand.
@@ -179,10 +179,10 @@ three lines/commands are optional and unsets the three environment variables to
 avoid additional tests from also persisting, logging, and dumping output to the
 terminal/console. 
 
-[!NOTE]
-The `-- --nocapture` option is _not_ needed to display the logging
-statements or the output from the WiX Toolset compiler (candle.exe) and linker
-(light.exe). 
+>[!NOTE]
+>The `-- --nocapture` option is _not_ needed to display the logging
+>statements or the output from the WiX Toolset compiler (candle.exe) and linker
+>(light.exe). 
 
 Here is the same example with [Powershell]:
 
