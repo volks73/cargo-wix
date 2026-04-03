@@ -223,7 +223,7 @@ fn product_name(product_name: Option<&String>, manifest: &Package) -> String {
     if let Some(p) = product_name {
         p.to_owned()
     } else {
-        manifest.name.clone()
+        manifest.name.to_string()
     }
 }
 
