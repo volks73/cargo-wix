@@ -1,6 +1,9 @@
 # cargo-wix: A cargo subcommand to create Windows installers
 
-A subcommand for [Cargo](http://doc.crates.io/) that builds a Windows installer (msi) using the [Wix Toolset](http://wixtoolset.org/) from the release build of a [Rust](https://www.rust-lang.org) binary project. It also supports signing the Windows installer if a code signing certificate is available using the [SignTool](https://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx) application available in the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk).
+A subcommand for [Cargo] that builds a Windows installer (MSI) using the [Wix
+Toolset] from the build of a [Rust] binary project. It also supports signing the
+Windows installer if a code signing certificate is available using the
+[SignTool] application available in the [Windows SDK].
 
 [![Crates.io](https://img.shields.io/crates/v/cargo-wix.svg)](https://crates.io/crates/cargo-wix)
 [![GitHub release](https://img.shields.io/github/release/volks73/cargo-wix.svg)](https://github.com/volks73/cargo-wix/releases)
@@ -110,3 +113,8 @@ PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item En
 
 The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE) files for more information about licensing and copyright.
 
+[cargo]: http://doc.crates.io/
+[rust]: https://www.rust-lang.org
+[signtool]: https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool
+[windows sdk]: https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads
+[wix toolset]: http://wixtoolset.org/
