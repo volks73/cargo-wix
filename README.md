@@ -48,7 +48,9 @@ C:\> cargo install cargo-wix
 
 ## Usage
 
-Start a command prompt, such as `cmd.exe`, the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) installed with the [VC Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2017) (recommended), or [git bash](https://gitforwindows.org/), and navigate to the project's root folder. Run the subcommand:
+Start a command prompt, such as `cmd.exe`, the [Developer Prompt] installed with
+the [Build Tools for Visual Studio 2026], [Windows Terminal] with [Powershell],
+or [git bash], and navigate to the project's root folder. Run the subcommand:
 
 ```dos
 C:\Path\to\Project> cargo wix init
@@ -121,9 +123,14 @@ PS C:\Path\to\Cargo\Wix> Remove-Item Env:\CARGO_WIX_TEST_PERSIST; Remove-Item En
 
 The `cargo-wix` project is licensed under either the [MIT license](https://opensource.org/licenses/MIT) or [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). See the [LICENSE-MIT](https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT) or [LICENSE-APACHE](https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE) files for more information about licensing and copyright.
 
+[build tools for visual studio 2026]: https://visualstudio.microsoft.com/downloads/
 [cargo]: http://doc.crates.io/
+[developer prompt]: https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell
 [documentation]: https://volks73.github.io/cargo-wix/cargo_wix/index.html
+[git bash]: https://gitforwindows.org/
+[powershell]: https://learn.microsoft.com/en-us/powershell/
 [rust]: https://www.rust-lang.org
 [signtool]: https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool
 [windows sdk]: https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads
+[windows terminal]: https://learn.microsoft.com/en-us/windows/terminal/install
 [wix toolset]: http://wixtoolset.org/
