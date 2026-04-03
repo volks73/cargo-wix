@@ -46,16 +46,16 @@ dependencies are installed before proceeding.
 >Modern (v4+). The Legacy variant uses a two-stage approach with a compiler,
 >`candle.exe`, and a linker, `light.exe`. The Modern variant uses a single stage
 >approach with a single executable, `wix.exe`, and a new XML schema and
->namespace. The Legacy variant is no longer support by the WiX Toolset
+>namespace. The Legacy variant is no longer supported by the WiX Toolset
 >developers, [FireGiant]. Both variants are supported by the cargo-wix project
 >and the `cargo wix` subcommand, but usage of the Legacy variant is currently the
 >default.
 
 >[!WARNING]
 >As of April 3rd, 2026, the `windows-latest` GitHub Action image still only
->contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant
->of the WiX Toolset is desired, then a newer version will needed to be explicitly
->installed as a step in the action _before_ any `cargo wix` commands.
+>contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant,
+>v4+, of the WiX Toolset is desired, then a newer version will needed to be
+>explicitly installed as a step in the action _before_ any `cargo wix` commands.
 
 Once the prerequisites have been installed, execute the following command to
 install the `cargo wix` subcommand.
