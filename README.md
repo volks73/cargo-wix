@@ -58,8 +58,10 @@ dependencies are installed before proceeding.
 >explicitly installed as a step in the action _before_ any `cargo wix` commands.
 
 >[!WARNING]
->The [Legacy] (v3.14.1) variant of the [WiX Toolset] does _not_ support Windows
->ARM64. Only the [Modern] (v4+) variant supports Windows ARM64.
+>As of April 3rd, 2026, the GitHub Action Windows 11 ARM64 runner image does not
+>have the [WiX Toolset] installed. The [Legacy] or [Modern] variants will have
+>to be explicitly installed as a step in the action _before_ any `cargo wix`
+>commands. See <https://github.com/actions/partner-runner-images/blob/main/images/arm-windows-11-image.md#omitted-software>.
 
 Once the prerequisites have been installed, execute the following command to
 install the `cargo wix` subcommand.
