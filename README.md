@@ -1,6 +1,6 @@
 # cargo-wix: A cargo subcommand to create Windows installers
 
-A subcommand for [Cargo] that builds a Windows installer (MSI) using the [Wix
+A subcommand for [Cargo] that builds a Windows installer (MSI) using the [WiX
 Toolset] from the build of a [Rust] binary project. It also supports signing the
 Windows installer if a code signing certificate is available using the
 [SignTool] application available in the [Windows SDK].
@@ -28,7 +28,7 @@ advanced usage, configuration, and customization.
 ## Installation
 
 The cargo-wix project can be installed on any platform supported by the Rust
-programming language, but the Wix Toolset is Windows only; thus, this project is
+programming language, but the [WiX Toolset] is Windows only; thus, this project is
 only useful when installed on a Windows machine. Ensure the following
 dependencies are installed before proceeding. Note, Cargo is installed
 automatically when installing the Rust programming language. The
