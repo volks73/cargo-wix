@@ -506,9 +506,13 @@ mod tests {
 
         #[test]
         fn signer_with_nonexistent_environment_path_fails() {
-            env::set_var(SIGNTOOL_PATH_KEY, "Example");
+            unsafe {
+                env::set_var(SIGNTOOL_PATH_KEY, "Example");
+            }
             let result = Execution::default().signer();
-            env::remove_var(SIGNTOOL_PATH_KEY);
+            unsafe {
+                env::remove_var(SIGNTOOL_PATH_KEY);
+            }
             assert!(result.is_err());
         }
     }
