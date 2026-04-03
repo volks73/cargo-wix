@@ -1256,7 +1256,7 @@
 use clap::builder::EnumValueParser;
 use clap::{Arg, ArgAction, Command};
 
-use env_logger::fmt::Color as LogColor;
+use env_logger::fmt::style::{AnsiColor as LogColor, Style};
 use env_logger::Builder;
 
 use log::{Level, LevelFilter};
@@ -1976,19 +1976,18 @@ fn main() {
             // This implementation for a format is copied from the default format implemented for the
             // `env_logger` crate but modified to use a colon, `:`, to separate the level from the
             // message and change the colors to match the previous colors used by the `loggerv` crate.
-            let mut level_style = buf.style();
             let level = record.level();
-            match level {
+            let style = match level {
                 // Light Gray, or just Gray, is not a supported color for non-ANSI enabled Windows
                 // consoles, so TRACE and DEBUG statements are differentiated by boldness but use the
                 // same white color.
-                Level::Trace => level_style.set_color(LogColor::White).set_bold(false),
-                Level::Debug => level_style.set_color(LogColor::White).set_bold(true),
-                Level::Info => level_style.set_color(LogColor::Green).set_bold(true),
-                Level::Warn => level_style.set_color(LogColor::Yellow).set_bold(true),
-                Level::Error => level_style.set_color(LogColor::Red).set_bold(true),
+                Level::Trace => Style::new().fg_color(Some(LogColor::White.into())),
+                Level::Debug => Style::new().fg_color(Some(LogColor::White.into())).bold(),
+                Level::Info => Style::new().fg_color(Some(LogColor::Green.into())).bold(),
+                Level::Warn => Style::new().fg_color(Some(LogColor::Yellow.into())).bold(),
+                Level::Error => Style::new().fg_color(Some(LogColor::Red.into())).bold(),
             };
-            let write_level = write!(buf, "{:>5}: ", level_style.value(level));
+            let write_level = write!(buf, "{style}{level:>5}{style:#}: ");
             let write_args = writeln!(buf, "{}", record.args());
             write_level.and(write_args)
         })
