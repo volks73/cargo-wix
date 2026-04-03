@@ -245,9 +245,7 @@ fn input_with_output_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => {
-                        t.insert(String::from("license"), Value::from("MIT"))
-                    }
+                    Value::Table(t) => t.insert(String::from("license"), Value::from("MIT")),
                     _ => panic!("The 'package' section is not a table"),
                 };
                 Some(p)
@@ -379,9 +377,7 @@ fn mit_license_id_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => {
-                        t.insert(String::from("license"), Value::from("MIT"))
-                    }
+                    Value::Table(t) => t.insert(String::from("license"), Value::from("MIT")),
                     _ => panic!("The 'package' section is not a table"),
                 };
                 Some(p)
@@ -449,9 +445,7 @@ fn apache2_license_id_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => {
-                        t.insert(String::from("license"), Value::from("Apache-2.0"))
-                    }
+                    Value::Table(t) => t.insert(String::from("license"), Value::from("Apache-2.0")),
                     _ => panic!("The 'package' section is not a table"),
                 };
                 Some(p)
@@ -519,9 +513,7 @@ fn gpl3_license_id_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => {
-                        t.insert(String::from("license"), Value::from("GPL-3.0"))
-                    }
+                    Value::Table(t) => t.insert(String::from("license"), Value::from("GPL-3.0")),
                     _ => panic!("The 'package' section is not a table"),
                 };
                 Some(p)
@@ -592,7 +584,7 @@ fn license_file_field_with_rtf_file_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => t.insert(
+                    Value::Table(t) => t.insert(
                         String::from("license-file"),
                         Value::from(package_license.path().to_str().unwrap()),
                     ),
@@ -657,7 +649,7 @@ fn license_file_field_with_txt_file_works() {
         toml.get_mut("package")
             .map(|p| {
                 match p {
-                    Value::Table(ref mut t) => t.insert(
+                    Value::Table(t) => t.insert(
                         String::from("license-file"),
                         Value::from(package_license.path().to_str().unwrap()),
                     ),
