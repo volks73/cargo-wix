@@ -30,9 +30,11 @@ advanced usage, configuration, and customization.
 The cargo-wix project can be installed on any platform supported by the Rust
 programming language, but the [WiX Toolset] is Windows only; thus, this project is
 only useful when installed on a Windows machine. Ensure the following
-dependencies are installed before proceeding. Note, Cargo is installed
-automatically when installing the Rust programming language. The
-`stable-x86_64-pc-windows-msvc` toolchain is recommended.
+dependencies are installed before proceeding. 
+
+[!NOTE]
+Cargo is installed automatically when installing the Rust programming language.
+The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
 
 - [Cargo]
 - [Rust v1.78.0 or newer](https://www.rust-lang.org)
