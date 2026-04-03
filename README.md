@@ -56,42 +56,65 @@ or [git bash], and navigate to the project's root folder. Run the subcommand:
 C:\Path\to\Project> cargo wix init
 ```
 
-This will create the `wix` folder in the project's root (along side the `Cargo.toml` file) and then it will create the `wix\main.wxs` file from the WiX Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file can be used without modification with the following command to create an installer for the project:
+This will create the `wix` folder in the project's root (along side the
+`Cargo.toml` file) and then it will create the `wix\main.wxs` file from the WiX
+Source (wxs) embedded within the subcommand. The generated `wix\main.wxs` file
+can be used without modification with the following command to create an
+installer for the project:
 
 ```dos
 C:\Path\to\Project> cargo wix
 ```
 
-The `cargo wix` subcommand without any arguments searches for a `wix\main.wxs` file, relative to the project's root. It will compile the `wix\main.wxs` file and then link the object file (`target\wix\build\main.wixobj`) to create the Windows installer (msi). The installer will be located in the `target\wix` folder. All artifacts of the installer compilation and linking process are placed within the `target\wix` folder. Paths in the `wix\main.wxs` file should be relative to the project's root, i.e. the same location as the `Cargo.toml` manifest file. 
+The `cargo wix` subcommand without any arguments searches for a `wix\main.wxs`
+file, relative to the project's root. It will compile the `wix\main.wxs` file
+and then link the object file (`target\wix\build\main.wixobj`) to create the
+Windows installer (MSI). The installer will be located in the `target\wix`
+folder. All artifacts of the installer compilation and linking process are
+placed within the `target\wix` folder. Paths in the `wix\main.wxs` file should
+be relative to the project's root, i.e. the same location as the `Cargo.toml`
+manifest file. 
 
-A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by specifying a path to it as an argument to the subcommand as follows:
+A different WiX Source (wxs) file from the `wix\main.wxs` file can be used by
+specifying a path to it as an argument to the subcommand as follows:
 
 ```dos
 C:\Path\to\Project> cargo wix Path\to\WiX\Source\File.wxs
 ```
 
-You can also automatically run the installer after creating it by specifying the `--install` argument:
+You can also automatically run the installer after creating it by specifying the
+`--install` argument:
 
 ```dos
 C:\Path\to\Project> cargo wix --install
 ```
 
-The `print <template>` subcommand, which prints one of the embedded templates to stdout, can be used to create the `main.wxs` file. A [WXS template](https://github.com/volks73/cargo-wix/blob/main/src/templates/main.wxs.mustache) file specifically designed to work with this subcommand is embedded within the `cargo-wix` binary during installation. Use the following commands to create a WiX Source file and use it to create an installer with this subcommand.
+The `print <template>` subcommand, which prints one of the embedded templates to
+stdout, can be used to create the `main.wxs` file. A [WXS template] file
+specifically designed to work with this subcommand is embedded within the
+`cargo-wix` binary during installation. Use the following commands to create a
+WiX Source file and use it to create an installer with this subcommand.
 
 ```dos
 C:\Path\to\Project> cargo wix print wxs > example.wxs
 C:\Path\to\Project> cargo wix example.wxs
 ```
 
-The WiX source file can be customized using a text editor, but modification of the XML preprocessor variables should be avoided to ensure the `cargo wix` command works properly. 
+The WiX source file can be customized using a text editor, but modification of
+the XML preprocessor variables should be avoided to ensure the `cargo wix`
+command works properly. 
 
-To sign the installer (msi) as part of the build process, ensure the `signtool` command is available in the PATH system environment variable or use the [Developer Prompt](https://msdn.microsoft.com/en-us/library/f35ctcxw.aspx) that was installed with the Windows 10 SDK, and use the `sign` sub-subcommand as follows: 
+To sign the installer (MSI) as part of the build process, ensure the `signtool`
+command is available in the `PATH` system environment variable or use the
+[Developer Prompt] that was installed with the Windows SDK, and use the `sign`
+sub-subcommand as follows: 
 
 ```dos
 C:\Path\to\Project> cargo wix sign
 ```
 
-Use the `-h,--help` flag to display information about additional options and features.
+Use the `-h,--help` flag to display information about additional options and
+features.
 
 ```dos
 C:\Path\to\Project> cargo wix -h
@@ -134,3 +157,4 @@ The `cargo-wix` project is licensed under either the [MIT license](https://opens
 [windows sdk]: https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads
 [windows terminal]: https://learn.microsoft.com/en-us/windows/terminal/install
 [wix toolset]: http://wixtoolset.org/
+[wxs template]: https://github.com/volks73/cargo-wix/blob/main/src/templates/main.v3.wxs.mustache
