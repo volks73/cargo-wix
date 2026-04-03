@@ -37,7 +37,7 @@ dependencies are installed before proceeding.
 >The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
 
 - [Cargo]
-- [Rust v1.78.0 or newer](https://www.rust-lang.org)
+- [Rust v1.88.0 or newer](https://www.rust-lang.org)
 - [WiX Toolset] [v3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm) or [newer](https://github.com/wixtoolset/wix/releases)
 - [Windows SDK] (Optional), needed for signing the installer
 
