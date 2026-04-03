@@ -41,10 +41,24 @@ The `stable-x86_64-pc-windows-msvc` toolchain is recommended.
 - [WiX Toolset] [v3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm) or [newer](https://github.com/wixtoolset/wix/releases)
 - [Windows SDK] (Optional), needed for signing the installer
 
+[!IMPORTANT]
+The WiX Toolset is available in two different variants: Legacy (v3.14.1) and
+Modern (v4+). The Legacy variant uses a two-stage approach with a compiler,
+`candle.exe`, and a linker, `light.exe`. The Modern variant uses a single stage
+approach with a single executable, `wix.exe`, and a new XML schema and
+namespace. The Legacy variant is no longer support by the WiX Toolset
+developers, [FireGiant]. Both variants are supported by the cargo-wix project
+and the `cargo wix` subcommand, but usage of the Legacy variant is currently the
+default.
 
+[!WARNING]
+As of April 3rd, 2026, the `windows-latest` GitHub Action image still only
+contains the Legacy variant, v3.14.1, of the WiX Toolset. If the Modern variant
+of the WiX Toolset is desired, then a newer version will needed to be explicitly
+installed as a step in the action _before_ any `cargo wix` commands.
 
-After installing and configuring the dependencies, execute the following command
-to install the `cargo-wix` subcommand:
+Once the prerequisites have been installed, execute the following command to
+install the `cargo wix` subcommand.
 
 ```dos
 C:\> cargo install cargo-wix
@@ -189,6 +203,7 @@ information about licensing and copyright.
 [cargo]: http://doc.crates.io/
 [developer prompt]: https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell
 [documentation]: https://volks73.github.io/cargo-wix/cargo_wix/index.html
+[firegiant]: https://www.firegiant.com
 [git bash]: https://gitforwindows.org/
 [license-apache]: https://github.com/volks73/cargo-wix/blob/main/LICENSE-APACHE
 [license-mit]: https://github.com/volks73/cargo-wix/blob/main/LICENSE-MIT
