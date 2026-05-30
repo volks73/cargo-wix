@@ -355,16 +355,13 @@ impl Execution {
     fn timestamp(&self, metadata: &Value) -> Option<String> {
         if let Some(timestamp) = &self.timestamp {
             Some(timestamp.to_owned())
-        } else if let Some(pkg_meta_wix_timestamp) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("timestamp"))
-            .and_then(|l| l.as_str())
-            .map(String::from)
-        {
-            Some(pkg_meta_wix_timestamp)
         } else {
-            None
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("timestamp"))
+                .and_then(|l| l.as_str())
+                .map(String::from)
         }
     }
 }
