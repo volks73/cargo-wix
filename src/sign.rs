@@ -15,14 +15,14 @@
 //! The implementation for the `sign` command. This command focuses on signing
 //! installers using the Windows SDK `signtool` application.
 
-use crate::Error;
-use crate::Result;
-use crate::TimestampServer;
 use crate::BINARY_FOLDER_NAME;
 use crate::EXE_FILE_EXTENSION;
+use crate::Error;
 use crate::MSI_FILE_EXTENSION;
+use crate::Result;
 use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
+use crate::TimestampServer;
 use crate::WIX;
 
 use log::{debug, info, trace};
