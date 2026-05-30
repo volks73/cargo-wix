@@ -15,14 +15,14 @@
 //! The implementation for the `sign` command. This command focuses on signing
 //! installers using the Windows SDK `signtool` application.
 
+use crate::Error;
+use crate::Result;
+use crate::TimestampServer;
 use crate::BINARY_FOLDER_NAME;
 use crate::EXE_FILE_EXTENSION;
-use crate::Error;
 use crate::MSI_FILE_EXTENSION;
-use crate::Result;
 use crate::SIGNTOOL;
 use crate::SIGNTOOL_PATH_KEY;
-use crate::TimestampServer;
 use crate::WIX;
 
 use log::{debug, info, trace};
@@ -355,16 +355,13 @@ impl Execution {
     fn timestamp(&self, metadata: &Value) -> Option<String> {
         if let Some(timestamp) = &self.timestamp {
             Some(timestamp.to_owned())
-        } else if let Some(pkg_meta_wix_timestamp) = metadata
-            .get("wix")
-            .and_then(|w| w.as_object())
-            .and_then(|t| t.get("timestamp"))
-            .and_then(|l| l.as_str())
-            .map(String::from)
-        {
-            Some(pkg_meta_wix_timestamp)
         } else {
-            None
+            metadata
+                .get("wix")
+                .and_then(|w| w.as_object())
+                .and_then(|t| t.get("timestamp"))
+                .and_then(|l| l.as_str())
+                .map(String::from)
         }
     }
 }
